@@ -11,11 +11,10 @@ const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(file
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
+  base: '/CyberUI/',
   plugins: [
-    react(), 
-    tailwindcss({
-      config: path.resolve(__dirname, 'tailwind.config.js'), // ✅ 明確指定 config 路徑
-    }),
+    react(),
+    tailwindcss(),
   ],
   test: {
     projects: [{
