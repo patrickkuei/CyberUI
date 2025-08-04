@@ -42,7 +42,7 @@ export default defineConfig(({ mode }) => ({
           'react-dom': 'ReactDOM',
         },
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name === 'style.css') return 'style.css';
+          if (assetInfo.name === 'style.css') return 'cyberui-2045.css';
           return assetInfo.name as string;
         },
       },
