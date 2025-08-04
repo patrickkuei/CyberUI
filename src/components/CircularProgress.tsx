@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface CircularProgressProps {
+export interface CircularProgressProps {
   progress: number;
   radius: number;
   className?: string;

@@ -15,7 +15,16 @@ const preview: Preview = {
       // 'error' - fail CI on a11y violations
       // 'off' - skip a11y checks entirely
       test: 'todo'
+    },
+    backgrounds: {
+      options: {
+        light: { name: 'light', value: '#ffffff' },
+        dark: { name: 'dark', value: '#222222' },
+      },
     }
+  },
+  initialGlobals: {
+    backgrounds: { value: 'dark' },
   },
 };
 

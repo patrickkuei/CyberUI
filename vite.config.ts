@@ -2,6 +2,8 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite'
+import { resolve } from 'path';
+import dts from 'vite-plugin-dts';
 
 // https://vite.dev/config/
 import path from 'node:path';
@@ -10,12 +12,43 @@ import { storybookTest } from '@storybook/addon-vitest/vitest-plugin';
 const dirname = typeof __dirname !== 'undefined' ? __dirname : path.dirname(fileURLToPath(import.meta.url));
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
   base: '/CyberUI/',
   plugins: [
     react(),
     tailwindcss(),
+    ...(mode === 'library' ? [dts({
+      insertTypesEntry: true,
+      tsconfigPath: './tsconfig.app.json',
+      compilerOptions: {
+        noEmit: false,
+        declaration: true,
+        emitDeclarationOnly: false
+      }
+    })] : []),
   ],
+  build: mode === 'library' ? {
+    lib: {
+      entry: resolve(__dirname, 'src/index.ts'),
+      name: 'CyberUI',
+      formats: ['es', 'umd'],
+      fileName: (format) => `index.${format === 'es' ? 'es.js' : 'js'}`,
+    },
+    rollupOptions: {
+      external: ['react', 'react-dom'],
+      output: {
+        globals: {
+          react: 'React',
+          'react-dom': 'ReactDOM',
+        },
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name === 'style.css') return 'style.css';
+          return assetInfo.name as string;
+        },
+      },
+    },
+    cssCodeSplit: false,
+  } : undefined,
   test: {
     projects: [{
       extends: true,
@@ -39,4 +72,4 @@ export default defineConfig({
       }
     }]
   }
-});
+}));

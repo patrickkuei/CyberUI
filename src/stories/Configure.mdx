@@ -1,364 +1,299 @@
 import { Meta } from "@storybook/addon-docs/blocks";
 
-import Github from "./assets/github.svg";
-import Discord from "./assets/discord.svg";
-import Youtube from "./assets/youtube.svg";
-import Tutorials from "./assets/tutorials.svg";
-import Styling from "./assets/styling.png";
-import Context from "./assets/context.png";
-import Assets from "./assets/assets.png";
-import Docs from "./assets/docs.png";
-import Share from "./assets/share.png";
-import FigmaPlugin from "./assets/figma-plugin.png";
-import Testing from "./assets/testing.png";
-import Accessibility from "./assets/accessibility.png";
-import Theming from "./assets/theming.png";
-import AddonLibrary from "./assets/addon-library.png";
-
-export const RightArrow = () => <svg 
-    viewBox="0 0 14 14" 
-    width="8px" 
-    height="14px" 
-    style={{ 
-      marginLeft: '4px',
-      display: 'inline-block',
-      shapeRendering: 'inherit',
-      verticalAlign: 'middle',
-      fill: 'currentColor',
-      'path fill': 'currentColor'
-    }}
->
-  <path d="m11.1 7.35-5.5 5.5a.5.5 0 0 1-.7-.7L10.04 7 4.9 1.85a.5.5 0 1 1 .7-.7l5.5 5.5c.2.2.2.5 0 .7Z" />
-</svg>
-
-<Meta title="Configure your project" />
-
-<div className="sb-container">
-  <div className='sb-section-title'>
-    # Configure your project
-
-    Because Storybook works separately from your app, you'll need to configure it for your specific stack and setup. Below, explore guides for configuring Storybook with popular frameworks and tools. If you get stuck, learn how you can ask for help from our community.
-  </div>
-  <div className="sb-section">
-    <div className="sb-section-item">
-      <img
-        src={Styling}
-        alt="A wall of logos representing different styling technologies"
-      />
-      <h4 className="sb-section-item-heading">Add styling and CSS</h4>
-      <p className="sb-section-item-paragraph">Like with web applications, there are many ways to include CSS within Storybook. Learn more about setting up styling within Storybook.</p>
-      <a
-        href="https://storybook.js.org/docs/configure/styling-and-css/?renderer=react"
-        target="_blank"
-      >Learn more<RightArrow /></a>
-    </div>
-    <div className="sb-section-item">
-      <img
-        src={Context}
-        alt="An abstraction representing the composition of data for a component"
-      />
-      <h4 className="sb-section-item-heading">Provide context and mocking</h4>
-      <p className="sb-section-item-paragraph">Often when a story doesn't render, it's because your component is expecting a specific environment or context (like a theme provider) to be available.</p>
-      <a
-        href="https://storybook.js.org/docs/writing-stories/decorators/?renderer=react#context-for-mocking"
-        target="_blank"
-      >Learn more<RightArrow /></a>
-    </div>
-    <div className="sb-section-item">
-      <img src={Assets} alt="A representation of typography and image assets" />
-      <div>
-        <h4 className="sb-section-item-heading">Load assets and resources</h4>
-        <p className="sb-section-item-paragraph">To link static files (like fonts) to your projects and stories, use the
-        `staticDirs` configuration option to specify folders to load when
-        starting Storybook.</p>
-        <a
-          href="https://storybook.js.org/docs/configure/images-and-assets/?renderer=react"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-    </div>
-  </div>
-</div>
-<div className="sb-container">
-  <div className='sb-section-title'>
-    # Do more with Storybook
-
-    Now that you know the basics, let's explore other parts of Storybook that will improve your experience. This list is just to get you started. You can customise Storybook in many ways to fit your needs.
-  </div>
-
-  <div className="sb-section">
-    <div className="sb-features-grid">
-      <div className="sb-grid-item">
-        <img src={Docs} alt="A screenshot showing the autodocs tag being set, pointing a docs page being generated" />
-        <h4 className="sb-section-item-heading">Autodocs</h4>
-        <p className="sb-section-item-paragraph">Auto-generate living,
-          interactive reference documentation from your components and stories.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-docs/autodocs/?renderer=react"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <img src={Share} alt="A browser window showing a Storybook being published to a chromatic.com URL" />
-        <h4 className="sb-section-item-heading">Publish to Chromatic</h4>
-        <p className="sb-section-item-paragraph">Publish your Storybook to review and collaborate with your entire team.</p>
-        <a
-          href="https://storybook.js.org/docs/sharing/publish-storybook/?renderer=react#publish-storybook-with-chromatic"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <img src={FigmaPlugin} alt="Windows showing the Storybook plugin in Figma" />
-        <h4 className="sb-section-item-heading">Figma Plugin</h4>
-        <p className="sb-section-item-paragraph">Embed your stories into Figma to cross-reference the design and live
-          implementation in one place.</p>
-        <a
-          href="https://storybook.js.org/docs/sharing/design-integrations/?renderer=react#embed-storybook-in-figma-with-the-plugin"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <img src={Testing} alt="Screenshot of tests passing and failing" />
-        <h4 className="sb-section-item-heading">Testing</h4>
-        <p className="sb-section-item-paragraph">Use stories to test a component in all its variations, no matter how
-          complex.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-tests/?renderer=react"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <img src={Accessibility} alt="Screenshot of accessibility tests passing and failing" />
-        <h4 className="sb-section-item-heading">Accessibility</h4>
-        <p className="sb-section-item-paragraph">Automatically test your components for a11y issues as you develop.</p>
-        <a
-          href="https://storybook.js.org/docs/writing-tests/accessibility-testing/?renderer=react"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-      <div className="sb-grid-item">
-        <img src={Theming} alt="Screenshot of Storybook in light and dark mode" />
-        <h4 className="sb-section-item-heading">Theming</h4>
-        <p className="sb-section-item-paragraph">Theme Storybook's UI to personalize it to your project.</p>
-        <a
-          href="https://storybook.js.org/docs/configure/theming/?renderer=react"
-          target="_blank"
-        >Learn more<RightArrow /></a>
-      </div>
-    </div>
-  </div>
-</div>
-<div className='sb-addon'>
-  <div className='sb-addon-text'>
-    <h4>Addons</h4>
-    <p className="sb-section-item-paragraph">Integrate your tools with Storybook to connect workflows.</p>
-    <a
-        href="https://storybook.js.org/addons/"
-        target="_blank"
-      >Discover all addons<RightArrow /></a>
-  </div>
-  <div className='sb-addon-img'>
-    <img src={AddonLibrary} alt="Integrate your tools with Storybook to connect workflows." />
-  </div>
-</div>
-
-<div className="sb-section sb-socials">
-    <div className="sb-section-item">
-      <img src={Github} alt="Github logo" className="sb-explore-image"/>
-      Join our contributors building the future of UI development.
-
-      <a
-        href="https://github.com/storybookjs/storybook"
-        target="_blank"
-      >Star on GitHub<RightArrow /></a>
-    </div>
-    <div className="sb-section-item">
-      <img src={Discord} alt="Discord logo" className="sb-explore-image"/>
-      <div>
-        Get support and chat with frontend developers.
-
-        <a
-          href="https://discord.gg/storybook"
-          target="_blank"
-        >Join Discord server<RightArrow /></a>
-      </div>
-    </div>
-    <div className="sb-section-item">
-      <img src={Youtube} alt="Youtube logo" className="sb-explore-image"/>
-      <div>
-        Watch tutorials, feature previews and interviews.
-
-        <a
-          href="https://www.youtube.com/@chromaticui"
-          target="_blank"
-        >Watch on YouTube<RightArrow /></a>
-      </div>
-    </div>
-    <div className="sb-section-item">
-      <img src={Tutorials} alt="A book" className="sb-explore-image"/>
-      <p>Follow guided walkthroughs on for key workflows.</p>
-
-      <a
-          href="https://storybook.js.org/tutorials/"
-          target="_blank"
-        >Discover tutorials<RightArrow /></a>
-    </div>
-</div>
+<Meta title="Welcome" />
 
 <style>
-  {`
-  .sb-container {
-    margin-bottom: 48px;
+{`
+  .sbdocs, .sbdocs-wrapper, .css-3rewwu {
+    padding: 0;
   }
 
-  .sb-section {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    gap: 20px;
+  .welcome-container {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
   }
 
-  img {
-    object-fit: cover;
+  .welcome-title {
+    font-size: 3rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #ff005d;
+    text-shadow: 0 0 8px #ff005d, 0 0 16px #ff005d;
   }
 
-  .sb-section-title {
-    margin-bottom: 32px;
+  .welcome-subtitle {
+    font-size: 1.25rem;
+    font-style: italic;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #00fff9;
   }
 
-  .sb-section a:not(h1 a, h2 a, h3 a) {
-    font-size: 14px;
-  }
-
-  .sb-section-item, .sb-grid-item {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .sb-section-item-heading {
-    padding-top: 20px !important;
-    padding-bottom: 5px !important;
-    margin: 0 !important;
-  }
-  .sb-section-item-paragraph {
-    margin: 0;
-    padding-bottom: 10px;
-  }
-
-  .sb-chevron {
-    margin-left: 5px;
-  }
-
-  .sb-features-grid {
+  .features-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-gap: 32px 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin: 3rem 0;
   }
 
-  .sb-socials {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+  .feature-card {
+    text-align: center;
+    padding: 1.5rem;
+    border: 1px solid #3c3c5e;
+    border-radius: 0.5rem;
+    background-color: #2d2d44;
+    transition: all 0.3s ease;
   }
 
-  .sb-socials p {
-    margin-bottom: 10px;
+  .feature-card:hover {
+    border-color: #ff005d;
+    box-shadow: 0 0 12px rgba(255, 0, 93, 0.3);
   }
 
-  .sb-explore-image {
-    max-height: 32px;
-    align-self: flex-start;
+  .feature-card h3 {
+    color: #00fff9;
+    margin-bottom: 0.5rem;
   }
 
-  .sb-addon {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    position: relative;
-    background-color: #EEF3F8;
-    border-radius: 5px;
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    background: #EEF3F8;
-    height: 180px;
-    margin-bottom: 48px;
-    overflow: hidden;
+  .feature-card p {
+    color: #8888aa;
   }
 
-  .sb-addon-text {
-    padding-left: 48px;
-    max-width: 240px;
+  .feature-icon {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: block;
+    color: #fffb00;
   }
 
-  .sb-addon-text h4 {
-    padding-top: 0px;
+  .section-divider {
+    margin: 2rem 0;
+    border: none;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #3c3c5e, transparent);
   }
 
-  .sb-addon-img {
-    position: absolute;
-    left: 345px;
-    top: 0;
-    height: 100%;
-    width: 200%;
-    overflow: hidden;
+  /* Code blocks and inline code styling */
+  pre {
+    background-color: #2d2d44;
+    border: 1px solid #3c3c5e;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    color: #e0e0e0;
   }
 
-  .sb-addon-img img {
-    width: 650px;
-    transform: rotate(-15deg);
-    margin-left: 40px;
-    margin-top: -72px;
-    box-shadow: 0 0 1px rgba(255, 255, 255, 0);
-    backface-visibility: hidden;
+  code {
+    background-color: #2d2d44;
+    color: #00fff9;
+    padding: 0.2em 0.4em;
+    border-radius: 0.25rem;
+    font-family: 'Courier New', monospace;
   }
 
-  @media screen and (max-width: 800px) {
-    .sb-addon-img {
-      left: 300px;
-    }
+  /* Headings - override Storybook defaults */
+  h1, h2, h3, h4, h5, h6,
+  .sbdocs h1, .sbdocs h2, .sbdocs h3, .sbdocs h4, .sbdocs h5, .sbdocs h6,
+  .sbdocs-wrapper h1, .sbdocs-wrapper h2, .sbdocs-wrapper h3, .sbdocs-wrapper h4, .sbdocs-wrapper h5, .sbdocs-wrapper h6 {
+    color: #ff005d !important;
   }
 
-  @media screen and (max-width: 600px) {
-    .sb-section {
-      flex-direction: column;
-    }
-
-    .sb-features-grid {
-      grid-template-columns: repeat(1, 1fr);
-    }
-
-    .sb-socials {
-      grid-template-columns: repeat(2, 1fr);
-    }
-
-    .sb-addon {
-      height: 280px;
-      align-items: flex-start;
-      padding-top: 32px;
-      overflow: hidden;
-    }
-
-    .sb-addon-text {
-      padding-left: 24px;
-    }
-
-    .sb-addon-img {
-      right: 0;
-      left: 0;
-      top: 130px;
-      bottom: 0;
-      overflow: hidden;
-      height: auto;
-      width: 124%;
-    }
-
-    .sb-addon-img img {
-      width: 1200px;
-      transform: rotate(-12deg);
-      margin-left: 0;
-      margin-top: 48px;
-      margin-bottom: -40px;
-      margin-left: -24px;
-    }
+  /* Paragraph text - override Storybook defaults */
+  p, .css-x28zkw p, .css-x28zkw :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)),
+  .sbdocs p, .sbdocs-wrapper p,
+  div:not(.feature-card) > p {
+    color: #e0e0e0 !important;
   }
-  `}
+
+  /* List styling - override Storybook defaults */
+  ul, ol, li,
+  .sbdocs ul, .sbdocs ol, .sbdocs li,
+  .sbdocs-wrapper ul, .sbdocs-wrapper ol, .sbdocs-wrapper li {
+    color: #e0e0e0 !important;
+  }
+
+  li {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Strong text - override Storybook defaults */
+  strong, b,
+  .sbdocs strong, .sbdocs b,
+  .sbdocs-wrapper strong, .sbdocs-wrapper b {
+    color: #00fff9 !important;
+    font-weight: 600;
+  }
+
+  /* Emphasis text - override Storybook defaults */
+  em, i,
+  .sbdocs em, .sbdocs i,
+  .sbdocs-wrapper em, .sbdocs-wrapper i {
+    color: #fffb00 !important;
+    font-style: italic;
+  }
+
+  /* Generic text content override */
+  .sbdocs, .sbdocs-wrapper {
+    color: #e0e0e0 !important;
+  }
+
+  /* Links styling */
+  a, .sbdocs a, .sbdocs-wrapper a {
+    color: #00fff9 !important;
+    text-decoration: underline;
+  }
+
+  a:hover, .sbdocs a:hover, .sbdocs-wrapper a:hover {
+    color: #ff005d !important;
+  }
+
+  /* Blockquote styling */
+  blockquote, .sbdocs blockquote, .sbdocs-wrapper blockquote {
+    color: #8888aa !important;
+    border-left: 3px solid #ff005d;
+    padding-left: 1rem;
+    font-style: italic;
+  }
+`}
 </style>
+
+<div className="welcome-container">
+
+<h1 className="welcome-title">CYBERUI</h1>
+<p className="welcome-subtitle">A cyberpunk-themed React UI library</p>
+
+Build futuristic interfaces with neon-styled components, smooth animations, and cyberpunk aesthetics. Perfect for sci-fi projects and modern web applications.
+
+<hr className="section-divider" />
+
+<div className="features-grid">
+
+<div className="feature-card">
+<div className="feature-icon">⚡</div>
+<h3>Fast & Lightweight</h3>
+<p>Optimized components with minimal bundle size</p>
+</div>
+
+<div className="feature-card">
+<div className="feature-icon">🎨</div>
+<h3>Cyberpunk Theme</h3>
+<p>Neon colors, glitch effects, and futuristic styling</p>
+</div>
+
+<div className="feature-card">
+<div className="feature-icon">📱</div>
+<h3>Fully Responsive</h3>
+<p>Works perfectly on all screen sizes</p>
+</div>
+
+<div className="feature-card">
+<div className="feature-icon">🔧</div>
+<h3>TypeScript Ready</h3>
+<p>Full TypeScript support with type definitions</p>
+</div>
+
+<div className="feature-card">
+<div className="feature-icon">♿</div>
+<h3>Accessible</h3>
+<p>Built with accessibility in mind</p>
+</div>
+
+<div className="feature-card">
+<div className="feature-icon">📚</div>
+<h3>Well Documented</h3>
+<p>Comprehensive documentation and examples</p>
+</div>
+
+</div>
+
+<hr className="section-divider" />
+
+## Quick Start
+
+### Installation
+
+```
+npm install cyberui
+```
+
+### Basic Usage
+
+```jsx
+import React from 'react';
+import { CircularProgress, Notification } from 'cyberui';
+
+function App() {
+  return (
+    <div>
+      <CircularProgress progress={75} size="large" />
+      <Notification
+        type="success"
+        title="System Online"
+        message="All systems operational"
+      />
+    </div>
+  );
+}
+```
+
+<hr className="section-divider" />
+
+## Available Components
+
+### 🏠 **Home Components**
+- Overview and welcome screens
+- Landing page elements
+
+### 🎛️ **Interactive Elements**
+- **CircularProgress** - Animated progress circles
+- **SegmentedProgress** - Multi-segment progress bars
+- **TabNavigation** - Cyberpunk-styled tabs
+
+### 📊 **Feedback Components**
+- **Notification** - Toast notifications with animations
+- Progress indicators and status displays
+
+### 🧩 **UI Elements**
+- Basic building blocks for cyberpunk interfaces
+- Themed containers and layouts
+
+<hr className="section-divider" />
+
+## Component Categories
+
+Navigate through the sidebar to explore:
+
+- **🏠 Home** - Welcome screens and overviews
+- **🎛️ Interactive** - Buttons, inputs, and controls
+- **📊 Feedback** - Progress bars and notifications
+- **🧩 Elements** - Basic UI components
+
+<hr className="section-divider" />
+
+## Getting Started
+
+1. **Browse Components** - Explore the sidebar navigation
+2. **View Examples** - See live interactive examples
+3. **Copy Code** - Use the code snippets in your project
+4. **Customize** - Adapt components to your needs
+
+<hr className="section-divider" />
+
+## Resources
+
+- **📖 Documentation** - Comprehensive guides and API references
+- **💻 GitHub** - Source code and contributions
+- **🎨 Design System** - Color palettes and theme variables
+- **🚀 Examples** - Live demos and use cases
+
+<hr className="section-divider" />
+
+*Ready to build the future? Start exploring the components in the sidebar →*
+
+</div>
+

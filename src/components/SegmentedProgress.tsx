@@ -1,7 +1,7 @@
 import React from 'react';
 import { PROGRESS_CONFIG } from '../constants';
 
-interface SegmentedProgressProps {
+export interface SegmentedProgressProps {
   progress: number;
   className?: string;
   children?: React.ReactNode;

@@ -1,6 +1,6 @@
 import React from 'react';
 
-interface NotificationProps {
+export interface NotificationProps {
   type: 'success' | 'warning' | 'error';
   title: string;
   message: string;

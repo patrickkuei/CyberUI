@@ -1,0 +1,47 @@
+# Development files
+.storybook/
+src/
+public/
+storybook-static/
+
+# Config files
+*.config.*
+tsconfig*.json
+vitest.shims.d.ts
+eslint.config.js
+
+# Git and version control
+.git*
+.github/
+
+# Dependencies
+node_modules/
+
+# Development docs
+CONTRIBUTING.md
+REFACTORING.md
+roadmap.md
+
+# Build artifacts
+dist-ssr/
+*.local
+
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Demo app files
+index.html

@@ -1,7 +1,7 @@
 import React from 'react';
 import type { Tab } from '../constants';
 
-interface TabNavigationProps {
+export interface TabNavigationProps {
   tabs: readonly Tab[];
   activeTab: Tab;
   onTabChange: (tab: Tab) => void;

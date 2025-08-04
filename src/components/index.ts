@@ -10,4 +10,8 @@ export { default as CircularProgress } from './CircularProgress';
 export { default as SegmentedProgress } from './SegmentedProgress';
 export { default as Notification } from './Notification';
 
-// CyberButton removed: not used in app code
+// Export component prop types
+export type { CircularProgressProps } from './CircularProgress';
+export type { NotificationProps } from './Notification';
+export type { SegmentedProgressProps } from './SegmentedProgress';
+export type { TabNavigationProps } from './TabNavigation';
