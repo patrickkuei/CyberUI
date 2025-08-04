@@ -1,40 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import CyberButton from '../components/CyberButton';
+// CyberButton story removed
+// CyberButton removed from codebase. Story disabled.
 
-const meta: Meta<typeof CyberButton> = {
-  title: 'Components/CyberButton',
-  component: CyberButton,
+// Default export to satisfy Storybook, but no stories are present.
+export default {
+  title: 'Components/CyberButton (removed)',
   parameters: {
-    layout: 'centered',
-  },
-  tags: ['autodocs'],
-  argTypes: {
-    children: { control: 'text' },
-    disabled: { control: 'boolean' },
-    className: { control: 'text' },
-  },
-};
-
-export default meta;
-
-type Story = StoryObj<typeof CyberButton>;
-
-export const Default: Story = {
-  args: {
-    children: 'Click Me',
-  },
-};
-
-export const Disabled: Story = {
-  args: {
-    children: 'Disabled',
-    disabled: true,
-  },
-};
-
-export const Large: Story = {
-  args: {
-    children: 'Large Button',
-    className: 'text-lg py-3 px-6',
+    docs: { description: { story: 'CyberButton has been removed from the codebase.' } },
   },
 };
