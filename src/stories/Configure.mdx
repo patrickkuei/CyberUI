@@ -1,299 +1,285 @@
-import { Meta } from "@storybook/addon-docs/blocks";
+import { Meta } from '@storybook/addon-docs/blocks';
 
 <Meta title="Welcome" />
 
 <style>
-{`
-  .sbdocs, .sbdocs-wrapper, .css-3rewwu {
-    padding: 0;
-  }
+  {`
+    .sbdocs,
+    .sbdocs-wrapper,
+    .css-3rewwu {
+      padding: 0;
+    }
 
-  .welcome-container {
-    max-width: 64rem;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #1a1a2e;
-    color: #e0e0e0;
-  }
+    .welcome-container {
+      max-width: 64rem;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+    }
 
-  .welcome-title {
-    font-size: 3rem;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-bottom: 1rem;
-    text-align: center;
-    color: #ff005d;
-    text-shadow: 0 0 8px #ff005d, 0 0 16px #ff005d;
-  }
+    .welcome-title {
+      font-size: 3rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      text-align: center;
+      color: #ff005d;
+      text-shadow: 0 0 8px #ff005d, 0 0 16px #ff005d;
+    }
 
-  .welcome-subtitle {
-    font-size: 1.25rem;
-    font-style: italic;
-    margin-bottom: 2rem;
-    text-align: center;
-    color: #00fff9;
-  }
+    .welcome-subtitle {
+      font-size: 1.25rem;
+      font-style: italic;
+      margin-bottom: 2rem;
+      text-align: center;
+      color: #00fff9;
+    }
 
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.5rem;
-    margin: 3rem 0;
-  }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 3rem 0;
+    }
 
-  .feature-card {
-    text-align: center;
-    padding: 1.5rem;
-    border: 1px solid #3c3c5e;
-    border-radius: 0.5rem;
-    background-color: #2d2d44;
-    transition: all 0.3s ease;
-  }
+    .feature-card {
+      text-align: center;
+      padding: 1.5rem;
+      border: 1px solid #3c3c5e;
+      border-radius: 0.5rem;
+      background-color: #2d2d44;
+      transition: all 0.3s ease;
+    }
 
-  .feature-card:hover {
-    border-color: #ff005d;
-    box-shadow: 0 0 12px rgba(255, 0, 93, 0.3);
-  }
+    .feature-card:hover {
+      border-color: #ff005d;
+      box-shadow: 0 0 12px rgba(255, 0, 93, 0.3);
+    }
 
-  .feature-card h3 {
-    color: #00fff9;
-    margin-bottom: 0.5rem;
-  }
+    .feature-card h3 {
+      color: #00fff9;
+      margin-bottom: 0.5rem;
+    }
 
-  .feature-card p {
-    color: #8888aa;
-  }
+    .feature-card p {
+      color: #8888aa;
+    }
 
-  .feature-icon {
-    font-size: 2rem;
-    margin-bottom: 1rem;
-    display: block;
-    color: #fffb00;
-  }
+    .feature-icon {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      display: block;
+      color: #fffb00;
+    }
 
-  .section-divider {
-    margin: 2rem 0;
-    border: none;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, #3c3c5e, transparent);
-  }
+    .section-divider {
+      margin: 2rem 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #3c3c5e, transparent);
+    }
 
-  /* Code blocks and inline code styling */
-  pre {
-    background-color: #2d2d44;
-    border: 1px solid #3c3c5e;
-    border-radius: 0.5rem;
-    padding: 1rem;
-    color: #e0e0e0;
-  }
+    /* Code blocks and inline code styling */
+    pre {
+      background-color: #2d2d44;
+      border: 1px solid #3c3c5e;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      color: #e0e0e0;
+    }
 
-  code {
-    background-color: #2d2d44;
-    color: #00fff9;
-    padding: 0.2em 0.4em;
-    border-radius: 0.25rem;
-    font-family: 'Courier New', monospace;
-  }
+    code {
+      background-color: #2d2d44;
+      color: #00fff9;
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      font-family: 'Courier New', monospace;
+    }
 
-  /* Headings - override Storybook defaults */
-  h1, h2, h3, h4, h5, h6,
-  .sbdocs h1, .sbdocs h2, .sbdocs h3, .sbdocs h4, .sbdocs h5, .sbdocs h6,
-  .sbdocs-wrapper h1, .sbdocs-wrapper h2, .sbdocs-wrapper h3, .sbdocs-wrapper h4, .sbdocs-wrapper h5, .sbdocs-wrapper h6 {
-    color: #ff005d !important;
-  }
+    /* Headings - override Storybook defaults */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .sbdocs h1,
+    .sbdocs h2,
+    .sbdocs h3,
+    .sbdocs h4,
+    .sbdocs h5,
+    .sbdocs h6,
+    .sbdocs-wrapper h1,
+    .sbdocs-wrapper h2,
+    .sbdocs-wrapper h3,
+    .sbdocs-wrapper h4,
+    .sbdocs-wrapper h5,
+    .sbdocs-wrapper h6 {
+      color: #ff005d !important;
+    }
 
-  /* Paragraph text - override Storybook defaults */
-  p, .css-x28zkw p, .css-x28zkw :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)),
-  .sbdocs p, .sbdocs-wrapper p,
-  div:not(.feature-card) > p {
-    color: #e0e0e0 !important;
-  }
+    /* Paragraph text - override Storybook defaults */
+    p,
+    .css-x28zkw p,
+    .css-x28zkw :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)),
+    .sbdocs p,
+    .sbdocs-wrapper p,
+    div:not(.feature-card) > p {
+      color: #e0e0e0 !important;
+    }
 
-  /* List styling - override Storybook defaults */
-  ul, ol, li,
-  .sbdocs ul, .sbdocs ol, .sbdocs li,
-  .sbdocs-wrapper ul, .sbdocs-wrapper ol, .sbdocs-wrapper li {
-    color: #e0e0e0 !important;
-  }
+    /* List styling - override Storybook defaults */
+    ul,
+    ol,
+    li,
+    .sbdocs ul,
+    .sbdocs ol,
+    .sbdocs li,
+    .sbdocs-wrapper ul,
+    .sbdocs-wrapper ol,
+    .sbdocs-wrapper li {
+      color: #e0e0e0 !important;
+    }
 
-  li {
-    margin-bottom: 0.5rem;
-  }
+    li {
+      margin-bottom: 0.5rem;
+    }
 
-  /* Strong text - override Storybook defaults */
-  strong, b,
-  .sbdocs strong, .sbdocs b,
-  .sbdocs-wrapper strong, .sbdocs-wrapper b {
-    color: #00fff9 !important;
-    font-weight: 600;
-  }
+    /* Strong text - override Storybook defaults */
+    strong,
+    b,
+    .sbdocs strong,
+    .sbdocs b,
+    .sbdocs-wrapper strong,
+    .sbdocs-wrapper b {
+      color: #00fff9 !important;
+      font-weight: 600;
+    }
 
-  /* Emphasis text - override Storybook defaults */
-  em, i,
-  .sbdocs em, .sbdocs i,
-  .sbdocs-wrapper em, .sbdocs-wrapper i {
-    color: #fffb00 !important;
-    font-style: italic;
-  }
+    /* Emphasis text - override Storybook defaults */
+    em,
+    i,
+    .sbdocs em,
+    .sbdocs i,
+    .sbdocs-wrapper em,
+    .sbdocs-wrapper i {
+      color: #fffb00 !important;
+      font-style: italic;
+    }
 
-  /* Generic text content override */
-  .sbdocs, .sbdocs-wrapper {
-    color: #e0e0e0 !important;
-  }
+    /* Generic text content override */
+    .sbdocs,
+    .sbdocs-wrapper {
+      color: #e0e0e0 !important;
+    }
 
-  /* Links styling */
-  a, .sbdocs a, .sbdocs-wrapper a {
-    color: #00fff9 !important;
-    text-decoration: underline;
-  }
+    /* Links styling */
+    a,
+    .sbdocs a,
+    .sbdocs-wrapper a {
+      color: #00fff9 !important;
+      text-decoration: underline;
+    }
 
-  a:hover, .sbdocs a:hover, .sbdocs-wrapper a:hover {
-    color: #ff005d !important;
-  }
+    a:hover,
+    .sbdocs a:hover,
+    .sbdocs-wrapper a:hover {
+      color: #ff005d !important;
+    }
 
-  /* Blockquote styling */
-  blockquote, .sbdocs blockquote, .sbdocs-wrapper blockquote {
-    color: #8888aa !important;
-    border-left: 3px solid #ff005d;
-    padding-left: 1rem;
-    font-style: italic;
-  }
-`}
+    /* Blockquote styling */
+    blockquote,
+    .sbdocs blockquote,
+    .sbdocs-wrapper blockquote {
+      color: #8888aa !important;
+      border-left: 3px solid #ff005d;
+      padding-left: 1rem;
+      font-style: italic;
+    }
+  `}
 </style>
 
 <div className="welcome-container">
+  <h1 className="welcome-title">CYBERUI</h1>
+  <p className="welcome-subtitle">A cyberpunk-themed React UI library</p>
 
-<h1 className="welcome-title">CYBERUI</h1>
-<p className="welcome-subtitle">A cyberpunk-themed React UI library</p>
+  Build futuristic interfaces with neon-styled components, smooth animations, and cyberpunk aesthetics. Perfect for sci-fi projects and modern web applications.
 
-Build futuristic interfaces with neon-styled components, smooth animations, and cyberpunk aesthetics. Perfect for sci-fi projects and modern web applications.
+  <hr className="section-divider" />
 
-<hr className="section-divider" />
-
-<div className="features-grid">
-
-<div className="feature-card">
-<div className="feature-icon">⚡</div>
-<h3>Fast & Lightweight</h3>
-<p>Optimized components with minimal bundle size</p>
-</div>
-
-<div className="feature-card">
-<div className="feature-icon">🎨</div>
-<h3>Cyberpunk Theme</h3>
-<p>Neon colors, glitch effects, and futuristic styling</p>
-</div>
-
-<div className="feature-card">
-<div className="feature-icon">📱</div>
-<h3>Fully Responsive</h3>
-<p>Works perfectly on all screen sizes</p>
-</div>
-
-<div className="feature-card">
-<div className="feature-icon">🔧</div>
-<h3>TypeScript Ready</h3>
-<p>Full TypeScript support with type definitions</p>
-</div>
-
-<div className="feature-card">
-<div className="feature-icon">♿</div>
-<h3>Accessible</h3>
-<p>Built with accessibility in mind</p>
-</div>
-
-<div className="feature-card">
-<div className="feature-icon">📚</div>
-<h3>Well Documented</h3>
-<p>Comprehensive documentation and examples</p>
-</div>
-
-</div>
-
-<hr className="section-divider" />
-
-## Quick Start
-
-### Installation
-
-```
-npm install cyberui
-```
-
-### Basic Usage
-
-```jsx
-import React from 'react';
-import { CircularProgress, Notification } from 'cyberui';
-
-function App() {
-  return (
-    <div>
-      <CircularProgress progress={75} size="large" />
-      <Notification
-        type="success"
-        title="System Online"
-        message="All systems operational"
-      />
+  <div className="features-grid">
+    <div className="feature-card">
+      <div className="feature-icon">⚡</div>
+      <h3>Fast & Lightweight</h3>
+      <p>Optimized components with minimal bundle size</p>
     </div>
-  );
-}
-```
 
-<hr className="section-divider" />
+    <div className="feature-card">
+      <div className="feature-icon">🎨</div>
+      <h3>Cyberpunk Theme</h3>
+      <p>Neon colors, glitch effects, and futuristic styling</p>
+    </div>
 
-## Available Components
+    <div className="feature-card">
+      <div className="feature-icon">📱</div>
+      <h3>Fully Responsive</h3>
+      <p>Works perfectly on all screen sizes</p>
+    </div>
 
-### 🏠 **Home Components**
-- Overview and welcome screens
-- Landing page elements
+    <div className="feature-card">
+      <div className="feature-icon">🔧</div>
+      <h3>TypeScript Ready</h3>
+      <p>Full TypeScript support with type definitions</p>
+    </div>
 
-### 🎛️ **Interactive Elements**
-- **CircularProgress** - Animated progress circles
-- **SegmentedProgress** - Multi-segment progress bars
-- **TabNavigation** - Cyberpunk-styled tabs
+    <div className="feature-card">
+      <div className="feature-icon">♿</div>
+      <h3>Accessible</h3>
+      <p>Built with accessibility in mind</p>
+    </div>
 
-### 📊 **Feedback Components**
-- **Notification** - Toast notifications with animations
-- Progress indicators and status displays
+    <div className="feature-card">
+      <div className="feature-icon">📚</div>
+      <h3>Well Documented</h3>
+      <p>Comprehensive documentation and examples</p>
+    </div>
+  </div>
 
-### 🧩 **UI Elements**
-- Basic building blocks for cyberpunk interfaces
-- Themed containers and layouts
+  <hr className="section-divider" />
 
-<hr className="section-divider" />
+  ## Quick Start
 
-## Component Categories
+  ### Installation
 
-Navigate through the sidebar to explore:
+  ```
+  npm install cyberui
+  ```
 
-- **🏠 Home** - Welcome screens and overviews
-- **🎛️ Interactive** - Buttons, inputs, and controls
-- **📊 Feedback** - Progress bars and notifications
-- **🧩 Elements** - Basic UI components
+  ### Basic Usage
 
-<hr className="section-divider" />
+  ```tsx
+  import React from 'react';
+  import { CircularProgress, Notification } from 'cyberui';
+  import 'cyberui/styles.css';
 
-## Getting Started
+  function App() {
+    return (
+      <div>
+        <CircularProgress progress={75} radius={20} className="w-32 h-32" />
+        <Notification
+          type="success"
+          title="System Online"
+          message="All systems operational"
+        />
+      </div>
+    );
+  }
+  ```
 
-1. **Browse Components** - Explore the sidebar navigation
-2. **View Examples** - See live interactive examples
-3. **Copy Code** - Use the code snippets in your project
-4. **Customize** - Adapt components to your needs
+  <hr className="section-divider" />
 
-<hr className="section-divider" />
-
-## Resources
-
-- **📖 Documentation** - Comprehensive guides and API references
-- **💻 GitHub** - Source code and contributions
-- **🎨 Design System** - Color palettes and theme variables
-- **🚀 Examples** - Live demos and use cases
-
-<hr className="section-divider" />
-
-*Ready to build the future? Start exploring the components in the sidebar →*
-
+  _Ready to build the future? Start exploring the components in the sidebar →_
 </div>
 

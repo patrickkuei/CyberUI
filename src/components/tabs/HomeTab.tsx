@@ -38,7 +38,7 @@ const HomeTab: React.FC = () => {
       {/* Call to action */}
       <div className="flex justify-center space-x-6 pt-8">
         <button
-          onClick={() => window.open('/storybook', '_blank')}
+          onClick={() => window.open('https://patrickkuei.github.io/CyberUI/storybook/', '_blank')}
           className="px-6 py-3 bg-primary text-base font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg shadow-primary/25"
         >
           View Documentation
