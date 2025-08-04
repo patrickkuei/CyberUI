@@ -37,5 +37,5 @@
 html,
 body {
   scrollbar-gutter: stable;
-  background-color: var(--color-base);
+  background-color: var;
 }

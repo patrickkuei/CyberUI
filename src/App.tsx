@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import "./index.css";
 
 const tabs = ["Home", "Interactive", "Elements", "Feedback"];
@@ -6,17 +6,63 @@ const tabs = ["Home", "Interactive", "Elements", "Feedback"];
 const DemoPage = () => {
   const [input, setInput] = useState("");
   const [activeTab, setActiveTab] = useState(tabs[0]);
+  const [progress, setProgress] = useState(0);
+  const [direction, setDirection] = useState(1); // 1 表示向上，-1 表示向下
+
+  useEffect(() => {
+    const max = 95;
+    const min = 5;
+
+    const interval = setInterval(() => {
+      setProgress((prev) => {
+        let next = prev + direction;
+
+        if (next >= max) {
+          next = max;
+          setDirection(-1);
+        } else if (next <= min) {
+          next = min;
+          setDirection(1);
+        }
+
+        return next;
+      });
+    }, 30);
+
+    return () => clearInterval(interval);
+  }, [direction]);
+
+  // 先前的雙半圓圓弧參數
+  const radius = 20;
+  const circumference = 2 * Math.PI * radius; // 約 125.66
+  const halfCircumference = circumference / 2;
+
+  const leftOffset = halfCircumference * (1 - progress / 100);
+  const rightOffset = halfCircumference * (1 - progress / 100);
+
+  // 新增：刻度圓環參數
+  const segmentAngle = 360 / 20;
+  const segmentCount = 20;
+  const outerRadius = 30; // 外圓半徑，比主要圓大一點，讓刻度在外圍
+  const gapAngle = 4; // 每格留 4 度間隙
+  const activeAngle = segmentAngle - gapAngle; // 每格實際角度
+
+  const innerR = 18.5;
+  const outerR = 23.5;
 
   const renderContent = () => {
     switch (activeTab) {
       case "Home":
         return (
           <div className="text-center">
-            <h2 className="text-5xl font-bold text-primary tracking-wider">
+            <h2 className="text-5xl font-semibold text-primary tracking-tight uppercase">
               Glitch in the System
             </h2>
-            <p className="text-muted mt-4 text-lg">
+            <p className="text-secondary mt-4 text-lg font-light italic tracking-wide">
               A UI Kit for the dystopian future.
+            </p>
+            <p className="text-muted mt-3 max-w-xl mx-auto font-normal leading-relaxed">
+              Futuristic neon components with animations and cyberpunk vibes.
             </p>
           </div>
         );
@@ -50,7 +96,7 @@ const DemoPage = () => {
                     placeholder="Enter command sequence..."
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    className="w-full px-4 py-3 rounded-lg border-2 border-accent bg-surface text-default placeholder-muted shadow-input-accent transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:shadow-lg-accent active:bg-base"
+                    className="w-full px-4 py-3 rounded-lg border-2 border-accent bg-surface text-default placeholder-muted shadow-input-accent hover:shadow-lg-accent transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:shadow-lg-accent active:bg-base"
                   />
                   <div className="text-xs text-muted font-mono">
                     {input.length > 0
@@ -68,7 +114,7 @@ const DemoPage = () => {
                     <input
                       type="text"
                       placeholder="Search corporate database..."
-                      className="w-full px-4 py-3 pl-10 rounded-lg border-2 border-secondary bg-surface text-default placeholder-muted shadow-secondary/30 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:shadow-secondary active:bg-base"
+                      className="w-full px-4 py-3 pl-10 rounded-lg border-2 border-secondary bg-surface text-default placeholder-muted shadow-secondary/30 hover:shadow-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:shadow-secondary active:bg-base"
                     />
                     <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
                       <svg
@@ -97,10 +143,10 @@ const DemoPage = () => {
                 System Actions
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 {/* Primary Action */}
                 <button
-                  className="group relative overflow-hidden py-4 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-linear-(--gradient-accent) text-base shadow-primary border-none transition-all duration-300 ease-in-out transform hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95"
+                  className="group relative overflow-hidden py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-linear-(--gradient-accent) text-base shadow-primary border-none transition-all duration-300 ease-in-out transform hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95 cursor-pointer"
                   onClick={() => alert("Initiating neural link protocol...")}
                 >
                   <span className="relative z-10">Execute Protocol</span>
@@ -109,7 +155,7 @@ const DemoPage = () => {
 
                 {/* Secondary Action */}
                 <button
-                  className="group py-4 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-secondary text-secondary shadow-secondary/30 transition-all duration-300 ease-in-out transform hover:bg-secondary hover:text-base hover:shadow-secondary hover:scale-105 focus:outline-none focus:ring-4 focus:ring-secondary active:scale-95"
+                  className="group py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-secondary text-secondary shadow-secondary/30 transition-all duration-300 ease-in-out transform hover:bg-secondary hover:text-base hover:shadow-secondary hover:scale-105 focus:outline-none focus:ring-4 focus:ring-secondary active:scale-95 cursor-pointer"
                   onClick={() => alert("Running system diagnostics...")}
                 >
                   <span className="relative z-10">Scan System</span>
@@ -117,12 +163,21 @@ const DemoPage = () => {
 
                 {/* Danger Action */}
                 <button
-                  className="group py-4 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-error text-error shadow-error/30 transition-all duration-300 ease-in-out transform hover:bg-error hover:text-base hover:shadow-error hover:scale-105 focus:outline-none focus:ring-4 focus:ring-error active:scale-95"
+                  className="group py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-error text-error shadow-error/30 transition-all duration-300 ease-in-out transform hover:bg-error hover:text-base hover:shadow-error hover:scale-105 focus:outline-none focus:ring-4 focus:ring-error active:scale-95 cursor-pointer"
                   onClick={() =>
                     alert("Warning: Initiating shutdown sequence...")
                   }
                 >
                   <span className="relative z-10">Emergency Stop</span>
+                </button>
+
+                <button
+                  onClick={() =>
+                    alert("Loading system diagnostics interface...")
+                  }
+                  className="group relative overflow-hidden py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-accent text-accent shadow-secondary transition-all duration-300 ease-in-out transform hover:bg-accent hover:text-base hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95"
+                >
+                  <span className="relative z-10">Run Diagnostics</span>
                 </button>
               </div>
             </div>
@@ -133,7 +188,7 @@ const DemoPage = () => {
                 Interactive Demo Card
               </h3>
 
-              <div className="bg-surface border-2 border-accent rounded-xl p-6 shadow-input-accent hover:shadow-lg-accent transition-all duration-300 transform hover:scale-[1.02]">
+              <div className="bg-surface border-2 border-accent rounded-xl p-6 shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform">
                 <div className="text-center space-y-6">
                   <div className="space-y-2">
                     <h4 className="text-xl font-semibold text-default">
@@ -161,10 +216,10 @@ const DemoPage = () => {
                   </div>
 
                   <div className="flex space-x-3">
-                    <button className="flex-1 py-2 px-4 rounded bg-primary text-base font-semibold hover:shadow-primary transition-all duration-300">
+                    <button className="flex-1 py-2 px-4 rounded bg-primary text-base font-semibold hover:shadow-primary transition-all duration-300 cursor-pointer">
                       Sync
                     </button>
-                    <button className="flex-1 py-2 px-4 rounded bg-surface border border-secondary text-secondary font-semibold hover:bg-secondary hover:text-base transition-all duration-300">
+                    <button className="flex-1 py-2 px-4 rounded bg-surface border border-secondary text-secondary font-semibold hover:bg-secondary hover:text-base transition-all duration-300 cursor-pointer">
                       Monitor
                     </button>
                   </div>
@@ -199,7 +254,7 @@ const DemoPage = () => {
                     Corporate Faction
                   </label>
                   <div className="relative">
-                    <select className="appearance-none w-full bg-surface border-2 border-accent text-default px-4 py-3 pr-10 rounded-lg shadow-input-accent focus:outline-none focus:ring-2 focus:ring-accent focus:border-primary transition-all duration-300">
+                    <select className="appearance-none w-full bg-surface border border-border-default text-default px-4 py-3 pr-10 rounded-lg shadow-primary focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-300">
                       <option>Arasaka Corporation</option>
                       <option>Militech Industries</option>
                       <option>Kang Tao Systems</option>
@@ -230,7 +285,7 @@ const DemoPage = () => {
                     <span className="text-default">Enable Ghost Mode</span>
                     <label className="relative inline-flex items-center cursor-pointer">
                       <input type="checkbox" className="sr-only peer" />
-                      <div className="w-14 h-7 bg-gray-600 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-accent/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-accent"></div>
+                      <div className="w-14 h-7 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-linear-(--gradient-accent)"></div>
                     </label>
                   </div>
                 </div>
@@ -337,7 +392,7 @@ const DemoPage = () => {
                       Successfully connected to the cybernet mainframe
                     </p>
                   </div>
-                  <button className="flex-shrink-0 text-base hover:text-base/70 transition-colors">
+                  <button className="flex-shrink-0 text-base hover:text-base/30 transition-colors cursor-pointer">
                     <svg
                       className="w-5 h-5"
                       fill="currentColor"
@@ -375,7 +430,7 @@ const DemoPage = () => {
                       Unauthorized access attempt detected on port 2077
                     </p>
                   </div>
-                  <button className="flex-shrink-0 text-muted hover:text-default transition-colors">
+                  <button className="flex-shrink-0 text-muted hover:text-default transition-colors cursor-pointer">
                     <svg
                       className="w-5 h-5"
                       fill="currentColor"
@@ -413,7 +468,7 @@ const DemoPage = () => {
                       Critical firewall failure - immediate action required
                     </p>
                   </div>
-                  <button className="flex-shrink-0 text-base hover:text-base/70 transition-colors">
+                  <button className="flex-shrink-0 text-base hover:text-base/30 transition-colors cursor-pointer">
                     <svg
                       className="w-5 h-5"
                       fill="currentColor"
@@ -436,17 +491,22 @@ const DemoPage = () => {
                 Loading States
               </h3>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {/* Linear Progress */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-default font-medium">
                       Data Transfer
                     </span>
-                    <span className="text-accent font-mono text-sm">68%</span>
+                    <span className="text-accent font-mono text-sm">
+                      {progress}%
+                    </span>
                   </div>
                   <div className="w-full bg-surface rounded-full h-3 shadow-inner">
-                    <div className="bg-gradient-to-r from-accent to-primary h-3 rounded-full w-[68%] shadow-lg-accent transition-all duration-500 ease-out"></div>
+                    <div
+                      className="bg-gradient-to-r from-accent to-primary h-3 rounded-full shadow-lg-accent transition-all duration-500 ease-out"
+                      style={{ width: `${progress}%` }}
+                    ></div>
                   </div>
                   <div className="text-xs text-muted">
                     Uploading neural patterns...
@@ -456,24 +516,51 @@ const DemoPage = () => {
                 {/* Circular Progress */}
                 <div className="flex flex-col items-center space-y-4">
                   <div className="relative w-20 h-20">
-                    <div className="absolute inset-0 animate-spin-slow">
-                      <svg className="w-full h-full" viewBox="0 0 50 50">
-                        <circle
-                          cx="25"
-                          cy="25"
-                          r="20"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="4"
-                          strokeLinecap="round"
-                          strokeDasharray="31.416"
-                          strokeDashoffset="7.854"
-                          className="text-accent"
-                        />
-                      </svg>
-                    </div>
+                    <svg
+                      className="w-full h-full overflow-visible"
+                      viewBox="0 0 50 50"
+                    >
+                      {/* 左半圓 */}
+                      <circle
+                        cx="25"
+                        cy="25"
+                        r={radius}
+                        fill="none"
+                        stroke="var(--color-accent)"
+                        strokeWidth="4"
+                        strokeLinecap="butt" // 改成 butt 避免圓角重疊
+                        strokeDasharray={`${
+                          halfCircumference * 0.98
+                        } ${circumference}`} // 稍微少一點長度
+                        strokeDashoffset={leftOffset}
+                        transform="rotate(-90 25 25)"
+                        style={{
+                          filter: "drop-shadow(0 0 8px var(--color-accent))",
+                        }}
+                      />
+                      {/* 右半圓 */}
+                      <circle
+                        cx="25"
+                        cy="25"
+                        r={radius}
+                        fill="none"
+                        stroke="var(--color-primary)"
+                        strokeWidth="4"
+                        strokeLinecap="butt"
+                        strokeDasharray={`${
+                          halfCircumference * 0.98
+                        } ${circumference}`}
+                        strokeDashoffset={rightOffset}
+                        transform="rotate(90 25 25)"
+                        style={{
+                          filter: "drop-shadow(0 0 8px var(--color-primary))",
+                        }}
+                      />
+                    </svg>
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-accent font-mono text-sm">85%</span>
+                      <span className="text-accent font-mono text-sm">
+                        {progress}%
+                      </span>
                     </div>
                   </div>
                   <div className="text-center">
@@ -483,34 +570,111 @@ const DemoPage = () => {
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
+                {/* 新增：一格一格的刻度型 Circular Progress Bar */}
+                <div className="flex flex-col items-center space-y-4">
+                  <div className="relative w-28 h-28">
+                    <svg
+                      className="w-full h-full"
+                      viewBox="0 0 60 60"
+                      style={{ overflow: "visible" }}
+                    >
+                      {/* 外圍刻度線 */}
+                      {[...Array(60)].map((_, i) => {
+                        // i: 0 ~ 59，每分鐘刻度，長短不同
+                        const angle = (360 / 60) * i;
+                        const isHourMark = i % 5 === 0;
+                        const lineLength = isHourMark ? 6 : 3; // 長短刻度
+                        const strokeColor = "var(--color-muted)";
+                        // 起點(外圓半徑)與終點(外圓半徑 - 線長)
+                        const x1 =
+                          30 + outerRadius * Math.cos((angle * Math.PI) / 180);
+                        const y1 =
+                          30 + outerRadius * Math.sin((angle * Math.PI) / 180);
+                        const x2 =
+                          30 +
+                          (outerRadius - lineLength) *
+                            Math.cos((angle * Math.PI) / 180);
+                        const y2 =
+                          30 +
+                          (outerRadius - lineLength) *
+                            Math.sin((angle * Math.PI) / 180);
+                        return (
+                          <line
+                            key={`tick-${i}`}
+                            x1={x1}
+                            y1={y1}
+                            x2={x2}
+                            y2={y2}
+                            stroke={strokeColor}
+                            strokeWidth={1}
+                            strokeLinecap="round"
+                            opacity={0.7}
+                          />
+                        );
+                      })}
+                      {[...Array(segmentCount)].map((_, i) => {
+                        const angleStart = segmentAngle * i - 90 + gapAngle / 2; // 每格從多留一半空隙的角度開始
+                        const angleEnd = angleStart + activeAngle;
 
-            {/* Interactive Actions Group */}
-            <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-              <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-                System Actions
-              </h3>
+                        // 其他保持不變
+                        const toRad = (deg) => (deg * Math.PI) / 180;
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={() =>
-                    alert("Initiating neural interface protocol...")
-                  }
-                  className="group relative overflow-hidden py-4 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-linear-(--gradient-accent) text-base shadow-primary border-none transition-all duration-300 ease-in-out transform hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95"
-                >
-                  <span className="relative z-10">Initialize Protocol</span>
-                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-                </button>
+                        const x1 = 30 + innerR * Math.cos(toRad(angleStart));
+                        const y1 = 30 + innerR * Math.sin(toRad(angleStart));
 
-                <button
-                  onClick={() =>
-                    alert("Loading system diagnostics interface...")
-                  }
-                  className="group relative overflow-hidden py-4 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-accent text-accent shadow-secondary transition-all duration-300 ease-in-out transform hover:bg-accent hover:text-base hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95"
-                >
-                  <span className="relative z-10">Run Diagnostics</span>
-                </button>
+                        const x2 = 30 + outerR * Math.cos(toRad(angleStart));
+                        const y2 = 30 + outerR * Math.sin(toRad(angleStart));
+
+                        const x3 = 30 + outerR * Math.cos(toRad(angleEnd));
+                        const y3 = 30 + outerR * Math.sin(toRad(angleEnd));
+
+                        const x4 = 30 + innerR * Math.cos(toRad(angleEnd));
+                        const y4 = 30 + innerR * Math.sin(toRad(angleEnd));
+
+                        const pathData = `
+    M ${x1} ${y1}
+    L ${x2} ${y2}
+    L ${x3} ${y3}
+    L ${x4} ${y4}
+    Z
+  `;
+
+                        const isActive = i < Math.floor(progress / 5); // 每 5% 一格
+
+                        return (
+                          <path
+                            key={`segment-${i}`}
+                            d={pathData}
+                            fill={
+                              isActive
+                                ? "var(--color-accent)"
+                                : "var(--color-border-default)"
+                            }
+                            style={{
+                              filter: isActive
+                                ? "drop-shadow(0 0 6px var(--color-accent))"
+                                : "none",
+                              transition: "fill 0.3s ease",
+                            }}
+                          />
+                        );
+                      })}
+                    </svg>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <span className="text-accent font-mono text-sm">
+                        {progress}%
+                      </span>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-default font-medium">
+                      Segmented Progress
+                    </div>
+                    <div className="text-xs text-muted mt-1">
+                      Monitoring segmented data flow...
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
 
