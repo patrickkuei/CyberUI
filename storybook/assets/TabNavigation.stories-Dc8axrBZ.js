@@ -1,4 +1,4 @@
-import{j as c}from"./jsx-runtime-D_zvdyIk.js";import"./iframe-CY0blb0B.js";import{T as a}from"./index-BBwP5Ey1.js";import"./preload-helper-D9Z9MdNV.js";const b=({tabs:e,activeTab:i,onTabChange:d})=>c.jsx("div",{className:"flex space-x-2",children:e.map(t=>c.jsx("button",{onClick:()=>d(t),className:`
+import{j as c}from"./jsx-runtime-D_zvdyIk.js";import"./iframe-AOrnjAMv.js";import{T as a}from"./index-BBwP5Ey1.js";import"./preload-helper-D9Z9MdNV.js";const b=({tabs:e,activeTab:i,onTabChange:d})=>c.jsx("div",{className:"flex space-x-2",children:e.map(t=>c.jsx("button",{onClick:()=>d(t),className:`
             px-6 py-2 font-bold text-lg transition-all duration-300 rounded-t-lg cursor-pointer
             ${i===t?"bg-surface text-secondary border-2 border-border-default border-b-0 shadow-secondary -mb-[2px] hover:shadow-lg-accent":"text-muted border-b-2 border-border-default hover:text-secondary hover:border-secondary"}
           `,children:t},t))});b.__docgenInfo={description:"",methods:[],displayName:"TabNavigation",props:{tabs:{required:!0,tsType:{name:"unknown"},description:""},activeTab:{required:!0,tsType:{name:"TABS[number]",raw:"typeof TABS[number]"},description:""},onTabChange:{required:!0,tsType:{name:"signature",type:"function",raw:"(tab: Tab) => void",signature:{arguments:[{type:{name:"TABS[number]",raw:"typeof TABS[number]"},name:"tab"}],return:{name:"void"}}},description:""}}};const l={title:"Components/TabNavigation",component:b,parameters:{layout:"centered",docs:{description:{component:`A cyberpunk-themed tab navigation component with neon styling and smooth animations.
@@ -7,8 +7,8 @@ import{j as c}from"./jsx-runtime-D_zvdyIk.js";import"./iframe-CY0blb0B.js";impor
 
 \`\`\`tsx
 import React, { useState } from 'react';
-import { TabNavigation } from 'cyberui-react';
-import 'cyberui-react/styles.css';
+import { TabNavigation } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
 
 const tabs = ['Home', 'Interactive', 'Feedback', 'Elements'];
 
