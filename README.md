@@ -12,12 +12,12 @@ A cyberpunk-themed React UI library with neon-styled components and futuristic a
 ## 🚀 Quick Start
 
 ```bash
-npm install cyberui
+npm install cyberui-2045
 ```
 
 ```tsx
 import React from 'react';
-import { CircularProgress, Notification } from 'cyberui';
+import { CircularProgress, Notification } from 'cyberui-2045';
 
 function App() {
   return (

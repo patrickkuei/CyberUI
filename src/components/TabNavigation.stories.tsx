@@ -15,8 +15,8 @@ const meta: Meta<typeof TabNavigation> = {
 
 \`\`\`tsx
 import React, { useState } from 'react';
-import { TabNavigation } from 'cyberui';
-import 'cyberui/styles.css';
+import { TabNavigation } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
 
 const tabs = ['Home', 'Interactive', 'Feedback', 'Elements'];
 

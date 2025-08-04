@@ -14,8 +14,8 @@ const meta: Meta<typeof Notification> = {
 
 \`\`\`tsx
 import React from 'react';
-import { Notification } from 'cyberui';
-import 'cyberui/styles.css';
+import { Notification } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
 
 // Success notification
 <Notification

@@ -14,8 +14,8 @@ const meta: Meta<typeof CircularProgress> = {
 
 \`\`\`tsx
 import React from 'react';
-import { CircularProgress } from 'cyberui';
-import 'cyberui/styles.css';
+import { CircularProgress } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
 
 // Basic usage
 <CircularProgress progress={50} radius={20} className="w-32 h-32" />

@@ -1,4 +1,4 @@
-# Contributing to CyberUI
+# Contributing to cyberui-2045
 
 Thank you for your interest in contributing to CyberUI! We welcome contributions from the community.
 

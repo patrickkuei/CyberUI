@@ -14,8 +14,8 @@ const meta: Meta<typeof SegmentedProgress> = {
 
 \`\`\`tsx
 import React from 'react';
-import { SegmentedProgress } from 'cyberui';
-import 'cyberui/styles.css';
+import { SegmentedProgress } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
 
 // Basic usage
 <SegmentedProgress progress={60} />

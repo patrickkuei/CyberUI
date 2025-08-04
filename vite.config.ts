@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => ({
   build: mode === 'library' ? {
     lib: {
       entry: resolve(__dirname, 'src/index.ts'),
-      name: 'CyberUI',
+      name: 'CyberUI2045',
       formats: ['es', 'umd'],
       fileName: (format) => `index.${format === 'es' ? 'es.js' : 'js'}`,
     },
