@@ -50,7 +50,6 @@
     "build-storybook": "storybook build",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
-    "deploy-storybook": "npm run build-storybook && gh-pages -d storybook-static -e storybook",
     "prepublishOnly": "npm run build:lib"
   },
   "dependencies": {
