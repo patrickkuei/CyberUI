@@ -2,26 +2,27 @@
 
 @theme {
   /* 主色系 */
-  --color-primary: #ff005d;        /* 粉紅霓虹 */
-  --color-secondary: #00fff9;      /* 水藍霓虹 */
-  --color-accent: #fffb00;         /* 高亮用電光黃 */
+  --color-primary: #ff005d; /* 粉紅霓虹 */
+  --color-secondary: #00fff9; /* 水藍霓虹 */
+  --color-accent: #fffb00; /* 高亮用電光黃 */
 
   /* 背景與區塊 */
-  --color-base: #1a1a2e;        /* 背景基底 */
-  --color-surface: #2d2d44;     /* 元件、卡片底色 */
+  --color-base: #1a1a2e; /* 背景基底 */
+  --color-surface: #2d2d44; /* 元件、卡片底色 */
   --color-border-default: #3c3c5e; /* 邊框 */
 
   /* 文字 */
-  --color-default: #e0e0e0;   /* 主文字 */
-  --color-muted: #8888aa;     /* 次要文字 */
-  --color-inverse: #1a1a2e;   /* 反白文字（配合亮色背景用） */
+  --color-default: #e0e0e0; /* 主文字 */
+  --color-muted: #8888aa; /* 次要文字 */
+  --color-inverse: #1a1a2e; /* 反白文字（配合亮色背景用） */
 
   /* 狀態色 */
-  --color-success: #00ff9e;        /* 成功提示 */
-  --color-error: #ff4f4f;          /* 錯誤提示 */
-  --color-warning: #ffaa00;        /* 警告提示 */
-  --color-info: #00aaff;           /* 資訊提示 */
-  --neon-success-glow: 0 0 8px var(--color-success), 0 0 16px var(--color-success);
+  --color-success: #00ff9e; /* 成功提示 */
+  --color-error: #ff4f4f; /* 錯誤提示 */
+  --color-warning: #ffaa00; /* 警告提示 */
+  --color-info: #00aaff; /* 資訊提示 */
+  --neon-success-glow: 0 0 8px var(--color-success),
+    0 0 16px var(--color-success);
   --neon-error-glow: 0 0 8px var(--color-error), 0 0 16px var(--color-error);
   --animate-spin-slow: spin-slow 4s linear infinite;
 
@@ -31,4 +32,10 @@
   --shadow-input-accent: 0 0 8px var(--color-accent);
   --shadow-primary: 0 0 12px var(--color-primary);
   --shadow-error: 0 0 8px var(--color-error);
+}
+
+html,
+body {
+  scrollbar-gutter: stable;
+  background-color: var(--color-base);
 }
