@@ -1,4 +1,5 @@
 import React from 'react';
+import Button from '../Button';
 
 const HomeTab: React.FC = () => {
   return (
@@ -37,18 +38,18 @@ const HomeTab: React.FC = () => {
 
       {/* Call to action */}
       <div className="flex justify-center space-x-6 pt-8">
-        <button
+        <Button
+          variant="primary"
           onClick={() => window.open('https://patrickkuei.github.io/CyberUI/storybook/', '_blank')}
-          className="px-6 py-3 bg-primary text-base font-semibold rounded-lg hover:bg-opacity-90 transition-all duration-300 shadow-lg shadow-primary/25"
         >
           View Documentation
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
           onClick={() => window.open('https://github.com/patrickkuei/CyberUI', '_blank')}
-          className="px-6 py-3 border border-border-default text-primary font-semibold rounded-lg hover:bg-surface transition-all duration-300"
         >
           GitHub Repository
-        </button>
+        </Button>
       </div>
     </div>
   );

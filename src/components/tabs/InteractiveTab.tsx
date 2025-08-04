@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
+import Button from "../Button";
 
 const InteractiveTab: React.FC = () => {
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
 
   const handleAlert = (message: string) => {
     alert(message);
@@ -41,7 +42,7 @@ const InteractiveTab: React.FC = () => {
             <div className="text-xs text-muted font-mono">
               {input.length > 0
                 ? `Input: ${input.length} characters`
-                : 'Awaiting neural input...'}
+                : "Awaiting neural input..."}
             </div>
           </div>
 
@@ -85,40 +86,58 @@ const InteractiveTab: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Primary Action */}
-          <button
-            className="group relative overflow-hidden py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-linear-(--gradient-accent) text-base shadow-primary border-none transition-all duration-300 ease-in-out transform hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95 cursor-pointer"
-            onClick={() => handleAlert('Initiating neural link protocol...')}
+          <Button
+            variant="primary"
+            onClick={() => handleAlert("Initiating neural link protocol...")}
           >
-            <span className="relative z-10">Execute Protocol</span>
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></div>
-          </button>
+            Execute Protocol
+          </Button>
 
           {/* Secondary Action */}
-          <button
-            className="group py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-secondary text-secondary shadow-secondary/30 transition-all duration-300 ease-in-out transform hover:bg-secondary hover:text-base hover:shadow-secondary hover:scale-105 focus:outline-none focus:ring-4 focus:ring-secondary active:scale-95 cursor-pointer"
-            onClick={() => handleAlert('Running system diagnostics...')}
+          <Button
+            variant="secondary"
+            onClick={() => handleAlert("Running system diagnostics...")}
           >
-            <span className="relative z-10">Scan System</span>
-          </button>
+            Scan System
+          </Button>
 
           {/* Danger Action */}
-          <button
-            className="group py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-error text-error shadow-error/30 transition-all duration-300 ease-in-out transform hover:bg-error hover:text-base hover:shadow-error hover:scale-105 focus:outline-none focus:ring-4 focus:ring-error active:scale-95 cursor-pointer"
+          <Button
+            variant="danger"
             onClick={() =>
-              handleAlert('Warning: Initiating shutdown sequence...')
+              handleAlert("Warning: Initiating shutdown sequence...")
             }
           >
-            <span className="relative z-10">Emergency Stop</span>
-          </button>
+            Emergency Stop
+          </Button>
 
-          <button
+          <Button
+            variant="ghost"
             onClick={() =>
-              handleAlert('Loading system diagnostics interface...')
+              handleAlert("Loading system diagnostics interface...")
             }
-            className="group relative overflow-hidden py-2 px-6 rounded-lg font-bold text-lg uppercase tracking-wider bg-surface border-2 border-accent text-accent shadow-secondary transition-all duration-300 ease-in-out transform hover:bg-accent hover:text-base hover:shadow-lg-accent hover:scale-105 focus:outline-none focus:ring-4 focus:ring-accent active:scale-95"
           >
-            <span className="relative z-10">Run Diagnostics</span>
-          </button>
+            Run Diagnostics
+          </Button>
+        </div>
+
+        {/* Disabled Button Demo */}
+        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
+          System Status: Offline
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Button variant="primary" disabled>
+            System Offline
+          </Button>
+          <Button variant="secondary" disabled>
+            Access Denied
+          </Button>
+          <Button variant="danger" disabled>
+            Critical Error
+          </Button>
+          <Button variant="ghost" disabled>
+            Network Down
+          </Button>
         </div>
       </div>
 
@@ -135,33 +154,29 @@ const InteractiveTab: React.FC = () => {
                 Neural Interface Status
               </h4>
               <p className="text-muted">
-                Monitor and control your cybernetic enhancements through
-                this interactive panel.
+                Monitor and control your cybernetic enhancements through this
+                interactive panel.
               </p>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div className="bg-base rounded-lg p-3 border border-border-default">
-                <div className="text-primary font-mono font-bold">
-                  ONLINE
-                </div>
+                <div className="text-primary font-mono font-bold">ONLINE</div>
                 <div className="text-muted">Connection Status</div>
               </div>
               <div className="bg-base rounded-lg p-3 border border-border-default">
-                <div className="text-secondary font-mono font-bold">
-                  87%
-                </div>
+                <div className="text-secondary font-mono font-bold">87%</div>
                 <div className="text-muted">Neural Sync Rate</div>
               </div>
             </div>
 
             <div className="flex space-x-3">
-              <button className="flex-1 py-2 px-4 rounded bg-primary text-base font-semibold hover:shadow-primary transition-all duration-300 cursor-pointer">
+              <Button variant="primary" size="sm" className="flex-1">
                 Sync
-              </button>
-              <button className="flex-1 py-2 px-4 rounded bg-surface border border-secondary text-secondary font-semibold hover:bg-secondary hover:text-base transition-all duration-300 cursor-pointer">
+              </Button>
+              <Button variant="secondary" size="sm" className="flex-1">
                 Monitor
-              </button>
+              </Button>
             </div>
           </div>
         </div>
