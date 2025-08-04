@@ -1,0 +1,40 @@
+name: Deploy Demo App
+
+on:
+  push:
+    branches: [ master ]
+  workflow_dispatch:
+
+jobs:
+  deploy-demo:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+      pages: write
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    - name: Install dependencies with yarn
+      run: |
+        npm install -g yarn
+        yarn install
+
+    - name: Build demo app
+      run: yarn build
+
+    - name: Deploy to GitHub Pages (root)
+      uses: peaceiris/actions-gh-pages@v4
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./dist
+        destination_dir: .
+        keep_files: true  # Keep the storybook subfolder
