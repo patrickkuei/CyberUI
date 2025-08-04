@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import Button from "../Button";
+import Input from "../Input";
 
 const InteractiveTab: React.FC = () => {
   const [input, setInput] = useState("");
@@ -7,6 +8,17 @@ const InteractiveTab: React.FC = () => {
   const handleAlert = (message: string) => {
     alert(message);
   };
+
+  // Search Icon Component
+  const SearchIcon = () => (
+    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+      <path
+        fillRule="evenodd"
+        d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
 
   return (
     <div className="w-full max-w-4xl space-y-12">
@@ -28,53 +40,27 @@ const InteractiveTab: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Text Input */}
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-default mb-2">
-              Neural Interface Command
-            </label>
-            <input
-              type="text"
-              placeholder="Enter command sequence..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              className="w-full px-4 py-3 rounded-lg border-2 border-accent bg-surface text-default placeholder-muted shadow-input-accent hover:shadow-lg-accent transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:shadow-lg-accent active:bg-base"
-            />
-            <div className="text-xs text-muted font-mono">
-              {input.length > 0
+          <Input
+            variant="primary"
+            label="Neural Interface Command"
+            placeholder="Enter command sequence..."
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            helperText={
+              input.length > 0
                 ? `Input: ${input.length} characters`
-                : "Awaiting neural input..."}
-            </div>
-          </div>
+                : "Awaiting neural input..."
+            }
+          />
 
           {/* Search Input */}
-          <div className="space-y-4">
-            <label className="block text-sm font-medium text-default mb-2">
-              Database Query
-            </label>
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Search corporate database..."
-                className="w-full px-4 py-3 pl-10 rounded-lg border-2 border-secondary bg-surface text-default placeholder-muted shadow-secondary/30 hover:shadow-secondary transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-secondary focus:shadow-secondary active:bg-base"
-              />
-              <div className="absolute inset-y-0 left-0 flex items-center pl-3 text-secondary">
-                <svg
-                  className="w-5 h-5"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-            </div>
-            <div className="text-xs text-muted">
-              Search through encrypted corporate files
-            </div>
-          </div>
+          <Input
+            variant="secondary"
+            label="Database Query"
+            placeholder="Search corporate database..."
+            leftIcon={<SearchIcon />}
+            helperText="Search through encrypted corporate files"
+          />
         </div>
       </div>
 

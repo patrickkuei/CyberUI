@@ -10,6 +10,7 @@ export { default as CircularProgress } from './CircularProgress';
 export { default as SegmentedProgress } from './SegmentedProgress';
 export { default as Notification } from './Notification';
 export { default as Button } from './Button';
+export { default as Input } from './Input';
 
 // Export component prop types
 export type { CircularProgressProps } from './CircularProgress';
@@ -17,3 +18,4 @@ export type { NotificationProps } from './Notification';
 export type { SegmentedProgressProps } from './SegmentedProgress';
 export type { TabNavigationProps } from './TabNavigation';
 export type { ButtonProps } from './Button';
+export type { InputProps } from './Input';
