@@ -84,5 +84,17 @@ export const RESPONSIVE_SIZE_MAPS = {
     sm: 'px-3 py-1 text-sm',
     md: 'px-6 py-2 text-lg',
     lg: 'px-8 py-3 text-xl'
+  },
+  linearProgress: {
+    width: {
+      sm: 'w-48',
+      md: 'w-80',
+      lg: 'w-96'
+    },
+    height: {
+      sm: 'h-1.5',
+      md: 'h-3',
+      lg: 'h-4'
+    }
   }
 } as const;

@@ -4,6 +4,7 @@ import { PROGRESS_CONFIG } from '../../constants';
 import CircularProgress from '../CircularProgress';
 import SegmentedProgress from '../SegmentedProgress';
 import Notification from '../Notification';
+import LinearProgress from '../LinearProgress';
 
 const FeedbackTab: React.FC = () => {
   const progress = useAnimatedProgress();
@@ -65,12 +66,10 @@ const FeedbackTab: React.FC = () => {
                 {progress}%
               </span>
             </div>
-            <div className="w-full bg-surface rounded-full h-3 shadow-inner">
-              <div
-                className="bg-gradient-to-r from-accent to-primary h-3 rounded-full shadow-lg-accent transition-all duration-500 ease-out"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
+            <LinearProgress
+              progress={progress}
+              className='w-full'
+            />
             <div className="text-xs text-muted">
               Uploading neural patterns...
             </div>
