@@ -37,7 +37,6 @@ const Button: React.FC<ButtonProps> = ({
     return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.button);
   };
 
-  // Variant styles with disabled states
   const getVariantClasses = (variant: string, disabled: boolean): string => {
     const variants = {
       primary: {

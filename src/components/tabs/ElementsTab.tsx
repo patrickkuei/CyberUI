@@ -16,9 +16,7 @@ const ElementsTab: React.FC = () => {
         </p>
       </div>
 
-      {/* Form Controls Group */}
       <Card title="Form Controls">
-        {/* Dropdown with better layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
             <label className="block text-sm font-medium text-default mb-2">

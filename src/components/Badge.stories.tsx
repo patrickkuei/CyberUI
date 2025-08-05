@@ -31,7 +31,6 @@ import 'cyberui-2045/styles.css';
 <Badge size={{ base: 'sm', lg: 'lg' }}>Responsive</Badge>
 <Badge size={{ base: 'md', md: 'sm', xl: 'lg' }}>Multi-breakpoint</Badge>
 
-// With icons
 <Badge
   variant="success"
   leftIcon={<StatusIcon />}

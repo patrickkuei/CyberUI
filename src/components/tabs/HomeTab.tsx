@@ -17,7 +17,6 @@ const HomeTab: React.FC = () => {
         </p>
       </div>
 
-      {/* Quick stats or features */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-8 md:mt-12">
         <div className="text-center p-4 md:p-6 bg-surface border border-border-default rounded-lg">
           <div className="text-primary text-xl md:text-2xl mb-2 md:mb-3">⚡</div>
@@ -36,7 +35,6 @@ const HomeTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Call to action */}
       <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 pt-8">
         <Button
           variant="primary"

@@ -18,7 +18,6 @@ const FeedbackTab: React.FC = () => {
         <p className="text-muted">System responses and loading states</p>
       </div>
 
-      {/* Notifications Group */}
       <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
         <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
           System Notifications
@@ -51,14 +50,12 @@ const FeedbackTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Progress Indicators Group */}
       <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
         <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
           Loading States
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {/* Linear Progress */}
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-default font-medium">
@@ -79,7 +76,6 @@ const FeedbackTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Circular Progress */}
           <div className="flex flex-col items-center space-y-4">
             <CircularProgress
               progress={progress}
@@ -98,7 +94,6 @@ const FeedbackTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Segmented Progress */}
           <div className="flex flex-col items-center space-y-4">
             <SegmentedProgress
               progress={progress}
@@ -120,7 +115,6 @@ const FeedbackTab: React.FC = () => {
         </div>
       </div>
 
-      {/* Data Loading Skeleton */}
       <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
         <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
           Loading Placeholder

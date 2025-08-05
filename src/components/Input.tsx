@@ -24,7 +24,6 @@ const Input: React.FC<InputProps> = ({
   disabled = false,
   ...props
 }) => {
-  // Base classes that apply to all inputs
   const baseClasses = [
     'w-full',
     'rounded-lg',

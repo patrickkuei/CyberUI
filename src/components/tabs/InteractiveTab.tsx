@@ -10,7 +10,6 @@ const InteractiveTab: React.FC = () => {
     alert(message);
   };
 
-  // Search Icon Component
   const SearchIcon = () => (
     <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
       <path
@@ -23,7 +22,6 @@ const InteractiveTab: React.FC = () => {
 
   return (
     <div className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl space-y-8 md:space-y-12">
-      {/* Section Header */}
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">
           Interactive Components
@@ -33,10 +31,8 @@ const InteractiveTab: React.FC = () => {
         </p>
       </div>
 
-            {/* Input & Controls Group */}
       <Card title="User Input">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Text Input */}
           <Input
             variant="primary"
             label="Neural Interface Command"
@@ -50,7 +46,6 @@ const InteractiveTab: React.FC = () => {
             }
           />
 
-          {/* Search Input */}
           <Input
             variant="secondary"
             label="Database Query"
@@ -61,10 +56,8 @@ const InteractiveTab: React.FC = () => {
         </div>
       </Card>
 
-      {/* Action Buttons Group */}
       <Card title="System Actions">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Primary Action */}
           <Button
             variant="primary"
             onClick={() => handleAlert("Initiating neural link protocol...")}
@@ -72,7 +65,6 @@ const InteractiveTab: React.FC = () => {
             Execute Protocol
           </Button>
 
-          {/* Secondary Action */}
           <Button
             variant="secondary"
             onClick={() => handleAlert("Running system diagnostics...")}
@@ -80,7 +72,6 @@ const InteractiveTab: React.FC = () => {
             Scan System
           </Button>
 
-          {/* Danger Action */}
           <Button
             variant="danger"
             onClick={() =>
@@ -100,7 +91,6 @@ const InteractiveTab: React.FC = () => {
           </Button>
         </div>
 
-        {/* Disabled Button Demo */}
         <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
           System Status: Offline
         </h3>
@@ -120,7 +110,6 @@ const InteractiveTab: React.FC = () => {
         </div>
       </Card>
 
-      {/* Interactive Card Demo */}
       <Card title="Interactive Demo Card">
         <Card variant="accent" titleBorder={false}>
           <div className="text-center space-y-6">

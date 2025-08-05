@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import Input from './Input';
 
-// Search Icon Component
 const SearchIcon = () => (
   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
     <path
@@ -12,14 +11,12 @@ const SearchIcon = () => (
   </svg>
 );
 
-// User Icon Component
 const UserIcon = () => (
   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
     <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
   </svg>
 );
 
-// Lock Icon Component
 const LockIcon = () => (
   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
     <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
@@ -42,7 +39,6 @@ import React from 'react';
 import { Input } from 'cyberui-2045';
 import 'cyberui-2045/styles.css';
 
-// Basic usage
 <Input
   variant="primary"
   label="Neural Interface Command"
@@ -50,7 +46,6 @@ import 'cyberui-2045/styles.css';
   helperText="Awaiting neural input..."
 />
 
-// With search icon
 <Input
   variant="secondary"
   label="Database Query"
@@ -58,21 +53,17 @@ import 'cyberui-2045/styles.css';
   leftIcon={<SearchIcon />}
 />
 
-// Different variants
-<Input variant="primary" />    // accent colors
-<Input variant="secondary" />  // secondary colors
-<Input variant="danger" />     // error colors
-<Input variant="ghost" />      // minimal styling
+<Input variant="primary" />
+<Input variant="secondary" />
+<Input variant="danger" />
+<Input variant="ghost" />
 
-// Different sizes
 <Input variant="primary" size="sm" placeholder="Small input" />
 <Input variant="primary" size="lg" placeholder="Large input" />
 
-// Responsive sizes
 <Input variant="primary" size={{ base: 'sm', lg: 'lg' }} placeholder="Responsive input" />
 <Input variant="primary" size={{ base: 'md', md: 'sm', xl: 'lg' }} placeholder="Multi-breakpoint" />
 
-// With validation
 <Input
   variant="primary"
   label="Username"
