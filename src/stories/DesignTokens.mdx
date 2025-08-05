@@ -1,0 +1,449 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Design Tokens" />
+
+<style>
+  {`
+    .sbdocs,
+    .sbdocs-wrapper,
+    .css-3rewwu {
+      padding: 0;
+    }
+
+    .tokens-container {
+      max-width: 64rem;
+      margin: 0 auto;
+      padding: 2rem;
+      background-color: #1a1a2e;
+      color: #e0e0e0;
+    }
+
+    .tokens-title {
+      font-size: 2.5rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 1rem;
+      color: #ff005d;
+      text-shadow: 0 0 8px #ff005d, 0 0 16px #ff005d;
+    }
+
+    .tokens-subtitle {
+      font-size: 1.125rem;
+      margin-bottom: 2rem;
+      color: #00fff9;
+    }
+
+    .section-divider {
+      margin: 2rem 0;
+      border: none;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #3c3c5e, transparent);
+    }
+
+    .token-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin: 2rem 0;
+    }
+
+    .token-card {
+      background-color: #2d2d44;
+      border: 1px solid #3c3c5e;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+    }
+
+    .token-card h3 {
+      color: #00fff9;
+      margin-bottom: 1rem;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+
+    .color-token {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem;
+      background-color: #1a1a2e;
+      border-radius: 0.25rem;
+      border: 1px solid #3c3c5e;
+    }
+
+    .color-swatch {
+      width: 2rem;
+      height: 2rem;
+      border-radius: 0.25rem;
+      margin-right: 1rem;
+      border: 1px solid #3c3c5e;
+      flex-shrink: 0;
+    }
+
+    .token-info {
+      flex: 1;
+    }
+
+    .token-name {
+      font-family: 'Courier New', monospace;
+      font-size: 0.875rem;
+      color: #fffb00;
+      margin-bottom: 0.25rem;
+    }
+
+    .gradient .token-name,
+    .gradient .token-value {
+      color: #1a1a2e;
+    }
+
+    .token-value {
+      font-family: 'Courier New', monospace;
+      font-size: 0.75rem;
+      color: #8888aa;
+    }
+
+    .usage-example {
+      background-color: #2d2d44;
+      border: 1px solid #3c3c5e;
+      border-radius: 0.5rem;
+      padding: 1.5rem;
+      margin: 1rem 0;
+    }
+
+    .effect-demo {
+      padding: 1rem;
+      margin: 0.5rem 0;
+      background-color: #2d2d44;
+      border-radius: 0.5rem;
+      text-align: center;
+      color: #e0e0e0;
+    }
+
+    .shadow-demo {
+      display: inline-block;
+      padding: 1rem 2rem;
+      margin: 0.5rem;
+      background-color: #1a1a2e;
+      border-radius: 0.5rem;
+      color: #e0e0e0;
+    }
+
+    /* Code blocks and inline code styling */
+    pre {
+      background-color: #2d2d44;
+      border: 1px solid #3c3c5e;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      color: #e0e0e0;
+    }
+
+    code {
+      background-color: #2d2d44;
+      color: #00fff9;
+      padding: 0.2em 0.4em;
+      border-radius: 0.25rem;
+      font-family: 'Courier New', monospace;
+    }
+
+    /* Headings - override Storybook defaults */
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    .sbdocs h1,
+    .sbdocs h2,
+    .sbdocs h3,
+    .sbdocs h4,
+    .sbdocs h5,
+    .sbdocs h6,
+    .sbdocs-wrapper h1,
+    .sbdocs-wrapper h2,
+    .sbdocs-wrapper h3,
+    .sbdocs-wrapper h4,
+    .sbdocs-wrapper h5,
+    .sbdocs-wrapper h6 {
+      color: #ff005d !important;
+    }
+
+    /* Paragraph text - override Storybook defaults */
+    p,
+    .css-x28zkw p,
+    .css-x28zkw :where(p:not(.sb-anchor, .sb-unstyled, .sb-unstyled p)),
+    .sbdocs p,
+    .sbdocs-wrapper p {
+      color: #e0e0e0 !important;
+    }
+
+    /* Strong text - override Storybook defaults */
+    strong,
+    b,
+    .sbdocs strong,
+    .sbdocs b,
+    .sbdocs-wrapper strong,
+    .sbdocs-wrapper b {
+      color: #00fff9 !important;
+      font-weight: 600;
+    }
+
+    /* Generic text content override */
+    .sbdocs,
+    .sbdocs-wrapper {
+      color: #e0e0e0 !important;
+    }
+
+    /* List styling - override Storybook defaults */
+    ul,
+    ol,
+    li,
+    .sbdocs ul,
+    .sbdocs ol,
+    .sbdocs li,
+    .sbdocs-wrapper ul,
+    .sbdocs-wrapper ol,
+    .sbdocs-wrapper li {
+      color: #e0e0e0 !important;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+    }
+  `}
+</style>
+
+<div className="tokens-container">
+  <h1 className="tokens-title">Design Tokens</h1>
+  <p className="tokens-subtitle">The foundation of CyberUI's cyberpunk aesthetic</p>
+
+  Design tokens are the **single source of truth** for all design decisions in CyberUI. They ensure consistency across components and make theming effortless.
+
+  <hr className="section-divider" />
+
+  ## Color Tokens
+
+  CyberUI uses a carefully crafted cyberpunk color palette with neon highlights and dark backgrounds.
+
+  <div className="token-grid">
+    <div className="token-card">
+      <h3>🎨 Brand Colors</h3>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#ff005d' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-primary</div>
+          <div className="token-value">#ff005d</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#00fff9' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-secondary</div>
+          <div className="token-value">#00fff9</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#fffb00' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-accent</div>
+          <div className="token-value">#fffb00</div>
+        </div>
+      </div>
+    </div>
+
+    <div className="token-card">
+      <h3>🏗️ Background Colors</h3>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#1a1a2e' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-base</div>
+          <div className="token-value">#1a1a2e</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#2d2d44' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-surface</div>
+          <div className="token-value">#2d2d44</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#3c3c5e' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-border-default</div>
+          <div className="token-value">#3c3c5e</div>
+        </div>
+      </div>
+    </div>
+
+    <div className="token-card">
+      <h3>📝 Text Colors</h3>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#e0e0e0' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-default</div>
+          <div className="token-value">#e0e0e0</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#8888aa' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-muted</div>
+          <div className="token-value">#8888aa</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#1a1a2e' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-inverse</div>
+          <div className="token-value">#1a1a2e</div>
+        </div>
+      </div>
+    </div>
+
+    <div className="token-card">
+      <h3>⚡ Status Colors</h3>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#00ff9e' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-success</div>
+          <div className="token-value">#00ff9e</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#ff4f4f' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-error</div>
+          <div className="token-value">#ff4f4f</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#ffaa00' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-warning</div>
+          <div className="token-value">#ffaa00</div>
+        </div>
+      </div>
+      <div className="color-token">
+        <div className="color-swatch" style={{ backgroundColor: '#00aaff' }}></div>
+        <div className="token-info">
+          <div className="token-name">--color-info</div>
+          <div className="token-value">#00aaff</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr className="section-divider" />
+
+  ## Effect Tokens
+
+  CyberUI includes special effect tokens for creating the signature cyberpunk aesthetic.
+
+  <div className="token-grid">
+    <div className="token-card">
+      <h3>✨ Neon Glow Effects</h3>
+      <div className="effect-demo" style={{ boxShadow: '0 0 8px #00ff9e, 0 0 16px #00ff9e' }}>
+        <div className="token-name">--neon-success-glow</div>
+        <div className="token-value">0 0 8px var(--color-success), 0 0 16px var(--color-success)</div>
+      </div>
+      <div className="effect-demo" style={{ boxShadow: '0 0 8px #ff4f4f, 0 0 16px #ff4f4f' }}>
+        <div className="token-name">--neon-error-glow</div>
+        <div className="token-value">0 0 8px var(--color-error), 0 0 16px var(--color-error)</div>
+      </div>
+    </div>
+
+    <div className="token-card">
+      <h3>🌈 Gradients</h3>
+      <div className="effect-demo gradient" style={{ background: 'linear-gradient(90deg, #fffb00, #00fff9)' }}>
+        <div className="token-name">--gradient-accent</div>
+        <div className="token-value">90deg, var(--color-accent), var(--color-secondary)</div>
+      </div>
+    </div>
+
+    <div className="token-card">
+      <h3>🎭 Component Shadows</h3>
+      <div className="shadow-demo" style={{ boxShadow: '0 0 12px #fffb00' }}>
+        <div className="token-name">--shadow-lg-accent</div>
+      </div>
+      <div className="shadow-demo" style={{ boxShadow: '0 0 16px #00fff9' }}>
+        <div className="token-name">--shadow-secondary</div>
+      </div>
+      <div className="shadow-demo" style={{ boxShadow: '0 0 12px #ff005d' }}>
+        <div className="token-name">--shadow-primary</div>
+      </div>
+    </div>
+  </div>
+
+  <hr className="section-divider" />
+
+  ## Usage in Components
+
+  ### Using Tokens in Tailwind Classes
+
+  All color tokens are automatically available as Tailwind CSS classes:
+
+  <div className="usage-example">
+    ```tsx
+    // Background colors
+    <div className="bg-primary">Primary background</div>
+    <div className="bg-surface">Surface background</div>
+
+    // Text colors
+    <p className="text-default">Primary text</p>
+    <p className="text-muted">Muted text</p>
+
+    // Border colors
+    <div className="border-2 border-border-default">With border</div>
+
+    // Accent gradient
+    <div class="h-48 w-full bg-linear-(--gradient-accent)">
+        Accent Gradient Background
+    </div>
+    ```
+  </div>
+
+  ### Using Tokens in Custom CSS
+
+  Access tokens directly in your custom styles:
+
+  <div className="usage-example">
+    ```css
+    .custom-component {
+      background-color: var(--color-surface);
+      color: var(--color-default);
+      border: 1px solid var(--color-border-default);
+      box-shadow: var(--shadow-primary);
+    }
+
+    .neon-button {
+      background: var(--color-primary);
+      box-shadow: var(--neon-success-glow);
+    }
+    ```
+  </div>
+
+  ### Using Tokens in Inline Styles
+
+  Perfect for dynamic styling in React components:
+
+  <div className="usage-example">
+    ```tsx
+    const MyComponent = ({ glowColor }) => (
+      <div
+        style={{
+          backgroundColor: 'var(--color-surface)',
+          boxShadow: `0 0 12px var(--color-${glowColor})`,
+          border: '1px solid var(--color-border-default)'
+        }}
+      >
+        Dynamic styling with tokens
+      </div>
+    );
+    ```
+  </div>
+
+  <hr className="section-divider" />
+
+  _Design tokens power the cyberpunk future! 🚀_
+</div>
