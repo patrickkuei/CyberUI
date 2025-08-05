@@ -6,22 +6,96 @@ const meta: Meta<typeof Badge> = {
   component: Badge,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: `A cyberpunk-themed badge component with multiple variants, icon support, and interactive capabilities.
+
+**Usage:**
+
+\`\`\`tsx
+import React from 'react';
+import { Badge } from 'cyberui-2045';
+import 'cyberui-2045/styles.css';
+
+// Basic usage
+<Badge variant="primary">Primary</Badge>
+<Badge variant="secondary">Secondary</Badge>
+<Badge variant="accent">Accent</Badge>
+
+// Different sizes
+<Badge size="sm">Small</Badge>
+<Badge size="md">Medium</Badge>
+<Badge size="lg">Large</Badge>
+
+// With icons
+<Badge
+  variant="success"
+  leftIcon={<StatusIcon />}
+>
+  Online
+</Badge>
+
+<Badge
+  variant="accent"
+  rightIcon={<ArrowIcon />}
+>
+  Action
+</Badge>
+
+// Interactive badges
+<Badge
+  variant="primary"
+  clickable
+  onClick={() => console.log('Badge clicked')}
+>
+  Click Me
+</Badge>
+
+// Status indicators
+<Badge variant="success">ONLINE</Badge>
+<Badge variant="warning">DEGRADED</Badge>
+<Badge variant="error">OFFLINE</Badge>
+\`\`\`
+
+**Props:**
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| \`variant\` | \`string\` | ❌ | \`'primary'\` | Badge color variant |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg'\` | ❌ | \`'md'\` | Badge size |
+| \`leftIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the left side |
+| \`rightIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the right side |
+| \`clickable\` | \`boolean\` | ❌ | \`false\` | Whether the badge is clickable with hover effects |
+| \`children\` | \`React.ReactNode\` | ✅ | - | Badge content |
+| \`className\` | \`string\` | ❌ | - | Additional CSS classes |
+| \`onClick\` | \`() => void\` | ❌ | - | Click handler function |
+
+**Variant options:** \`'primary'\`, \`'secondary'\`, \`'accent'\`, \`'success'\`, \`'error'\`, \`'warning'\`
+
+Additional HTML span attributes can be passed and will be applied to the badge element.
+`,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
     variant: {
-      description: 'The badge color variant',
       control: { type: 'select' },
       options: ['primary', 'secondary', 'accent', 'success', 'error', 'warning'],
+      description: 'Badge color variant',
     },
     size: {
-      description: 'The badge size',
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
+      description: 'Badge size',
     },
     clickable: {
+      control: 'boolean',
       description: 'Whether the badge is clickable with hover effects',
-      control: { type: 'boolean' },
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
     },
   },
 } satisfies Meta<typeof Badge>;
