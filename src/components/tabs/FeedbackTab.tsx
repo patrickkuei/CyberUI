@@ -9,10 +9,10 @@ const FeedbackTab: React.FC = () => {
   const progress = useAnimatedProgress();
 
   return (
-    <div className="w-full max-w-4xl space-y-12">
+    <div className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl space-y-8 md:space-y-12">
       {/* Section Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-primary mb-2">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">
           User Feedback
         </h2>
         <p className="text-muted">System responses and loading states</p>
@@ -30,6 +30,7 @@ const FeedbackTab: React.FC = () => {
             title="Neural Link Established"
             message="Successfully connected to the cybernet mainframe"
             onClose={() => {}}
+            size={{ base: 'sm', md: 'md', lg: 'lg' }}
           />
 
           <Notification
@@ -37,6 +38,7 @@ const FeedbackTab: React.FC = () => {
             title="Security Protocol Warning"
             message="Unauthorized access attempt detected on port 2077"
             onClose={() => {}}
+            size={{ base: 'sm', md: 'md', lg: 'lg' }}
           />
 
           <Notification
@@ -44,6 +46,7 @@ const FeedbackTab: React.FC = () => {
             title="System Breach Detected"
             message="Critical firewall failure - immediate action required"
             onClose={() => {}}
+            size={{ base: 'sm', md: 'md', lg: 'lg' }}
           />
         </div>
       </div>

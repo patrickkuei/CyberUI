@@ -23,23 +23,28 @@ export const getResponsiveClasses = <T extends string>(
   }
 
   if (prop.sm && classMap[prop.sm]) {
-    classes.push(`sm:${classMap[prop.sm]}`);
+    const smClasses = classMap[prop.sm].split(' ').map(cls => `sm:${cls}`);
+    classes.push(...smClasses);
   }
 
   if (prop.md && classMap[prop.md]) {
-    classes.push(`md:${classMap[prop.md]}`);
+    const mdClasses = classMap[prop.md].split(' ').map(cls => `md:${cls}`);
+    classes.push(...mdClasses);
   }
 
   if (prop.lg && classMap[prop.lg]) {
-    classes.push(`lg:${classMap[prop.lg]}`);
+    const lgClasses = classMap[prop.lg].split(' ').map(cls => `lg:${cls}`);
+    classes.push(...lgClasses);
   }
 
   if (prop.xl && classMap[prop.xl]) {
-    classes.push(`xl:${classMap[prop.xl]}`);
+    const xlClasses = classMap[prop.xl].split(' ').map(cls => `xl:${cls}`);
+    classes.push(...xlClasses);
   }
 
   if (prop['2xl'] && classMap[prop['2xl']]) {
-    classes.push(`2xl:${classMap[prop['2xl']]}`);
+    const xl2Classes = classMap[prop['2xl']].split(' ').map(cls => `2xl:${cls}`);
+    classes.push(...xl2Classes);
   }
 
   return classes.join(' ');

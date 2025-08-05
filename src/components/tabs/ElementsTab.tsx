@@ -5,10 +5,10 @@ import Badge from '../Badge';
 
 const ElementsTab: React.FC = () => {
   return (
-    <div className="w-full max-w-4xl space-y-12">
+    <div className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl space-y-8 md:space-y-12">
       {/* Section Header */}
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-primary mb-2">
+        <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">
           UI Elements
         </h2>
         <p className="text-muted">
