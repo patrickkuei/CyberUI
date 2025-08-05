@@ -1,5 +1,7 @@
 import React from 'react';
 import { CORPORATIONS } from '../../constants';
+import Card from '../Card';
+import Badge from '../Badge';
 
 const ElementsTab: React.FC = () => {
   return (
@@ -15,11 +17,7 @@ const ElementsTab: React.FC = () => {
       </div>
 
       {/* Form Controls Group */}
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          Form Controls
-        </h3>
-
+      <Card title="Form Controls">
         {/* Dropdown with better layout */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
           <div>
@@ -64,14 +62,10 @@ const ElementsTab: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Status Indicators Group */}
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          Status Indicators
-        </h3>
-
+      <Card title="Status Indicators">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Security Clearance Chips */}
           <div>
@@ -79,18 +73,15 @@ const ElementsTab: React.FC = () => {
               Security Clearance Levels
             </label>
             <div className="flex flex-wrap gap-3">
-              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold text-base bg-primary shadow-lg hover:shadow-primary transition-shadow cursor-pointer">
-                <span className="w-2 h-2 bg-base rounded-full mr-2"></span>
+              <Badge variant="primary" clickable leftIcon={<span className="w-2 h-2 bg-base rounded-full mr-2"></span>}>
                 Administrator
-              </span>
-              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold text-base bg-secondary shadow-lg hover:shadow-secondary transition-shadow cursor-pointer">
-                <span className="w-2 h-2 bg-base rounded-full mr-2"></span>
+              </Badge>
+              <Badge variant="secondary" clickable leftIcon={<span className="w-2 h-2 bg-base rounded-full mr-2"></span>}>
                 Operator
-              </span>
-              <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold text-base bg-accent shadow-lg hover:shadow-lg-accent transition-shadow cursor-pointer">
-                <span className="w-2 h-2 bg-base rounded-full mr-2"></span>
+              </Badge>
+              <Badge variant="accent" clickable leftIcon={<span className="w-2 h-2 bg-base rounded-full mr-2"></span>}>
                 Guest Access
-              </span>
+              </Badge>
             </div>
           </div>
 
@@ -121,7 +112,7 @@ const ElementsTab: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
     </div>
   );
 };

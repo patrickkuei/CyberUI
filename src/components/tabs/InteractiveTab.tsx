@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import Button from "../Button";
 import Input from "../Input";
+import Card from "../Card";
 
 const InteractiveTab: React.FC = () => {
   const [input, setInput] = useState("");
@@ -32,12 +33,8 @@ const InteractiveTab: React.FC = () => {
         </p>
       </div>
 
-      {/* Input & Controls Group */}
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-8">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          User Input
-        </h3>
-
+            {/* Input & Controls Group */}
+      <Card title="User Input">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Text Input */}
           <Input
@@ -62,14 +59,10 @@ const InteractiveTab: React.FC = () => {
             helperText="Search through encrypted corporate files"
           />
         </div>
-      </div>
+      </Card>
 
       {/* Action Buttons Group */}
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          System Actions
-        </h3>
-
+      <Card title="System Actions">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Primary Action */}
           <Button
@@ -125,15 +118,11 @@ const InteractiveTab: React.FC = () => {
             Network Down
           </Button>
         </div>
-      </div>
+      </Card>
 
       {/* Interactive Card Demo */}
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          Interactive Demo Card
-        </h3>
-
-        <div className="bg-surface border-2 border-accent rounded-xl p-6 shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform">
+      <Card title="Interactive Demo Card">
+        <Card variant="accent" titleBorder={false}>
           <div className="text-center space-y-6">
             <div className="space-y-2">
               <h4 className="text-xl font-semibold text-default">
@@ -146,14 +135,14 @@ const InteractiveTab: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-sm">
-              <div className="bg-base rounded-lg p-3 border border-border-default">
+              <Card variant="small">
                 <div className="text-primary font-mono font-bold">ONLINE</div>
                 <div className="text-muted">Connection Status</div>
-              </div>
-              <div className="bg-base rounded-lg p-3 border border-border-default">
+              </Card>
+              <Card variant="small">
                 <div className="text-secondary font-mono font-bold">87%</div>
                 <div className="text-muted">Neural Sync Rate</div>
-              </div>
+              </Card>
             </div>
 
             <div className="flex space-x-3">
@@ -165,8 +154,8 @@ const InteractiveTab: React.FC = () => {
               </Button>
             </div>
           </div>
-        </div>
-      </div>
+        </Card>
+      </Card>
     </div>
   );
 };

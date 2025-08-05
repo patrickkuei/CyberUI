@@ -11,6 +11,8 @@ export { default as SegmentedProgress } from './SegmentedProgress';
 export { default as Notification } from './Notification';
 export { default as Button } from './Button';
 export { default as Input } from './Input';
+export { default as Card } from './Card';
+export { default as Badge } from './Badge';
 
 // Export component prop types
 export type { CircularProgressProps } from './CircularProgress';
@@ -19,3 +21,5 @@ export type { SegmentedProgressProps } from './SegmentedProgress';
 export type { TabNavigationProps } from './TabNavigation';
 export type { ButtonProps } from './Button';
 export type { InputProps } from './Input';
+export type { CardProps } from './Card';
+export type { BadgeProps } from './Badge';

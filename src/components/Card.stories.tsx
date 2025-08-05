@@ -1,0 +1,315 @@
+import type { Meta, StoryObj } from '@storybook/react-vite';
+import Card from './Card';
+
+// Shield Icon Component
+const ShieldIcon = () => (
+  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+  </svg>
+);
+
+// CPU Icon Component
+const CPUIcon = () => (
+  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z" />
+  </svg>
+);
+
+// Database Icon Component
+const DatabaseIcon = () => (
+  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z" />
+    <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z" />
+    <path d="M17 5c0 1.657-3.134 3-7 3S3 6.657 3 5s3.134-3 7-3 7 1.343 7 3z" />
+  </svg>
+);
+
+const meta: Meta<typeof Card> = {
+  title: 'Components/Card',
+  component: Card,
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: `A cyberpunk-themed card component with multiple variants and customizable styling.
+
+**Usage:**
+
+\`\`\`tsx
+import React from 'react';
+import { Card } from 'cyberui-2045';
+
+// With cyberui-2045 theme (recommended)
+import 'cyberui-2045/styles.css';
+
+<Card>
+  <p className="text-default">Basic card content</p>
+</Card>
+
+<Card title="Neural Interface Status">
+  <p className="text-default">System operational and ready for commands.</p>
+</Card>
+
+// Different variants with theme
+<Card variant="accent">
+  <p className="text-default">Enhanced with hover effects</p>
+</Card>
+
+<Card variant="small">
+  <p className="text-default">Compact card for metrics</p>
+</Card>
+
+// With custom styling (theme-agnostic)
+<Card>
+  <p className="text-white">Basic card content</p>
+</Card>
+
+<Card title="Status Panel">
+  <p style={{ color: '#ffffff' }}>Custom styled content</p>
+</Card>
+
+// Advanced usage with cyberpunk theme
+<Card
+  variant="accent"
+  title="Interactive Panel"
+  titleBorder={false}
+  className="w-96"
+>
+  <div className="space-y-4">
+    <p className="text-default">Custom content with enhanced styling</p>
+    <div className="flex justify-between">
+      <span className="text-muted">Status:</span>
+      <span className="text-primary font-mono">ACTIVE</span>
+    </div>
+  </div>
+</Card>
+\`\`\`
+
+**Props:**
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| \`variant\` | \`'default' \\| 'accent' \\| 'small'\` | ❌ | \`'default'\` | Card style variant |
+| \`title\` | \`string\` | ❌ | - | Card title text |
+| \`titleBorder\` | \`boolean\` | ❌ | \`true\` | Whether to show border under title |
+| \`children\` | \`React.ReactNode\` | ✅ | - | Card content |
+| \`className\` | \`string\` | ❌ | - | Additional CSS classes |
+
+All standard HTML div props are also supported.
+`,
+      },
+    },
+  },
+  tags: ['autodocs'],
+  argTypes: {
+    variant: {
+      control: { type: 'select' },
+      options: ['default', 'accent', 'small'],
+      description: 'Card style variant',
+    },
+    title: {
+      control: 'text',
+      description: 'Card title text',
+    },
+    titleBorder: {
+      control: 'boolean',
+      description: 'Whether to show border under title',
+    },
+    className: {
+      control: 'text',
+      description: 'Additional CSS classes',
+    },
+  },
+} satisfies Meta<typeof Card>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Default: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        This is a default card with standard cyberpunk styling. Perfect for main content sections and general information display.
+      </p>
+    </Card>
+  ),
+  args: {
+    variant: 'default',
+  },
+};
+
+export const Accent: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        This is an accent card with enhanced visual emphasis and hover effects. Use for interactive or important content that needs to stand out.
+      </p>
+    </Card>
+  ),
+  args: {
+    variant: 'accent',
+  },
+};
+
+export const Small: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        Compact card variant designed for metrics, status indicators, or secondary information that needs minimal space.
+      </p>
+    </Card>
+  ),
+  args: {
+    variant: 'small',
+  },
+};
+
+export const WithTitle: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        System operational and ready for neural link commands. All subsystems are functioning within normal parameters.
+      </p>
+    </Card>
+  ),
+  args: {
+    title: 'Neural Interface Status',
+  },
+};
+
+export const WithTitleNoBorder: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        This card has a title without the bottom border for a cleaner, more minimal appearance.
+      </p>
+    </Card>
+  ),
+  args: {
+    title: 'Clean Interface',
+    titleBorder: false,
+  },
+};
+
+export const AccentWithTitle: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        Enhanced accent card with title. Features hover effects and visual emphasis for important interactive content.
+      </p>
+    </Card>
+  ),
+  args: {
+    variant: 'accent',
+    title: 'Interactive Dashboard',
+  },
+};
+
+export const SmallWithTitle: Story = {
+  render: (args) => (
+    <Card {...args}>
+      <p className="text-default">
+        Compact card with title, perfect for displaying key metrics or status information in a minimal space.
+      </p>
+    </Card>
+  ),
+  args: {
+    variant: 'small',
+    title: 'Metric',
+  },
+};
+
+export const SystemStatus: Story = {
+  render: () => (
+    <Card title="System Status" className="w-80">
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="text-primary">
+              <ShieldIcon />
+            </div>
+            <span className="text-default">Security Level</span>
+          </div>
+          <span className="text-primary font-mono font-bold">MAXIMUM</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="text-secondary">
+              <CPUIcon />
+            </div>
+            <span className="text-default">Neural Processor</span>
+          </div>
+          <span className="text-secondary font-mono">ONLINE</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="text-accent">
+              <DatabaseIcon />
+            </div>
+            <span className="text-default">Data Integrity</span>
+          </div>
+          <span className="text-primary font-mono">98.7%</span>
+        </div>
+      </div>
+    </Card>
+  ),
+};
+
+export const AllVariants: Story = {
+  render: () => (
+    <div className="flex flex-col gap-6 p-6 bg-base min-w-96">
+      <h4 className="text-secondary font-semibold">Card Variants</h4>
+
+      <Card title="Default Card">
+        <p className="text-default">
+          Standard card styling with neutral background and basic border. Perfect for general content and information display.
+        </p>
+      </Card>
+
+      <Card variant="accent" title="Accent Card">
+        <p className="text-default">
+          Enhanced card with accent border, shadow effects, and hover animations. Use for interactive or highlighted content.
+        </p>
+      </Card>
+
+      <Card variant="small" title="Small Card">
+        <p className="text-default">
+          Compact variant with reduced padding and smaller dimensions. Ideal for metrics, status indicators, or secondary info.
+        </p>
+      </Card>
+    </div>
+  ),
+};
+
+export const DashboardExample: Story = {
+  render: () => (
+    <Card title="Cyberpunk Dashboard" className="w-96">
+      <p className="text-default mb-6">Neural interface control panel with system metrics and nested components:</p>
+
+      <div className="space-y-4">
+        <Card variant="accent" title="Connection Status" titleBorder={false}>
+          <div className="text-center space-y-2">
+            <div className="text-lg font-semibold text-default">Neural Link</div>
+            <div className="text-primary font-mono text-xl">CONNECTED</div>
+            <div className="text-xs text-muted">Latency: 0.3ms</div>
+          </div>
+        </Card>
+
+        <div className="grid grid-cols-2 gap-3">
+          <Card variant="small">
+            <div className="text-center">
+              <div className="text-primary font-mono font-bold text-2xl">98%</div>
+              <div className="text-muted text-xs">CPU Usage</div>
+            </div>
+          </Card>
+          <Card variant="small">
+            <div className="text-center">
+              <div className="text-secondary font-mono font-bold text-2xl">2.1GB</div>
+              <div className="text-muted text-xs">Memory</div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    </Card>
+  ),
+};
