@@ -27,6 +27,10 @@ import 'cyberui-2045/styles.css';
 <Badge size="md">Medium</Badge>
 <Badge size="lg">Large</Badge>
 
+// Responsive sizes
+<Badge size={{ base: 'sm', lg: 'lg' }}>Responsive</Badge>
+<Badge size={{ base: 'md', md: 'sm', xl: 'lg' }}>Multi-breakpoint</Badge>
+
 // With icons
 <Badge
   variant="success"
@@ -62,7 +66,7 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`string\` | ❌ | \`'primary'\` | Badge color variant |
-| \`size\` | \`'sm' \\| 'md' \\| 'lg'\` | ❌ | \`'md'\` | Badge size |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Badge size (supports responsive values) |
 | \`leftIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the left side |
 | \`rightIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the right side |
 | \`clickable\` | \`boolean\` | ❌ | \`false\` | Whether the badge is clickable with hover effects |
@@ -87,7 +91,7 @@ Additional HTML span attributes can be passed and will be applied to the badge e
     size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
-      description: 'Badge size',
+      description: 'Badge size (supports responsive values)',
     },
     clickable: {
       control: 'boolean',

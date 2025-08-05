@@ -45,6 +45,14 @@ import 'cyberui-2045/styles.css';
   message="This notification can be closed"
   onClose={() => console.log('Notification closed')}
 />
+
+// Responsive sizes
+<Notification
+  type="success"
+  title="Responsive Notification"
+  message="This notification adapts to screen size"
+  size={{ base: 'sm', lg: 'lg' }}
+/>
 \`\`\`
 
 **Props:**
@@ -54,6 +62,7 @@ import 'cyberui-2045/styles.css';
 | \`type\` | \`'success' | 'warning' | 'error'\` | ✅ | - | Determines the visual style and icon of the notification |
 | \`title\` | \`string\` | ✅ | - | The main heading text displayed prominently |
 | \`message\` | \`string\` | ✅ | - | The descriptive content below the title |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Notification size (supports responsive values) |
 | \`onClose\` | \`() => void\` | ❌ | \`undefined\` | Callback function triggered when close button is clicked. When provided, renders a close button |
 `,
       },
@@ -73,6 +82,11 @@ import 'cyberui-2045/styles.css';
     message: {
       control: 'text',
       description: 'The message content of the notification',
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Notification size (supports responsive values)',
     },
     onClose: {
       action: 'closed',

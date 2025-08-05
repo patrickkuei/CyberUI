@@ -23,3 +23,6 @@ export type { ButtonProps } from './Button';
 export type { InputProps } from './Input';
 export type { CardProps } from './Card';
 export type { BadgeProps } from './Badge';
+
+export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
+export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

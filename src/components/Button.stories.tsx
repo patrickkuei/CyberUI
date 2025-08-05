@@ -31,6 +31,10 @@ import 'cyberui-2045/styles.css';
 <Button variant="primary" size="sm">Small</Button>
 <Button variant="primary" size="lg">Large</Button>
 
+// Responsive sizes
+<Button variant="primary" size={{ base: 'sm', lg: 'lg' }}>Responsive</Button>
+<Button variant="primary" size={{ base: 'md', md: 'sm', xl: 'lg' }}>Multi-breakpoint</Button>
+
 // Disabled state
 <Button variant="primary" disabled>Disabled Button</Button>
 \`\`\`
@@ -40,7 +44,7 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`'primary' \\| 'secondary' \\| 'danger' \\| 'ghost'\` | ❌ | \`'primary'\` | Button style variant |
-| \`size\` | \`'sm' \\| 'md' \\| 'lg'\` | ❌ | \`'md'\` | Button size |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Button size (supports responsive values) |
 | \`children\` | \`React.ReactNode\` | ✅ | - | Button content/text |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
 | \`onClick\` | \`() => void\` | ❌ | - | Click handler function |
@@ -61,7 +65,7 @@ All standard HTML button props are also supported.
     size: {
       control: { type: 'select' },
       options: ['sm', 'md', 'lg'],
-      description: 'Button size',
+      description: 'Button size (supports responsive values)',
     },
     children: {
       control: 'text',

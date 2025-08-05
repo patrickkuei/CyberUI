@@ -64,6 +64,14 @@ import 'cyberui-2045/styles.css';
 <Input variant="danger" />     // error colors
 <Input variant="ghost" />      // minimal styling
 
+// Different sizes
+<Input variant="primary" size="sm" placeholder="Small input" />
+<Input variant="primary" size="lg" placeholder="Large input" />
+
+// Responsive sizes
+<Input variant="primary" size={{ base: 'sm', lg: 'lg' }} placeholder="Responsive input" />
+<Input variant="primary" size={{ base: 'md', md: 'sm', xl: 'lg' }} placeholder="Multi-breakpoint" />
+
 // With validation
 <Input
   variant="primary"
@@ -77,6 +85,7 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`'primary' \\| 'secondary' \\| 'danger' \\| 'ghost'\` | ❌ | \`'primary'\` | Input style variant |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Input size (supports responsive values) |
 | \`label\` | \`string\` | ❌ | - | Input label text |
 | \`helperText\` | \`string\` | ❌ | - | Helper text below input |
 | \`error\` | \`string\` | ❌ | - | Error message (overrides helperText) |
@@ -95,6 +104,11 @@ All standard HTML input props are also supported.
       control: { type: 'select' },
       options: ['primary', 'secondary', 'danger', 'ghost'],
       description: 'Input style variant',
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Input size (supports responsive values)',
     },
     label: {
       control: 'text',

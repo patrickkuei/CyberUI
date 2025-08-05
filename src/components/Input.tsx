@@ -1,7 +1,10 @@
 import React from 'react';
+import type { ResponsiveValue } from '../utils/responsive';
+import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
-export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   label?: string;
   helperText?: string;
   error?: string;
@@ -11,6 +14,7 @@ export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> 
 
 const Input: React.FC<InputProps> = ({
   variant = 'primary',
+  size = 'md',
   label,
   helperText,
   error,
@@ -33,12 +37,17 @@ const Input: React.FC<InputProps> = ({
     disabled ? 'cursor-not-allowed opacity-60' : 'cursor-text'
   ].join(' ');
 
-  // Padding classes based on icons
-  const getPaddingClasses = (): string => {
-    if (leftIcon && rightIcon) return 'py-3 pl-10 pr-10';
-    if (leftIcon) return 'py-3 pl-10 pr-4';
-    if (rightIcon) return 'py-3 pl-4 pr-10';
-    return 'py-3 px-4';
+  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.input);
+  };
+
+  const getPaddingClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    const baseSizeClasses = getSizeClasses(size);
+
+    if (leftIcon && rightIcon) return `pl-10 pr-10 ${baseSizeClasses}`;
+    if (leftIcon) return `pl-10 pr-4 ${baseSizeClasses}`;
+    if (rightIcon) return `pl-4 pr-10 ${baseSizeClasses}`;
+    return `px-4 ${baseSizeClasses}`;
   };
 
   // Variant styles
@@ -81,7 +90,7 @@ const Input: React.FC<InputProps> = ({
   // Combine all classes
   const inputClasses = [
     baseClasses,
-    getPaddingClasses(),
+    getPaddingClasses(size),
     getVariantClasses(variant, !!error, disabled),
     className
   ].filter(Boolean).join(' ');

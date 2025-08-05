@@ -1,8 +1,10 @@
 import React from 'react';
+import type { ResponsiveValue } from '../utils/responsive';
+import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   children: React.ReactNode;
 }
 
@@ -31,11 +33,8 @@ const Button: React.FC<ButtonProps> = ({
     disabled ? 'cursor-not-allowed' : 'cursor-pointer'
   ].join(' ');
 
-  // Size variations
-  const sizeVariants = {
-    sm: 'py-1 px-4 text-sm',
-    md: 'py-2 px-6 text-lg',
-    lg: 'py-3 px-8 text-xl'
+  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.button);
   };
 
   // Variant styles with disabled states
@@ -65,7 +64,7 @@ const Button: React.FC<ButtonProps> = ({
   // Combine all classes
   const buttonClasses = [
     baseClasses,
-    sizeVariants[size],
+    getSizeClasses(size),
     getVariantClasses(variant, disabled),
     className
   ].filter(Boolean).join(' ');

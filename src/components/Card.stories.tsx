@@ -59,13 +59,22 @@ import 'cyberui-2045/styles.css';
   <p className="text-default">Compact card for metrics</p>
 </Card>
 
-// With custom styling (theme-agnostic)
-<Card>
-  <p className="text-white">Basic card content</p>
+// Different sizes
+<Card size="sm">
+  <p className="text-default">Small card with compact spacing</p>
 </Card>
 
-<Card title="Status Panel">
-  <p style={{ color: '#ffffff' }}>Custom styled content</p>
+<Card size="lg">
+  <p className="text-default">Large card with generous spacing</p>
+</Card>
+
+// Responsive sizes
+<Card size={{ base: 'sm', lg: 'lg' }}>
+  <p className="text-default">Responsive card sizing</p>
+</Card>
+
+<Card size={{ base: 'md', md: 'sm', xl: 'lg' }}>
+  <p className="text-default">Multi-breakpoint card</p>
 </Card>
 
 // Advanced usage with cyberpunk theme
@@ -90,6 +99,7 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`'default' \\| 'accent' \\| 'small'\` | ❌ | \`'default'\` | Card style variant |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Card size (supports responsive values) |
 | \`title\` | \`string\` | ❌ | - | Card title text |
 | \`titleBorder\` | \`boolean\` | ❌ | \`true\` | Whether to show border under title |
 | \`children\` | \`React.ReactNode\` | ✅ | - | Card content |
@@ -106,6 +116,11 @@ All standard HTML div props are also supported.
       control: { type: 'select' },
       options: ['default', 'accent', 'small'],
       description: 'Card style variant',
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Card size (supports responsive values)',
     },
     title: {
       control: 'text',

@@ -1,8 +1,10 @@
 import React from 'react';
+import type { ResponsiveValue } from '../utils/responsive';
+import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
 export interface BadgeProps {
   variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning';
-  size?: 'sm' | 'md' | 'lg';
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   children: React.ReactNode;
   className?: string;
   leftIcon?: React.ReactNode;
@@ -22,13 +24,8 @@ const Badge: React.FC<BadgeProps> = ({
   onClick,
   ...props
 }) => {
-  const getSizeClasses = (size: string): string => {
-    const sizes = {
-      sm: 'px-2 py-1 text-xs gap-1',
-      md: 'px-4 py-2 text-sm gap-2',
-      lg: 'px-6 py-3 text-base gap-3'
-    };
-    return sizes[size as keyof typeof sizes];
+  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.badge);
   };
 
   const getVariantClasses = (variant: string): string => {

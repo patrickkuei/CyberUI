@@ -1,9 +1,12 @@
 import React from 'react';
+import type { ResponsiveValue } from '../utils/responsive';
+import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
 export interface NotificationProps {
   type: 'success' | 'warning' | 'error';
   title: string;
   message: string;
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   onClose?: () => void;
 }
 
@@ -11,8 +14,13 @@ const Notification: React.FC<NotificationProps> = ({
   type,
   title,
   message,
+  size = 'md',
   onClose
 }) => {
+  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.notification);
+  };
+
   const getNotificationStyles = () => {
     switch (type) {
       case 'success':
@@ -67,9 +75,10 @@ const Notification: React.FC<NotificationProps> = ({
   };
 
   const styles = getNotificationStyles();
+  const sizeClasses = getSizeClasses(size);
 
   return (
-    <div className={`flex items-start space-x-4 rounded-lg p-4 ${styles.container}`}>
+    <div className={`flex items-start rounded-lg ${sizeClasses} ${styles.container}`}>
       <div className="flex-shrink-0">
         {styles.icon}
       </div>

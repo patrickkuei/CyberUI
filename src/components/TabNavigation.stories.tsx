@@ -31,6 +31,14 @@ function MyComponent() {
     />
   );
 }
+
+// Responsive sizes
+<TabNavigation
+  tabs={tabs}
+  activeTab={activeTab}
+  onTabChange={setActiveTab}
+  size={{ base: 'sm', lg: 'lg' }}
+/>
 \`\`\`
 
 **Props:**
@@ -40,6 +48,7 @@ function MyComponent() {
 | \`tabs\` | \`readonly Tab[]\` | ✅ | - | Array of tab names to display |
 | \`activeTab\` | \`Tab\` | ✅ | - | Currently selected tab name |
 | \`onTabChange\` | \`(tab: Tab) => void\` | ✅ | - | Callback function triggered when a tab is clicked |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Tab size (supports responsive values) |
 `,
       },
     },
@@ -60,6 +69,11 @@ function MyComponent() {
     onTabChange: {
       action: 'tab changed',
       description: 'Callback function when tab is changed',
+    },
+    size: {
+      control: { type: 'select' },
+      options: ['sm', 'md', 'lg'],
+      description: 'Tab size (supports responsive values)',
     },
   },
 };

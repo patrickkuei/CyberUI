@@ -1,7 +1,10 @@
 import React from 'react';
+import type { ResponsiveValue } from '../utils/responsive';
+import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
 export interface CardProps {
   variant?: 'default' | 'accent' | 'small';
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   title?: string;
   titleBorder?: boolean;
   children: React.ReactNode;
@@ -10,17 +13,23 @@ export interface CardProps {
 
 const Card: React.FC<CardProps> = ({
   variant = 'default',
+  size = 'md',
   title,
   titleBorder = true,
   children,
   className = '',
   ...props
 }) => {
+  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
+    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.card);
+  };
+
   const getVariantClasses = (variant: string): string => {
+    const baseSize = getSizeClasses(size);
     const variants = {
-      default: 'bg-base border border-border-default rounded-xl p-6 space-y-6',
-      accent: 'bg-surface border-2 border-accent rounded-xl p-6 shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform',
-      small: 'bg-base rounded-lg p-3 border border-border-default'
+      default: `bg-base border border-border-default rounded-xl ${baseSize}`,
+      accent: `bg-surface border-2 border-accent rounded-xl shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform ${baseSize}`,
+      small: `bg-base rounded-lg border border-border-default ${baseSize}`
     };
     return variants[variant as keyof typeof variants];
   };
