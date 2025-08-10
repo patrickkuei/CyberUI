@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { CORPORATIONS } from '../../constants';
 import Card from '../Card';
 import Badge from '../Badge';
+import Toggle from '../Toggle';
 
 const ElementsTab: React.FC = () => {
+  const [stealthMode, setStealthMode] = useState(false);
+
   return (
     <div className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl space-y-8 md:space-y-12">
       {/* Section Header */}
@@ -46,17 +49,18 @@ const ElementsTab: React.FC = () => {
             </div>
           </div>
 
-          {/* Toggle Switch with better styling */}
+          {/* Toggle Switch */}
           <div>
             <label className="block text-sm font-medium text-default mb-2">
               Stealth Protocol
             </label>
-            <div className="flex items-center justify-between bg-surface border border-border-default rounded-lg p-3">
-              <span className="text-default">Enable Ghost Mode</span>
-              <label className="relative inline-flex items-center cursor-pointer">
-                <input type="checkbox" className="sr-only peer" />
-                <div className="w-14 h-7 bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-linear-(--gradient-accent)"></div>
-              </label>
+            <div className="bg-surface border border-border-default rounded-lg p-3">
+              <Toggle
+                label="Enable Ghost Mode"
+                variant="primary"
+                checked={stealthMode}
+                onChange={setStealthMode}
+              />
             </div>
           </div>
         </div>
