@@ -16,6 +16,7 @@ export { default as Card } from './Card';
 export { default as Badge } from './Badge';
 export { default as Toggle } from './Toggle';
 export { default as Select } from './Select';
+export { default as Skeleton } from './Skeleton';
 
 // Export component prop types
 export type { CircularProgressProps } from './CircularProgress';
@@ -29,6 +30,7 @@ export type { CardProps } from './Card';
 export type { BadgeProps } from './Badge';
 export type { ToggleProps } from './Toggle';
 export type { SelectProps, SelectOption } from './Select';
+export type { SkeletonProps } from './Skeleton';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

@@ -96,5 +96,10 @@ export const RESPONSIVE_SIZE_MAPS = {
       md: 'h-3',
       lg: 'h-4'
     }
+  },
+  skeleton: {
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg'
   }
 } as const;
