@@ -129,7 +129,7 @@ All standard HTML img props are also supported.
     },
   },
   args: {
-    src: "/image_demo_1.jpg",
+    src: "image_demo_1.jpg",
     alt: "Cyberpunk Demo Image",
     size: "md",
     preview: true,
@@ -149,7 +149,7 @@ export const Default: Story = {
     },
   },
   args: {
-    src: "/image_demo_1.jpg",
+    src: "image_demo_1.jpg",
     alt: "Cyberpunk cityscape with neon lights",
   },
   render: (args) => (
@@ -175,7 +175,7 @@ export const AllFeatures: Story = {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="text-center">
             <Image
-              src="/image_demo_2.jpg"
+              src="image_demo_2.jpg"
               alt="No preview mode"
               preview={false}
               size="sm"
@@ -186,14 +186,14 @@ export const AllFeatures: Story = {
             <Image
               src="/nonexistent-image.jpg"
               alt="Fallback demo"
-              fallback="/image_demo_1.jpg"
+              fallback="image_demo_1.jpg"
               size="sm"
             />
             <p className="text-muted text-sm mt-2">With Fallback</p>
           </div>
           <div className="text-center">
             <Image
-              src="/image_demo_3.jpg"
+              src="image_demo_3.jpg"
               alt="Minimal effects"
               animation={{ cyberpunkEffects: false }}
               size="sm"
@@ -210,9 +210,9 @@ export const AllFeatures: Story = {
           story)
         </p>
         <div className="grid grid-cols-3 gap-4">
-          <Image src="/image_demo_1.jpg" alt="Cyberpunk cityscape" size="md" />
-          <Image src="/image_demo_2.jpg" alt="Neural network" size="md" />
-          <Image src="/image_demo_3.jpg" alt="Holographic display" size="md" />
+          <Image src="image_demo_1.jpg" alt="Cyberpunk cityscape" size="md" />
+          <Image src="image_demo_2.jpg" alt="Neural network" size="md" />
+          <Image src="image_demo_3.jpg" alt="Holographic display" size="md" />
         </div>
       </div>
     </div>
@@ -233,17 +233,17 @@ export const AllSizes: Story = {
       <h4 className="text-secondary font-semibold">Size Comparison</h4>
       <div className="flex gap-8 items-end justify-center">
         <div className="text-center">
-          <Image src="/image_demo_1.jpg" alt="Small size demo" size="sm" />
+          <Image src="image_demo_1.jpg" alt="Small size demo" size="sm" />
           <p className="text-muted text-xs mt-2">Small (sm)</p>
           <p className="text-accent text-xs font-mono">128×96px</p>
         </div>
         <div className="text-center">
-          <Image src="/image_demo_2.jpg" alt="Medium size demo" size="md" />
+          <Image src="image_demo_2.jpg" alt="Medium size demo" size="md" />
           <p className="text-muted text-xs mt-2">Medium (md)</p>
           <p className="text-accent text-xs font-mono">256×192px</p>
         </div>
         <div className="text-center">
-          <Image src="/image_demo_3.jpg" alt="Large size demo" size="lg" />
+          <Image src="image_demo_3.jpg" alt="Large size demo" size="lg" />
           <p className="text-muted text-xs mt-2">Large (lg)</p>
           <p className="text-accent text-xs font-mono">384×288px</p>
         </div>
