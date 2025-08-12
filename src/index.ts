@@ -5,4 +5,4 @@ import './index.css';
 export * from './components';
 
 // Export version
-export const version = '1.0.0';
+export const version = '1.2.0';

@@ -5,6 +5,74 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-08-12
+
+### Added
+- **Image Component**: Click-to-expand preview with cyberpunk effects
+  - Full-screen preview mode with animated overlay
+  - Fallback image support for error handling
+  - Loading states with customizable placeholders
+  - Cyberpunk visual effects (grid background, scanning lines, corner brackets)
+  - Responsive sizing (sm, md, lg) with clear size differentiation
+  - Accessibility features (ARIA attributes, keyboard navigation)
+  - Lazy loading and eager loading options
+  - Smooth animations and transitions
+  - Perfect Storybook integration with contained preview mode
+
+- **Skeleton Component**: Loading placeholder component
+  - Multiple variants (text, circular, rectangular, button)
+  - Customizable dimensions and animation
+  - Responsive sizing support
+  - Cyberpunk-themed styling with gradient animations
+
+- **Select Component**: Dropdown select component
+  - Multiple variants (primary, secondary, danger)
+  - Form integration with labels and validation states
+  - Responsive design with proper focus states
+  - Accessible with keyboard navigation
+
+- **Toggle Component**: Switch/toggle component  
+  - Multiple variants with cyberpunk styling
+  - Form integration and controlled/uncontrolled modes
+  - Accessible with proper ARIA attributes
+  - Smooth animations and hover effects
+
+- **LinearProgress Component**: Progress bar component
+  - Determinate and indeterminate modes
+  - Customizable colors and sizing
+  - Smooth animations and cyberpunk styling
+  - Responsive design
+
+### Documentation
+- **Design Tokens Documentation**: Comprehensive design system guide in Storybook
+  - Color palette documentation
+  - Typography system
+  - Spacing and sizing guidelines
+  - Component design patterns
+
+### Enhanced
+- **ElementsTab**: Updated showcase with new components
+  - Added Image Gallery section with demo images
+  - Enhanced form controls section with Select and Toggle
+  - Improved layout and organization
+
+- **Responsive Utilities**: Extended responsive system
+  - Added new size mappings for components
+  - Enhanced responsive value support
+
+### Infrastructure
+- Added demo images for Image component showcase
+- Updated roadmap with development progress
+- Enhanced Storybook configuration for better component testing
+- Improved build system and type definitions
+
+## [1.1.0] - 2025-08-11
+
+### Added
+- **Card Component**: Container component with cyberpunk styling
+- **Badge Component**: Status indicator with multiple variants
+- **Input Component**: Form input with validation states
+
 ## [1.0.0] - 2025-08-05
 
 ### Added
