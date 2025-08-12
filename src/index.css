@@ -25,6 +25,7 @@
     0 0 16px var(--color-success);
   --neon-error-glow: 0 0 8px var(--color-error), 0 0 16px var(--color-error);
   --animate-spin-slow: spin-slow 4s linear infinite;
+  --animate-scan: scan 2s ease-in-out infinite;
 
   --gradient-accent: 90deg, var(--color-accent), var(--color-secondary);
   --shadow-lg-accent: 0 0 12px var(--color-accent);
@@ -38,4 +39,36 @@ html,
 body {
   scrollbar-gutter: stable;
   background-color: var(--color-base);
+}
+
+/* Cyberpunk Animations */
+@keyframes scan {
+  0% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(calc(100vh + 50px));
+    opacity: 0;
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Custom animation classes */
+.animate-scan {
+  animation: scan 3s linear infinite;
 }

@@ -4,6 +4,7 @@ import Card from "../Card";
 import Badge from "../Badge";
 import Toggle from "../Toggle";
 import Select from "../Select";
+import Image from "../Image";
 
 const ElementsTab: React.FC = () => {
   const [stealthMode, setStealthMode] = useState(false);
@@ -116,6 +117,62 @@ const ElementsTab: React.FC = () => {
                 <span className="text-xs text-secondary font-mono">
                   STANDBY
                 </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
+
+      {/* Image Gallery Showcase */}
+      <Card title="Media Gallery">
+        <div className="space-y-6">
+          <div>
+            <label className="block text-sm font-medium text-default mb-3">
+              Cyberpunk Image Gallery
+            </label>
+            <p className="text-muted text-sm mb-4">
+              Click any image to expand it in full-screen preview mode
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <div className="h-48">
+                  <Image
+                    src="image_demo_1.jpg"
+                    alt="Cyberpunk cityscape with neon lights reflecting on wet streets"
+                    size="md"
+                    className="h-full object-cover"
+                  />
+                </div>
+                <p className="text-xs text-muted text-center">Neon Cityscape</p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="h-48">
+                  <Image
+                    src="image_demo_3.jpg"
+                    alt="Holographic display showing system diagnostics"
+                    size="md"
+                    className="h-full object-cover"
+                  />
+                </div>
+                <p className="text-xs text-muted text-center">
+                  System Diagnostics
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <div className="h-48">
+                  <Image
+                    src="noexist.jpg"
+                    alt="Futuristic neural network interface with data streams"
+                    size="md"
+                    className="h-full object-cover"
+                  />
+                </div>
+                <p className="text-xs text-muted text-center">
+                  Neural Interface Offline
+                </p>
               </div>
             </div>
           </div>
