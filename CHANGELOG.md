@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Enhanced
+- **Image Component**: Preview mode now uses React Portal for true fullscreen display
+  - Image preview overlay now renders at document root using `createPortal`
+  - Prevents preview from being constrained by parent container overflow
+  - Ensures consistent fullscreen behavior across all usage contexts
+  - Maintains all existing functionality while improving z-index handling
+  - No breaking changes - fully backward compatible
+
+- **Carousel Component**: Improved objectFit implementation  
+  - Simplified objectFit options to `cover` and `contain` only
+  - Removed `dynamic` option that could cause layout instability
+  - ObjectFit styles now handled via CSS selectors for better performance
+  - Clean separation between component logic and styling concerns
+
 ## [1.2.0] - 2025-08-12
 
 ### Added

@@ -2,9 +2,30 @@ import React, { useState } from "react";
 import Button from "../Button";
 import Input from "../Input";
 import Card from "../Card";
+import Carousel from "../Carousel";
 
 const InteractiveTab: React.FC = () => {
   const [input, setInput] = useState("");
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Sample images for carousel
+  const carouselImages = [
+    {
+      src: "image_demo_1.jpg",
+      alt: "Cyberpunk cityscape with neon lights",
+      caption: "Neo-Tokyo District 7",
+    },
+    {
+      src: "image_demo_2.jpg",
+      alt: "Futuristic architecture",
+      caption: "Corporate Megastructure",
+    },
+    {
+      src: "image_demo_3.jpg",
+      alt: "Cyberpunk street scene",
+      caption: "Underground Market",
+    },
+  ];
 
   const handleAlert = (message: string) => {
     alert(message);
@@ -107,6 +128,36 @@ const InteractiveTab: React.FC = () => {
           <Button variant="ghost" disabled>
             Network Down
           </Button>
+        </div>
+      </Card>
+
+      <Card title="Visual Data Stream">
+        <div className="space-y-4">
+          <p className="text-muted text-center">
+            Navigate through corporate surveillance footage
+          </p>
+          <Carousel
+            images={carouselImages}
+            currentIndex={currentSlide}
+            onChange={setCurrentSlide}
+            size="md"
+            transition="signal-glitch"
+            glitchRate={0.3}
+            autoPlay={true}
+            interval={4000}
+            onBeforeChange={(from, to) =>
+              console.log(`Switching surveillance feed ${from} → ${to}`)
+            }
+            onAfterChange={(index) =>
+              console.log(`Now monitoring sector ${index + 1}`)
+            }
+          />
+          <div className="flex justify-between items-center text-sm text-muted">
+            <span>
+              Feed {currentSlide + 1} of {carouselImages.length}
+            </span>
+            <span className="font-mono">AUTO-SCAN: ACTIVE</span>
+          </div>
         </div>
       </Card>
 

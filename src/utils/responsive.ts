@@ -101,5 +101,10 @@ export const RESPONSIVE_SIZE_MAPS = {
     sm: 'text-sm',
     md: 'text-base',
     lg: 'text-lg'
+  },
+  carousel: {
+    sm: 'h-48',
+    md: 'h-64',
+    lg: 'h-80'
   }
 } as const;

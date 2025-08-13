@@ -6,6 +6,7 @@ import React, {
   memo,
   useMemo,
 } from "react";
+import { createPortal } from "react-dom";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -401,7 +402,7 @@ const Image: React.FC<ImageProps> = memo(
         {imageElement}
 
         {/* Preview Overlay */}
-        {isPreviewOpen && (
+        {isPreviewOpen && createPortal(
           <div
             ref={overlayRef}
             className={`fixed z-50 flex items-center justify-center p-4 transition-all ease-out ${previewClassName} ${
@@ -598,7 +599,8 @@ const Image: React.FC<ImageProps> = memo(
                 )}
               </div>
             </div>
-          </div>
+          </div>,
+          document.body
         )}
       </>
     );
