@@ -128,10 +128,10 @@ const ElementsTab: React.FC = () => {
         <div className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-default mb-3">
-              Cyberpunk Image Gallery
+              Enhanced Visual Analysis System
             </label>
             <p className="text-muted text-sm mb-4">
-              Click any image to expand it in full-screen preview mode
+              Access enhanced imaging protocol for detailed examination
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

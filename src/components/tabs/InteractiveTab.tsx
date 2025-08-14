@@ -134,7 +134,7 @@ const InteractiveTab: React.FC = () => {
       <Card title="Visual Data Stream">
         <div className="space-y-4">
           <p className="text-muted text-center">
-            Navigate through corporate surveillance footage
+            Navigate through archived data streams
           </p>
           <Carousel
             images={carouselImages}

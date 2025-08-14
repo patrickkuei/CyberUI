@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Arrow Component**: Directional indicator component with cyberpunk styling
+  - Multiple directional variants (up, down, left, right)
+  - Integrated with carousel navigation
+  - Responsive sizing and hover effects
+  - Consistent with overall cyberpunk design theme
+
 ### Enhanced
 - **Image Component**: Preview mode now uses React Portal for true fullscreen display
   - Image preview overlay now renders at document root using `createPortal`
@@ -20,6 +27,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Removed `dynamic` option that could cause layout instability
   - ObjectFit styles now handled via CSS selectors for better performance
   - Clean separation between component logic and styling concerns
+  - Enhanced with arrow indicators for better navigation
+
+- **UI Text and Descriptions**: Enhanced cyberpunk theming
+  - Updated component descriptions to match Blade Runner aesthetic
+  - Improved visual data stream navigation text
+  - Enhanced imaging protocol descriptions for better immersion
 
 ## [1.2.0] - 2025-08-12
 
