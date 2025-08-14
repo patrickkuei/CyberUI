@@ -580,10 +580,95 @@ const Carousel: React.FC<CarouselProps> = ({
             (!infinite && currentIndex === 0) ||
             (isTransitioning && transition === "signal-glitch" && shouldGlitch)
           }
-          className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/90 hover:bg-surface border-2 border-accent hover:border-primary text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none focus:ring-4 focus:ring-accent/50 backdrop-blur-sm hover:shadow-lg-primary transition-all duration-300 rounded-lg flex items-center justify-center"
+          className="group absolute left-2 top-1/2 -translate-y-1/2 w-16 h-16 text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
           aria-label="Previous image"
         >
-          <span className="text-2xl font-bold">&lt;</span>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 100 100"
+            className="transition-all duration-300 group-hover:scale-110 overflow-visible"
+            style={{ overflow: "visible" } as React.CSSProperties}
+          >
+            <defs>
+              <linearGradient
+                id="arrow-gradient-left"
+                x1="100%"
+                y1="0%"
+                x2="0%"
+                y2="0%"
+              >
+                <stop
+                  offset="0%"
+                  stopColor="rgb(0, 255, 136)"
+                  stopOpacity="1"
+                  className="transition-all duration-500 opacity-0 group-hover:opacity-100"
+                />
+                <stop
+                  offset="50%"
+                  stopColor="rgb(0, 255, 249)"
+                  stopOpacity="1"
+                  className="transition-all duration-500 opacity-0 group-hover:opacity-100"
+                />
+                <stop
+                  offset="100%"
+                  stopColor="rgb(255, 0, 93)"
+                  stopOpacity="1"
+                  className="transition-all duration-500 opacity-0 group-hover:opacity-100"
+                />
+              </linearGradient>
+            </defs>
+            <path
+              d="M70 20 L20 50 L70 80 L60 50 Z"
+              stroke="currentColor"
+              strokeWidth="3"
+              fill="none"
+              className="transition-all duration-300 group-hover:stroke-primary group-hover:drop-shadow-[0_0_8px_rgba(0,255,136,0.8)] group-hover:stroke-[4]"
+            />
+            {/* Left arrow morphing animation: right edge to left edge */}
+            {/* Stage 1: Right edge shape */}
+            <path
+              d="M70 20 L60 50 L70 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphLeftStage1_0.5s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+            {/* Stage 2: Intermediate shape */}
+            <path
+              d="M70 20 L40 50 L70 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphLeftStage2_0.3s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+            {/* Stage 3: Left edge shape (tip) */}
+            <path
+              d="M70 20 L20 50 L70 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphLeftStage3_0.2s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+          </svg>
         </button>
 
         {/* Next arrow */}
@@ -593,10 +678,67 @@ const Carousel: React.FC<CarouselProps> = ({
             (!infinite && currentIndex === images.length - 1) ||
             (isTransitioning && transition === "signal-glitch" && shouldGlitch)
           }
-          className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 bg-surface/90 hover:bg-surface border-2 border-accent hover:border-primary text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none focus:ring-4 focus:ring-accent/50 backdrop-blur-sm hover:shadow-lg-primary transition-all duration-300 rounded-lg flex items-center justify-center"
+          className="group absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
           aria-label="Next image"
         >
-          <span className="text-2xl font-bold">&gt;</span>
+          <svg
+            width="48"
+            height="48"
+            viewBox="0 0 100 100"
+            className="transition-all duration-300 group-hover:scale-110 overflow-visible"
+            style={{ overflow: "visible" } as React.CSSProperties}
+          >
+            <path
+              d="M30 20 L80 50 L30 80 L40 50 Z"
+              stroke="currentColor"
+              strokeWidth="3"
+              fill="none"
+              className="transition-all duration-300 group-hover:stroke-primary group-hover:drop-shadow-[0_0_8px_rgba(0,255,136,0.8)] group-hover:stroke-[4]"
+            />
+            {/* Right arrow morphing animation: left edge to right edge */}
+            {/* Stage 1: Left edge shape */}
+            <path
+              d="M30 20 L40 50 L30 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphRightStage1_0.5s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+            {/* Stage 2: Intermediate shape */}
+            <path
+              d="M30 20 L60 50 L30 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphRightStage2_0.3s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+            {/* Stage 3: Right edge shape */}
+            <path
+              d="M30 20 L80 50 L30 80"
+              stroke="rgb(0, 255, 136)"
+              strokeWidth="4"
+              fill="none"
+              className="opacity-0 group-hover:animate-[morphRightStage3_0.2s_ease-out_forwards]"
+              style={
+                {
+                  filter:
+                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                } as React.CSSProperties
+              }
+            />
+          </svg>
         </button>
       </>
     );
