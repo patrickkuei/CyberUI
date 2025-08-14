@@ -580,7 +580,7 @@ const Carousel: React.FC<CarouselProps> = ({
             (!infinite && currentIndex === 0) ||
             (isTransitioning && transition === "signal-glitch" && shouldGlitch)
           }
-          className="group absolute left-2 top-1/2 -translate-y-1/2 w-16 h-16 text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
+          className="group absolute left-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
           aria-label="Previous image"
         >
           <svg
@@ -623,50 +623,29 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="currentColor"
               strokeWidth="3"
               fill="none"
-              className="transition-all duration-300 group-hover:stroke-primary group-hover:drop-shadow-[0_0_8px_rgba(0,255,136,0.8)] group-hover:stroke-[4]"
+              className="transition-all duration-300 group-hover:stroke-[4]"
             />
-            {/* Left arrow morphing animation: right edge to left edge */}
-            {/* Stage 1: Right edge shape */}
+            {/* RGB cycling halo on hover */}
             <path
-              d="M70 20 L60 50 L70 80"
-              stroke="rgb(0, 255, 136)"
+              d="M70 20 L20 50 L70 80 L60 50 Z"
+              stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:animate-[morphLeftStage1_0.5s_ease-out_forwards]"
+              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] group-active:opacity-0"
               style={
                 {
                   filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                    "drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor) drop-shadow(0 0 18px currentColor)",
                 } as React.CSSProperties
               }
             />
-            {/* Stage 2: Intermediate shape */}
+            {/* RGB cycling solid stroke on click */}
             <path
-              d="M70 20 L40 50 L70 80"
-              stroke="rgb(0, 255, 136)"
+              d="M70 20 L20 50 L70 80 L60 50 Z"
+              stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:animate-[morphLeftStage2_0.3s_ease-out_forwards]"
-              style={
-                {
-                  filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
-                } as React.CSSProperties
-              }
-            />
-            {/* Stage 3: Left edge shape (tip) */}
-            <path
-              d="M70 20 L20 50 L70 80"
-              stroke="rgb(0, 255, 136)"
-              strokeWidth="4"
-              fill="none"
-              className="opacity-0 group-hover:animate-[morphLeftStage3_0.2s_ease-out_forwards]"
-              style={
-                {
-                  filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
-                } as React.CSSProperties
-              }
+              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite]"
             />
           </svg>
         </button>
@@ -678,7 +657,7 @@ const Carousel: React.FC<CarouselProps> = ({
             (!infinite && currentIndex === images.length - 1) ||
             (isTransitioning && transition === "signal-glitch" && shouldGlitch)
           }
-          className="group absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 text-accent hover:text-primary cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
+          className="group absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
           aria-label="Next image"
         >
           <svg
@@ -693,50 +672,29 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="currentColor"
               strokeWidth="3"
               fill="none"
-              className="transition-all duration-300 group-hover:stroke-primary group-hover:drop-shadow-[0_0_8px_rgba(0,255,136,0.8)] group-hover:stroke-[4]"
+              className="transition-all duration-300 group-hover:stroke-[4]"
             />
-            {/* Right arrow morphing animation: left edge to right edge */}
-            {/* Stage 1: Left edge shape */}
+            {/* RGB cycling halo on hover */}
             <path
-              d="M30 20 L40 50 L30 80"
-              stroke="rgb(0, 255, 136)"
+              d="M30 20 L80 50 L30 80 L40 50 Z"
+              stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:animate-[morphRightStage1_0.5s_ease-out_forwards]"
+              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] group-active:opacity-0"
               style={
                 {
                   filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
+                    "drop-shadow(0 0 6px currentColor) drop-shadow(0 0 12px currentColor) drop-shadow(0 0 18px currentColor)",
                 } as React.CSSProperties
               }
             />
-            {/* Stage 2: Intermediate shape */}
+            {/* RGB cycling solid stroke on click */}
             <path
-              d="M30 20 L60 50 L30 80"
-              stroke="rgb(0, 255, 136)"
+              d="M30 20 L80 50 L30 80 L40 50 Z"
+              stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:animate-[morphRightStage2_0.3s_ease-out_forwards]"
-              style={
-                {
-                  filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
-                } as React.CSSProperties
-              }
-            />
-            {/* Stage 3: Right edge shape */}
-            <path
-              d="M30 20 L80 50 L30 80"
-              stroke="rgb(0, 255, 136)"
-              strokeWidth="4"
-              fill="none"
-              className="opacity-0 group-hover:animate-[morphRightStage3_0.2s_ease-out_forwards]"
-              style={
-                {
-                  filter:
-                    "drop-shadow(0 0 8px rgb(0, 255, 136)) drop-shadow(0 0 16px rgb(0, 255, 136)) drop-shadow(0 0 24px rgb(0, 255, 136))",
-                } as React.CSSProperties
-              }
+              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite]"
             />
           </svg>
         </button>
@@ -757,43 +715,72 @@ const Carousel: React.FC<CarouselProps> = ({
             disabled={
               isTransitioning && transition === "signal-glitch" && shouldGlitch
             }
-            className="group relative transition-all duration-300 hover:scale-110 focus:outline-none focus:ring-2 focus:ring-accent/50 disabled:cursor-not-allowed disabled:opacity-30"
+            className="group relative transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
             style={{
               width: "24px",
               height: "24px",
             }}
             aria-label={`Go to slide ${index + 1}`}
           >
-            {/* Diamond shape using CSS clip-path */}
+            {/* Rotating focus ring - diamond to square frame */}
+            {index === currentIndex && (
+              <div
+                className="absolute inset-[-1px] border-2"
+                style={
+                  {
+                    borderColor: "rgb(255, 0, 93)",
+                    animation:
+                      "rotateFocusRing 0.8s ease-out forwards, rgbBorder 1.5s linear infinite 0.8s",
+                  } as React.CSSProperties
+                }
+              />
+            )}
+            {/* Diamond shape with RGB cycling */}
             <div
               className={`absolute inset-0 border-2 transition-all duration-300 ${
                 index === currentIndex
-                  ? "border-primary bg-primary/30 shadow-lg-primary"
-                  : "border-accent bg-surface/50 group-hover:border-primary group-hover:bg-primary/20 group-hover:shadow-primary"
+                  ? "border-primary bg-primary/30 shadow-lg-primary animate-[rgbBorder_1.5s_linear_infinite]"
+                  : "border-accent bg-surface/50 group-hover:border-primary group-hover:bg-primary/20 group-hover:shadow-primary group-hover:animate-[rgbBorder_1.5s_linear_infinite]"
               }`}
               style={{
                 clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
               }}
             />
-            {/* Inner glow effect */}
+            {/* Inner RGB glow effect with pulse */}
             {index === currentIndex && (
               <div
                 className="absolute inset-2 bg-primary/60 animate-pulse"
-                style={{
-                  clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                }}
+                style={
+                  {
+                    clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                    animation:
+                      "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                  } as React.CSSProperties
+                }
               />
             )}
-            {/* Electric lines for active state */}
+            {/* Electric RGB lines for active state */}
             {index === currentIndex && (
               <div className="absolute inset-0 opacity-80">
                 <div
                   className="absolute top-1/2 left-2 right-2 h-0.5 bg-primary/80 animate-pulse"
-                  style={{ transform: "translateY(-50%)" }}
+                  style={
+                    {
+                      transform: "translateY(-50%)",
+                      animation:
+                        "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                    } as React.CSSProperties
+                  }
                 />
                 <div
                   className="absolute left-1/2 top-2 bottom-2 w-0.5 bg-primary/80 animate-pulse"
-                  style={{ transform: "translateX(-50%)" }}
+                  style={
+                    {
+                      transform: "translateX(-50%)",
+                      animation:
+                        "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                    } as React.CSSProperties
+                  }
                 />
               </div>
             )}

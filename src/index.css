@@ -92,159 +92,320 @@ body {
 }
 
 @keyframes signal-glitch-wobble {
-  0% { transform: translateX(0px); }
-  25% { transform: translateX(var(--wobble-1)); }
-  50% { transform: translateX(var(--wobble-2)); }
-  75% { transform: translateX(var(--wobble-3)); }
-  100% { transform: translateX(0px); }
+  0% {
+    transform: translateX(0px);
+  }
+  25% {
+    transform: translateX(var(--wobble-1));
+  }
+  50% {
+    transform: translateX(var(--wobble-2));
+  }
+  75% {
+    transform: translateX(var(--wobble-3));
+  }
+  100% {
+    transform: translateX(0px);
+  }
 }
 
 @keyframes signal-glitch-blink {
-  0% { opacity: 1; }
-  20% { opacity: 0; }
-  40% { opacity: 1; }
-  60% { opacity: 0; }
-  80% { opacity: 1; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 1;
+  }
+  20% {
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 0;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 @keyframes signal-scanline-jitter {
-  0% { transform: translateX(0px); }
-  10% { transform: translateX(2px); }
-  20% { transform: translateX(-1.5px); }
-  30% { transform: translateX(3px); }
-  40% { transform: translateX(-2px); }
-  50% { transform: translateX(1px); }
-  60% { transform: translateX(-2.5px); }
-  70% { transform: translateX(1.5px); }
-  80% { transform: translateX(-1px); }
-  90% { transform: translateX(2.5px); }
-  100% { transform: translateX(0px); }
+  0% {
+    transform: translateX(0px);
+  }
+  10% {
+    transform: translateX(2px);
+  }
+  20% {
+    transform: translateX(-1.5px);
+  }
+  30% {
+    transform: translateX(3px);
+  }
+  40% {
+    transform: translateX(-2px);
+  }
+  50% {
+    transform: translateX(1px);
+  }
+  60% {
+    transform: translateX(-2.5px);
+  }
+  70% {
+    transform: translateX(1.5px);
+  }
+  80% {
+    transform: translateX(-1px);
+  }
+  90% {
+    transform: translateX(2.5px);
+  }
+  100% {
+    transform: translateX(0px);
+  }
 }
 
 @keyframes signal-rgb-separation {
   0% {
-    filter: 
-      drop-shadow(3px 0 0 rgba(255, 0, 0, 1))
-      drop-shadow(-3px 0 0 rgba(0, 255, 255, 1))
-      brightness(0.9);
+    filter: drop-shadow(3px 0 0 rgba(255, 0, 0, 1))
+      drop-shadow(-3px 0 0 rgba(0, 255, 255, 1)) brightness(0.9);
   }
   33% {
-    filter: 
-      drop-shadow(6px 0 0 rgba(255, 0, 0, 0.8))
-      drop-shadow(-6px 0 0 rgba(0, 255, 255, 0.8))
-      brightness(1.2);
+    filter: drop-shadow(6px 0 0 rgba(255, 0, 0, 0.8))
+      drop-shadow(-6px 0 0 rgba(0, 255, 255, 0.8)) brightness(1.2);
   }
   66% {
-    filter: 
-      drop-shadow(2px 0 0 rgba(255, 0, 0, 1))
-      drop-shadow(-2px 0 0 rgba(0, 255, 255, 1))
-      brightness(0.8);
+    filter: drop-shadow(2px 0 0 rgba(255, 0, 0, 1))
+      drop-shadow(-2px 0 0 rgba(0, 255, 255, 1)) brightness(0.8);
   }
   100% {
-    filter: 
-      drop-shadow(4px 0 0 rgba(255, 0, 0, 0.9))
-      drop-shadow(-4px 0 0 rgba(0, 255, 255, 0.9))
-      brightness(1.1);
+    filter: drop-shadow(4px 0 0 rgba(255, 0, 0, 0.9))
+      drop-shadow(-4px 0 0 rgba(0, 255, 255, 0.9)) brightness(1.1);
   }
 }
 
 @keyframes signal-image-flicker-out {
-  0% { opacity: 1; }
-  70% { opacity: 1; }
-  75% { opacity: 0.2; }
-  80% { opacity: 0.8; }
-  85% { opacity: 0.1; }
-  90% { opacity: 0.6; }
-  95% { opacity: 0; }
-  100% { opacity: 0; }
+  0% {
+    opacity: 1;
+  }
+  70% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.2;
+  }
+  80% {
+    opacity: 0.8;
+  }
+  85% {
+    opacity: 0.1;
+  }
+  90% {
+    opacity: 0.6;
+  }
+  95% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
 }
 
 @keyframes signal-image-flicker-in {
-  0% { opacity: 0; }
-  5% { opacity: 0.3; }
-  10% { opacity: 0; }
-  15% { opacity: 0.7; }
-  20% { opacity: 0.1; }
-  25% { opacity: 0.9; }
-  30% { opacity: 0.2; }
-  35% { opacity: 1; }
-  100% { opacity: 1; }
+  0% {
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.3;
+  }
+  10% {
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.7;
+  }
+  20% {
+    opacity: 0.1;
+  }
+  25% {
+    opacity: 0.9;
+  }
+  30% {
+    opacity: 0.2;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
 }
 
 /* Arrow Line Animation */
 @keyframes slideRight {
-  0% { transform: translateX(0px); }
-  100% { transform: translateX(40px); }
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(40px);
+  }
 }
 
 @keyframes slideLeft {
-  0% { transform: translateX(0px); }
-  100% { transform: translateX(-40px); }
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(-40px);
+  }
 }
 
 @keyframes slideRightAndHide {
-  0% { transform: translateX(0px); opacity: 1; }
-  80% { transform: translateX(40px); opacity: 1; }
-  100% { transform: translateX(40px); opacity: 0; }
+  0% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(40px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(40px);
+    opacity: 0;
+  }
 }
 
 @keyframes slideLeftAndHide {
-  0% { transform: translateX(0px); opacity: 1; }
-  80% { transform: translateX(-40px); opacity: 1; }
-  100% { transform: translateX(-40px); opacity: 0; }
+  0% {
+    transform: translateX(0px);
+    opacity: 1;
+  }
+  80% {
+    transform: translateX(-40px);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-40px);
+    opacity: 0;
+  }
 }
 
-/* Right arrow morphing stages - 0.5s duration */
-@keyframes morphRightStage1 {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  30% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 0; }
+/* Arrow RGB Cycling Animation */
+@keyframes rgbCycle {
+  0% {
+    filter: drop-shadow(0 0 12px rgb(255, 0, 93))
+      drop-shadow(0 0 24px rgb(255, 0, 93))
+      drop-shadow(0 0 36px rgb(255, 0, 93));
+  }
+  25% {
+    filter: drop-shadow(0 0 12px rgb(0, 255, 249))
+      drop-shadow(0 0 24px rgb(0, 255, 249))
+      drop-shadow(0 0 36px rgb(0, 255, 249));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgb(0, 255, 136))
+      drop-shadow(0 0 24px rgb(0, 255, 136))
+      drop-shadow(0 0 36px rgb(0, 255, 136));
+  }
+  75% {
+    filter: drop-shadow(0 0 12px rgb(255, 251, 0))
+      drop-shadow(0 0 24px rgb(255, 251, 0))
+      drop-shadow(0 0 36px rgb(255, 251, 0));
+  }
+  100% {
+    filter: drop-shadow(0 0 12px rgb(255, 0, 93))
+      drop-shadow(0 0 24px rgb(255, 0, 93))
+      drop-shadow(0 0 36px rgb(255, 0, 93));
+  }
 }
 
-@keyframes morphRightStage2 {
-  0% { opacity: 0; }
-  30% { opacity: 0; }
-  50% { opacity: 1; }
-  70% { opacity: 1; }
-  90% { opacity: 0; }
-  100% { opacity: 0; }
+@keyframes rgbStroke {
+  0% {
+    stroke: rgb(255, 0, 93);
+  }
+  25% {
+    stroke: rgb(0, 255, 249);
+  }
+  50% {
+    stroke: rgb(0, 255, 136);
+  }
+  75% {
+    stroke: rgb(255, 251, 0);
+  }
+  100% {
+    stroke: rgb(255, 0, 93);
+  }
 }
 
-@keyframes morphRightStage3 {
-  0% { opacity: 0; }
-  70% { opacity: 0; }
-  90% { opacity: 1; }
-  95% { opacity: 1; }
-  100% { opacity: 0; }
+@keyframes rgbBorder {
+  0% {
+    border-color: rgb(255, 0, 93);
+  }
+  25% {
+    border-color: rgb(0, 255, 249);
+  }
+  50% {
+    border-color: rgb(0, 255, 136);
+  }
+  75% {
+    border-color: rgb(255, 251, 0);
+  }
+  100% {
+    border-color: rgb(255, 0, 93);
+  }
 }
 
-/* Left arrow morphing stages - 0.5s duration */
-@keyframes morphLeftStage1 {
-  0% { opacity: 0; }
-  10% { opacity: 1; }
-  30% { opacity: 1; }
-  50% { opacity: 0; }
-  100% { opacity: 0; }
+@keyframes rgbBackground {
+  0% {
+    background-color: rgb(255, 0, 93);
+  }
+  25% {
+    background-color: rgb(0, 255, 249);
+  }
+  50% {
+    background-color: rgb(0, 255, 136);
+  }
+  75% {
+    background-color: rgb(255, 251, 0);
+  }
+  100% {
+    background-color: rgb(255, 0, 93);
+  }
 }
 
-@keyframes morphLeftStage2 {
-  0% { opacity: 0; }
-  30% { opacity: 0; }
-  50% { opacity: 1; }
-  70% { opacity: 1; }
-  90% { opacity: 0; }
-  100% { opacity: 0; }
+@keyframes rotateFocusRing {
+  0% {
+    transform: rotate(0deg) scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: rotate(135deg) scale(1);
+    opacity: 1;
+  }
 }
 
-@keyframes morphLeftStage3 {
-  0% { opacity: 0; }
-  70% { opacity: 0; }
-  90% { opacity: 1; }
-  95% { opacity: 1; }
-  100% { opacity: 0; }
+/* Click Large Halo Effect - Persistent */
+@keyframes largeHaloClick {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  10% {
+    opacity: 1;
+    transform: scale(1.1);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1);
+  }
 }
 
 /* Carousel ObjectFit Styles */
