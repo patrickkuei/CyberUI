@@ -38,3 +38,7 @@ export type { CarouselProps, CarouselImageData } from './Carousel';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+
+// Export hooks
+export { useCyberScrollbar } from '../hooks/useCyberScrollbar';
+export type { UseCyberScrollbarOptions } from '../hooks/useCyberScrollbar';

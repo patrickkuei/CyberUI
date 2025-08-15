@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **useCyberScrollbar Hook**: Custom cyberpunk-themed scrollbar replacement
+  - **Velocity-responsive arrow animations** - Faster scrolling triggers faster arrow sequences
+  - **Direction-aware indicators** - Up/down arrows appear based on scroll direction  
+  - **Dynamic arrow scaling** - More arrows appear with increased scroll distance
+  - **Sequential glow animation** - Arrows glow in sequence without interruption
+  - **Smart page/container detection** - Auto-detects usage context when `pageLevel` not specified
+  - **Mobile optimization** - Auto-hide functionality and transparent variant on mobile devices
+  - **Customizable styling** - `variant` prop (default/minimal/transparent) and `className` for custom CSS
+  - **Performance optimized** - Efficient DOM operations and animation cleanup
+  - **TypeScript support** - Full type safety with comprehensive interfaces
+  - **Storybook documentation** - Interactive demos and usage examples
+
 - **Arrow Component**: Directional indicator component with cyberpunk styling
   - Multiple directional variants (up, down, left, right)
   - Integrated with carousel navigation
@@ -28,6 +40,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - ObjectFit styles now handled via CSS selectors for better performance
   - Clean separation between component logic and styling concerns
   - Enhanced with arrow indicators for better navigation
+
+- **Demo Application**: Integrated cyberpunk scrollbar throughout
+  - Page-level scrollbar replacement in main app with auto-detection
+  - Enhanced user experience with responsive mobile optimization
+  - Maintains clean aesthetic while adding futuristic scrolling interactions
 
 - **UI Text and Descriptions**: Enhanced cyberpunk theming
   - Updated component descriptions to match Blade Runner aesthetic

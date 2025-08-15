@@ -7,9 +7,15 @@ import HomeTab from "./components/tabs/HomeTab";
 import InteractiveTab from "./components/tabs/InteractiveTab";
 import ElementsTab from "./components/tabs/ElementsTab";
 import FeedbackTab from "./components/tabs/FeedbackTab";
+import { useCyberScrollbar } from "./hooks/useCyberScrollbar";
 
 const DemoPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(TABS[0]);
+
+  useCyberScrollbar({
+    glowColor: "primary",
+    variant: "default",
+  });
 
   const renderContent = (): React.ReactNode => {
     switch (activeTab) {
@@ -41,7 +47,7 @@ const DemoPage: React.FC = () => {
         tabs={TABS}
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        size={{ base: 'sm', md: 'md', lg: 'lg' }}
+        size={{ base: "sm", md: "md", lg: "lg" }}
       />
 
       <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-6xl p-4 md:p-6 lg:p-8 bg-surface rounded-b-lg rounded-tr-lg border-2 border-border-default min-h-[400px] flex flex-col items-center justify-center">
