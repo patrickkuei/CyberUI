@@ -230,25 +230,13 @@ const Image: React.FC<ImageProps> = memo(
 
         return () => {
           document.removeEventListener("keydown", handleKeyDown);
-          // Restore original values after closing animation
-          if (isClosing) {
-            setTimeout(() => {
-              document.body.style.overflow = originalOverflow;
-              document.body.style.paddingRight = originalPaddingRight;
-              document.documentElement.style.scrollbarGutter =
-                originalScrollbarGutter;
-            }, 50);
-          } else {
-            document.body.style.overflow = originalOverflow;
-            document.body.style.paddingRight = originalPaddingRight;
-            document.documentElement.style.scrollbarGutter =
-              originalScrollbarGutter;
-          }
+          // Always restore original values immediately to prevent page freeze
+          document.body.style.overflow = originalOverflow;
+          document.body.style.paddingRight = originalPaddingRight;
+          document.documentElement.style.scrollbarGutter = originalScrollbarGutter;
         };
-      } else {
-        document.removeEventListener("keydown", handleKeyDown);
       }
-    }, [isPreviewOpen, isClosing, handleKeyDown]);
+    }, [isPreviewOpen, handleKeyDown]);
 
     // Memoized class calculations
     const imageClasses = useMemo(

@@ -5,51 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.3.0] - 2025-08-16
 
 ### Added
-- **useCyberScrollbar Hook**: Custom cyberpunk-themed scrollbar replacement
-  - **Velocity-responsive arrow animations** - Faster scrolling triggers faster arrow sequences
-  - **Direction-aware indicators** - Up/down arrows appear based on scroll direction  
-  - **Dynamic arrow scaling** - More arrows appear with increased scroll distance
-  - **Sequential glow animation** - Arrows glow in sequence without interruption
-  - **Smart page/container detection** - Auto-detects usage context when `pageLevel` not specified
-  - **Mobile optimization** - Auto-hide functionality and transparent variant on mobile devices
-  - **Customizable styling** - `variant` prop (default/minimal/transparent) and `className` for custom CSS
-  - **Performance optimized** - Efficient DOM operations and animation cleanup
-  - **TypeScript support** - Full type safety with comprehensive interfaces
-  - **Storybook documentation** - Interactive demos and usage examples
+- **Modal Component** - Cyberpunk-themed modal with CRT power-on animation and RGB borders
+- **Notification System** - Complete provider/hook pattern with `CyberNotificationProvider` and `useCyberNotifications`
+- **useCyberScrollbar Hook** - Velocity-responsive cyberpunk scrollbar with direction-aware arrows
+- **Arrow Component** - Directional indicators for carousel navigation
 
-- **Arrow Component**: Directional indicator component with cyberpunk styling
-  - Multiple directional variants (up, down, left, right)
-  - Integrated with carousel navigation
-  - Responsive sizing and hover effects
-  - Consistent with overall cyberpunk design theme
+### Enhanced  
+- **InteractiveTab** - 6 interactive cyberpunk modals with rich content and notification integration
+- **Image Component** - Portal rendering for true fullscreen preview mode
+- **Carousel Component** - Improved objectFit implementation with arrow indicators
+- **Demo Application** - Integrated cyberpunk scrollbar throughout
+- **Documentation** - Complete Storybook API reference for notification system
 
-### Enhanced
-- **Image Component**: Preview mode now uses React Portal for true fullscreen display
-  - Image preview overlay now renders at document root using `createPortal`
-  - Prevents preview from being constrained by parent container overflow
-  - Ensures consistent fullscreen behavior across all usage contexts
-  - Maintains all existing functionality while improving z-index handling
-  - No breaking changes - fully backward compatible
-
-- **Carousel Component**: Improved objectFit implementation  
-  - Simplified objectFit options to `cover` and `contain` only
-  - Removed `dynamic` option that could cause layout instability
-  - ObjectFit styles now handled via CSS selectors for better performance
-  - Clean separation between component logic and styling concerns
-  - Enhanced with arrow indicators for better navigation
-
-- **Demo Application**: Integrated cyberpunk scrollbar throughout
-  - Page-level scrollbar replacement in main app with auto-detection
-  - Enhanced user experience with responsive mobile optimization
-  - Maintains clean aesthetic while adding futuristic scrolling interactions
-
-- **UI Text and Descriptions**: Enhanced cyberpunk theming
-  - Updated component descriptions to match Blade Runner aesthetic
-  - Improved visual data stream navigation text
-  - Enhanced imaging protocol descriptions for better immersion
+### Fixed
+- **Image Component** - Resolved ESC key freeze issue in preview mode
 
 ## [1.2.0] - 2025-08-12
 

@@ -10,56 +10,100 @@ const meta: Meta<typeof Notification> = {
       description: {
         component: `A cyberpunk-themed notification component with neon styling and smooth animations.
 
-**Usage:**
+## 🚀 Recommended: Use the Notification System
+
+For real applications, use the notification system with provider + hook:
 
 \`\`\`tsx
 import React from 'react';
-import { Notification } from 'cyberui-2045';
+import { CyberNotificationProvider, useCyberNotifications } from 'cyberui-2045';
 import 'cyberui-2045/styles.css';
 
-// Success notification
+// 1. Wrap your app with the provider
+function App() {
+  return (
+    <CyberNotificationProvider position="top-right" defaultDuration={2500}>
+      <MyComponent />
+    </CyberNotificationProvider>
+  );
+}
+
+// 2. Use the hook in any component
+function MyComponent() {
+  const { showNotification } = useCyberNotifications();
+
+  const handleClick = () => {
+    showNotification('success', 'NEURAL.SYS', 'Operation completed successfully');
+    showNotification('warning', 'SECURITY.SYS', 'Check your input');
+    showNotification('error', 'SYSTEM.ERR', 'Something went wrong');
+  };
+
+  return <button onClick={handleClick}>Show Notifications</button>;
+}
+\`\`\`
+
+## 📋 Static Usage (for demos/storybook)
+
+For static displays or when you need full control:
+
+\`\`\`tsx
+import { Notification } from 'cyberui-2045';
+
 <Notification
   type="success"
   title="Success"
   message="Operation completed successfully"
 />
 
-// Warning notification
 <Notification
   type="warning"
-  title="Warning"
-  message="Please check your input and try again"
-/>
-
-// Error notification
-<Notification
-  type="error"
-  title="Error"
-  message="Something went wrong. Please try again"
-/>
-
-// With close button
-<Notification
-  type="success"
-  title="Dismissible Notification"
-  message="This notification can be closed"
-  onClose={() => console.log('Notification closed')}
-/>
-
-// Responsive sizes
-<Notification
-  type="success"
-  title="Responsive Notification"
-  message="This notification adapts to screen size"
-  size={{ base: 'sm', lg: 'lg' }}
+  title="Warning" 
+  message="Please check your input"
+  onClose={() => console.log('Closed')}
 />
 \`\`\`
 
-**Props:**
+## 📋 API Reference
+
+### CyberNotificationProvider Props
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| \`type\` | \`'success' | 'warning' | 'error'\` | ✅ | - | Determines the visual style and icon of the notification |
+| \`children\` | \`ReactNode\` | ✅ | - | The app content to wrap with notification context |
+| \`position\` | \`'top-right' \\| 'top-left' \\| 'bottom-right' \\| 'bottom-left'\` | ❌ | \`'top-right'\` | Position where notifications will appear |
+| \`defaultDuration\` | \`number\` | ❌ | \`2500\` | Default auto-hide duration in milliseconds |
+
+### useCyberNotifications Hook
+
+Returns an object with:
+
+| Method | Type | Description |
+|--------|------|-------------|
+| \`showNotification\` | \`(type, title, message, options?) => string\` | Display a new notification. Returns the notification ID |
+| \`hideNotification\` | \`(id: string) => void\` | Manually hide a specific notification |
+| \`clearAllNotifications\` | \`() => void\` | Clear all visible notifications |
+
+#### showNotification Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| \`type\` | \`'success' \\| 'warning' \\| 'error'\` | ✅ | Notification type determining style and icon |
+| \`title\` | \`string\` | ✅ | Main heading text |
+| \`message\` | \`string\` | ✅ | Descriptive content |
+| \`options\` | \`NotificationOptions\` | ❌ | Additional configuration |
+
+#### NotificationOptions
+
+| Option | Type | Default | Description |
+|--------|------|---------|-------------|
+| \`autoHide\` | \`boolean\` | \`true\` | Whether notification auto-hides |
+| \`duration\` | \`number\` | \`defaultDuration\` | Custom duration in milliseconds |
+
+### Notification Component Props
+
+| Prop | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| \`type\` | \`'success' \\| 'warning' \\| 'error'\` | ✅ | - | Determines the visual style and icon of the notification |
 | \`title\` | \`string\` | ✅ | - | The main heading text displayed prominently |
 | \`message\` | \`string\` | ✅ | - | The descriptive content below the title |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Notification size (supports responsive values) |

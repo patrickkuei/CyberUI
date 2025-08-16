@@ -19,6 +19,7 @@ export { default as Select } from './Select';
 export { default as Skeleton } from './Skeleton';
 export { default as Image } from './Image';
 export { default as Carousel } from './Carousel';
+export { default as Modal } from './Modal';
 
 // Export component prop types
 export type { CircularProgressProps } from './CircularProgress';
@@ -35,6 +36,7 @@ export type { SelectProps, SelectOption } from './Select';
 export type { SkeletonProps } from './Skeleton';
 export type { ImageProps } from './Image';
 export type { CarouselProps, CarouselImageData } from './Carousel';
+export type { ModalProps, ModalAnimationConfig, ModalCallbacks } from './Modal';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
@@ -42,3 +44,9 @@ export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } 
 // Export hooks
 export { useCyberScrollbar } from '../hooks/useCyberScrollbar';
 export type { UseCyberScrollbarOptions } from '../hooks/useCyberScrollbar';
+export { useCyberNotifications } from '../hooks/useCyberNotifications';
+export type { CyberNotification, NotificationOptions } from '../hooks/useCyberNotifications';
+
+// Export providers
+export { CyberNotificationProvider } from '../contexts/NotificationContext';
+export type { CyberNotificationProviderProps } from '../contexts/NotificationContext';

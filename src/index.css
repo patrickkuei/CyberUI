@@ -29,6 +29,7 @@
 
   --gradient-accent: 90deg, var(--color-accent), var(--color-secondary);
   --shadow-lg-accent: 0 0 12px var(--color-accent);
+  --shadow-md-accent: 0 0 8px var(--color-accent);
   --shadow-secondary: 0 0 16px var(--color-secondary);
   --shadow-input-accent: 0 0 8px var(--color-accent);
   --shadow-primary: 0 0 12px var(--color-primary);
@@ -356,6 +357,33 @@ body {
   }
 }
 
+@keyframes rgbGlow {
+  0% {
+    border-color: rgb(255, 0, 93);
+    box-shadow: 0 0 12px rgb(255, 0, 93), 0 0 24px rgb(255, 0, 93);
+  }
+  25% {
+    border-color: rgb(0, 255, 249);
+    box-shadow: 0 0 12px rgb(0, 255, 249), 0 0 24px rgb(0, 255, 249);
+  }
+  50% {
+    border-color: rgb(0, 255, 136);
+    box-shadow: 0 0 12px rgb(0, 255, 136), 0 0 24px rgb(0, 255, 136);
+  }
+  75% {
+    border-color: rgb(255, 251, 0);
+    box-shadow: 0 0 12px rgb(255, 251, 0), 0 0 24px rgb(255, 251, 0);
+  }
+  100% {
+    border-color: rgb(255, 0, 93);
+    box-shadow: 0 0 12px rgb(255, 0, 93), 0 0 24px rgb(255, 0, 93);
+  }
+}
+
+.animate-rgb-glow {
+  animation: rgbGlow 3s ease-in-out infinite;
+}
+
 @keyframes rgbBackground {
   0% {
     background-color: rgb(255, 0, 93);
@@ -408,6 +436,60 @@ body {
   }
 }
 
+/* CRT Power-On Effect Animations */
+
+@keyframes crt-power-on {
+  0% {
+    transform: scaleX(0) scaleY(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scaleX(1) scaleY(0.01);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scaleX(1) scaleY(0.01);
+    opacity: 0.1;
+  }
+  100% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+}
+
+@keyframes crt-power-off {
+  0% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+  20% {
+    transform: scaleX(1) scaleY(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scaleX(1) scaleY(0.8);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scaleX(0.8) scaleY(0.1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scaleX(0) scaleY(0);
+    opacity: 0;
+  }
+}
+
+.animate-crt-power-on {
+  animation: crt-power-on 0.5s ease-out forwards;
+  animation-fill-mode: both;
+}
+
+.animate-crt-power-off {
+  animation: crt-power-off 0.4s ease-in forwards;
+  animation-fill-mode: both;
+}
+
 /* Carousel ObjectFit Styles */
 .carousel-cover img {
   object-fit: cover;
@@ -418,3 +500,4 @@ body {
   object-fit: contain;
   height: 100%;
 }
+
