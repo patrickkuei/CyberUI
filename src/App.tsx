@@ -50,6 +50,7 @@ const DemoPage: React.FC = () => {
           activeTab={activeTab}
           onTabChange={setActiveTab}
           size={{ base: "sm", md: "md", lg: "lg" }}
+          mode={{ base: "dropdown", md: "scroll" }}
         />
 
         <div className="w-full max-w-2xl md:max-w-3xl lg:max-w-4xl xl:max-w-6xl p-4 md:p-6 lg:p-8 bg-surface rounded-b-lg rounded-tr-lg border-2 border-border-default min-h-[400px] flex flex-col items-center justify-center">

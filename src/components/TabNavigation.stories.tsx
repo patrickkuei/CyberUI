@@ -1,12 +1,12 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
-import TabNavigation from './TabNavigation';
-import { TABS } from '../constants';
+import type { Meta, StoryObj } from "@storybook/react-vite";
+import TabNavigation from "./TabNavigation";
+import { TABS } from "../constants";
 
 const meta: Meta<typeof TabNavigation> = {
-  title: 'Components/TabNavigation',
+  title: "Components/TabNavigation",
   component: TabNavigation,
   parameters: {
-    layout: 'centered',
+    layout: "centered",
     docs: {
       description: {
         component: `A cyberpunk-themed tab navigation component with neon styling and smooth animations.
@@ -39,6 +39,15 @@ function MyComponent() {
   onTabChange={setActiveTab}
   size={{ base: 'sm', lg: 'lg' }}
 />
+
+// Responsive mode (mobile dropdown → desktop scroll)
+<TabNavigation
+  tabs={tabs}
+  activeTab={activeTab}
+  onTabChange={setActiveTab}
+  mode={{ base: 'dropdown', md: 'scroll' }}
+  size={{ base: 'sm', md: 'md' }}
+/>
 \`\`\`
 
 **Props:**
@@ -49,31 +58,61 @@ function MyComponent() {
 | \`activeTab\` | \`Tab\` | ✅ | - | Currently selected tab name |
 | \`onTabChange\` | \`(tab: Tab) => void\` | ✅ | - | Callback function triggered when a tab is clicked |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Tab size (supports responsive values) |
+| \`mode\` | \`'scroll' \\| 'wrap' \\| 'dropdown' \\| ResponsiveValue<...>\` | ❌ | \`'scroll'\` | Layout mode (supports responsive values) |
+| \`containerClassName\` | \`string\` | ❌ | - | Extra classes for outer container |
+| \`tabsClassName\` | \`string\` | ❌ | - | Extra classes for each tab button |
+| \`dropdownLabel\` | \`string\` | ❌ | activeTab | Label for dropdown anchor |
+| \`closeOnSelect\` | \`boolean\` | ❌ | true | Close dropdown when selecting a tab |
+| \`anchorClassName\` | \`string\` | ❌ | - | Extra classes for dropdown anchor button |
+| \`menuClassName\` | \`string\` | ❌ | - | Extra classes for dropdown menu container |
 `,
       },
     },
   },
-  tags: ['autodocs'],
+  tags: ["autodocs"],
   argTypes: {
     tabs: {
       control: false,
-      description: 'Array of tab names',
+      description: "Array of tab names",
     },
     activeTab: {
       control: {
-        type: 'select',
+        type: "select",
       },
       options: TABS,
-      description: 'Currently active tab',
+      description: "Currently active tab",
     },
     onTabChange: {
-      action: 'tab changed',
-      description: 'Callback function when tab is changed',
+      action: "tab changed",
+      description: "Callback function when tab is changed",
     },
     size: {
-      control: { type: 'select' },
-      options: ['sm', 'md', 'lg'],
-      description: 'Tab size (supports responsive values)',
+      control: { type: "select" },
+      options: ["sm", "md", "lg"],
+      description: "Tab size (supports responsive values)",
+    },
+    mode: {
+      control: { type: "select" },
+      options: ["scroll", "wrap", "dropdown"],
+      description: "Layout mode (supports responsive values)",
+    },
+    containerClassName: {
+      control: { type: "text" },
+    },
+    tabsClassName: {
+      control: { type: "text" },
+    },
+    dropdownLabel: {
+      control: { type: "text" },
+    },
+    closeOnSelect: {
+      control: { type: "boolean" },
+    },
+    anchorClassName: {
+      control: { type: "text" },
+    },
+    menuClassName: {
+      control: { type: "text" },
     },
   },
 };
@@ -84,31 +123,44 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {
   args: {
     tabs: TABS,
-    activeTab: 'Home',
-    onTabChange: (tab) => console.log('Tab changed to:', tab),
+    activeTab: "Home",
+    onTabChange: (tab) => console.log("Tab changed to:", tab),
   },
 };
 
-export const InteractiveTab: Story = {
+export const DropdownMode: Story = {
   args: {
     tabs: TABS,
-    activeTab: 'Interactive',
-    onTabChange: (tab) => console.log('Tab changed to:', tab),
+    activeTab: "Home",
+    onTabChange: (tab) => console.log("Tab changed to:", tab),
+    mode: "dropdown",
+    dropdownLabel: "Tabs",
+    closeOnSelect: true,
   },
+  parameters: {
+    layout: "padded",
+  },
+  render: (args) => (
+    <div
+      style={{
+        minHeight: 280,
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "center",
+        paddingTop: 16,
+      }}
+    >
+      <TabNavigation {...args} />
+    </div>
+  ),
 };
 
-export const ElementsTab: Story = {
+export const ResponsiveModes: Story = {
   args: {
     tabs: TABS,
-    activeTab: 'Elements',
-    onTabChange: (tab) => console.log('Tab changed to:', tab),
-  },
-};
-
-export const FeedbackTab: Story = {
-  args: {
-    tabs: TABS,
-    activeTab: 'Feedback',
-    onTabChange: (tab) => console.log('Tab changed to:', tab),
+    activeTab: "Home",
+    onTabChange: (tab) => console.log("Tab changed to:", tab),
+    mode: { base: "dropdown", md: "scroll" },
+    size: { base: "sm", md: "md" },
   },
 };
