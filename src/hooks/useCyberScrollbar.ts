@@ -47,7 +47,7 @@ const CONFIG = {
 /**
  * Custom hook that creates a cyberpunk-themed scrollbar with animated arrows
  * that respond to scroll velocity and direction.
- * 
+ *
  * @param options Configuration options for the scrollbar
  * @returns Ref to attach to scrollable container (not needed for pageLevel)
  */
@@ -80,7 +80,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
   const [showScrollbar, setShowScrollbar] = useState(() => {
     return window.innerWidth >= CONFIG.MOBILE_BREAKPOINT;
   });
-  const [currentArrowCount, setCurrentArrowCount] = useState(0);
+  const currentArrowCountRef = useRef(0);
   const [effectivePageLevel, setEffectivePageLevel] = useState(pageLevel ?? false);
 
   useEffect(() => {
@@ -185,15 +185,18 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       element.innerHTML = "=";
     }
 
+    const filterCss = sizes.isMobile
+      ? "none"
+      : `drop-shadow(0 0 6px var(--color-${glowColor}))
+         drop-shadow(0 0 12px var(--color-${glowColor}))
+         drop-shadow(0 0 18px var(--color-${glowColor}))`;
+
     element.style.cssText = `
       font-size: ${isArrow ? sizes.arrowSize : sizes.lineSize}px;
       color: var(--color-${glowColor});
       opacity: 0;
       transition: all 0.2s ease;
-      filter:
-        drop-shadow(0 0 6px var(--color-${glowColor}))
-        drop-shadow(0 0 12px var(--color-${glowColor}))
-        drop-shadow(0 0 18px var(--color-${glowColor}));
+      filter: ${filterCss};
       line-height: 1;
       font-weight: bold;
     `;
@@ -238,11 +241,11 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     hideNativeScrollbars(effectivePageLevel ? undefined : containerRef.current || undefined);
     const scrollbarElement = document.createElement("div");
     scrollbarElement.className = `cyber-scrollbar ${className}`.trim();
-    
+
     const isMobile = sizes.isMobile;
     const effectiveVariant = isMobile ? "transparent" : variant;
     const variantStyles = getVariantStyles(effectiveVariant);
-    
+
     scrollbarElement.style.cssText = `
       position: fixed;
       top: ${position.top}px;
@@ -322,8 +325,9 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
   const animateArrows = useCallback((arrowsToAnimate: Element[], velocity: number, direction: string) => {
     const animationSpeed = Math.min(velocity * sensitivity, CONFIG.MAX_ANIMATION_SPEED);
-    const glowDuration = Math.max(300 / animationSpeed, CONFIG.MIN_GLOW_DURATION);
-    const sequenceDelay = Math.max(40, 80 / animationSpeed);
+    const isMobile = window.innerWidth < CONFIG.MOBILE_BREAKPOINT;
+    const glowDuration = Math.max(300 / animationSpeed, CONFIG.MIN_GLOW_DURATION) * (isMobile ? 1.5 : 1);
+    const sequenceDelay = Math.max(40, 80 / animationSpeed) * (isMobile ? 1.25 : 1);
 
     const arrows = direction === "up" ? [...arrowsToAnimate].reverse() : arrowsToAnimate;
 
@@ -356,8 +360,8 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       });
 
       const totalArrowCount = calculateArrowCount(velocity, scrollDistance);
-      
-      if (totalArrowCount !== currentArrowCount) {
+
+      if (totalArrowCount !== currentArrowCountRef.current) {
         animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
         animationTimeoutsRef.current = [];
 
@@ -367,14 +371,14 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
         const relevantArrows = selectRelevantArrows(Array.from(arrows), direction, totalArrowCount);
         animateArrows(relevantArrows, velocity, direction);
-        
-        setCurrentArrowCount(totalArrowCount);
+
+        currentArrowCountRef.current = totalArrowCount;
       }
 
     } else {
       animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
       animationTimeoutsRef.current = [];
-      setCurrentArrowCount(0);
+      currentArrowCountRef.current = 0;
 
       arrows.forEach(arrow => {
         (arrow as HTMLElement).style.opacity = "0";
@@ -386,9 +390,11 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
         });
       }
     }
-  }, [scrollState, hasEverScrolled, animateArrows, calculateArrowCount, selectRelevantArrows, currentArrowCount]);
+  }, [scrollState, hasEverScrolled, animateArrows, calculateArrowCount, selectRelevantArrows]);
 
-  const handleScroll = useCallback(() => {
+  const rafIdRef = useRef<number | null>(null);
+
+  const processScroll = useCallback(() => {
     if (disabled) return;
     if (!effectivePageLevel && !containerRef.current) return;
 
@@ -453,13 +459,22 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     lastScrollTime.current = now;
     lastScrollTop.current = scrollInfo.currentScrollTop;
   }, [disabled, effectivePageLevel, hasEverScrolled, showScrollbar]);
+
+  // Throttle scroll handling to 1 per animation frame
+  const handleScroll = useCallback(() => {
+    if (rafIdRef.current !== null) return;
+    rafIdRef.current = requestAnimationFrame(() => {
+      rafIdRef.current = null;
+      processScroll();
+    });
+  }, [processScroll]);
   useEffect(() => {
     if (disabled) return;
     if (!effectivePageLevel && !containerRef.current) return;
 
     const cleanup = createScrollbarUI();
     const target = effectivePageLevel ? window : containerRef.current!;
-    
+
     target.addEventListener("scroll", handleScroll, { passive: true });
 
     return () => {
@@ -467,6 +482,10 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       if (stableTimeoutRef.current) clearTimeout(stableTimeoutRef.current);
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
       animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
+      if (rafIdRef.current !== null) {
+        cancelAnimationFrame(rafIdRef.current);
+        rafIdRef.current = null;
+      }
       cleanup?.();
     };
   }, [createScrollbarUI, handleScroll, disabled, effectivePageLevel]);
