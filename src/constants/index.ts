@@ -1,4 +1,5 @@
-export const TABS = ['Home', 'Interactive', 'Elements', 'Feedback'] as const;
+// Demo tabs for Storybook stories - not part of the component API
+export const DEMO_TABS = ['Home', 'Interactive', 'Elements', 'Feedback'] as const;
 
 export const PROGRESS_CONFIG = {
   RADIUS: 20,
@@ -17,4 +18,16 @@ export const CORPORATIONS = [
   'NetWatch Division',
 ] as const;
 
-export type Tab = typeof TABS[number];
+/**
+ * @deprecated This export will be removed in v2.0.0.
+ * Use your own custom tab names array instead. The TabNavigation component
+ * now accepts any string[] for tabs, so you don't need predefined constants.
+ */
+export const TABS = DEMO_TABS;
+
+/**
+ * @deprecated This export will be removed in v2.0.0.
+ * Use 'string' type directly instead. The TabNavigation component now accepts
+ * any string for tab names instead of being limited to predefined values.
+ */
+export type Tab = string;

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./index.css";
-import { TABS } from "./constants";
-import type { Tab } from "./constants";
+import { DEMO_TABS } from "./constants";
 import TabNavigation from "./components/TabNavigation";
 import HomeTab from "./components/tabs/HomeTab";
 import InteractiveTab from "./components/tabs/InteractiveTab";
@@ -11,7 +10,7 @@ import { useCyberScrollbar } from "./hooks/useCyberScrollbar";
 import { CyberNotificationProvider } from "./contexts/NotificationContext";
 
 const DemoPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<Tab>(TABS[0]);
+  const [activeTab, setActiveTab] = useState<string>(DEMO_TABS[0]);
 
   useCyberScrollbar({
     glowColor: "primary",
@@ -46,7 +45,7 @@ const DemoPage: React.FC = () => {
         </header>
 
         <TabNavigation
-          tabs={TABS}
+          tabs={DEMO_TABS}
           activeTab={activeTab}
           onTabChange={setActiveTab}
           size={{ base: "sm", md: "md", lg: "lg" }}

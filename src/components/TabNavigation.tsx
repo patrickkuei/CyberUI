@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import type { Tab } from "../constants";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -10,14 +9,18 @@ import {
 export type TabNavigationMode = "scroll" | "wrap" | "dropdown" | "collapsible";
 
 interface TabDropdownProps {
-  tabs: readonly Tab[];
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
+  tabs: readonly string[];
+  activeTab: string;
+  onTabChange: (tab: string) => void;
   sizeClasses: string;
   containerClassName?: string;
   anchorClassName?: string;
   menuClassName?: string;
-  dropdownLabel?: string;
+  menuItemClassName?: string;
+  dropdownLabel?: React.ReactNode;
+  anchorIcon?: React.ReactNode;
+  showAnchorLabel?: boolean;
+  anchorAriaLabel?: string;
   closeOnSelect?: boolean;
 }
 
@@ -29,7 +32,11 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   containerClassName = "",
   anchorClassName = "",
   menuClassName = "",
+  menuItemClassName = "",
   dropdownLabel,
+  anchorIcon,
+  showAnchorLabel = true,
+  anchorAriaLabel,
   closeOnSelect = true,
 }) => {
   const [open, setOpen] = useState(false);
@@ -86,13 +93,20 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
         <button
           onClick={toggleOpen}
           className={`inline-flex items-center gap-2 ${sizeClasses} bg-surface text-default border-2 border-border-default rounded-lg transition-all duration-300 hover:text-secondary hover:border-secondary hover:cursor-pointer shadow-secondary/30 ${anchorClassName}`}
+          aria-haspopup="menu"
+          aria-expanded={open}
+          aria-label={!showAnchorLabel ? (anchorAriaLabel ?? (typeof dropdownLabel === 'string' ? dropdownLabel : 'Open tabs')) : undefined}
         >
-          <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-            <rect x="3" y="5" width="14" height="2" rx="1" />
-            <rect x="3" y="9" width="14" height="2" rx="1" />
-            <rect x="3" y="13" width="14" height="2" rx="1" />
-          </svg>
-          <span>{dropdownLabel ?? activeTab}</span>
+          {anchorIcon ?? (
+            <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <rect x="3" y="5" width="14" height="2" rx="1" />
+              <rect x="3" y="9" width="14" height="2" rx="1" />
+              <rect x="3" y="13" width="14" height="2" rx="1" />
+            </svg>
+          )}
+          {showAnchorLabel && (
+            <span>{dropdownLabel ?? activeTab}</span>
+          )}
         </button>
 
         {(open || isClosing) && (
@@ -126,7 +140,7 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
                   activeTab === tab
                     ? "text-secondary relative pl-4 before:content-[''] before:h-full before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-4 before:w-[3px] before:rounded before:bg-accent before:shadow-lg-accent"
                     : "text-default hover:text-secondary hover:bg-base/70"
-                }`}
+                } ${menuItemClassName}`}
                 >
                   <span>{tab}</span>
                 </button>
@@ -140,17 +154,21 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
 };
 
 export interface TabNavigationProps {
-  tabs: readonly Tab[];
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
+  tabs: readonly string[];
+  activeTab: string;
+  onTabChange: (tab: string) => void;
   size?: ResponsiveValue<"sm" | "md" | "lg">;
   mode?: ResponsiveValue<TabNavigationMode>;
   containerClassName?: string;
   tabsClassName?: string;
-  dropdownLabel?: string;
+  dropdownLabel?: React.ReactNode;
+  anchorIcon?: React.ReactNode;
+  showAnchorLabel?: boolean;
+  anchorAriaLabel?: string;
   closeOnSelect?: boolean;
   anchorClassName?: string;
   menuClassName?: string;
+  menuItemClassName?: string;
 }
 
 const TabNavigation: React.FC<TabNavigationProps> = ({
@@ -162,9 +180,13 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   containerClassName = "",
   tabsClassName = "",
   dropdownLabel,
+  anchorIcon,
+  showAnchorLabel = true,
+  anchorAriaLabel,
   closeOnSelect = true,
   anchorClassName = "",
   menuClassName = "",
+  menuItemClassName = "",
 }) => {
   const getSizeClasses = (
     size: ResponsiveValue<"sm" | "md" | "lg">
@@ -223,7 +245,11 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
         containerClassName={containerClassName}
         anchorClassName={anchorClassName}
         menuClassName={menuClassName}
+        menuItemClassName={menuItemClassName}
         dropdownLabel={dropdownLabel}
+        anchorIcon={anchorIcon}
+        showAnchorLabel={showAnchorLabel}
+        anchorAriaLabel={anchorAriaLabel}
         closeOnSelect={closeOnSelect}
       />
     );
