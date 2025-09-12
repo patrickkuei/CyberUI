@@ -1,0 +1,1 @@
+const s=["Home","Interactive","Elements","Feedback"],t={SEGMENT_COUNT:20,SEGMENT_ANGLE:18,GAP_ANGLE:4,INNER_RADIUS:18.5,OUTER_RADIUS:23.5,OUTER_TICK_RADIUS:30},a=["Arasaka Corporation","Militech Industries","Kang Tao Systems","NetWatch Division"];export{a as C,s as D,t as P};
