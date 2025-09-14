@@ -78,6 +78,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
   const [hasEverScrolled, setHasEverScrolled] = useState(false);
   const [showScrollbar, setShowScrollbar] = useState(() => {
+    if (typeof window === "undefined") return false;
     return window.innerWidth >= CONFIG.MOBILE_BREAKPOINT;
   });
   const currentArrowCountRef = useRef(0);

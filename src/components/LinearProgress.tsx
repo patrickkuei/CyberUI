@@ -45,7 +45,13 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   ].join(" ");
 
   return (
-    <div className={containerClasses}>
+    <div
+      className={containerClasses}
+      role="progressbar"
+      aria-valuenow={Math.max(0, Math.min(100, progress))}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <div
         className={progressBarClasses}
         style={{ width: `${progress}%` }}

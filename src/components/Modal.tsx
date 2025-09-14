@@ -92,6 +92,8 @@ const Modal: React.FC<ModalProps> = memo(
 
     const overlayRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
+    const previouslyFocusedRef = useRef<HTMLElement | null>(null);
+    const titleIdRef = useRef<string>(`modal-title-${Math.random().toString(36).slice(2)}`);
 
     const closeModal = useCallback(() => {
       setIsClosing(true);
@@ -105,12 +107,15 @@ const Modal: React.FC<ModalProps> = memo(
 
     useEffect(() => {
       if (isOpen && !isClosing) {
+        previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
         setIsOpening(true);
         onOpen?.();
 
         setTimeout(() => {
           setIsOpening(false);
           onCRTBootComplete?.();
+          // Focus the modal container for accessibility
+          modalRef.current?.focus();
         }, animationConfig.openDuration);
       }
     }, [
@@ -167,6 +172,8 @@ const Modal: React.FC<ModalProps> = memo(
           document.removeEventListener("keydown", handleKeyDown);
           document.body.style.overflow = originalOverflow;
           document.body.style.paddingRight = "";
+          // Restore focus to the previously focused element if possible
+          previouslyFocusedRef.current?.focus?.();
         };
       }
     }, [isOpen, handleKeyDown]);
@@ -221,14 +228,16 @@ const Modal: React.FC<ModalProps> = memo(
           height: "100vh",
         }}
         onClick={handleOverlayClick}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title ? `Modal: ${title}` : "Modal dialog"}
+        aria-hidden={true}
       >
         <div
           ref={modalRef}
           className={modalClasses}
           onClick={(e) => e.stopPropagation()}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={title ? titleIdRef.current : undefined}
+          tabIndex={-1}
         >
           {showCloseButton && (
             <button
@@ -268,7 +277,7 @@ const Modal: React.FC<ModalProps> = memo(
                   : "opacity-0 translate-y-2"
               }`}
             >
-              <h2 className="text-lg font-semibold text-primary">{title}</h2>
+              <h2 id={titleIdRef.current} className="text-lg font-semibold text-primary">{title}</h2>
             </div>
           )}
 

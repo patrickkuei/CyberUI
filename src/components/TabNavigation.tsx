@@ -228,6 +228,9 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
             }
             ${tabsClassName}
           `}
+          role="tab"
+          aria-selected={activeTab === tab}
+          tabIndex={activeTab === tab ? 0 : -1}
         >
           {tab}
         </button>
@@ -259,14 +262,14 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   // while preserving correct scroll extents when overflowing.
   if (currentMode === "scroll") {
     return (
-      <div className={`${getContainerClasses()} ${containerClassName}`}>
+      <div className={`${getContainerClasses()} ${containerClassName}`} role="tablist" aria-label="Tabs">
         <div className="w-max mx-auto flex space-x-2">{tabButtons}</div>
       </div>
     );
   }
 
   return (
-    <div className={`${getContainerClasses()} ${containerClassName}`}>
+    <div className={`${getContainerClasses()} ${containerClassName}`} role="tablist" aria-label="Tabs">
       {tabButtons}
     </div>
   );

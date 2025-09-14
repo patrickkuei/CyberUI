@@ -76,9 +76,11 @@ const Notification: React.FC<NotificationProps> = ({
 
   const styles = getNotificationStyles();
   const sizeClasses = getSizeClasses(size);
+  const role = type === 'error' ? 'alert' : 'status';
+  const hoverTextClass = type === 'warning' ? 'hover:text-default/70' : 'hover:text-base/70';
 
   return (
-    <div className={`flex items-start rounded-lg ${sizeClasses} ${styles.container}`}>
+    <div className={`flex items-start rounded-lg ${sizeClasses} ${styles.container}`} role={role} aria-atomic="true">
       <div className="flex-shrink-0">
         {styles.icon}
       </div>
@@ -92,8 +94,9 @@ const Notification: React.FC<NotificationProps> = ({
       </div>
       {onClose && (
         <button
-          className={`flex-shrink-0 ${styles.textColor} hover:${styles.textColor}/30 transition-colors cursor-pointer`}
+          className={`flex-shrink-0 ${styles.textColor} ${hoverTextClass} transition-colors cursor-pointer`}
           onClick={onClose}
+          aria-label="Close notification"
         >
           <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
             <path

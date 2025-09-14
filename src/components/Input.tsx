@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
@@ -24,6 +24,9 @@ const Input: React.FC<InputProps> = ({
   disabled = false,
   ...props
 }) => {
+  const generatedId = useId();
+  const inputId = (props as { id?: string }).id || generatedId;
+
   const baseClasses = [
     'w-full',
     'rounded-lg',
@@ -96,11 +99,13 @@ const Input: React.FC<InputProps> = ({
 
   const iconColorClass = getIconColorClass(variant);
 
+  const describedById = error ? `${inputId}-error` : helperText ? `${inputId}-help` : undefined;
+
   return (
     <div className="space-y-2">
       {/* Label */}
       {label && (
-        <label className="block text-sm font-medium text-default">
+        <label htmlFor={inputId} className="block text-sm font-medium text-default">
           {label}
         </label>
       )}
@@ -118,6 +123,9 @@ const Input: React.FC<InputProps> = ({
         <input
           className={inputClasses}
           disabled={disabled}
+          id={inputId}
+          aria-invalid={!!error}
+          aria-describedby={describedById}
           {...props}
         />
 
@@ -131,7 +139,7 @@ const Input: React.FC<InputProps> = ({
 
       {/* Helper Text or Error */}
       {(helperText || error) && (
-        <div className={`text-xs font-mono ${error ? 'text-error' : 'text-muted'}`}>
+        <div id={error ? `${inputId}-error` : `${inputId}-help`} className={`text-xs font-mono ${error ? 'text-error' : 'text-muted'}`}>
           {error || helperText}
         </div>
       )}

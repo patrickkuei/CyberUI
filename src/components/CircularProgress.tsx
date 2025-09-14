@@ -5,13 +5,15 @@ export interface CircularProgressProps {
   radius: number;
   className?: string;
   children?: React.ReactNode;
+  ariaLabel?: string;
 }
 
 const CircularProgress: React.FC<CircularProgressProps> = ({
   progress,
   radius,
   className = '',
-  children
+  children,
+  ariaLabel
 }) => {
   const circumference = 2 * Math.PI * radius;
   const halfCircumference = circumference / 2;
@@ -19,7 +21,14 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   const rightOffset = halfCircumference * (1 - progress / 100);
 
   return (
-    <div className={`relative ${className}`}>
+    <div
+      className={`relative ${className}`}
+      role="progressbar"
+      aria-label={ariaLabel || 'Progress'}
+      aria-valuenow={Math.max(0, Math.min(100, progress))}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <svg
         className="w-full h-full overflow-visible"
         viewBox="0 0 50 50"

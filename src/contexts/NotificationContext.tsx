@@ -81,7 +81,12 @@ export const CyberNotificationProvider: React.FC<
       {children}
       {/* Notification Container */}
       {notifications.length > 0 && (
-        <div className={`fixed z-50 ${getPositionClasses(position)}`}>
+        <div
+          className={`fixed z-50 ${getPositionClasses(position)}`}
+          aria-live="polite"
+          aria-relevant="additions text"
+          aria-atomic="true"
+        >
           {notifications.map((notification, index) => (
             <div
               key={notification.id}
