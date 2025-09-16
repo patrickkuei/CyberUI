@@ -1,10 +1,10 @@
-# CyberUI 🚀
+# CyberUI
 
 A cyberpunk-themed React UI library with neon-styled components and futuristic aesthetics.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-## � Demo & Documentation
+## 🌐 Demo & Documentation
 
 - 🔗 **[Live Demo](https://patrickkuei.github.io/CyberUI)** - Experience the cyberpunk theme in action
 - 📚 **[Storybook Documentation](https://patrickkuei.github.io/CyberUI/storybook)** - Interactive component documentation
@@ -15,9 +15,12 @@ A cyberpunk-themed React UI library with neon-styled components and futuristic a
 npm install cyberui-2045
 ```
 
+Import the core stylesheet and components
+
 ```tsx
-import React from 'react';
-import { CircularProgress, Notification } from 'cyberui-2045';
+import React from "react";
+import "cyberui-2045/styles.css";
+import { CircularProgress, Notification } from "cyberui-2045";
 
 function App() {
   return (
@@ -35,6 +38,10 @@ function App() {
   );
 }
 ```
+
+## Changelog
+
+See the full history in [CHANGELOG.md](./CHANGELOG.md).
 
 ## 🛠️ Development
 

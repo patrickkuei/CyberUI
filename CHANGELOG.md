@@ -5,31 +5,53 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2025-09-16
+
+### Fixed
+
+- Restored missing CSS and full type declarations (1.3.1 packaging issue)
+
+### Changed
+
+- Simplified Storybook title handling
+
+### Internal
+
+- Added sourcemaps
+- Clarified React peer dependency configuration
+- Excluded story/test declaration files from published package
+
 ## [1.3.1] - 2025-09-12
 
 ### Added
+
 - **TabNavigation Component** - Responsive design (RWD) support with dropdown mode for mobile
 
 ### Enhanced
+
 - **useCyberScrollbar Hook** - Improved performance and event handling
 - **TabNavigation Component** - More flexible API accepting custom tab names
 
 ### Fixed
+
 - **TabNavigation Component** - Type restrictions for real-world usage
 - **Storybook** - Documentation display issues for TabNavigation
 
 ### Deprecated
+
 - **Tab Type Export** - Use custom string arrays instead. Will be removed in v2.0.0.
 
 ## [1.3.0] - 2025-08-16
 
 ### Added
+
 - **Modal Component** - Cyberpunk-themed modal with CRT power-on animation and RGB borders
 - **Notification System** - Complete provider/hook pattern with `CyberNotificationProvider` and `useCyberNotifications`
 - **useCyberScrollbar Hook** - Velocity-responsive cyberpunk scrollbar with direction-aware arrows
 - **Arrow Component** - Directional indicators for carousel navigation
 
 ### Enhanced
+
 - **InteractiveTab** - 6 interactive cyberpunk modals with rich content and notification integration
 - **Image Component** - Portal rendering for true fullscreen preview mode
 - **Carousel Component** - Improved objectFit implementation with arrow indicators
@@ -37,12 +59,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Documentation** - Complete Storybook API reference for notification system
 
 ### Fixed
+
 - **Image Component** - Resolved ESC key freeze issue in preview mode
 
 ## [1.2.0] - 2025-08-12
 
 ### Added
+
 - **Image Component**: Click-to-expand preview with cyberpunk effects
+
   - Full-screen preview mode with animated overlay
   - Fallback image support for error handling
   - Loading states with customizable placeholders
@@ -54,18 +79,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Perfect Storybook integration with contained preview mode
 
 - **Skeleton Component**: Loading placeholder component
+
   - Multiple variants (text, circular, rectangular, button)
   - Customizable dimensions and animation
   - Responsive sizing support
   - Cyberpunk-themed styling with gradient animations
 
 - **Select Component**: Dropdown select component
+
   - Multiple variants (primary, secondary, danger)
   - Form integration with labels and validation states
   - Responsive design with proper focus states
   - Accessible with keyboard navigation
 
 - **Toggle Component**: Switch/toggle component
+
   - Multiple variants with cyberpunk styling
   - Form integration and controlled/uncontrolled modes
   - Accessible with proper ARIA attributes
@@ -78,6 +106,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Responsive design
 
 ### Documentation
+
 - **Design Tokens Documentation**: Comprehensive design system guide in Storybook
   - Color palette documentation
   - Typography system
@@ -85,7 +114,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Component design patterns
 
 ### Enhanced
+
 - **ElementsTab**: Updated showcase with new components
+
   - Added Image Gallery section with demo images
   - Enhanced form controls section with Select and Toggle
   - Improved layout and organization
@@ -95,6 +126,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Enhanced responsive value support
 
 ### Infrastructure
+
 - Added demo images for Image component showcase
 - Updated roadmap with development progress
 - Enhanced Storybook configuration for better component testing
@@ -103,6 +135,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.1.0] - 2025-08-11
 
 ### Added
+
 - **Card Component**: Container component with cyberpunk styling
 - **Badge Component**: Status indicator with multiple variants
 - **Input Component**: Form input with validation states
@@ -110,6 +143,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.0.0] - 2025-08-05
 
 ### Added
+
 - Initial release of CyberUI 2045
 - **Button Component**: 4 variants (primary, secondary, danger, ghost), 3 sizes, enhanced disabled states
 - **CircularProgress Component**: Customizable progress indicator with neon styling
@@ -124,6 +158,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - GitHub Actions for automated Storybook deployment
 
 ### Features
+
 - 🎨 Cyberpunk-themed UI components
 - 📱 Responsive design
 - ⚡ React 19 support
@@ -134,6 +169,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ♿ Accessibility-focused design
 
 ### Technical Details
+
 - Built with React 19 and TypeScript
 - Styled with Tailwind CSS v4
 - Bundled with Vite

@@ -1,0 +1,16 @@
+<title>CyberUI</title>
+<meta name="description" content="CyberUI – Futuristic neon-styled React component library documentation." />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+<script>
+	// Keep Storybook tab title stable
+	const TARGET_TITLE = 'CyberUI';
+	if (document.title !== TARGET_TITLE) document.title = TARGET_TITLE;
+	window.addEventListener('DOMContentLoaded', () => {
+		if (document.title !== TARGET_TITLE) document.title = TARGET_TITLE;
+	});
+	const mo = new MutationObserver(() => {
+		if (document.title !== TARGET_TITLE) document.title = TARGET_TITLE;
+	});
+	mo.observe(document.head, { childList: true, subtree: true });
+</script>

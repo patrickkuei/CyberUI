@@ -1,8 +1,8 @@
 // Import CSS for the library
-import './index.css';
+import "./index.css";
 
 // Export all components and types
-export * from './components';
+export * from "./components";
 
 // Export version
-export const version = '1.3.0';
+export const version = "1.3.2";
