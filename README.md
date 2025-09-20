@@ -6,6 +6,12 @@ A cyberpunk-themed React UI library with neon-styled components and futuristic a
 
 ## 🌐 Demo & Documentation
 
+<details>
+  <summary>Check out the Demo Video 🎬</summary>
+  <video src="https://github.com/user-attachments/assets/00d3de8d-d243-4ae0-80c4-e6b97b71c0f0">
+  </video>
+</details>
+
 - 🔗 **[Live Demo](https://patrickkuei.github.io/CyberUI)** - Experience the cyberpunk theme in action
 - 📚 **[Storybook Documentation](https://patrickkuei.github.io/CyberUI/storybook)** - Interactive component documentation
 
