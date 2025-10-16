@@ -211,12 +211,29 @@ const InteractiveTab: React.FC = () => {
       <Card title="Visual Display Card">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Card variant="accent" className="p-0!">
-            <img
-              src="image_demo_1.jpg"
-              alt="visual_disp_img1"
-              className="rounded-t-2xl"
-            />
-            <div className="flex flex-col justify-center gap-2 items-center px-8 pb-4">
+            <div className="relative">
+              <img
+                src="image_demo_1.jpg"
+                alt="visual_disp_img1"
+                className="rounded-t-2xl"
+              />
+              <div
+                className={`absolute inset-0 transition-opacity duration-300 opacity-20 hover:opacity-0`}
+                aria-hidden="true"
+              >
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `
+                      linear-gradient(rgba(255, 255, 255, 0.3) 4px, transparent 1px),
+                      linear-gradient(90deg, rgba(255, 255, 255, 0.3) 4px, transparent 1px)
+                    `,
+                    backgroundSize: "20px 20px",
+                  }}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col justify-center gap-2 items-center px-8 pb-6 transition-opacity duration-300 opacity-20 hover:opacity-100">
               <h3 className="text-default text-lg font-bold">
                 Neo-Tokyo District 7
               </h3>
@@ -227,11 +244,11 @@ const InteractiveTab: React.FC = () => {
               </p>
             </div>
           </Card>
-          <Card>
+          <Card className="p-0!">
             <img
               src="image_demo_2.jpg"
               alt="visual_disp_img2"
-              className="rounded-t-2xl"
+              className="rounded-t-2xl relative"
             />
             <div className="flex flex-col justify-center gap-2 items-center px-8 pb-4">
               <h3 className="text-muted text-lg font-bold">
