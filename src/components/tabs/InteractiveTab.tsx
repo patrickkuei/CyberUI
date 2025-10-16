@@ -208,6 +208,45 @@ const InteractiveTab: React.FC = () => {
         </Card>
       </Card>
 
+      <Card title="Visual Display Card">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <Card variant="accent" className="p-0!">
+            <img
+              src="image_demo_1.jpg"
+              alt="visual_disp_img1"
+              className="rounded-t-2xl"
+            />
+            <div className="flex flex-col justify-center gap-2 items-center px-8 pb-4">
+              <h3 className="text-default text-lg font-bold">
+                Neo-Tokyo District 7
+              </h3>
+              <p className="text-muted">
+                A neon-drenched sector pulsing with life, where towering
+                holograms light the smog-choked skies and cyber-enhanced
+                citizens weave through crowded alleyways.
+              </p>
+            </div>
+          </Card>
+          <Card>
+            <img
+              src="image_demo_2.jpg"
+              alt="visual_disp_img2"
+              className="rounded-t-2xl"
+            />
+            <div className="flex flex-col justify-center gap-2 items-center px-8 pb-4">
+              <h3 className="text-muted text-lg font-bold">
+                Corporate Megastructure
+              </h3>
+              <p className="text-muted/50">
+                A colossal skyscraper-city ruled by profit and precision, where
+                entire corporations exist within gleaming walls of steel and
+                glass.
+              </p>
+            </div>
+          </Card>
+        </div>
+      </Card>
+
       {/* Neural Protocol Modal */}
       <Modal
         isOpen={protocolModal}
