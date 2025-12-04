@@ -1,6 +1,6 @@
 {
   "name": "cyberui-2045",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "A cyberpunk-themed React UI library with neon-styled components. Also known as CyberUI.",
   "private": false,
   "type": "module",
