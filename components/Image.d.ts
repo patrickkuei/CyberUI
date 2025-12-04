@@ -30,6 +30,23 @@ export interface ImageCallbacks {
 }
 /**
  * Props for the CyberUI Image component
+ *
+ * @example
+ * // Basic image with preview
+ * <Image
+ *   src="/cyber-city.jpg"
+ *   alt="Cyberpunk cityscape"
+ *   size="lg"
+ * />
+ *
+ * @example
+ * // Image with fallback and custom animation
+ * <Image
+ *   src={src}
+ *   alt="Avatar"
+ *   fallback="/default-avatar.png"
+ *   animation={{ cyberpunkEffects: false }}
+ * />
  */
 export interface ImageProps extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "size" | "onLoad" | "onError">, ImageCallbacks {
     /** Image source URL (required) */
