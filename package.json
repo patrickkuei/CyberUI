@@ -17,7 +17,8 @@
     "dist/index.js",
     "dist/index.es.js",
     "dist/cyberui-2045.css",
-    "README.md"
+    "README.md",
+    "AGENT.md"
   ],
   "sideEffects": [
     "dist/*.css",

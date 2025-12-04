@@ -2,8 +2,34 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * A status indicator badge with various semantic variants.
+ *
+ * @example
+ * // Success badge
+ * <Badge variant="success">ONLINE</Badge>
+ *
+ * @example
+ * // Clickable badge with icon
+ * <Badge
+ *   variant="primary"
+ *   clickable
+ *   onClick={handleClick}
+ *   leftIcon={<Icon name="user" />}
+ * >
+ *   Profile
+ * </Badge>
+ */
 export interface BadgeProps {
+  /**
+   * Semantic style of the badge.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning';
+  /**
+   * Size of the badge.
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   children: React.ReactNode;
   className?: string;

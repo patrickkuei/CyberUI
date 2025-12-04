@@ -2,9 +2,37 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses } from '../utils/responsive';
 
+/**
+ * A toggle switch component.
+ *
+ * @example
+ * // Basic toggle
+ * <Toggle
+ *   label="Enable Notifications"
+ *   checked={enabled}
+ *   onChange={setEnabled}
+ * />
+ *
+ * @example
+ * // Large accent toggle
+ * <Toggle
+ *   checked={isActive}
+ *   onChange={toggle}
+ *   size="lg"
+ *   variant="accent"
+ * />
+ */
 export interface ToggleProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'> {
   label?: string;
+  /**
+   * Size of the toggle.
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /**
+   * Visual style variant.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'accent';
   className?: string;
   checked?: boolean;
@@ -44,7 +72,7 @@ const Toggle: React.FC<ToggleProps> = ({
 
     const variants = {
       primary: 'bg-gray-600 peer-checked:bg-linear-(--gradient-accent) peer-focus:ring-primary',
-      secondary: 'bg-gray-600 peer-checked:bg-secondary peer-focus:ring-secondary', 
+      secondary: 'bg-gray-600 peer-checked:bg-secondary peer-focus:ring-secondary',
       accent: 'bg-gray-600 peer-checked:bg-accent peer-focus:ring-accent'
     };
 
@@ -75,8 +103,8 @@ const Toggle: React.FC<ToggleProps> = ({
   return (
     <div className={containerClasses}>
       {label && (
-        <label 
-          htmlFor={id} 
+        <label
+          htmlFor={id}
           className={`text-default font-medium ${disabled ? 'text-muted opacity-50' : 'cursor-pointer'}`}
         >
           {label}

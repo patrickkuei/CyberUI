@@ -17,6 +17,13 @@ export const isResponsiveObject = <T>(
 ): v is ResponsiveObject<T> => typeof v === "object" && v !== null;
 
 export type Breakpoint = "base" | "sm" | "md" | "lg" | "xl" | "2xl";
+/**
+ * Resolves responsive classes based on the current viewport size.
+ *
+ * @param prop The responsive value configuration (string or object)
+ * @param classMap Map of values to CSS classes
+ * @returns A string of combined Tailwind classes
+ */
 export const getResponsiveClasses = <T extends string>(
   prop: ResponsiveValue<T>,
   classMap: Record<T, string>
@@ -61,6 +68,12 @@ export const getResponsiveClasses = <T extends string>(
   return classes.join(" ");
 };
 
+/**
+ * Combines multiple class strings, filtering out falsy values.
+ *
+ * @param classes List of class strings
+ * @returns Combined class string
+ */
 export const combineResponsiveClasses = (
   ...classes: (string | undefined)[]
 ): string => {
@@ -135,6 +148,14 @@ export const BREAKPOINT_PIXELS = {
 export type BreakpointPixels = typeof BREAKPOINT_PIXELS;
 
 // Resolve a ResponsiveValue<T> to a concrete value at a given viewport width
+/**
+ * Resolves a ResponsiveValue to a concrete value for a specific width.
+ *
+ * @param prop The responsive value to resolve
+ * @param width The current viewport width in pixels
+ * @param fallback Fallback value if no breakpoint matches
+ * @returns The resolved value
+ */
 export const resolveResponsiveValue = <T>(
   prop: ResponsiveValue<T>,
   width: number,
@@ -156,6 +177,13 @@ export const resolveResponsiveValue = <T>(
 };
 
 // React hook to resolve a ResponsiveValue<T> and update on resize
+/**
+ * A hook that returns the current resolved value based on window resize events.
+ *
+ * @param prop The responsive value configuration
+ * @param fallback Default value to use during SSR or initial render
+ * @returns The current resolved value
+ */
 export const useResponsiveValue = <T>(
   prop: ResponsiveValue<T>,
   fallback: T

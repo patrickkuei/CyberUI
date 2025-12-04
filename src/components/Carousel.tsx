@@ -45,8 +45,32 @@ export interface CarouselCallbacks {
   onAfterChange?: (index: number) => void;
 }
 
+
 /**
  * Props for the CyberUI Carousel component
+ *
+ * @example
+ * // Basic carousel
+ * <Carousel
+ *   images={[
+ *     { src: 'img1.jpg', alt: 'Cyber City' },
+ *     { src: 'img2.jpg', alt: 'Neon Lights' }
+ *   ]}
+ *   currentIndex={index}
+ *   onChange={setIndex}
+ * />
+ *
+ * @example
+ * // Glitch effect carousel
+ * <Carousel
+ *   images={images}
+ *   currentIndex={index}
+ *   onChange={setIndex}
+ *   transition="signal-glitch"
+ *   glitchRate={0.5}
+ *   autoPlay
+ *   interval={5000}
+ * />
  */
 export interface CarouselProps extends CarouselCallbacks {
   /** Array of images to display */

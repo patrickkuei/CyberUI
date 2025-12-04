@@ -2,8 +2,32 @@ import React, { useId } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * A cyberpunk-styled text input field.
+ *
+ * @example
+ * // Basic input with label
+ * <Input label="Username" placeholder="Enter alias..." />
+ *
+ * @example
+ * // Input with error state and icon
+ * <Input
+ *   label="Password"
+ *   type="password"
+ *   error="Invalid credentials"
+ *   leftIcon={<LockIcon />}
+ * />
+ */
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  /**
+   * Visual style of the input.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  /**
+   * Size of the input (height and padding).
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   label?: string;
   helperText?: string;

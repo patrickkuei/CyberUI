@@ -5,7 +5,31 @@ import {
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
 
+/**
+ * A placeholder component for loading states.
+ *
+ * @example
+ * // Text skeleton
+ * <Skeleton variant="text" lines={3} />
+ *
+ * @example
+ * // Avatar and text combination
+ * <Skeleton variant="avatar-text" size="lg" />
+ *
+ * @example
+ * // Custom rectangular skeleton
+ * <Skeleton
+ *   variant="rectangular"
+ *   width={200}
+ *   height={150}
+ *   animate={false}
+ * />
+ */
 export interface SkeletonProps {
+  /**
+   * Shape variant of the skeleton.
+   * @default 'text'
+   */
   variant?:
     | "text"
     | "circular"
@@ -13,11 +37,23 @@ export interface SkeletonProps {
     | "card"
     | "avatar-text"
     | "button-group";
+  /**
+   * Size of the skeleton element.
+   * @default 'md'
+   */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
   width?: string | number;
   height?: string | number;
   className?: string;
+  /**
+   * Number of lines for text variant.
+   * @default 3
+   */
   lines?: number; // For text variant
+  /**
+   * Whether to show the pulse animation.
+   * @default true
+   */
   animate?: boolean;
 }
 
