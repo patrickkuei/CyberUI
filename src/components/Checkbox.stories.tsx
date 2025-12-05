@@ -35,6 +35,7 @@ import { Checkbox } from 'cyberui-2045';
 |------|------|----------|---------|-------------|
 | \`label\` | \`string\` | ❌ | - | Label text displayed next to the checkbox |
 | \`error\` | \`string\` | ❌ | - | Error message to display below the checkbox |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Checkbox size (supports responsive values) |
 | \`checked\` | \`boolean\` | ❌ | - | Checked state (controlled) |
 | \`defaultChecked\` | \`boolean\` | ❌ | - | Initial checked state (uncontrolled) |
 | \`onChange\` | \`(event: React.ChangeEvent<HTMLInputElement>) => void\` | ❌ | - | Change handler |
@@ -51,6 +52,11 @@ All standard HTML input props (except 'type') are also supported.
     label: {
       control: 'text',
       description: 'Label text to display next to the checkbox',
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Checkbox size (supports responsive values)',
     },
     checked: {
       control: 'boolean',
@@ -100,4 +106,14 @@ export const WithError: Story = {
     label: 'Security Protocol',
     error: 'Authentication failed',
   },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex flex-col gap-4">
+      <Checkbox label="Small checkbox" size="sm" />
+      <Checkbox label="Medium checkbox (default)" size="md" />
+      <Checkbox label="Large checkbox" size="lg" />
+    </div>
+  ),
 };

@@ -1,4 +1,6 @@
 import React from 'react';
+import type { ResponsiveValue } from "../utils/responsive";
+import { getResponsiveClasses } from "../utils/responsive";
 
 /**
  * A cyberpunk-styled checkbox with neon glow effects.
@@ -25,7 +27,7 @@ import React from 'react';
  *   error="This field is required"
  * />
  */
-export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type'> {
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'size'> {
   /**
    * Label text displayed next to the checkbox.
    */
@@ -35,6 +37,11 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
    */
   error?: string;
   /**
+   * Size of the checkbox. Supports responsive values.
+   * @default 'md'
+   */
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /**
    * Additional CSS classes.
    */
   className?: string;
@@ -43,6 +50,7 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 const Checkbox: React.FC<CheckboxProps> = ({
   label,
   error,
+  size = 'md',
   className = '',
   checked: controlledChecked,
   onChange,
@@ -59,6 +67,28 @@ const Checkbox: React.FC<CheckboxProps> = ({
     }
     onChange?.(e);
   };
+
+  const sizeMap = {
+    sm: 'w-4 h-4',
+    md: 'w-5 h-5',
+    lg: 'w-6 h-6',
+  };
+
+  const labelSizeMap = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+  };
+
+  const errorMarginMap = {
+    sm: 'ml-6',
+    md: 'ml-8',
+    lg: 'ml-9',
+  };
+
+  const sizeClasses = getResponsiveClasses(size, sizeMap);
+  const labelSizeClasses = getResponsiveClasses(size, labelSizeMap);
+  const errorMarginClasses = getResponsiveClasses(size, errorMarginMap);
 
   const getBorderClasses = (isChecked: boolean): string => {
     if (disabled) return 'stroke-muted/20';
@@ -81,7 +111,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   return (
     <div className={`flex flex-col gap-1 ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
       <label className={`flex items-center gap-3 group ${disabled ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}>
-        <div className="relative w-5 h-5">
+        <div className={`relative flex-shrink-0 ${sizeClasses}`}>
           <input
             type="checkbox"
             className="absolute opacity-0 w-0 h-0"
@@ -116,16 +146,17 @@ const Checkbox: React.FC<CheckboxProps> = ({
           </svg>
         </div>
         {label && (
-          <span className={`text-sm transition-colors ${disabled ? 'text-muted' : 'text-muted group-hover:text-secondary'}`}>
+          <span className={`transition-colors ${labelSizeClasses} ${disabled ? 'text-muted' : 'text-muted group-hover:text-secondary'}`}>
             {label}
           </span>
         )}
       </label>
       {error && !disabled && (
-        <span className="text-xs text-error ml-8">{error}</span>
+        <span className={`text-xs text-error ${errorMarginClasses}`}>{error}</span>
       )}
     </div>
   );
 };
 
 export default Checkbox;
+
