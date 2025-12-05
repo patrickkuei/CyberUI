@@ -38,6 +38,7 @@ const events = [
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`events\` | \`TimelineEvent[]\` | ✅ | - | Array of timeline events to display |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Timeline size (supports responsive values) |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
 
 **TimelineEvent Interface:**
@@ -57,6 +58,11 @@ const events = [
     events: {
       control: 'object',
       description: 'Array of event objects { title, time, description, status }',
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Timeline size (supports responsive values)',
     },
     className: {
       control: 'text',
@@ -99,4 +105,23 @@ export const Default: Story = {
   args: {
     events: defaultEvents,
   },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div>
+        <h3 className="text-sm font-bold text-muted mb-4">Small</h3>
+        <Timeline events={defaultEvents.slice(0, 2)} size="sm" />
+      </div>
+      <div>
+        <h3 className="text-sm font-bold text-muted mb-4">Medium (Default)</h3>
+        <Timeline events={defaultEvents.slice(0, 2)} size="md" />
+      </div>
+      <div>
+        <h3 className="text-sm font-bold text-muted mb-4">Large</h3>
+        <Timeline events={defaultEvents.slice(0, 2)} size="lg" />
+      </div>
+    </div>
+  ),
 };

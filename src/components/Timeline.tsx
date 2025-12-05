@@ -1,4 +1,6 @@
 import React from 'react';
+import type { ResponsiveValue } from "../utils/responsive";
+import { getResponsiveClasses } from "../utils/responsive";
 
 /**
  * Individual timeline event data.
@@ -58,6 +60,11 @@ export interface TimelineProps {
    */
   events: TimelineEvent[];
   /**
+   * Size of the timeline. Supports responsive values.
+   * @default 'md'
+   */
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /**
    * Additional CSS classes.
    */
   className?: string;
@@ -65,8 +72,59 @@ export interface TimelineProps {
 
 const Timeline: React.FC<TimelineProps> = ({
   events,
+  size = 'md',
   className = '',
 }) => {
+  const diamondSizeMap = {
+    sm: 'w-5 h-5',
+    md: 'w-6 h-6',
+    lg: 'w-8 h-8',
+  };
+
+  const innerSizeMap = {
+    sm: 'inset-1.5',
+    md: 'inset-2',
+    lg: 'inset-2.5',
+  };
+
+  const titleSizeMap = {
+    sm: 'text-sm',
+    md: 'text-base',
+    lg: 'text-lg',
+  };
+
+  const descSizeMap = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+  };
+
+  const timeSizeMap = {
+    sm: 'text-[10px]',
+    md: 'text-xs',
+    lg: 'text-sm',
+  };
+
+  const gapMap = {
+    sm: 'gap-3',
+    md: 'gap-4',
+    lg: 'gap-5',
+  };
+
+  const spacingMap = {
+    sm: 'space-y-4',
+    md: 'space-y-6',
+    lg: 'space-y-8',
+  };
+
+  const diamondClasses = getResponsiveClasses(size, diamondSizeMap);
+  const innerClasses = getResponsiveClasses(size, innerSizeMap);
+  const titleClasses = getResponsiveClasses(size, titleSizeMap);
+  const descClasses = getResponsiveClasses(size, descSizeMap);
+  const timeClasses = getResponsiveClasses(size, timeSizeMap);
+  const gapClasses = getResponsiveClasses(size, gapMap);
+  const spacingClasses = getResponsiveClasses(size, spacingMap);
+
   const getStatusClasses = (status?: string): { border: string; background: string; inner: string } => {
     const statusStyles = {
       success: {
@@ -96,20 +154,20 @@ const Timeline: React.FC<TimelineProps> = ({
   const diamondClipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
 
   return (
-    <div className={`space-y-6 ${className}`}>
+    <div className={`${spacingClasses} ${className}`}>
       {events.map((event, index) => {
         const statusClasses = getStatusClasses(event.status);
 
         return (
-          <div key={index} className="flex gap-4 group">
+          <div key={index} className={`flex ${gapClasses} group`}>
             <div className="flex flex-col items-center">
-              <div className="relative w-6 h-6 flex-shrink-0 mt-1.5">
+              <div className={`relative ${diamondClasses} flex-shrink-0 mt-1.5`}>
                 <div
                   className={`absolute inset-0 border-2 transition-all duration-300 ${statusClasses.border}`}
                   style={{ clipPath: diamondClipPath }}
                 />
                 <div
-                  className={`absolute inset-2 ${statusClasses.inner}`}
+                  className={`absolute ${innerClasses} ${statusClasses.inner}`}
                   style={{ clipPath: diamondClipPath }}
                 />
               </div>
@@ -119,16 +177,16 @@ const Timeline: React.FC<TimelineProps> = ({
             </div>
 
             <div className="flex-1 pb-6">
-              <div className="flex items-start justify-between mb-1">
-                <h4 className="text-base font-semibold text-default group-hover:text-secondary transition-colors">
+              <div className="flex items-center justify-between mb-1">
+                <h4 className={`font-semibold text-default group-hover:text-secondary transition-colors ${titleClasses}`}>
                   {event.title}
                 </h4>
-                <span className="text-xs text-muted whitespace-nowrap ml-4">
+                <span className={`text-muted whitespace-nowrap ml-4 ${timeClasses}`}>
                   {event.time}
                 </span>
               </div>
               {event.description && (
-                <p className="text-sm text-muted mt-1">
+                <p className={`text-muted mt-1 ${descClasses}`}>
                   {event.description}
                 </p>
               )}
@@ -141,3 +199,4 @@ const Timeline: React.FC<TimelineProps> = ({
 };
 
 export default Timeline;
+
