@@ -97,16 +97,18 @@ const InteractiveTab: React.FC = () => {
           <p className="text-muted text-center">
             Complete the neural link initialization sequence
           </p>
-          <Steps
-            current={currentStep}
-            items={[
-              { title: "Authenticate", description: "Verify identity" },
-              { title: "Calibrate", description: "Neural sync" },
-              { title: "Connect", description: "Establish link" },
-              { title: "Activate", description: "Go online" },
-            ]}
-          />
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center">
+            <Steps
+              current={currentStep}
+              items={[
+                { title: "Authenticate", description: "Verify identity" },
+                { title: "Calibrate", description: "Neural sync" },
+                { title: "Connect", description: "Establish link" },
+                { title: "Activate", description: "Go online" },
+              ]}
+            />
+          </div>
+          <div className="flex justify-between w-full">
             <Button
               variant="ghost"
               size="sm"
