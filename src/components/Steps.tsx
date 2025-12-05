@@ -1,4 +1,6 @@
 import React from 'react';
+import type { ResponsiveValue } from "../utils/responsive";
+import { useResponsiveValue } from "../utils/responsive";
 
 /**
  * Individual step item data.
@@ -46,13 +48,10 @@ export interface StepItem {
  * />
  *
  * @example
- * // With error state
+ * // Responsive orientation (vertical on mobile, horizontal on desktop)
  * <Steps
- *   items={[
- *     { title: "Upload", status: "completed" },
- *     { title: "Process", status: "error" },
- *     { title: "Done", status: "pending" }
- *   ]}
+ *   orientation={{ base: 'vertical', md: 'horizontal' }}
+ *   items={[...]}
  * />
  */
 export interface StepsProps {
@@ -66,6 +65,11 @@ export interface StepsProps {
    */
   current?: number;
   /**
+   * Layout orientation. Supports responsive values.
+   * @default { base: 'vertical', md: 'horizontal' }
+   */
+  orientation?: ResponsiveValue<'horizontal' | 'vertical'>;
+  /**
    * Additional CSS classes.
    */
   className?: string;
@@ -74,8 +78,12 @@ export interface StepsProps {
 const Steps: React.FC<StepsProps> = ({
   items,
   current = 0,
+  orientation = { base: 'vertical', md: 'horizontal' },
   className = '',
 }) => {
+  const currentOrientation = useResponsiveValue(orientation, 'vertical');
+  const isVertical = currentOrientation === 'vertical';
+
   const getStepStatus = (item: StepItem, index: number): { isCompleted: boolean; isCurrent: boolean; isError: boolean } => {
     const isCompleted = item.status === 'completed' || (item.status === undefined && index < current);
     const isCurrent = item.status === 'current' || (item.status === undefined && index === current && current < items.length);
@@ -120,8 +128,35 @@ const Steps: React.FC<StepsProps> = ({
     };
   };
 
+  const containerClasses = isVertical
+    ? `flex flex-col items-start gap-0 ${className}`
+    : `flex items-center justify-center gap-4 ${className}`;
+
+  // Triangle indicator classes for vertical mode (using unicode character)
+  const getTriangleColorClass = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
+    if (isCompleted) return 'text-secondary drop-shadow-[0_0_4px_var(--color-secondary)]';
+    if (isCurrent) return 'text-accent drop-shadow-[0_0_6px_var(--color-accent)]';
+    if (isError) return 'text-error drop-shadow-[0_0_4px_var(--color-error)]';
+    return 'text-muted/50';
+  };
+
+  // Vertical title classes with animated underline (left-to-right animation)
+  const getVerticalTitleClasses = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
+    const baseClasses = [
+      'relative font-bold text-sm transition-colors duration-200 pb-1 w-fit',
+      "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:transition-transform after:duration-300 after:ease-out",
+    ].join(' ');
+
+    if (isCompleted) {
+      return `${baseClasses} text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100`;
+    }
+    if (isCurrent) return `${baseClasses} text-secondary`;
+    if (isError) return `${baseClasses} text-error`;
+    return `${baseClasses} text-muted`;
+  };
+
   return (
-    <div className={`flex items-center justify-center gap-4 ${className}`}>
+    <div className={containerClasses}>
       {items.map((item, index) => {
         const { isCompleted, isCurrent, isError } = getStepStatus(item, index);
         const nextStepCurrent = index < items.length - 1 &&
@@ -131,16 +166,52 @@ const Steps: React.FC<StepsProps> = ({
 
         return (
           <React.Fragment key={index}>
-            <div className="flex flex-col items-center">
-              <div className={getTitleClasses(isCompleted, isCurrent, isError)}>
-                {item.title}
+            {isVertical ? (
+              // Vertical layout: step row + chevrons below
+              <div className="flex flex-col w-full">
+                {/* Step row: triangle + title/description */}
+                <div className="flex items-start gap-1.5">
+                  <span className={`text-xs leading-5 flex-shrink-0 ${getTriangleColorClass(isCompleted, isCurrent, isError)}`}>
+                    ▸
+                  </span>
+                  <div className="flex flex-col">
+                    <div className={getVerticalTitleClasses(isCompleted, isCurrent, isError)}>
+                      {item.title}
+                    </div>
+                    {item.description && (
+                      <div className="text-xs text-muted mt-0.5 font-normal">{item.description}</div>
+                    )}
+                  </div>
+                </div>
+                {/* Chevrons aligned at fixed position */}
+                {index < items.length - 1 && (
+                  <div className="flex flex-col items-center py-0.5">
+                    {[0, 1, 2].map((chevronIndex) => (
+                      <div
+                        key={chevronIndex}
+                        className="text-sm font-bold transition-all duration-300 rotate-90 leading-[0.6]"
+                        style={getChevronStyle(isCompleted, nextStepCurrent, nextStepCompleted, chevronIndex)}
+                      >
+                        ›
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-              {item.description && (
-                <div className="text-xs text-muted mt-1 font-normal">{item.description}</div>
-              )}
-            </div>
+            ) : (
+              // Horizontal layout: title and description stacked with underline indicator
+              <div className="flex flex-col items-center">
+                <div className={getTitleClasses(isCompleted, isCurrent, isError)}>
+                  {item.title}
+                </div>
+                {item.description && (
+                  <div className="text-xs text-muted mt-1 font-normal">{item.description}</div>
+                )}
+              </div>
+            )}
 
-            {index < items.length - 1 && (
+            {/* Horizontal chevrons (only for horizontal mode) */}
+            {!isVertical && index < items.length - 1 && (
               <div className="flex">
                 {[0, 1, 2].map((chevronIndex) => (
                   <div
@@ -161,3 +232,4 @@ const Steps: React.FC<StepsProps> = ({
 };
 
 export default Steps;
+

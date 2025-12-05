@@ -30,6 +30,7 @@ const steps = [
 |------|------|----------|---------|-------------|
 | \`items\` | \`StepItem[]\` | ✅ | - | Array of step items to display |
 | \`current\` | \`number\` | ❌ | \`0\` | Current active step index (0-based) |
+| \`orientation\` | \`'horizontal' \\| 'vertical' \\| ResponsiveValue<...>\` | ❌ | \`{ base: 'vertical', md: 'horizontal' }\` | Layout orientation |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
 
 **StepItem Interface:**
@@ -52,6 +53,11 @@ const steps = [
     current: {
       control: { type: 'number', min: 0 },
       description: 'Index of the current active step (0-based)',
+    },
+    orientation: {
+      control: 'select',
+      options: ['horizontal', 'vertical'],
+      description: 'Layout orientation (supports responsive values)',
     },
     className: {
       control: 'text',
@@ -81,4 +87,17 @@ export const Completed: Story = {
     items: defaultSteps,
     current: 3,
   },
+};
+
+export const Vertical: Story = {
+  args: {
+    items: defaultSteps,
+    current: 1,
+    orientation: 'vertical',
+  },
+  render: (args) => (
+    <div className="flex justify-center">
+      <Steps {...args} />
+    </div>
+  ),
 };
