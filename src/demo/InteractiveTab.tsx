@@ -1,14 +1,18 @@
 import React, { useState } from "react";
-import Button from "../Button";
-import Input from "../Input";
-import Card from "../Card";
-import Carousel from "../Carousel";
-import Modal from "../Modal";
-import { useCyberNotifications } from "../../hooks/useCyberNotifications";
+import Button from "../components/Button";
+import Input from "../components/Input";
+import Card from "../components/Card";
+import Carousel from "../components/Carousel";
+import Modal from "../components/Modal";
+import SectionTitle from "../components/SectionTitle";
+import Steps from "../components/Steps";
+import Divider from "../components/Divider";
+import { useCyberNotifications } from "../hooks/useCyberNotifications";
 
 const InteractiveTab: React.FC = () => {
   const [input, setInput] = useState("");
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
 
   // Modal states
   const [protocolModal, setProtocolModal] = useState(false);
@@ -18,10 +22,8 @@ const InteractiveTab: React.FC = () => {
   const [syncModal, setSyncModal] = useState(false);
   const [monitorModal, setMonitorModal] = useState(false);
 
-  // Use the new notification hook
   const { showNotification } = useCyberNotifications();
 
-  // Sample images for carousel
   const carouselImages = [
     {
       src: "image_demo_1.jpg",
@@ -61,7 +63,8 @@ const InteractiveTab: React.FC = () => {
         </p>
       </div>
 
-      <Card title="User Input">
+      <SectionTitle>User Input</SectionTitle>
+      <Card>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <Input
             variant="primary"
@@ -86,45 +89,98 @@ const InteractiveTab: React.FC = () => {
         </div>
       </Card>
 
-      <Card title="System Actions">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="primary" onClick={() => setProtocolModal(true)}>
-            Execute Protocol
-          </Button>
+      <Divider />
 
-          <Button variant="secondary" onClick={() => setScanModal(true)}>
-            Scan System
-          </Button>
-
-          <Button variant="danger" onClick={() => setEmergencyModal(true)}>
-            Emergency Stop
-          </Button>
-
-          <Button variant="ghost" onClick={() => setDiagnosticsModal(true)}>
-            Run Diagnostics
-          </Button>
-        </div>
-
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          System Status: Offline
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="primary" disabled>
-            System Offline
-          </Button>
-          <Button variant="secondary" disabled>
-            Access Denied
-          </Button>
-          <Button variant="danger" disabled>
-            Critical Error
-          </Button>
-          <Button variant="ghost" disabled>
-            Network Down
-          </Button>
+      <SectionTitle>Neural Link Setup</SectionTitle>
+      <Card>
+        <div className="space-y-6">
+          <p className="text-muted text-center">
+            Complete the neural link initialization sequence
+          </p>
+          <Steps
+            current={currentStep}
+            items={[
+              { title: "Authenticate", description: "Verify identity" },
+              { title: "Calibrate", description: "Neural sync" },
+              { title: "Connect", description: "Establish link" },
+              { title: "Activate", description: "Go online" },
+            ]}
+          />
+          <div className="flex justify-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setCurrentStep(Math.max(0, currentStep - 1))}
+              disabled={currentStep === 0}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="primary"
+              size="sm"
+              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+              disabled={currentStep === 4}
+            >
+              Next Step
+            </Button>
+          </div>
         </div>
       </Card>
 
-      <Card title="Visual Data Stream">
+      <Divider />
+
+      <SectionTitle>System Actions</SectionTitle>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border-default">
+              <div className="w-2 h-2 bg-primary rounded-full"></div>
+              <span className="text-sm font-semibold text-primary uppercase tracking-wider">Core Operations</span>
+            </div>
+            <Button variant="primary" size="sm" className="w-full" onClick={() => setProtocolModal(true)}>
+              Execute Protocol
+            </Button>
+            <Button variant="primary" size="sm" className="w-full" disabled>
+              System Locked
+            </Button>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border-default">
+              <div className="w-2 h-2 bg-secondary rounded-full"></div>
+              <span className="text-sm font-semibold text-secondary uppercase tracking-wider">System Utilities</span>
+            </div>
+            <Button variant="secondary" size="sm" className="w-full" onClick={() => setScanModal(true)}>
+              Scan System
+            </Button>
+            <Button variant="ghost" size="sm" className="w-full" onClick={() => setDiagnosticsModal(true)}>
+              Run Diagnostics
+            </Button>
+          </div>
+        </Card>
+
+        <Card>
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 pb-3 border-b border-border-default">
+              <div className="w-2 h-2 bg-error rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-error uppercase tracking-wider">Emergency</span>
+            </div>
+            <Button variant="danger" size="sm" className="w-full" onClick={() => setEmergencyModal(true)}>
+              Emergency Stop
+            </Button>
+            <Button variant="danger" size="sm" className="w-full" disabled>
+              Override Disabled
+            </Button>
+          </div>
+        </Card>
+      </div>
+
+      <Divider />
+
+      <SectionTitle>Visual Data Stream</SectionTitle>
+      <Card>
         <div className="space-y-4">
           <p className="text-muted text-center">
             Navigate through archived data streams
@@ -162,7 +218,10 @@ const InteractiveTab: React.FC = () => {
         </div>
       </Card>
 
-      <Card title="Interactive Demo Card">
+      <Divider />
+
+      <SectionTitle>Neural Interface Panel</SectionTitle>
+      <Card>
         <Card variant="accent" titleBorder={false}>
           <div className="text-center space-y-6">
             <div className="space-y-2">
@@ -256,17 +315,8 @@ const InteractiveTab: React.FC = () => {
 
           <p className="text-muted text-sm">
             This protocol will establish a direct neural interface connection
-            with the primary cortex module. All sensory data will be enhanced
-            through cybernetic augmentation layers.
+            with the primary cortex module.
           </p>
-
-          <div className="border-l-2 border-primary pl-4">
-            <p className="text-primary text-sm font-mono">
-              &gt; WARNING: Neural bandwidth at 87% capacity
-              <br />
-              &gt; Recommend defragmenting memory banks before execution
-            </p>
-          </div>
         </div>
       </Modal>
 
@@ -296,39 +346,20 @@ const InteractiveTab: React.FC = () => {
           </div>
 
           <div className="bg-surface/30 p-4 rounded border border-secondary/30">
-            <div className="space-y-3">
-              <div className="text-sm font-mono space-y-1">
-                <div className="flex justify-between">
-                  <span className="text-muted">CPU Cores:</span>
-                  <span className="text-success">16/16 ONLINE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Memory Banks:</span>
-                  <span className="text-warning">64TB (73% USED)</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Neural Networks:</span>
-                  <span className="text-success">STABLE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Firewall Status:</span>
-                  <span className="text-error">3 INTRUSION ATTEMPTS</span>
-                </div>
+            <div className="text-sm font-mono space-y-1">
+              <div className="flex justify-between">
+                <span className="text-muted">CPU Cores:</span>
+                <span className="text-success">16/16 ONLINE</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Memory Banks:</span>
+                <span className="text-warning">64TB (73% USED)</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Firewall Status:</span>
+                <span className="text-error">3 INTRUSION ATTEMPTS</span>
               </div>
             </div>
-          </div>
-
-          <p className="text-muted text-sm">
-            Comprehensive scan will analyze all system components, neural
-            pathways, and security protocols. Estimated scan time: 47 seconds.
-          </p>
-
-          <div className="border-l-2 border-secondary pl-4">
-            <p className="text-secondary text-sm font-mono">
-              &gt; Scanning priority: Critical vulnerabilities
-              <br />
-              &gt; Background processes will be temporarily suspended
-            </p>
           </div>
         </div>
       </Modal>
@@ -363,14 +394,6 @@ const InteractiveTab: React.FC = () => {
                 <span className="text-error font-mono">DEFCON 1</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-muted">Threat Source:</span>
-                <span className="text-error font-mono">UNKNOWN</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Systems Affected:</span>
-                <span className="text-error font-mono">ALL MODULES</span>
-              </div>
-              <div className="flex justify-between">
                 <span className="text-muted">Time to Breach:</span>
                 <span className="text-error font-mono">00:00:47</span>
               </div>
@@ -378,21 +401,9 @@ const InteractiveTab: React.FC = () => {
           </div>
 
           <p className="text-error text-sm">
-            <strong>WARNING:</strong> Emergency shutdown will immediately
-            terminate all neural connections and cybernetic processes. This
-            action cannot be undone and may result in temporary disorientation
-            or memory fragments.
+            <strong>WARNING:</strong> Emergency shutdown will terminate all
+            neural connections.
           </p>
-
-          <div className="border-l-2 border-error pl-4">
-            <p className="text-error text-sm font-mono">
-              &gt; ALL DATA WILL BE PRESERVED IN EMERGENCY CACHE
-              <br />
-              &gt; NEURAL INTERFACE WILL BE FORCIBLY DISCONNECTED
-              <br />
-              &gt; AUTOMATIC REBOOT IN SAFE MODE WILL COMMENCE
-            </p>
-          </div>
         </div>
       </Modal>
 
@@ -422,37 +433,12 @@ const InteractiveTab: React.FC = () => {
           </div>
 
           <div className="bg-surface/30 p-4 rounded border border-accent/30">
-            <div className="space-y-3">
-              <p className="text-accent font-mono text-sm">
-                DIAGNOSTIC MODULES AVAILABLE:
-              </p>
-              <div className="grid grid-cols-2 gap-2 text-xs font-mono">
-                <div className="text-success">✓ Memory Integrity</div>
-                <div className="text-success">✓ Neural Pathways</div>
-                <div className="text-success">✓ Cybernetic Sync</div>
-                <div className="text-warning">⚠ Security Layers</div>
-                <div className="text-success">✓ Data Streams</div>
-                <div className="text-error">✗ Quantum Encryption</div>
-                <div className="text-success">✓ Bio-signatures</div>
-                <div className="text-success">✓ Network Protocols</div>
-              </div>
+            <div className="grid grid-cols-2 gap-2 text-xs font-mono">
+              <div className="text-success">✓ Memory Integrity</div>
+              <div className="text-success">✓ Neural Pathways</div>
+              <div className="text-warning">⚠ Security Layers</div>
+              <div className="text-error">✗ Quantum Encryption</div>
             </div>
-          </div>
-
-          <p className="text-muted text-sm">
-            Advanced diagnostics will perform deep analysis on all system
-            components including neural interface stability, cybernetic implant
-            functionality, and quantum encryption matrices.
-          </p>
-
-          <div className="border-l-2 border-accent pl-4">
-            <p className="text-accent text-sm font-mono">
-              &gt; Estimated completion time: 2 minutes 34 seconds
-              <br />
-              &gt; System performance may be temporarily reduced
-              <br />
-              &gt; All anomalies will be logged for review
-            </p>
           </div>
         </div>
       </Modal>
@@ -492,31 +478,7 @@ const InteractiveTab: React.FC = () => {
                 <span className="text-muted">Target Sync Rate:</span>
                 <span className="text-success font-mono">99.8%</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Latency:</span>
-                <span className="text-accent font-mono">0.003ms</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted">Neural Bandwidth:</span>
-                <span className="text-secondary font-mono">2.4 PB/s</span>
-              </div>
             </div>
-          </div>
-
-          <p className="text-muted text-sm">
-            Neural synchronization will optimize the connection between your
-            biological neural networks and cybernetic augmentations for maximum
-            efficiency and response time.
-          </p>
-
-          <div className="border-l-2 border-primary pl-4">
-            <p className="text-primary text-sm font-mono">
-              &gt; Backup neural patterns before sync
-              <br />
-              &gt; Calibrating synaptic response timing
-              <br />
-              &gt; Optimizing data flow protocols
-            </p>
           </div>
         </div>
       </Modal>
@@ -555,38 +517,14 @@ const InteractiveTab: React.FC = () => {
                 <div className="text-warning">73.2%</div>
               </div>
               <div>
-                <div className="text-muted">Neural Activity</div>
-                <div className="text-primary">High</div>
+                <div className="text-muted">Heat Index</div>
+                <div className="text-error">94.1°C</div>
               </div>
               <div>
                 <div className="text-muted">Network I/O</div>
                 <div className="text-accent">847 MB/s</div>
               </div>
-              <div>
-                <div className="text-muted">Power Draw</div>
-                <div className="text-success">67.4 kW</div>
-              </div>
-              <div>
-                <div className="text-muted">Heat Index</div>
-                <div className="text-error">94.1°C</div>
-              </div>
             </div>
-          </div>
-
-          <p className="text-muted text-sm">
-            Real-time monitoring provides continuous oversight of all system
-            functions, neural activity patterns, and cybernetic implant
-            performance metrics.
-          </p>
-
-          <div className="border-l-2 border-secondary pl-4">
-            <p className="text-secondary text-sm font-mono">
-              &gt; Auto-refresh every 100ms
-              <br />
-              &gt; Alert thresholds configured
-              <br />
-              &gt; Logging all anomalies to secure buffer
-            </p>
           </div>
         </div>
       </Modal>

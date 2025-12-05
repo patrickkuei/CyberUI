@@ -334,13 +334,13 @@ const Modal: React.FC<ModalProps> = memo(
               {footer ? (
                 footer
               ) : (
-                <div className="flex justify-between items-center">
-                  <span className="text-muted text-sm font-mono">
+                <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
+                  <span className="text-muted text-xs font-mono hidden sm:block">
                     &gt; ESC to abort
                   </span>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 w-full sm:w-auto">
                     {showCancel && onCancel && (
-                      <Button variant="ghost" size="sm" onClick={wrappedCancel}>
+                      <Button variant="ghost" size="sm" onClick={wrappedCancel} className="flex-1 sm:flex-none">
                         {cancelText}
                       </Button>
                     )}
@@ -350,6 +350,7 @@ const Modal: React.FC<ModalProps> = memo(
                         size="sm"
                         onClick={wrappedConfirm}
                         disabled={confirmLoading}
+                        className="flex-1 sm:flex-none"
                       >
                         {confirmText}
                       </Button>

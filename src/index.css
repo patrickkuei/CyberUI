@@ -27,7 +27,9 @@
   --animate-spin-slow: spin-slow 4s linear infinite;
   --animate-scan: scan 2s ease-in-out infinite;
 
-  --gradient-accent: 90deg, var(--color-accent), var(--color-secondary);
+  --gradient-primary: 135deg, var(--color-secondary) 10%, var(--color-primary) 90%;
+  --gradient-secondary: 135deg, var(--color-primary) 10%, var(--color-accent) 90%;
+  --gradient-accent: 135deg, var(--color-accent) 10%, var(--color-secondary) 90%;
   --shadow-lg-accent: 0 0 12px var(--color-accent);
   --shadow-md-accent: 0 0 8px var(--color-accent);
   --shadow-secondary: 0 0 16px var(--color-secondary);
@@ -501,3 +503,28 @@ body {
   height: 100%;
 }
 
+/* Cyberpunk Checkbox Folded Corner */
+.clip-folded-corner {
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), calc(100% - 6px) 100%, 0 100%);
+}
+
+/* Checkbox checked state */
+.checkbox-checked .checkbox-border {
+  stroke: rgb(6, 182, 212);
+}
+
+.checkbox-checked .checkbox-fill {
+  fill: rgb(103, 232, 249);
+}
+
+/* Steps Component Animation */
+@keyframes chevronFlow {
+  0%, 100% {
+    opacity: 0.3;
+    filter: none;
+  }
+  50% {
+    opacity: 1;
+    filter: drop-shadow(0 0 8px rgba(255, 0, 93, 0.9));
+  }
+}
