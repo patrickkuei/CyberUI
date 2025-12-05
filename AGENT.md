@@ -39,6 +39,12 @@ import "cyberui-2045/styles.css";
 | `Skeleton` | Loading placeholder. |
 | `Image` | Image with cyberpunk frame/effects. |
 | `Carousel` | Image carousel. |
+| `Checkbox` | Neon-styled checkbox with SVG icons. |
+| `Divider` | Gradient/solid/dashed content separator. |
+| `GradientText` | Text with cyberpunk gradient effects. |
+| `SectionTitle` | Title with decorative gradient line. |
+| `Steps` | Multi-step progress indicator. |
+| `Timeline` | Vertical event history display. |
 
 ## 4. Usage Patterns (Few-Shot)
 

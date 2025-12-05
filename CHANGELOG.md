@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- **Checkbox Component** - Cyberpunk-styled checkbox with custom SVG icons and neon glow effects
+- **Divider Component** - Flexible divider with gradient, solid, and dashed variants
+- **GradientText Component** - Text component with primary, secondary, and accent gradient options
+- **SectionTitle Component** - Standardized section title with decorative gradient line
+- **Steps Component** - Multi-step progress indicator with chevron separators
+- **Timeline Component** - Vertical event timeline with status indicators
+
+### Enhanced
+
+- **Button Component** - Refined focus ring to be thinner and semi-transparent for better accessibility
+- **Modal Component** - Improved footer layout to prevent "ESC to abort" text overlap on mobile devices
+- **Demo Application** - Reorganized demo tabs into a dedicated `src/demo` directory for better structure
+
 ## [1.3.3] - 2025-12-04
 
 ### Added
