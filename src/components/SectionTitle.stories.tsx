@@ -24,6 +24,7 @@ import { SectionTitle } from 'cyberui-2045';
 |------|------|----------|---------|-------------|
 | \`children\` | \`React.ReactNode\` | ✅ | - | The title text content |
 | \`showLine\` | \`boolean\` | ❌ | \`true\` | Whether to show a decorative gradient line |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Title size (supports responsive values) |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
 `,
       },
@@ -34,6 +35,11 @@ import { SectionTitle } from 'cyberui-2045';
     children: {
       control: 'text',
       description: 'Title text',
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
+      description: 'Title size (supports responsive values)',
     },
     className: {
       control: 'text',
@@ -49,4 +55,14 @@ export const Default: Story = {
   args: {
     children: 'System Overview',
   },
+};
+
+export const Sizes: Story = {
+  render: () => (
+    <div className="space-y-4">
+      <SectionTitle size="sm">Small Title</SectionTitle>
+      <SectionTitle size="md">Medium Title (Default)</SectionTitle>
+      <SectionTitle size="lg">Large Title</SectionTitle>
+    </div>
+  ),
 };

@@ -1,4 +1,6 @@
 import React from 'react';
+import type { ResponsiveValue } from "../utils/responsive";
+import { getResponsiveClasses } from "../utils/responsive";
 
 /**
  * A standardized section title with cyberpunk styling.
@@ -28,6 +30,11 @@ export interface SectionTitleProps {
    */
   showLine?: boolean;
   /**
+   * Size of the section title. Supports responsive values.
+   * @default 'md'
+   */
+  size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /**
    * Additional CSS classes.
    */
   className?: string;
@@ -36,10 +43,33 @@ export interface SectionTitleProps {
 const SectionTitle: React.FC<SectionTitleProps> = ({
   children,
   showLine = true,
+  size = 'md',
   className = '',
 }) => {
-  const baseClasses = 'flex items-center gap-4 mb-6';
-  const titleClasses = 'text-sm uppercase tracking-[0.2em] text-secondary font-bold whitespace-nowrap';
+  const textSizeMap = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+  };
+
+  const marginMap = {
+    sm: 'mb-4',
+    md: 'mb-6',
+    lg: 'mb-8',
+  };
+
+  const gapMap = {
+    sm: 'gap-3',
+    md: 'gap-4',
+    lg: 'gap-5',
+  };
+
+  const textClasses = getResponsiveClasses(size, textSizeMap);
+  const marginClasses = getResponsiveClasses(size, marginMap);
+  const gapClasses = getResponsiveClasses(size, gapMap);
+
+  const baseClasses = `flex items-center ${gapClasses} ${marginClasses}`;
+  const titleClasses = `uppercase tracking-[0.2em] text-secondary font-bold whitespace-nowrap ${textClasses}`;
   const lineClasses = 'h-[1px] w-full bg-gradient-to-r from-secondary/50 to-transparent';
 
   return (
@@ -55,3 +85,4 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
 };
 
 export default SectionTitle;
+
