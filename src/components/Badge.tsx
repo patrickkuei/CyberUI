@@ -2,17 +2,39 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * Props for the Badge component.
+ */
 export interface BadgeProps {
+  /** The visual style variant of the badge */
   variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning';
+  /** Responsive size configuration */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** The label or content of the badge */
   children: React.ReactNode;
+  /** Optional custom class name */
   className?: string;
+  /** Icon to render on the left side of the label */
   leftIcon?: React.ReactNode;
+  /** Icon to render on the right side of the label */
   rightIcon?: React.ReactNode;
+  /** Whether the badge should show hover effects and a pointer cursor */
   clickable?: boolean;
+  /** Optional click handler */
   onClick?: () => void;
 }
 
+/**
+ * A compact Cyberpunk-style tag or indicator used for status, categories, or metrics.
+ * 
+ * @example
+ * <Badge variant="success">Online</Badge>
+ * 
+ * @example
+ * <Badge variant="accent" size="sm" leftIcon={<ShieldIcon />}>
+ *   Protected
+ * </Badge>
+ */
 const Badge: React.FC<BadgeProps> = ({
   variant = 'primary',
   size = 'md',

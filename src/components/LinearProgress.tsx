@@ -2,12 +2,30 @@ import React from "react";
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from "../utils/responsive";
 
+/**
+ * Props for the LinearProgress component.
+ */
 export interface LinearProgressProps {
+  /** The current progress percentage (0-100) */
   progress: number;
+  /** Responsive size configuration for height and width */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** Optional custom class name to override default styles */
   className?: string;
 }
 
+/**
+ * A sleek, animated linear progress bar with cyberpunk aesthetic.
+ * 
+ * @example
+ * <LinearProgress progress={75} variant="primary" />
+ * 
+ * @example
+ * <LinearProgress 
+ *   progress={kbytesLoaded} 
+ *   size={{ base: 'sm', lg: 'md' }} 
+ * />
+ */
 const LinearProgress: React.FC<LinearProgressProps> = ({
   progress,
   size = 'md',
