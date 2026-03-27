@@ -5,24 +5,51 @@ import {
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
 
+/**
+ * Represents a single choice in the Select component.
+ */
 export interface SelectOption {
+  /** Internal value of the option */
   value: string;
+  /** Human-readable label displayed in the dropdown */
   label: string;
+  /** Whether this specific option is disabled */
   disabled?: boolean;
 }
 
+/**
+ * Props for the Select component.
+ */
 export interface SelectProps
   extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size"> {
+  /** Label for the select field */
   label?: string;
+  /** Responsive size configuration */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
+  /** Visual style variant */
   variant?: "primary" | "secondary" | "danger" | "ghost";
+  /** List of options to choose from */
   options: SelectOption[];
+  /** Placeholder text shown when no option is selected */
   placeholder?: string;
+  /** Optional helper text shown below the select */
   helperText?: string;
+  /** Error message that highlights the select and overrides helper text */
   error?: string;
+  /** Optional custom class name */
   className?: string;
 }
 
+/**
+ * A futuristic Cyberpunk-themed dropdown select component with support for labels and error states.
+ * 
+ * @example
+ * <Select 
+ *   label="Neural Port" 
+ *   options={[{ value: 'com1', label: 'COM 1' }, { value: 'com2', label: 'COM 2' }]} 
+ *   variant="primary" 
+ * />
+ */
 const Select: React.FC<SelectProps> = ({
   label,
   size = "md",

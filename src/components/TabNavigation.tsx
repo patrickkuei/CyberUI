@@ -153,24 +153,59 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   );
 };
 
+/**
+ * Props for the TabNavigation component.
+ */
 export interface TabNavigationProps {
+  /** Array of tab titles */
   tabs: readonly string[];
+  /** The currently active tab title */
   activeTab: string;
+  /** Callback fired when a tab is selected */
   onTabChange: (tab: string) => void;
+  /** Responsive size configuration */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
+  /** 
+   * Responsive layout mode: 
+   * - 'scroll': Horizontal scrolling track
+   * - 'wrap': Wrapping grid
+   * - 'dropdown': Mobile-first dropdown menu
+   * - 'collapsible': Adaptive behavior
+   */
   mode?: ResponsiveValue<TabNavigationMode>;
+  /** Optional custom class for the outer container */
   containerClassName?: string;
+  /** Optional custom class for the tab buttons */
   tabsClassName?: string;
+  /** Label for the dropdown anchor (mode="dropdown" only) */
   dropdownLabel?: React.ReactNode;
+  /** Custom icon for the dropdown anchor (mode="dropdown" only) */
   anchorIcon?: React.ReactNode;
+  /** Whether to show the label text next to the anchor icon */
   showAnchorLabel?: boolean;
+  /** ARIA label for the dropdown anchor */
   anchorAriaLabel?: string;
+  /** Whether to close the dropdown after choosing a tab */
   closeOnSelect?: boolean;
+  /** Optional class for the dropdown anchor button */
   anchorClassName?: string;
+  /** Optional class for the dropdown menu container */
   menuClassName?: string;
+  /** Optional class for items in the dropdown menu */
   menuItemClassName?: string;
 }
 
+/**
+ * A highly adaptive tabbed navigation system with cyberpunk animations and multiple layout modes.
+ * 
+ * @example
+ * <TabNavigation 
+ *   tabs={['DASHBOARD', 'NETWORK', 'SECURITY']} 
+ *   activeTab="DASHBOARD" 
+ *   onTabChange={setTab} 
+ *   mode={{ base: 'dropdown', md: 'scroll' }} 
+ * />
+ */
 const TabNavigation: React.FC<TabNavigationProps> = ({
   tabs,
   activeTab,
