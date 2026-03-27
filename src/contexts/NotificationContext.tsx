@@ -13,6 +13,15 @@ export interface CyberNotificationProviderProps {
   defaultDuration?: number;
 }
 
+/**
+ * Context provider for the Cyberpunk notification system.
+ * Wrap your application root with this provider to enable toasts.
+ * 
+ * @example
+ * <CyberNotificationProvider position="top-right">
+ *   <App />
+ * </CyberNotificationProvider>
+ */
 export const CyberNotificationProvider: React.FC<
   CyberNotificationProviderProps
 > = ({ children, position = "top-right", defaultDuration = 2500 }) => {

@@ -79,6 +79,20 @@ export interface CarouselProps extends CarouselCallbacks {
   glitchRate?: number | boolean;
 }
 
+/**
+ * A cinematic, high-performance cyberpunk carousel with glitch transitions and responsive scaling.
+ * 
+ * @example
+ * <Carousel 
+ *   images={[
+ *     { src: 'city.jpg', alt: 'Neo-Tokyo', caption: 'Sector 7' },
+ *     { src: 'lab.jpg', alt: 'Bio-Lab', caption: 'Deep Research' }
+ *   ]} 
+ *   currentIndex={index} 
+ *   onChange={setIndex} 
+ *   transition="signal-glitch" 
+ * />
+ */
 const Carousel: React.FC<CarouselProps> = ({
   images,
   currentIndex,
