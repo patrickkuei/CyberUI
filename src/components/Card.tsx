@@ -2,15 +2,37 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * Props for the Card component.
+ */
 export interface CardProps {
+  /** The visual style variant of the card */
   variant?: 'default' | 'accent' | 'small';
+  /** Responsive size configuration for padding and spacing */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** Optional title for the card */
   title?: string;
+  /** Whether to render a neon border under the title */
   titleBorder?: boolean;
+  /** The content to be rendered inside the card */
   children: React.ReactNode;
+  /** Optional custom class name */
   className?: string;
 }
 
+/**
+ * A cyberpunk-themed container with glassmorphism, neon borders, and responsive spacing.
+ * 
+ * @example
+ * <Card title="Security Log" variant="accent">
+ *   <p>Unauthorized access detected.</p>
+ * </Card>
+ * 
+ * @example
+ * <Card size={{ base: 'sm', lg: 'lg' }}>
+ *   Compact on mobile, spacious on desktop.
+ * </Card>
+ */
 const Card: React.FC<CardProps> = ({
   variant = 'default',
   size = 'md',
