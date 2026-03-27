@@ -1,12 +1,26 @@
 import React from 'react';
 import { PROGRESS_CONFIG } from '../constants';
 
+/**
+ * Props for the SegmentedProgress component.
+ */
 export interface SegmentedProgressProps {
+  /** The current progress percentage (0-100) */
   progress: number;
+  /** Optional custom class name */
   className?: string;
+  /** Optional content to render in the center of the segments */
   children?: React.ReactNode;
 }
 
+/**
+ * A highly technical, segmented radial progress indicator reminiscent of radar or power gauges.
+ * 
+ * @example
+ * <SegmentedProgress progress={45}>
+ *   <div className="text-primary font-bold">LVL 4</div>
+ * </SegmentedProgress>
+ */
 const SegmentedProgress: React.FC<SegmentedProgressProps> = ({
   progress,
   className = '',

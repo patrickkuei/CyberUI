@@ -5,7 +5,11 @@ import {
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
 
+/**
+ * Props for the Skeleton component.
+ */
 export interface SkeletonProps {
+  /** The visual variant of the skeleton loader */
   variant?:
     | "text"
     | "circular"
@@ -13,14 +17,29 @@ export interface SkeletonProps {
     | "card"
     | "avatar-text"
     | "button-group";
+  /** Responsive size configuration for base scaling */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
+  /** Custom width for the skeleton */
   width?: string | number;
+  /** Custom height for the skeleton */
   height?: string | number;
+  /** Optional custom class name */
   className?: string;
-  lines?: number; // For text variant
+  /** Number of lines to render for the 'text' variant */
+  lines?: number;
+  /** Whether to show the pulse animation */
   animate?: boolean;
 }
 
+/**
+ * A versatile skeleton loading indicator with multiple layout variants and pulse animation.
+ * 
+ * @example
+ * <Skeleton variant="card" size="lg" />
+ * 
+ * @example
+ * <Skeleton variant="text" lines={5} width="80%" />
+ */
 const Skeleton: React.FC<SkeletonProps> = ({
   variant = "text",
   size = "md",

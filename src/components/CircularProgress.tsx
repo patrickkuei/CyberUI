@@ -1,13 +1,29 @@
 import React from 'react';
 
+/**
+ * Props for the CircularProgress component.
+ */
 export interface CircularProgressProps {
+  /** The current progress percentage (0-100) */
   progress: number;
+  /** Radius of the progress circle in SVG units */
   radius: number;
+  /** Optional custom class name */
   className?: string;
+  /** Optional content to render in the center of the circle */
   children?: React.ReactNode;
+  /** Accessible label for screen readers */
   ariaLabel?: string;
 }
 
+/**
+ * A beautiful circular progress indicator with neon glow and dual-tone stroke.
+ * 
+ * @example
+ * <CircularProgress progress={60} radius={20}>
+ *   <span className="text-xs font-mono">60%</span>
+ * </CircularProgress>
+ */
 const CircularProgress: React.FC<CircularProgressProps> = ({
   progress,
   radius,
