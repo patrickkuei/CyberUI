@@ -2,12 +2,31 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * Props for the Button component.
+ */
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** The visual style variant of the button */
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  /** Responsive size configuration */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** The content to be rendered inside the button */
   children: React.ReactNode;
 }
 
+/**
+ * A highly customizable Cyberpunk-themed button with neon effects and animations.
+ * 
+ * @example
+ * <Button variant="primary" size={{ base: 'sm', md: 'md' }}>
+ *   Initialize System
+ * </Button>
+ * 
+ * @example
+ * <Button variant="secondary" disabled>
+ *   Access Denied
+ * </Button>
+ */
 const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'md',
