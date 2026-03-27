@@ -42,6 +42,7 @@ const Toggle: React.FC<ToggleProps> = ({
   ...props
 }) => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
     if (onChange) {
       onChange(e.target.checked);
     }

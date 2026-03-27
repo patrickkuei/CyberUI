@@ -21,6 +21,9 @@ export interface ModalCallbacks {
   onCRTBootComplete?: () => void;
 }
 
+/**
+ * Props for the Modal component.
+ */
 export interface ModalProps extends ModalCallbacks {
   isOpen: boolean;
   onClose: () => void;
@@ -58,6 +61,19 @@ const SIZE_CLASSES = {
   fullscreen: "max-w-none w-full h-full",
 };
 
+/**
+ * A cinematic Cyberpunk modal with CRT boot-up effects, RGB glow, and immersive animations.
+ * 
+ * @example
+ * <Modal 
+ *   isOpen={isOpen} 
+ *   onClose={() => setOpen(false)} 
+ *   title="DANGER: SYSTEM OVERLOAD"
+ *   onConfirm={initPurge}
+ * >
+ *   <p>Initiate emergency cooling sequence?</p>
+ * </Modal>
+ */
 const Modal: React.FC<ModalProps> = memo(
   ({
     isOpen,
