@@ -2,16 +2,43 @@ import React, { useId } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * Props for the Input component.
+ */
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
+  /** The visual style variant of the input */
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  /** Responsive size configuration */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** Label for the input */
   label?: string;
+  /** Optional helper text shown below the input */
   helperText?: string;
+  /** Error message that overrides helper text and highlights the input */
   error?: string;
+  /** Icon to render on the left side of the input */
   leftIcon?: React.ReactNode;
+  /** Icon to render on the right side of the input */
   rightIcon?: React.ReactNode;
 }
 
+/**
+ * A highly customizable Cyberpunk input field with support for icons, labels, and error states.
+ * 
+ * @example
+ * <Input 
+ *   label="Neural Key" 
+ *   placeholder="Enter bypass code" 
+ *   variant="primary" 
+ * />
+ * 
+ * @example
+ * <Input 
+ *   label="Data Port" 
+ *   error="Access Denied" 
+ *   leftIcon={<LockIcon />} 
+ * />
+ */
 const Input: React.FC<InputProps> = ({
   variant = 'primary',
   size = 'md',
