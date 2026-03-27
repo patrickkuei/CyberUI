@@ -47,9 +47,20 @@ const CONFIG = {
 /**
  * Custom hook that creates a cyberpunk-themed scrollbar with animated arrows
  * that respond to scroll velocity and direction.
+ * 
+ * @example
+ * ```tsx
+ * const scrollRef = useCyberScrollbar({
+ *   glowColor: 'accent',
+ *   sensitivity: 3,
+ *   variant: 'minimal'
+ * });
+ * 
+ * return <div ref={scrollRef} className="h-64 overflow-auto">...</div>;
+ * ```
  *
  * @param options Configuration options for the scrollbar
- * @returns Ref to attach to scrollable container (not needed for pageLevel)
+ * @returns Ref to attach to scrollable container (not used for pageLevel: true)
  */
 export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
   const {
