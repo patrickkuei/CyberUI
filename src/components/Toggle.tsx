@@ -2,15 +2,34 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses } from '../utils/responsive';
 
+/**
+ * Props for the Toggle component.
+ */
 export interface ToggleProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'> {
+  /** Optional label text to display next to the toggle */
   label?: string;
+  /** Responsive size configuration */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** Visual style variant */
   variant?: 'primary' | 'secondary' | 'accent';
+  /** Optional custom class name */
   className?: string;
+  /** Whether the toggle is currently checked */
   checked?: boolean;
+  /** Callback fired when the toggle state changes */
   onChange?: (checked: boolean) => void;
 }
 
+/**
+ * A futuristic cyberpunk-themed toggle switch with neon glow and smooth transitions.
+ * 
+ * @example
+ * <Toggle 
+ *   label="Night Mode" 
+ *   checked={isDark} 
+ *   onChange={setIsDark} 
+ * />
+ */
 const Toggle: React.FC<ToggleProps> = ({
   label,
   size = 'md',

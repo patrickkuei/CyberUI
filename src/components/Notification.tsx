@@ -2,14 +2,32 @@ import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 
+/**
+ * Props for the Notification component.
+ */
 export interface NotificationProps {
+  /** The type of notification which determines the color and icon */
   type: 'success' | 'warning' | 'error';
+  /** Bold title for the notification */
   title: string;
+  /** Detailed message content */
   message: string;
+  /** Responsive size configuration */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /** Optional callback for when the close button is clicked */
   onClose?: () => void;
 }
 
+/**
+ * A cyberpunk-themed toast or inline notification for system alerts and status updates.
+ * 
+ * @example
+ * <Notification 
+ *   type="success" 
+ *   title="Neural Link Established" 
+ *   message="Connection stable at 0.3ms latency." 
+ * />
+ */
 const Notification: React.FC<NotificationProps> = ({
   type,
   title,
