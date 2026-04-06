@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses } from '../utils/responsive';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the Toggle component.
@@ -71,12 +72,12 @@ const Toggle: React.FC<ToggleProps> = ({
     return variants[variant as keyof typeof variants] || variants.primary;
   };
 
-  const toggleClasses = [
-    'relative inline-flex items-center cursor-pointer',
+  const toggleClasses = cn(
+    'relative inline-flex items-center',
     disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
-  ].join(' ');
+  );
 
-  const sliderClasses = [
+  const sliderClasses = cn(
     getSizeClasses(size),
     getVariantClasses(variant, disabled),
     'peer-focus:outline-none rounded-full peer',
@@ -84,13 +85,9 @@ const Toggle: React.FC<ToggleProps> = ({
     'after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px]',
     'after:bg-white after:rounded-full after:transition-all',
     'transition-colors duration-300'
-  ].filter(Boolean).join(' ');
+  );
 
-  const containerClasses = [
-    'flex items-center justify-between',
-    label ? 'space-x-3' : '',
-    className
-  ].filter(Boolean).join(' ');
+  const containerClasses = cn('flex items-center justify-between', label && 'space-x-3', className);
 
   return (
     <div className={containerClasses}>

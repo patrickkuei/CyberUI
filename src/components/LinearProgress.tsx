@@ -1,6 +1,7 @@
 import React from "react";
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from "../utils/responsive";
+import { cn } from "../utils/cn";
 
 /**
  * Props for the LinearProgress component.
@@ -42,25 +43,9 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   const widthClasses = getWidthClasses(size);
   const heightClasses = getHeightClasses(size);
 
-  const containerClasses = [
-    "bg-surface",
-    "rounded-full",
-    "shadow-inner",
-    heightClasses,
-    className || widthClasses,
-  ].join(" ");
+  const containerClasses = cn('bg-surface rounded-full shadow-inner', heightClasses, className || widthClasses);
 
-  const progressBarClasses = [
-    "bg-gradient-to-r",
-    "from-accent",
-    "to-primary",
-    "rounded-full",
-    "shadow-lg-accent",
-    "transition-all",
-    "duration-500",
-    "ease-out",
-    heightClasses,
-  ].join(" ");
+  const progressBarClasses = cn('bg-gradient-to-r from-accent to-primary rounded-full shadow-lg-accent transition-all duration-500 ease-out', heightClasses);
 
   return (
     <div

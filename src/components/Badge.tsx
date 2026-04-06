@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the Badge component.
@@ -80,7 +81,7 @@ const Badge: React.FC<BadgeProps> = ({
 
   return (
     <span
-      className={`inline-flex items-center ${getSizeClasses(size)} rounded-full font-semibold ${getVariantClasses(variant)} ${getHoverClasses(variant, clickable || !!onClick)} ${className}`}
+      className={cn('inline-flex items-center rounded-full font-semibold', getSizeClasses(size), getVariantClasses(variant), getHoverClasses(variant, clickable || !!onClick), className)}
       onClick={onClick}
       {...props}
     >

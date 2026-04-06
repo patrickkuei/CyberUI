@@ -1,6 +1,7 @@
 import React, { useId } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the Input component.
@@ -116,13 +117,7 @@ const Input: React.FC<InputProps> = ({
     return colors[variant as keyof typeof colors];
   };
 
-  // Combine all classes
-  const inputClasses = [
-    baseClasses,
-    getPaddingClasses(size),
-    getVariantClasses(variant, !!error, disabled),
-    className
-  ].filter(Boolean).join(' ');
+  const inputClasses = cn(baseClasses, getPaddingClasses(size), getVariantClasses(variant, !!error, disabled), className);
 
   const iconColorClass = getIconColorClass(variant);
 

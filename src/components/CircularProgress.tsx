@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the CircularProgress component.
@@ -38,7 +39,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
   return (
     <div
-      className={`relative ${className}`}
+      className={cn('relative', className)}
       role="progressbar"
       aria-label={ariaLabel || 'Progress'}
       aria-valuenow={Math.max(0, Math.min(100, progress))}

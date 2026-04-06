@@ -7,6 +7,7 @@ import React, {
   useMemo,
 } from "react";
 import { createPortal } from "react-dom";
+import { cn } from "../utils/cn";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -241,27 +242,14 @@ const Image: React.FC<ImageProps> = memo(
     // Memoized class calculations
     const imageClasses = useMemo(
       () =>
-        [
-          "relative",
-          "rounded-lg",
-          "overflow-hidden",
-          "border-2",
-          "border-accent/30",
-          "transition-all",
-          "duration-300",
-          "ease-in-out",
-          "transform",
-          "flex",
-          "justify-center",
-          "content-center",
+        cn(
+          "relative rounded-lg overflow-hidden border-2 border-accent/30 transition-all duration-300 ease-in-out transform flex justify-center content-center",
           preview && !hasError
             ? "cursor-pointer hover:scale-105 hover:border-accent hover:shadow-lg-accent focus:outline-none focus:ring-4 focus:ring-accent/50"
             : "",
           getSizeClasses(size),
-          className,
-        ]
-          .filter(Boolean)
-          .join(" "),
+          className
+        ),
       [preview, hasError, getSizeClasses, size, className]
     );
 

@@ -8,6 +8,7 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import Button from "./Button";
+import { cn } from "../utils/cn";
 
 export interface ModalAnimationConfig {
   openDuration?: number;
@@ -196,18 +197,8 @@ const Modal: React.FC<ModalProps> = memo(
 
     const modalClasses = useMemo(
       () =>
-        [
-          "relative",
-          "bg-surface",
-          "border-2",
-          "rounded-lg",
-          "max-h-[90vh]",
-          "overflow-hidden",
-          "flex",
-          "flex-col",
-          "transform",
-          "transition-all",
-          "duration-300",
+        cn(
+          "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300",
           SIZE_CLASSES[size],
           animationConfig.crtEffects && isOpening
             ? "animate-crt-power-on border-accent shadow-lg-accent"
@@ -218,10 +209,8 @@ const Modal: React.FC<ModalProps> = memo(
             : isOpening
             ? "scale-105 opacity-90 border-accent shadow-input-accent/50"
             : "scale-100 opacity-100 animate-rgb-glow",
-          className,
-        ]
-          .filter(Boolean)
-          .join(" "),
+          className
+        ),
       [size, animationConfig.crtEffects, isClosing, isOpening, className]
     );
 

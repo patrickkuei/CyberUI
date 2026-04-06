@@ -4,6 +4,7 @@ import {
   getResponsiveClasses,
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
+import { cn } from "../utils/cn";
 
 /**
  * Props for the Skeleton component.
@@ -55,14 +56,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
     return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.skeleton);
   };
 
-  const baseClasses = [
-    "bg-gray-600",
-    animate ? "animate-pulse" : "",
-    getSizeClasses(size),
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+  const baseClasses = cn('bg-gray-600', animate && 'animate-pulse', getSizeClasses(size), className);
 
   const getCustomStyles = () => {
     const styles: React.CSSProperties = {};

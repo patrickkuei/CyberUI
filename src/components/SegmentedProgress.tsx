@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../utils/cn';
 import { PROGRESS_CONFIG } from '../constants';
 
 /**
@@ -38,7 +39,7 @@ const SegmentedProgress: React.FC<SegmentedProgressProps> = ({
   const activeAngle = SEGMENT_ANGLE - GAP_ANGLE;
 
   return (
-    <div className={`relative ${className}`}>
+    <div className={cn('relative', className)}>
       <svg
         className="w-full h-full"
         viewBox="0 0 60 60"

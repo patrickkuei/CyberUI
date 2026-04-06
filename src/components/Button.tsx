@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the Button component.
@@ -79,13 +80,7 @@ const Button: React.FC<ButtonProps> = ({
     return variants[variant as keyof typeof variants][disabled ? 'disabled' : 'enabled'];
   };
 
-  // Combine all classes
-  const buttonClasses = [
-    baseClasses,
-    getSizeClasses(size),
-    getVariantClasses(variant, disabled),
-    className
-  ].filter(Boolean).join(' ');
+  const buttonClasses = cn(baseClasses, getSizeClasses(size), getVariantClasses(variant, disabled), className);
 
   // Show gradient animation only for primary variant when enabled
   const showGradientAnimation = variant === 'primary' && !disabled;

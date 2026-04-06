@@ -34,6 +34,7 @@ export type { ModalProps, ModalAnimationConfig, ModalCallbacks } from './Modal';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+export { cn } from '../utils/cn';
 
 // Export hooks
 export { useCyberScrollbar } from '../hooks/useCyberScrollbar';

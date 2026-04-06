@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
+import { cn } from '../utils/cn';
 
 /**
  * Props for the Card component.
@@ -63,7 +64,7 @@ const Card: React.FC<CardProps> = ({
   };
 
   return (
-    <div className={`${getVariantClasses(variant)} ${className}`} {...props}>
+    <div className={cn(getVariantClasses(variant), className)} {...props}>
       {title && (
         <h3 className={getTitleClasses(titleBorder)}>
           {title}

@@ -5,6 +5,7 @@ import {
   getResponsiveClasses,
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
+import { cn } from "../utils/cn";
 
 /**
  * Size options for the Carousel component
@@ -810,7 +811,7 @@ const Carousel: React.FC<CarouselProps> = ({
   if (images.length === 0) {
     return (
       <div
-        className={`${sizeClasses} w-full bg-surface border border-accent rounded-lg flex items-center justify-center ${className}`}
+        className={cn(sizeClasses, 'w-full bg-surface border border-accent rounded-lg flex items-center justify-center', className)}
       >
         <p className="text-muted">No images to display</p>
       </div>
@@ -820,7 +821,7 @@ const Carousel: React.FC<CarouselProps> = ({
   const currentImage = images[currentIndex];
 
   return (
-    <div className={`relative w-full ${className}`}>
+    <div className={cn('relative w-full', className)}>
       {/* Main image container */}
       <div
         className={`relative w-full overflow-hidden rounded-lg border border-accent bg-surface ${sizeClasses}`}

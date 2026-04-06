@@ -4,6 +4,7 @@ import {
   getResponsiveClasses,
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
+import { cn } from "../utils/cn";
 
 /**
  * Represents a single choice in the Select component.
@@ -100,27 +101,21 @@ const Select: React.FC<SelectProps> = ({
     return variants[variant as keyof typeof variants] || variants.primary;
   };
 
-  const selectClasses = [
-    "appearance-none w-full rounded-lg font-mono transition-all duration-300",
-    "focus:outline-none px-4 pr-10",
+  const selectClasses = cn(
+    "appearance-none w-full rounded-lg font-mono transition-all duration-300 focus:outline-none px-4 pr-10",
     getSizeClasses(size),
     getVariantClasses(variant, disabled, !!error),
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ");
+    className
+  );
 
   const containerClasses = "relative w-full";
 
-  const labelClasses = [
+  const labelClasses = cn(
     "block text-sm font-medium mb-2 transition-colors duration-200",
-    disabled ? "text-muted opacity-50" : error ? "text-error" : "text-default",
-  ].join(" ");
+    disabled ? "text-muted opacity-50" : error ? "text-error" : "text-default"
+  );
 
-  const helperTextClasses = [
-    "mt-2 text-xs transition-colors duration-200",
-    error ? "text-error" : "text-muted",
-  ].join(" ");
+  const helperTextClasses = cn("mt-2 text-xs transition-colors duration-200", error ? "text-error" : "text-muted");
 
   return (
     <div className="w-full">
