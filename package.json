@@ -1,13 +1,15 @@
 {
   "name": "cyberui-2045",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "A cyberpunk-themed React UI library with neon-styled components. Also known as CyberUI.",
   "private": false,
   "type": "module",
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
-  "bin": "./bin/init.js",
+  "bin": {
+    "cyberui-2045": "./bin/cyberui-2045.js"
+  },
   "files": [
     "dist/assets",
     "dist/components",
