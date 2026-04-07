@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-04-07
+
+### Fixed
+
+- **CLI bin path** — corrected `bin/init.js` to `./bin/init.js` so `npx cyberui-2045 init` resolves correctly after install
+
 ## [2.0.0] - 2026-04-07
 
 ### Breaking Changes
