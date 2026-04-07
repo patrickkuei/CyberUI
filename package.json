@@ -58,7 +58,7 @@
   },
   "homepage": "https://patrickkuei.github.io/CyberUI",
   "scripts": {
-    "postinstall": "node -e \"process.stdout.isTTY && console.log('\\n  cyberui-2045 installed\\n\\n  AI coding setup \\u2192 npx cyberui-2045 init\\n  Docs           \\u2192 https://patrickkuei.github.io/CyberUI\\n')\"",
+    "postinstall": "node -e \"!process.env.CI && console.log('\\n  cyberui-2045 installed\\n\\n  AI coding setup \\u2192 npx cyberui-2045 init\\n  Docs           \\u2192 https://patrickkuei.github.io/CyberUI\\n')\"",
     "dev": "vite",
     "build": "vite build --mode library",
     "build:demo": "vite build",
