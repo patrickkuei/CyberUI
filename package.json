@@ -1,7 +1,7 @@
 {
   "name": "cyberui-2045",
   "version": "2.1.0",
-  "description": "A cyberpunk-themed React UI library with neon-styled components. Also known as CyberUI.",
+  "description": "The AI-first cyberpunk React UI library — built-in coding assistant context for Claude, Cursor, and Copilot out of the box.",
   "private": false,
   "type": "module",
   "main": "dist/index.js",
@@ -45,7 +45,13 @@
     "neon",
     "futuristic",
     "typescript",
-    "tailwind"
+    "tailwind",
+    "ai-friendly",
+    "claude",
+    "cursor",
+    "copilot",
+    "design-system",
+    "component-library"
   ],
   "author": "Patrick Yang <azureroki@gmail.com>",
   "license": "MIT",
