@@ -1,7 +1,7 @@
 // Consumer-facing AI usage guide for cyberui-2045.
 // Injected into CLAUDE.md / .cursorrules / copilot-instructions.md by `init`.
 
-export function getUsageContent(version = '1.3.2') {
+export function getUsageContent(version = '1.4.0') {
   return `## CyberUI (cyberui-2045 v${version})
 
 Cyberpunk-themed React UI library. Docs & live examples: https://patrickkuei.github.io/CyberUI
@@ -39,6 +39,12 @@ import { Button, Card, Modal } from 'cyberui-2045';
 | TabNavigation | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/tabnavigation--docs |
 | Carousel | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/carousel--docs |
 | Image | Media | https://patrickkuei.github.io/CyberUI/?path=/docs/image--docs |
+| Checkbox | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/checkbox--docs |
+| Divider | Layout | https://patrickkuei.github.io/CyberUI/?path=/docs/divider--docs |
+| GradientText | Typography | https://patrickkuei.github.io/CyberUI/?path=/docs/gradienttext--docs |
+| SectionTitle | Typography | https://patrickkuei.github.io/CyberUI/?path=/docs/sectiontitle--docs |
+| Steps | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/steps--docs |
+| Timeline | Display | https://patrickkuei.github.io/CyberUI/?path=/docs/timeline--docs |
 
 ### Hooks
 

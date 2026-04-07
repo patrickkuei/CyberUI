@@ -25,15 +25,17 @@ npm test              # All tests (unit + Storybook/Playwright)
 > `npm run build` runs in `--mode library` — it bundles to `dist/` and generates `.d.ts` files.
 > Unit tests use jsdom; Storybook tests use Playwright/Chromium headless.
 
-## Component Inventory (v1.3.2)
+## Component Inventory (v1.4.0)
 
 | Category    | Components |
 |-------------|-----------|
-| Forms       | Button, Input, Select, Toggle |
-| Layout      | Card, Modal |
+| Forms       | Button, Input, Select, Toggle, Checkbox |
+| Layout      | Card, Modal, Divider |
 | Feedback    | Notification, Badge, Skeleton |
 | Progress    | CircularProgress, LinearProgress, SegmentedProgress |
-| Navigation  | TabNavigation, Carousel |
+| Navigation  | TabNavigation, Carousel, Steps |
+| Typography  | GradientText, SectionTitle |
+| Display     | Timeline |
 | Media       | Image |
 | Hooks       | useCyberScrollbar, useCyberNotifications, useAnimatedProgress |
 | Context     | CyberNotificationProvider |

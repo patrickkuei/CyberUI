@@ -56,7 +56,13 @@ function App() {
 | SegmentedProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/segmentedprogress--docs) |
 | TabNavigation | Navigation | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/tabnavigation--docs) |
 | Carousel | Navigation | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/carousel--docs) |
+| Steps | Navigation | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/steps--docs) |
 | Image | Media | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/image--docs) |
+| Checkbox | Forms | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/checkbox--docs) |
+| Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/divider--docs) |
+| GradientText | Typography | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/gradienttext--docs) |
+| SectionTitle | Typography | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/sectiontitle--docs) |
+| Timeline | Display | [→](https://patrickkuei.github.io/CyberUI/?path=/docs/timeline--docs) |
 
 Also includes hooks (`useCyberNotifications`, `useAnimatedProgress`, `useCyberScrollbar`) and `CyberNotificationProvider` context.
 
