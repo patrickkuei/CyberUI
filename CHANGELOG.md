@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-04-07
+
+### Fixed
+
+- **CLI bin registration** — switched bin field to string format (`"bin": "./bin/init.js"`) to avoid npm normalizer stripping the `./` prefix and silently removing the entry. `npx cyberui-2045 init` now works correctly.
+
 ## [2.0.1] - 2026-04-07
 
 ### Fixed
