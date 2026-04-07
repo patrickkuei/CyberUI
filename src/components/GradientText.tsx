@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../utils/cn';
 
 /**
  * A component for rendering text with a neon gradient effect.
@@ -64,7 +65,7 @@ const GradientText: React.FC<GradientTextProps> = ({
 
   return (
     <Component
-      className={`${baseClasses} ${getVariantClasses(variant)} ${className}`}
+      className={cn(baseClasses, getVariantClasses(variant), className)}
     >
       {children}
     </Component>

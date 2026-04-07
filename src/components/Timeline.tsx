@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses } from "../utils/responsive";
+import { cn } from '../utils/cn';
 
 /**
  * Individual timeline event data.
@@ -154,20 +155,20 @@ const Timeline: React.FC<TimelineProps> = ({
   const diamondClipPath = 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)';
 
   return (
-    <div className={`${spacingClasses} ${className}`}>
+    <div className={cn(spacingClasses, className)}>
       {events.map((event, index) => {
         const statusClasses = getStatusClasses(event.status);
 
         return (
-          <div key={index} className={`flex ${gapClasses} group`}>
+          <div key={index} className={cn('flex', gapClasses, 'group')}>
             <div className="flex flex-col items-center">
-              <div className={`relative ${diamondClasses} flex-shrink-0 mt-1.5`}>
+              <div className={cn('relative flex-shrink-0 mt-1.5', diamondClasses)}>
                 <div
-                  className={`absolute inset-0 border-2 transition-all duration-300 ${statusClasses.border}`}
+                  className={cn('absolute inset-0 border-2 transition-all duration-300', statusClasses.border)}
                   style={{ clipPath: diamondClipPath }}
                 />
                 <div
-                  className={`absolute ${innerClasses} ${statusClasses.inner}`}
+                  className={cn('absolute', innerClasses, statusClasses.inner)}
                   style={{ clipPath: diamondClipPath }}
                 />
               </div>
@@ -178,15 +179,15 @@ const Timeline: React.FC<TimelineProps> = ({
 
             <div className="flex-1 pb-6">
               <div className="flex items-center justify-between mb-1">
-                <h4 className={`font-semibold text-default group-hover:text-secondary transition-colors ${titleClasses}`}>
+                <h4 className={cn('font-semibold text-default group-hover:text-secondary transition-colors', titleClasses)}>
                   {event.title}
                 </h4>
-                <span className={`text-muted whitespace-nowrap ml-4 ${timeClasses}`}>
+                <span className={cn('text-muted whitespace-nowrap ml-4', timeClasses)}>
                   {event.time}
                 </span>
               </div>
               {event.description && (
-                <p className={`text-muted mt-1 ${descClasses}`}>
+                <p className={cn('text-muted mt-1', descClasses)}>
                   {event.description}
                 </p>
               )}

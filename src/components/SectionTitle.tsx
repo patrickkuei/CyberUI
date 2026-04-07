@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses } from "../utils/responsive";
+import { cn } from '../utils/cn';
 
 /**
  * A standardized section title with cyberpunk styling.
@@ -68,12 +69,12 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
   const marginClasses = getResponsiveClasses(size, marginMap);
   const gapClasses = getResponsiveClasses(size, gapMap);
 
-  const baseClasses = `flex items-center ${gapClasses} ${marginClasses}`;
-  const titleClasses = `uppercase tracking-[0.2em] text-secondary font-bold whitespace-nowrap ${textClasses}`;
+  const baseClasses = cn('flex items-center', gapClasses, marginClasses);
+  const titleClasses = cn('uppercase tracking-[0.2em] text-secondary font-bold whitespace-nowrap', textClasses);
   const lineClasses = 'h-[1px] w-full bg-gradient-to-r from-secondary/50 to-transparent';
 
   return (
-    <div className={`${baseClasses} ${className}`}>
+    <div className={cn(baseClasses, className)}>
       <h2 className={titleClasses}>
         {children}
       </h2>

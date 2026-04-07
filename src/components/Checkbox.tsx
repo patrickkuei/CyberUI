@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses } from "../utils/responsive";
+import { cn } from '../utils/cn';
 
 /**
  * A cyberpunk-styled checkbox with neon glow effects.
@@ -93,25 +94,21 @@ const Checkbox: React.FC<CheckboxProps> = ({
   const getBorderClasses = (isChecked: boolean): string => {
     if (disabled) return 'stroke-muted/20';
     const baseClasses = 'transition-all duration-200 group-hover:stroke-secondary group-hover:stroke-[1.5]';
-    return isChecked
-      ? `${baseClasses} stroke-secondary`
-      : `${baseClasses} stroke-secondary/50`;
+    return cn(baseClasses, isChecked ? 'stroke-secondary' : 'stroke-secondary/50');
   };
 
   const getInnerClasses = (isChecked: boolean): string => {
     const baseClasses = 'transition-all duration-200';
     if (disabled) {
-      return isChecked ? `${baseClasses} fill-muted/20` : `${baseClasses} fill-transparent`;
+      return cn(baseClasses, isChecked ? 'fill-muted/20' : 'fill-transparent');
     }
-    return isChecked
-      ? `${baseClasses} fill-secondary`
-      : `${baseClasses} fill-transparent`;
+    return cn(baseClasses, isChecked ? 'fill-secondary' : 'fill-transparent');
   };
 
   return (
-    <div className={`flex flex-col gap-1 ${className} ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}>
-      <label className={`flex items-center gap-3 group ${disabled ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer'}`}>
-        <div className={`relative flex-shrink-0 ${sizeClasses}`}>
+    <div className={cn('flex flex-col gap-1', className, disabled && 'opacity-50 cursor-not-allowed')}>
+      <label className={cn('flex items-center gap-3 group', disabled ? 'cursor-not-allowed pointer-events-none' : 'cursor-pointer')}>
+        <div className={cn('relative flex-shrink-0', sizeClasses)}>
           <input
             type="checkbox"
             className="absolute opacity-0 w-0 h-0"
@@ -146,13 +143,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
           </svg>
         </div>
         {label && (
-          <span className={`transition-colors ${labelSizeClasses} ${disabled ? 'text-muted' : 'text-muted group-hover:text-secondary'}`}>
+          <span className={cn('transition-colors', labelSizeClasses, disabled ? 'text-muted' : 'text-muted group-hover:text-secondary')}>
             {label}
           </span>
         )}
       </label>
       {error && !disabled && (
-        <span className={`text-xs text-error ${errorMarginClasses}`}>{error}</span>
+        <span className={cn('text-xs text-error', errorMarginClasses)}>{error}</span>
       )}
     </div>
   );

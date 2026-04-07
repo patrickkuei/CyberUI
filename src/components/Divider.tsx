@@ -1,4 +1,5 @@
 import React from 'react';
+import { cn } from '../utils/cn';
 
 /**
  * A decorative divider with cyberpunk styling.
@@ -61,11 +62,11 @@ const Divider: React.FC<DividerProps> = ({
     return variants[variant as keyof typeof variants];
   };
 
-  const dividerClasses = [
+  const dividerClasses = cn(
     getBaseClasses(orientation),
     getVariantClasses(variant, orientation),
     className,
-  ].filter(Boolean).join(' ');
+  );
 
   return <div className={dividerClasses} />;
 };

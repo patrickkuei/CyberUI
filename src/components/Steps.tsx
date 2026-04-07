@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ResponsiveValue } from "../utils/responsive";
 import { useResponsiveValue } from "../utils/responsive";
+import { cn } from '../utils/cn';
 
 /**
  * Individual step item data.
@@ -92,22 +93,22 @@ const Steps: React.FC<StepsProps> = ({
   };
 
   const getTitleClasses = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
-    const baseClasses = [
+    const baseClasses = cn(
       'relative px-2 py-1 pb-2 font-bold text-sm transition-colors duration-200 whitespace-nowrap overflow-hidden',
       "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-center after:transition-transform after:duration-300 after:ease-out",
       "before:content-[''] before:absolute before:left-1/2 before:-translate-x-1/2 before:-bottom-[3px] before:w-1.5 before:h-1.5 before:bg-accent before:rotate-45 before:rounded-[2px] before:opacity-0 before:transition-opacity before:duration-200",
-    ].join(' ');
+    );
 
     if (isCompleted) {
-      return `${baseClasses} text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100`;
+      return cn(baseClasses, 'text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100');
     }
     if (isCurrent) {
-      return `${baseClasses} text-secondary before:opacity-100`;
+      return cn(baseClasses, 'text-secondary before:opacity-100');
     }
     if (isError) {
-      return `${baseClasses} text-error`;
+      return cn(baseClasses, 'text-error');
     }
-    return `${baseClasses} text-muted`;
+    return cn(baseClasses, 'text-muted');
   };
 
   const getChevronStyle = (
@@ -129,8 +130,8 @@ const Steps: React.FC<StepsProps> = ({
   };
 
   const containerClasses = isVertical
-    ? `flex flex-col items-start gap-0 ${className}`
-    : `flex items-center justify-center gap-4 ${className}`;
+    ? cn('flex flex-col items-start gap-0', className)
+    : cn('flex items-center justify-center gap-4', className);
 
   // Triangle indicator classes for vertical mode (using unicode character)
   const getTriangleColorClass = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
@@ -142,17 +143,17 @@ const Steps: React.FC<StepsProps> = ({
 
   // Vertical title classes with animated underline (left-to-right animation)
   const getVerticalTitleClasses = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
-    const baseClasses = [
+    const baseClasses = cn(
       'relative font-bold text-sm transition-colors duration-200 pb-1 w-fit',
       "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:transition-transform after:duration-300 after:ease-out",
-    ].join(' ');
+    );
 
     if (isCompleted) {
-      return `${baseClasses} text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100`;
+      return cn(baseClasses, 'text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100');
     }
-    if (isCurrent) return `${baseClasses} text-secondary`;
-    if (isError) return `${baseClasses} text-error`;
-    return `${baseClasses} text-muted`;
+    if (isCurrent) return cn(baseClasses, 'text-secondary');
+    if (isError) return cn(baseClasses, 'text-error');
+    return cn(baseClasses, 'text-muted');
   };
 
   return (
@@ -171,7 +172,7 @@ const Steps: React.FC<StepsProps> = ({
               <div className="flex flex-col w-full">
                 {/* Step row: triangle + title/description */}
                 <div className="flex items-start gap-1.5">
-                  <span className={`text-xs leading-5 flex-shrink-0 ${getTriangleColorClass(isCompleted, isCurrent, isError)}`}>
+                  <span className={cn('text-xs leading-5 flex-shrink-0', getTriangleColorClass(isCompleted, isCurrent, isError))}>
                     ▸
                   </span>
                   <div className="flex flex-col">
