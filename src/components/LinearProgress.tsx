@@ -34,15 +34,19 @@ export interface LinearProgressProps {
 
 /**
  * A sleek, animated linear progress bar with cyberpunk aesthetic.
- * 
+ *
+ * The bar is `w-full` by default — it fills its container width.
+ * Wrap it in a constrained element to control its width.
+ *
  * @example
- * <LinearProgress progress={75} variant="primary" />
- * 
+ * // Full-width bar (fills parent)
+ * <LinearProgress progress={75} />
+ *
  * @example
- * <LinearProgress 
- *   progress={kbytesLoaded} 
- *   size={{ base: 'sm', lg: 'md' }} 
- * />
+ * // Width-constrained
+ * <div className="w-64">
+ *   <LinearProgress progress={kbytesLoaded} size={{ base: 'sm', lg: 'md' }} />
+ * </div>
  */
 const LinearProgress: React.FC<LinearProgressProps> = ({
   progress,

@@ -5,13 +5,15 @@ import { PROGRESS_CONFIG } from '../constants';
 /**
  * A circular progress indicator divided into segments.
  *
- * @example
- * // Basic segmented progress
- * <SegmentedProgress progress={30} />
+ * Use the `size` prop to control dimensions — without it the component fills its container.
  *
  * @example
- * // Segmented progress with center content
- * <SegmentedProgress progress={80}>
+ * // Recommended: use size prop
+ * <SegmentedProgress progress={30} size="md" />
+ *
+ * @example
+ * // With center content
+ * <SegmentedProgress progress={80} size="lg">
  *   <div className="text-center">
  *     <div className="text-2xl font-bold text-accent">80%</div>
  *     <div className="text-xs text-muted">LOADED</div>
@@ -23,22 +25,36 @@ export interface SegmentedProgressProps {
    * Progress value (0-100).
    */
   progress: number;
+  /**
+   * Preset container size. Sets width and height automatically.
+   * - sm: 64px, md: 96px, lg: 128px, xl: 160px
+   * @default 'md'
+   */
+  size?: 'sm' | 'md' | 'lg' | 'xl';
   /** Optional custom class name */
   className?: string;
   /** Optional content to render in the center of the segments */
   children?: React.ReactNode;
 }
 
+const SEGMENTED_SIZE_MAP = {
+  sm: 'w-16 h-16',
+  md: 'w-24 h-24',
+  lg: 'w-32 h-32',
+  xl: 'w-40 h-40',
+};
+
 /**
  * A highly technical, segmented radial progress indicator reminiscent of radar or power gauges.
- * 
+ *
  * @example
- * <SegmentedProgress progress={45}>
+ * <SegmentedProgress progress={45} size="md">
  *   <div className="text-primary font-bold">LVL 4</div>
  * </SegmentedProgress>
  */
 const SegmentedProgress: React.FC<SegmentedProgressProps> = ({
   progress,
+  size = 'md',
   className = '',
   children
 }) => {
@@ -54,7 +70,7 @@ const SegmentedProgress: React.FC<SegmentedProgressProps> = ({
   const activeAngle = SEGMENT_ANGLE - GAP_ANGLE;
 
   return (
-    <div className={cn('relative', className)}>
+    <div className={cn('relative', SEGMENTED_SIZE_MAP[size], className)}>
       <svg
         className="w-full h-full"
         viewBox="0 0 60 60"

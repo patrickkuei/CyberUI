@@ -63,6 +63,11 @@ export interface SelectProps
   error?: string;
   /** Optional custom class name */
   className?: string;
+  /**
+   * Convenience callback that receives the selected string value directly.
+   * Use instead of onChange when you only need the value (not the raw event).
+   */
+  onValueChange?: (value: string) => void;
 }
 
 /**
@@ -87,8 +92,14 @@ const Select: React.FC<SelectProps> = ({
   disabled = false,
   id,
   name,
+  onValueChange,
+  onChange,
   ...props
 }) => {
+  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    onChange?.(e);
+    onValueChange?.(e.target.value);
+  };
   const generatedId = useId();
   const selectId = id || generatedId;
   const selectName = name || selectId;
@@ -155,6 +166,7 @@ const Select: React.FC<SelectProps> = ({
           disabled={disabled}
           id={selectId}
           name={selectName}
+          onChange={handleChange}
           {...props}
         >
           {placeholder && (

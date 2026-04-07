@@ -51,11 +51,11 @@ export interface CarouselCallbacks {
  * Props for the CyberUI Carousel component
  *
  * @example
- * // Basic carousel
+ * // Basic carousel — images is CarouselImageData[]: { src, alt, fallbackSrc?, caption? }
  * <Carousel
  *   images={[
- *     { src: 'img1.jpg', alt: 'Cyber City' },
- *     { src: 'img2.jpg', alt: 'Neon Lights' }
+ *     { src: 'img1.jpg', alt: 'Cyber City', caption: 'Night District' },
+ *     { src: 'img2.jpg', alt: 'Neon Lights', fallbackSrc: 'fallback.jpg' }
  *   ]}
  *   currentIndex={index}
  *   onChange={setIndex}

@@ -4,13 +4,18 @@ import { cn } from '../utils/cn';
 /**
  * A circular progress indicator with neon glow effects.
  *
- * @example
- * // Basic progress
- * <CircularProgress progress={75} radius={40} />
+ * Use the `size` prop for common cases — it constrains the container automatically.
+ * Only use `radius` if you need a custom size (radius is in SVG units, viewBox is 50×50).
  *
  * @example
- * // Progress with label
- * <CircularProgress progress={45} radius={60}>
+ * // Recommended: use size prop
+ * <CircularProgress progress={75} size="md">
+ *   <span className="text-xs font-mono text-accent">75%</span>
+ * </CircularProgress>
+ *
+ * @example
+ * // Custom size via className
+ * <CircularProgress progress={45} className="w-32 h-32">
  *   <span className="text-accent font-bold">45%</span>
  * </CircularProgress>
  */
@@ -20,9 +25,17 @@ export interface CircularProgressProps {
    */
   progress: number;
   /**
-   * Radius of the circle in pixels.
+   * Preset container size. Sets width and height of the component automatically.
+   * - sm: 64px, md: 96px, lg: 128px, xl: 160px
+   * @default 'md'
    */
-  radius: number;
+  size?: 'sm' | 'md' | 'lg' | 'xl';
+  /**
+   * Radius of the SVG circle in SVG units (viewBox is 50×50, center at 25,25).
+   * Default 20 fits cleanly within the viewBox. Only override for custom layouts.
+   * @default 20
+   */
+  radius?: number;
   /** Optional custom class name */
   className?: string;
   /** Optional content to render in the center of the circle */
@@ -31,17 +44,25 @@ export interface CircularProgressProps {
   ariaLabel?: string;
 }
 
+const SIZE_MAP = {
+  sm: 'w-16 h-16',
+  md: 'w-24 h-24',
+  lg: 'w-32 h-32',
+  xl: 'w-40 h-40',
+};
+
 /**
  * A beautiful circular progress indicator with neon glow and dual-tone stroke.
- * 
+ *
  * @example
- * <CircularProgress progress={60} radius={20}>
+ * <CircularProgress progress={60} size="md">
  *   <span className="text-xs font-mono">60%</span>
  * </CircularProgress>
  */
 const CircularProgress: React.FC<CircularProgressProps> = ({
   progress,
-  radius,
+  size = 'md',
+  radius = 20,
   className = '',
   children,
   ariaLabel
@@ -53,7 +74,7 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
 
   return (
     <div
-      className={cn('relative', className)}
+      className={cn('relative', SIZE_MAP[size], className)}
       role="progressbar"
       aria-label={ariaLabel || 'Progress'}
       aria-valuenow={Math.max(0, Math.min(100, progress))}

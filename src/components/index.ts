@@ -50,6 +50,8 @@ export { useCyberScrollbar } from '../hooks/useCyberScrollbar';
 export type { UseCyberScrollbarOptions } from '../hooks/useCyberScrollbar';
 export { useCyberNotifications } from '../hooks/useCyberNotifications';
 export type { CyberNotification, NotificationOptions } from '../hooks/useCyberNotifications';
+export { useAnimatedProgress } from '../hooks/useAnimatedProgress';
+export type { UseAnimatedProgressOptions } from '../hooks/useAnimatedProgress';
 
 export { CyberNotificationProvider } from '../contexts/NotificationContext';
 export type { CyberNotificationProviderProps } from '../contexts/NotificationContext';

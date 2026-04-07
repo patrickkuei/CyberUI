@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-interface UseAnimatedProgressOptions {
+export interface UseAnimatedProgressOptions {
   min?: number;
   max?: number;
   speed?: number;

@@ -61,7 +61,8 @@ export interface StepsProps {
    */
   items: StepItem[];
   /**
-   * Current active step index (0-based). Used to derive status when individual step status is not set.
+   * Current active step index. **0-based** — first step is `current={0}`, second is `current={1}`.
+   * A common mistake is passing a 1-based value which skips the first step.
    * @default 0
    */
   current?: number;

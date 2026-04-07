@@ -78,7 +78,11 @@ export interface ImageProps
   alt: string;
   /** Size of the image container */
   size?: ResponsiveValue<ImageSize>;
-  /** Enable click-to-expand preview functionality */
+  /**
+   * Enable click-to-expand fullscreen preview on click.
+   * Must be explicitly set to `true` — disabled by default.
+   * @default false
+   */
   preview?: boolean;
   /** Fallback image URL when main image fails to load */
   fallback?: string;

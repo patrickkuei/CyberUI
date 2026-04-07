@@ -66,7 +66,9 @@ export interface ModalProps extends ModalCallbacks {
   showConfirm?: boolean;
   /**
    * Width of the modal.
-   * @default 'md'
+   * - sm: 448px, md: 512px, lg: 672px, xl: 896px
+   * Use `lg` or `xl` for content-heavy modals (forms, tables, multi-step flows).
+   * @default 'lg'
    */
   size?: "sm" | "md" | "lg" | "xl" | "fullscreen";
   /**
@@ -125,7 +127,7 @@ const Modal: React.FC<ModalProps> = memo(
     confirmLoading = false,
     showCancel = true,
     showConfirm = true,
-    size = "md",
+    size = "lg",
     variant = "default",
     closeOnOverlayClick = true,
     closeOnEscape = true,

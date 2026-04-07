@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.2.0] - 2026-04-07
+
+### Added
+
+- **`useAnimatedProgress` exported** — was missing from the public API. `useAnimatedProgress({ min?, max?, speed? })` returns an oscillating number useful for pulse/loading animations.
+- **Select `onValueChange` prop** — convenience callback `(value: string) => void` matching the Toggle/Checkbox pattern. Standard `onChange` (raw event) still works for backwards compatibility.
+
+### Fixed
+
+- **`bin/usage-content.js` rewritten** — all component APIs now accurate: correct prop names (`progress` not `value` for progress components, `children` not `label` for Badge, `string[]` for TabNavigation tabs), correct Button variants (no `accent`), correct `useCyberNotifications` API (`showNotification(type, title, msg)`), correct `useAnimatedProgress` signature.
+- **`dist/index.d.ts` JSDoc** — hook API descriptions corrected.
+
 ## [2.1.1] - 2026-04-07
 
 ### Added
