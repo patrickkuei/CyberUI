@@ -1,6 +1,6 @@
 {
   "name": "cyberui-2045",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "description": "The AI-first cyberpunk React UI library — built-in coding assistant context for Claude, Cursor, and Copilot out of the box.",
   "private": false,
   "type": "module",

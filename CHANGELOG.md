@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.1] - 2026-04-07
+
+### Added
+
+- **Usage guide in `dist/index.d.ts`** — JSDoc on the `version` export is emitted into the published type declarations. AI agents read this when introspecting types, surfacing the correct import pattern, full component list, and `npx cyberui-2045 init` prompt automatically — no README required.
+
+### Changed
+
+- **npm description** updated to "The AI-first cyberpunk React UI library — built-in coding assistant context for Claude, Cursor, and Copilot out of the box."
+- **npm keywords** expanded with `ai-friendly`, `claude`, `cursor`, `copilot`, `design-system`, `component-library`.
+
 ## [2.1.0] - 2026-04-07
 
 ### Added

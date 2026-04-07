@@ -35,4 +35,4 @@ export * from "./components";
  *
  * Docs: https://patrickkuei.github.io/CyberUI/storybook/
  */
-export const version = "2.1.0";
+export const version = "2.1.1";
