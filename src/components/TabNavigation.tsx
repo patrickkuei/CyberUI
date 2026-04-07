@@ -154,23 +154,50 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
 };
 
 /**
- * Props for the TabNavigation component.
+ * A responsive tab navigation component.
+ *
+ * @example
+ * // Basic tabs
+ * <TabNavigation
+ *   tabs={['Home', 'Profile', 'Settings']}
+ *   activeTab={activeTab}
+ *   onTabChange={setActiveTab}
+ * />
+ *
+ * @example
+ * // Tabs with dropdown mode for mobile
+ * <TabNavigation
+ *   tabs={categories}
+ *   activeTab={category}
+ *   onTabChange={setCategory}
+ *   mode="dropdown"
+ *   dropdownLabel="Select Category"
+ * />
  */
 export interface TabNavigationProps {
-  /** Array of tab titles */
+  /**
+   * List of tab labels.
+   */
   tabs: readonly string[];
-  /** The currently active tab title */
+  /**
+   * Currently active tab label.
+   */
   activeTab: string;
-  /** Callback fired when a tab is selected */
+  /**
+   * Callback when a tab is selected.
+   */
   onTabChange: (tab: string) => void;
-  /** Responsive size configuration */
+  /**
+   * Size of the tabs.
+   * @default 'md'
+   */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
-  /** 
-   * Responsive layout mode: 
-   * - 'scroll': Horizontal scrolling track
-   * - 'wrap': Wrapping grid
-   * - 'dropdown': Mobile-first dropdown menu
-   * - 'collapsible': Adaptive behavior
+  /**
+   * Responsive display mode.
+   * - `scroll`: Horizontal scrolling container.
+   * - `wrap`: Wraps to new lines.
+   * - `dropdown`: Collapses into a dropdown menu.
+   * @default 'scroll'
    */
   mode?: ResponsiveValue<TabNavigationMode>;
   /** Optional custom class for the outer container */

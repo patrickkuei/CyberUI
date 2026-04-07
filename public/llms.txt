@@ -1,0 +1,36 @@
+# CyberUI 2045
+
+> A cyberpunk-themed React UI library with neon-styled components and futuristic aesthetics.
+
+## Summary
+CyberUI 2045 is a React component library built with Tailwind CSS v4. It provides a set of pre-styled, responsive, and accessible components designed for "Cyberpunk" or "Sci-Fi" interfaces. Key features include neon glows, glassmorphism, and CRT effects.
+
+## Documentation
+- **Agent Guide**: [AGENT.md](https://github.com/patrickkuei/CyberUI/blob/main/AGENT.md) - Best practices for AI agents.
+- **Storybook**: [Live Demo](https://patrickkuei.github.io/CyberUI/storybook) - Interactive component explorer.
+- **Repository**: [GitHub](https://github.com/patrickkuei/CyberUI) - Source code and issues.
+
+## Installation
+```bash
+npm install cyberui-2045
+```
+
+## Key Components
+- `Button`: Neon-styled action button.
+- `Card`: Glassmorphism container.
+- `Input`: Glowing text input.
+- `Modal`: CRT-style dialog.
+- `Notification`: Toast system.
+
+## Usage Example
+```tsx
+import { Button, Card } from "cyberui-2045";
+import "cyberui-2045/styles.css";
+
+export const App = () => (
+  <Card>
+    <h1>Welcome to 2045</h1>
+    <Button variant="primary">ENTER SYSTEM</Button>
+  </Card>
+);
+```

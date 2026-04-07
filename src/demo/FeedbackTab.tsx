@@ -1,18 +1,21 @@
 import React from "react";
-import { useAnimatedProgress } from "../../hooks/useAnimatedProgress";
-import { PROGRESS_CONFIG } from "../../constants";
-import CircularProgress from "../CircularProgress";
-import SegmentedProgress from "../SegmentedProgress";
-import Notification from "../Notification";
-import LinearProgress from "../LinearProgress";
-import Skeleton from "../Skeleton";
+import { useAnimatedProgress } from "../hooks/useAnimatedProgress";
+import { PROGRESS_CONFIG } from "../constants";
+import Card from "../components/Card";
+import CircularProgress from "../components/CircularProgress";
+import SegmentedProgress from "../components/SegmentedProgress";
+import Notification from "../components/Notification";
+import LinearProgress from "../components/LinearProgress";
+import Skeleton from "../components/Skeleton";
+import SectionTitle from "../components/SectionTitle";
+import Timeline from "../components/Timeline";
+import Divider from "../components/Divider";
 
 const FeedbackTab: React.FC = () => {
   const progress = useAnimatedProgress();
 
   return (
     <div className="w-full max-w-xl md:max-w-3xl lg:max-w-4xl space-y-8 md:space-y-12">
-      {/* Section Header */}
       <div className="text-center">
         <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold text-primary mb-2">
           User Feedback
@@ -20,11 +23,8 @@ const FeedbackTab: React.FC = () => {
         <p className="text-muted">System responses and loading states</p>
       </div>
 
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          System Notifications
-        </h3>
-
+      <SectionTitle>System Notifications</SectionTitle>
+      <Card>
         <div className="space-y-4">
           <Notification
             type="success"
@@ -50,14 +50,13 @@ const FeedbackTab: React.FC = () => {
             size={{ base: "sm", md: "md", lg: "lg" }}
           />
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          Loading States
-        </h3>
+      <Divider />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <SectionTitle>Loading States</SectionTitle>
+      <Card>
+        <div className="grid grid-cols-1 items-center md:grid-cols-3 gap-8">
           <div className="space-y-4">
             <div className="flex justify-between items-center">
               <span className="text-default font-medium">Data Transfer</span>
@@ -97,14 +96,48 @@ const FeedbackTab: React.FC = () => {
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
-      <div className="bg-base border border-border-default rounded-xl p-6 space-y-6">
-        <h3 className="text-xl font-semibold text-secondary mb-4 border-b border-accent pb-2">
-          Loading Placeholder
-        </h3>
+      <Divider />
+
+      <SectionTitle>System Activity Log</SectionTitle>
+      <Card>
+        <Timeline
+          events={[
+            {
+              title: "Neural Link Established",
+              description: "Successfully synchronized with primary cortex module at maximum bandwidth.",
+              time: "Just now",
+              status: "success",
+            },
+            {
+              title: "Security Scan Complete",
+              description: "All 47 security protocols verified. No anomalies detected.",
+              time: "2 min ago",
+              status: "info",
+            },
+            {
+              title: "Memory Usage Warning",
+              description: "Neural cache approaching 85% capacity. Consider defragmentation.",
+              time: "15 min ago",
+              status: "warning",
+            },
+            {
+              title: "Connection Interrupted",
+              description: "Lost connection to backup server cluster. Failover initiated.",
+              time: "1 hour ago",
+              status: "error",
+            },
+          ]}
+        />
+      </Card>
+
+      <Divider />
+
+      <SectionTitle>Loading Placeholder</SectionTitle>
+      <Card>
         <Skeleton variant="card" size="md" />
-      </div>
+      </Card>
     </div>
   );
 };

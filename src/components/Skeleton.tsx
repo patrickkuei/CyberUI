@@ -7,10 +7,30 @@ import {
 import { cn } from "../utils/cn";
 
 /**
- * Props for the Skeleton component.
+ * A placeholder component for loading states.
+ *
+ * @example
+ * // Text skeleton
+ * <Skeleton variant="text" lines={3} />
+ *
+ * @example
+ * // Avatar and text combination
+ * <Skeleton variant="avatar-text" size="lg" />
+ *
+ * @example
+ * // Custom rectangular skeleton
+ * <Skeleton
+ *   variant="rectangular"
+ *   width={200}
+ *   height={150}
+ *   animate={false}
+ * />
  */
 export interface SkeletonProps {
-  /** The visual variant of the skeleton loader */
+  /**
+   * Shape variant of the skeleton.
+   * @default 'text'
+   */
   variant?:
     | "text"
     | "circular"
@@ -18,7 +38,10 @@ export interface SkeletonProps {
     | "card"
     | "avatar-text"
     | "button-group";
-  /** Responsive size configuration for base scaling */
+  /**
+   * Size of the skeleton element.
+   * @default 'md'
+   */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
   /** Custom width for the skeleton */
   width?: string | number;
@@ -26,9 +49,15 @@ export interface SkeletonProps {
   height?: string | number;
   /** Optional custom class name */
   className?: string;
-  /** Number of lines to render for the 'text' variant */
-  lines?: number;
-  /** Whether to show the pulse animation */
+  /**
+   * Number of lines for text variant.
+   * @default 3
+   */
+  lines?: number; // For text variant
+  /**
+   * Whether to show the pulse animation.
+   * @default true
+   */
   animate?: boolean;
 }
 

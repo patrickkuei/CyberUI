@@ -1,6 +1,6 @@
 {
   "name": "cyberui-2045",
-  "version": "1.3.2",
+  "version": "1.4.0",
   "description": "A cyberpunk-themed React UI library with neon-styled components. Also known as CyberUI.",
   "private": false,
   "type": "module",
@@ -21,7 +21,8 @@
     "dist/index.es.js",
     "dist/cyberui-2045.css",
     "bin/",
-    "README.md"
+    "README.md",
+    "AGENT.md"
   ],
   "sideEffects": [
     "dist/*.css",
@@ -59,13 +60,14 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build --mode library",
+    "build:demo": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "predeploy": "npm run build",
+    "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist",
     "prepublishOnly": "npm run build"
   },

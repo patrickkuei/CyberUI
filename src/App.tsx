@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import "./index.css";
 import { DEMO_TABS } from "./constants";
 import TabNavigation from "./components/TabNavigation";
-import HomeTab from "./demo/tabs/HomeTab";
-import InteractiveTab from "./demo/tabs/InteractiveTab";
-import ElementsTab from "./demo/tabs/ElementsTab";
-import FeedbackTab from "./demo/tabs/FeedbackTab";
+import HomeTab from "./demo/HomeTab";
+import InteractiveTab from "./demo/InteractiveTab";
+import ElementsTab from "./demo/ElementsTab";
+import FeedbackTab from "./demo/FeedbackTab";
 import { useCyberScrollbar } from "./hooks/useCyberScrollbar";
 import { CyberNotificationProvider } from "./contexts/NotificationContext";
 

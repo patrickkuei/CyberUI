@@ -157,7 +157,11 @@ import { Button } from '../components';
 
   <div className="code-example">
     ```tsx
-    <Button size={{ base: 'sm', md: 'md', lg: 'lg' }}>
+    <Button
+      //      (WHEN: Breakpoint System)    (WHAT: Size Variant)
+      size={{ base:                        'sm',      // On Mobile  -> Small
+              md:                          'lg' }}    // On Tablet  -> Large
+    >
       Responsive Button
     </Button>
     ```
@@ -181,6 +185,42 @@ import { Button } from '../components';
     }
     ```
   </div>
+
+  <hr className="section-divider" />
+
+  ## Size Variants
+
+  These are the **prop values** for component dimensions (distinct from the breakpoint keys above):
+
+  - **sm**: Compact
+  - **md**: Standard
+  - **lg**: Spacious
+
+  <hr className="section-divider" />
+
+
+
+  ## TypeScript Support
+
+  Use `ResponsiveValue` for type safety:
+
+  <div className="code-example">
+    ```tsx
+    import type { ResponsiveValue } from 'cyberui';
+
+    interface Props {
+      size: ResponsiveValue<'sm' | 'md' | 'lg'>;
+    }
+    ```
+  </div>
+
+  <hr className="section-divider" />
+
+  ## Best Practices
+
+  - **Mobile-First**: Always define a `base` size.
+  - **Progressive**: Add larger sizes for bigger screens.
+  - **Consistent**: Use logical progression (sm → md → lg).
 
   <hr className="section-divider" />
 

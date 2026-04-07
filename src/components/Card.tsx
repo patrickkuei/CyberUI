@@ -4,16 +4,40 @@ import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive'
 import { cn } from '../utils/cn';
 
 /**
- * Props for the Card component.
+ * A glassmorphism container for grouping content.
+ *
+ * @example
+ * // Basic card with title
+ * <Card title="System Status">
+ *   <p>All systems operational.</p>
+ * </Card>
+ *
+ * @example
+ * // Accent variant with hover effect
+ * <Card variant="accent" title="High Priority">
+ *   <Button>Action Required</Button>
+ * </Card>
  */
 export interface CardProps {
-  /** The visual style variant of the card */
+  /**
+   * Visual style of the card.
+   * - `default`: Standard glassmorphism.
+   * - `accent`: Glowing border and hover effects.
+   * - `small`: Compact padding for tight spaces.
+   * @default 'default'
+   */
   variant?: 'default' | 'accent' | 'small';
-  /** Responsive size configuration for padding and spacing */
+  /**
+   * Padding size of the card content.
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   /** Optional title for the card */
   title?: string;
-  /** Whether to render a neon border under the title */
+  /**
+   * Whether to show a border under the title.
+   * @default true
+   */
   titleBorder?: boolean;
   /** The content to be rendered inside the card */
   children: React.ReactNode;

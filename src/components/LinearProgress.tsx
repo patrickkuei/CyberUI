@@ -4,12 +4,29 @@ import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from "../utils/responsive"
 import { cn } from "../utils/cn";
 
 /**
- * Props for the LinearProgress component.
+ * A linear progress bar with gradient and glow effects.
+ *
+ * @example
+ * // Basic progress bar
+ * <LinearProgress progress={60} />
+ *
+ * @example
+ * // Large progress bar with custom class
+ * <LinearProgress
+ *   progress={85}
+ *   size="lg"
+ *   className="my-4"
+ * />
  */
 export interface LinearProgressProps {
-  /** The current progress percentage (0-100) */
+  /**
+   * Progress value (0-100).
+   */
   progress: number;
-  /** Responsive size configuration for height and width */
+  /**
+   * Height of the progress bar.
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   /** Optional custom class name to override default styles */
   className?: string;

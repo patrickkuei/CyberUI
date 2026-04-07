@@ -19,15 +19,39 @@ export interface SelectOption {
 }
 
 /**
- * Props for the Select component.
+ * A styled dropdown selection component.
+ *
+ * @example
+ * // Basic select
+ * <Select
+ *   label="Choose Sector"
+ *   options={[
+ *     { value: 'sector-7', label: 'Sector 7' },
+ *     { value: 'sector-9', label: 'Sector 9' }
+ *   ]}
+ * />
+ *
+ * @example
+ * // Select with error
+ * <Select
+ *   label="Clearance Level"
+ *   error="Insufficient permissions"
+ *   options={levels}
+ * />
  */
 export interface SelectProps
   extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "size"> {
   /** Label for the select field */
   label?: string;
-  /** Responsive size configuration */
+  /**
+   * Size of the select input.
+   * @default 'md'
+   */
   size?: ResponsiveValue<"sm" | "md" | "lg">;
-  /** Visual style variant */
+  /**
+   * Visual style variant.
+   * @default 'primary'
+   */
   variant?: "primary" | "secondary" | "danger" | "ghost";
   /** List of options to choose from */
   options: SelectOption[];

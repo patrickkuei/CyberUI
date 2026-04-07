@@ -2,15 +2,11 @@ import { useContext } from "react";
 import { NotificationContext } from "../contexts/NotificationContextBase";
 
 /**
- * Hook to access the Cyberpunk notification system.
- * Allows triggering success, warning, and error toasts from anywhere in the app.
- * 
- * @example
- * const { showNotification } = useCyberNotifications();
- * 
- * const handleClick = () => {
- *   showNotification('success', 'SYSTEM', 'Reboot successful');
- * };
+ * Access the notification context to show toast notifications.
+ * Must be used within a CyberNotificationProvider.
+ *
+ * @returns The notification context value containing `showNotification`
+ * @throws Error if used outside of CyberNotificationProvider
  */
 export const useCyberNotifications = () => {
   const context = useContext(NotificationContext);

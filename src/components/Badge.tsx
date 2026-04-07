@@ -4,12 +4,33 @@ import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive'
 import { cn } from '../utils/cn';
 
 /**
- * Props for the Badge component.
+ * A status indicator badge with various semantic variants.
+ *
+ * @example
+ * // Success badge
+ * <Badge variant="success">ONLINE</Badge>
+ *
+ * @example
+ * // Clickable badge with icon
+ * <Badge
+ *   variant="primary"
+ *   clickable
+ *   onClick={handleClick}
+ *   leftIcon={<Icon name="user" />}
+ * >
+ *   Profile
+ * </Badge>
  */
 export interface BadgeProps {
-  /** The visual style variant of the badge */
+  /**
+   * Semantic style of the badge.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning';
-  /** Responsive size configuration */
+  /**
+   * Size of the badge.
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   /** The label or content of the badge */
   children: React.ReactNode;

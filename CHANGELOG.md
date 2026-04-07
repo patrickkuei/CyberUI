@@ -7,6 +7,34 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.4.0] - 2025-12-05
+
+### Added
+
+- **Checkbox Component** - Cyberpunk-styled checkbox with neon glow effects, responsive sizing (sm/md/lg), and custom SVG icons
+- **Divider Component** - Flexible divider with gradient, solid, and dashed variants
+- **GradientText Component** - Text component with primary, secondary, and accent gradient options
+- **SectionTitle Component** - Standardized section title with decorative gradient line and responsive sizing
+- **Steps Component** - Multi-step progress indicator with responsive layout (vertical/horizontal), animated underlines, and triangle indicators
+- **Timeline Component** - Vertical event timeline with status indicators and responsive sizing
+
+### Enhanced
+
+- **Button Component** - Refined focus ring to be thinner and semi-transparent for better accessibility
+- **Modal Component** - Improved footer layout to prevent "ESC to abort" text overlap on mobile devices
+- **Demo Application** - Reorganized demo tabs into a dedicated `src/demo` directory for better structure
+
+## [1.3.3] - 2025-12-04
+
+### Added
+
+- **AGENT.md** - Comprehensive guide for AI coding agents included in the NPM package
+- **llms.txt** - Discoverability manifest for AI search engines
+
+### Enhanced
+
+- **Documentation** - Added rich JSDoc examples (`@example`) to core components and precise params/returns to hooks for better AI context
+
 ## [1.3.2] - 2025-09-16
 
 ### Fixed

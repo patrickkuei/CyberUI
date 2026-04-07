@@ -23,10 +23,35 @@ export interface ModalCallbacks {
 }
 
 /**
- * Props for the Modal component.
+ * A CRT-styled modal dialog with retro animation effects.
+ *
+ * @example
+ * // Basic modal
+ * <Modal isOpen={isOpen} onClose={close} title="System Alert">
+ *   <p>Breach detected in sector 7.</p>
+ * </Modal>
+ *
+ * @example
+ * // Confirmation modal with custom actions
+ * <Modal
+ *   isOpen={isOpen}
+ *   onClose={close}
+ *   title="Confirm Override"
+ *   onConfirm={handleConfirm}
+ *   confirmText="EXECUTE"
+ *   variant="danger"
+ * >
+ *   Are you sure you want to override safety protocols?
+ * </Modal>
  */
 export interface ModalProps extends ModalCallbacks {
+  /**
+   * Whether the modal is visible.
+   */
   isOpen: boolean;
+  /**
+   * Callback when the modal requests to close.
+   */
   onClose: () => void;
   title?: string;
   children: React.ReactNode;
@@ -39,6 +64,10 @@ export interface ModalProps extends ModalCallbacks {
   confirmLoading?: boolean;
   showCancel?: boolean;
   showConfirm?: boolean;
+  /**
+   * Width of the modal.
+   * @default 'md'
+   */
   size?: "sm" | "md" | "lg" | "xl" | "fullscreen";
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
@@ -307,13 +336,13 @@ const Modal: React.FC<ModalProps> = memo(
               {footer ? (
                 footer
               ) : (
-                <div className="flex justify-between items-center">
-                  <span className="text-muted text-sm font-mono">
+                <div className="flex flex-col-reverse sm:flex-row justify-between items-center gap-3">
+                  <span className="text-muted text-xs font-mono hidden sm:block">
                     &gt; ESC to abort
                   </span>
-                  <div className="flex gap-3">
+                  <div className="flex gap-3 w-full sm:w-auto">
                     {showCancel && onCancel && (
-                      <Button variant="ghost" size="sm" onClick={wrappedCancel}>
+                      <Button variant="ghost" size="sm" onClick={wrappedCancel} className="flex-1 sm:flex-none">
                         {cancelText}
                       </Button>
                     )}
@@ -323,6 +352,7 @@ const Modal: React.FC<ModalProps> = memo(
                         size="sm"
                         onClick={wrappedConfirm}
                         disabled={confirmLoading}
+                        className="flex-1 sm:flex-none"
                       >
                         {confirmText}
                       </Button>

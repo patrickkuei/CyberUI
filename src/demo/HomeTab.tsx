@@ -1,5 +1,6 @@
 import React from 'react';
-import Button from '../Button';
+import Button from '../components/Button';
+import Divider from '../components/Divider';
 
 const HomeTab: React.FC = () => {
   return (
@@ -17,7 +18,9 @@ const HomeTab: React.FC = () => {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mt-8 md:mt-12">
+      <Divider className="my-8" />
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <div className="text-center p-4 md:p-6 bg-surface border border-border-default rounded-lg">
           <div className="text-primary text-xl md:text-2xl mb-2 md:mb-3">⚡</div>
           <h3 className="text-base md:text-lg font-semibold text-secondary mb-2">Fast & Lightweight</h3>

@@ -4,12 +4,31 @@ import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive'
 import { cn } from '../utils/cn';
 
 /**
- * Props for the Input component.
+ * A cyberpunk-styled text input field.
+ *
+ * @example
+ * // Basic input with label
+ * <Input label="Username" placeholder="Enter alias..." />
+ *
+ * @example
+ * // Input with error state and icon
+ * <Input
+ *   label="Password"
+ *   type="password"
+ *   error="Invalid credentials"
+ *   leftIcon={<LockIcon />}
+ * />
  */
 export interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
-  /** The visual style variant of the input */
+  /**
+   * Visual style of the input.
+   * @default 'primary'
+   */
   variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
-  /** Responsive size configuration */
+  /**
+   * Size of the input (height and padding).
+   * @default 'md'
+   */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   /** Label for the input */
   label?: string;
