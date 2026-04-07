@@ -24,27 +24,27 @@ import { Button, Card, Modal } from 'cyberui-2045';
 
 | Component | Category | Storybook |
 |-----------|----------|-----------|
-| Button | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/button--docs |
-| Input | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/input--docs |
-| Select | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/select--docs |
-| Toggle | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/toggle--docs |
-| Card | Layout | https://patrickkuei.github.io/CyberUI/?path=/docs/card--docs |
-| Modal | Layout | https://patrickkuei.github.io/CyberUI/?path=/docs/modal--docs |
-| Badge | Feedback | https://patrickkuei.github.io/CyberUI/?path=/docs/badge--docs |
-| Notification | Feedback | https://patrickkuei.github.io/CyberUI/?path=/docs/notification--docs |
-| Skeleton | Feedback | https://patrickkuei.github.io/CyberUI/?path=/docs/skeleton--docs |
-| CircularProgress | Progress | https://patrickkuei.github.io/CyberUI/?path=/docs/circularprogress--docs |
-| LinearProgress | Progress | https://patrickkuei.github.io/CyberUI/?path=/docs/linearprogress--docs |
-| SegmentedProgress | Progress | https://patrickkuei.github.io/CyberUI/?path=/docs/segmentedprogress--docs |
-| TabNavigation | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/tabnavigation--docs |
-| Carousel | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/carousel--docs |
-| Image | Media | https://patrickkuei.github.io/CyberUI/?path=/docs/image--docs |
-| Checkbox | Forms | https://patrickkuei.github.io/CyberUI/?path=/docs/checkbox--docs |
-| Divider | Layout | https://patrickkuei.github.io/CyberUI/?path=/docs/divider--docs |
-| GradientText | Typography | https://patrickkuei.github.io/CyberUI/?path=/docs/gradienttext--docs |
-| SectionTitle | Typography | https://patrickkuei.github.io/CyberUI/?path=/docs/sectiontitle--docs |
-| Steps | Navigation | https://patrickkuei.github.io/CyberUI/?path=/docs/steps--docs |
-| Timeline | Display | https://patrickkuei.github.io/CyberUI/?path=/docs/timeline--docs |
+| Button | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-button--docs |
+| Input | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-input--docs |
+| Select | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-select--docs |
+| Toggle | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-toggle--docs |
+| Card | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-card--docs |
+| Modal | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs |
+| Badge | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs |
+| Notification | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-notification--docs |
+| Skeleton | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-skeleton--docs |
+| CircularProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-circularprogress--docs |
+| LinearProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-linearprogress--docs |
+| SegmentedProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-segmentedprogress--docs |
+| TabNavigation | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-tabnavigation--docs |
+| Carousel | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-carousel--docs |
+| Image | Media | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs |
+| Checkbox | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-checkbox--docs |
+| Divider | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs |
+| GradientText | Typography | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-gradienttext--docs |
+| SectionTitle | Typography | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs |
+| Steps | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-steps--docs |
+| Timeline | Display | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs |
 
 ### Hooks
 
