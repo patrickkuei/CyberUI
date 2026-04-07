@@ -18,7 +18,7 @@ import { cn } from '../utils/cn';
  *   <Button>Action Required</Button>
  * </Card>
  */
-export interface CardProps {
+export interface CardProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
    * Visual style of the card.
    * - `default`: Standard glassmorphism.
@@ -41,8 +41,6 @@ export interface CardProps {
   titleBorder?: boolean;
   /** The content to be rendered inside the card */
   children: React.ReactNode;
-  /** Optional custom class name */
-  className?: string;
 }
 
 /**

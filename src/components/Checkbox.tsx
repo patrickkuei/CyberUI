@@ -14,11 +14,11 @@ import { cn } from '../utils/cn';
  * <Checkbox label="Accept terms" />
  *
  * @example
- * // Controlled checkbox
+ * // Controlled checkbox — simple boolean API (matches Toggle)
  * <Checkbox
  *   label="Enable notifications"
  *   checked={isEnabled}
- *   onChange={(e) => setIsEnabled(e.target.checked)}
+ *   onCheckedChange={setIsEnabled}
  * />
  *
  * @example
@@ -46,6 +46,11 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
    * Additional CSS classes.
    */
   className?: string;
+  /**
+   * Convenience callback that receives the boolean checked value directly.
+   * Mirrors Toggle's onChange API — use this instead of onChange when you only need the value.
+   */
+  onCheckedChange?: (checked: boolean) => void;
 }
 
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -55,6 +60,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   className = '',
   checked: controlledChecked,
   onChange,
+  onCheckedChange,
   disabled,
   ...props
 }) => {
@@ -67,6 +73,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
       setInternalChecked(e.target.checked);
     }
     onChange?.(e);
+    onCheckedChange?.(e.target.checked);
   };
 
   const sizeMap = {

@@ -69,6 +69,13 @@ export interface ModalProps extends ModalCallbacks {
    * @default 'md'
    */
   size?: "sm" | "md" | "lg" | "xl" | "fullscreen";
+  /**
+   * Visual variant of the modal.
+   * - `default`: Standard RGB glow border.
+   * - `danger`: Red error glow — use for destructive confirmations.
+   * @default 'default'
+   */
+  variant?: "default" | "danger";
   closeOnOverlayClick?: boolean;
   closeOnEscape?: boolean;
   animation?: ModalAnimationConfig;
@@ -119,6 +126,7 @@ const Modal: React.FC<ModalProps> = memo(
     showCancel = true,
     showConfirm = true,
     size = "md",
+    variant = "default",
     closeOnOverlayClick = true,
     closeOnEscape = true,
     animation,
@@ -224,24 +232,28 @@ const Modal: React.FC<ModalProps> = memo(
       }
     }, [isOpen, handleKeyDown]);
 
-    const modalClasses = useMemo(
-      () =>
-        cn(
-          "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300",
-          SIZE_CLASSES[size],
-          animationConfig.crtEffects && isOpening
-            ? "animate-crt-power-on border-accent shadow-lg-accent"
-            : animationConfig.crtEffects && isClosing
-            ? "animate-crt-power-off border-accent shadow-lg-accent"
-            : isClosing
-            ? "scale-95 opacity-0 border-accent/20"
-            : isOpening
-            ? "scale-105 opacity-90 border-accent shadow-input-accent/50"
-            : "scale-100 opacity-100 animate-rgb-glow",
-          className
-        ),
-      [size, animationConfig.crtEffects, isClosing, isOpening, className]
-    );
+    const modalClasses = useMemo(() => {
+      const danger = variant === "danger";
+      const border = danger ? "border-error" : "border-accent";
+      const glow = danger ? "shadow-error" : "shadow-lg-accent";
+      const inputGlow = danger ? "shadow-error/50" : "shadow-input-accent/50";
+      const idleAnim = danger ? "animate-danger-glow" : "animate-rgb-glow";
+
+      return cn(
+        "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300",
+        SIZE_CLASSES[size],
+        animationConfig.crtEffects && isOpening
+          ? `animate-crt-power-on ${border} ${glow}`
+          : animationConfig.crtEffects && isClosing
+          ? `animate-crt-power-off ${border} ${glow}`
+          : isClosing
+          ? `scale-95 opacity-0 ${border}/20`
+          : isOpening
+          ? `scale-105 opacity-90 ${border} ${inputGlow}`
+          : `scale-100 opacity-100 ${idleAnim}`,
+        className
+      );
+    }, [size, animationConfig.crtEffects, isClosing, isOpening, className, variant]);
 
     if (!isOpen) return null;
 
@@ -305,13 +317,18 @@ const Modal: React.FC<ModalProps> = memo(
 
           {title && (
             <div
-              className={`px-6 py-4 border-b border-accent/20 flex-shrink-0 transition-all duration-300 ${
-                !isOpening
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-2"
-              }`}
+              className={cn(
+                "px-6 py-4 border-b flex-shrink-0 transition-all duration-300",
+                variant === "danger" ? "border-error/20" : "border-accent/20",
+                !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              )}
             >
-              <h2 id={titleIdRef.current} className="text-lg font-semibold text-primary">{title}</h2>
+              <h2
+                id={titleIdRef.current}
+                className={cn("text-lg font-semibold", variant === "danger" ? "text-error" : "text-primary")}
+              >
+                {title}
+              </h2>
             </div>
           )}
 
@@ -327,11 +344,11 @@ const Modal: React.FC<ModalProps> = memo(
 
           {(footer || onCancel || onConfirm) && (
             <div
-              className={`px-6 py-4 border-t border-accent/20 flex-shrink-0 transition-all duration-300 ${
-                !isOpening
-                  ? "opacity-100 translate-y-0"
-                  : "opacity-0 translate-y-2"
-              }`}
+              className={cn(
+                "px-6 py-4 border-t flex-shrink-0 transition-all duration-300",
+                variant === "danger" ? "border-error/20" : "border-accent/20",
+                !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
+              )}
             >
               {footer ? (
                 footer
@@ -348,7 +365,7 @@ const Modal: React.FC<ModalProps> = memo(
                     )}
                     {showConfirm && onConfirm && (
                       <Button
-                        variant="primary"
+                        variant={variant === "danger" ? "danger" : "primary"}
                         size="sm"
                         onClick={wrappedConfirm}
                         disabled={confirmLoading}

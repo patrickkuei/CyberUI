@@ -262,6 +262,21 @@
     animation: rgbGlow 3s ease-in-out infinite;
   }
 
+  @keyframes dangerGlow {
+    0%, 100% {
+      border-color: var(--color-error);
+      box-shadow: 0 0 12px var(--color-error), 0 0 24px var(--color-error);
+    }
+    50% {
+      border-color: var(--color-error);
+      box-shadow: 0 0 20px var(--color-error), 0 0 40px var(--color-error);
+    }
+  }
+
+  .animate-danger-glow {
+    animation: dangerGlow 2s ease-in-out infinite;
+  }
+
   @keyframes rgbBackground {
     0% { background-color: var(--color-primary); }
     25% { background-color: var(--color-secondary); }

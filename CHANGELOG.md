@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.1.0] - 2026-04-07
+
+### Added
+
+- **Checkbox `onCheckedChange` prop** — convenience callback `(checked: boolean) => void` that mirrors Toggle's `onChange` API. The existing `onChange` (raw React event) is kept for backwards compatibility; `onCheckedChange` is now the recommended way to handle controlled checkboxes.
+- **Card HTML attributes passthrough** — `CardProps` now extends `React.HTMLAttributes<HTMLDivElement>`, so `onClick`, `onMouseEnter`, `data-*`, `aria-*`, and all other div attributes are fully typed and forwarded.
+- **Modal `variant="danger"`** — red pulsing glow border, red title text, red dividers, and a danger-styled confirm button for destructive confirmation dialogs.
+
 ## [2.0.4] - 2026-04-07
 
 ### Added
