@@ -8,7 +8,7 @@
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "cyberui-2045": "./bin/cyberui-2045.js"
+    "cyberui-2045": "bin/init.js"
   },
   "files": [
     "dist/assets",

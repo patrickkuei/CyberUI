@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- **CLI bin registration** — renamed `bin/init.js` to `bin/cyberui-2045.js` (matching the bin key name, following the convention used by vite, eslint, etc.) to resolve npm's path validation rejecting the entry. `npx cyberui-2045 init` now registers correctly.
+- **CLI bin warning** — removed `./` prefix from bin path (`"./bin/init.js"` → `"bin/init.js"`). npm normalizes the prefix away and emits a cosmetic "was invalid and removed" warning; the CLI worked in 2.0.x but the warning was misleading. Now publishes cleanly with zero warnings.
 
 ## [2.0.2] - 2026-04-07
 
