@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-04-07
+
+### Breaking Changes
+
+- **Runtime dependencies added** — `clsx` and `tailwind-merge` are now required runtime dependencies (previously zero-dep). Run `npm install` to pick them up automatically.
+- **CSS layer isolation** — All CyberUI styles are now wrapped in `@layer cyberui`. If you had unlayered overrides targeting CyberUI internals, they will continue to win (this is the intended behaviour), but `!important` workarounds may no longer be needed.
+- **Internal demo tab exports removed** — `HomeTab`, `InteractiveTab`, `ElementsTab`, and `FeedbackTab` are no longer exported from the package. These were never part of the public API.
+
+### Added
+
+- **`npx cyberui-2045 init` CLI** — zero-install setup for AI coding assistants. Writes a concise CyberUI usage guide into `CLAUDE.md`, `.cursorrules`, or `.github/copilot-instructions.md`. Supports `--claude`, `--cursor`, `--copilot`, `--all`, and `--dry-run` flags. Idempotent — safe to re-run after upgrades.
+- **`cn()` utility exported** — `import { cn } from 'cyberui-2045'` gives consumers the same clsx + tailwind-merge helper used internally.
+
+### Changed
+
+- **All 21 components** now use `cn()` internally for className composition — `className` prop overrides are resolved consistently via tailwind-merge (last class wins on conflict).
+- **Animation keyframes** — hardcoded RGB values replaced with CSS token references (`var(--color-primary)` etc.), so custom token overrides now also affect animations.
+
 ## [1.4.0] - 2025-12-05
 
 ### Added
