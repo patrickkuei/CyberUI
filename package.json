@@ -7,6 +7,9 @@
   "main": "dist/index.js",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "cyberui-2045": "./bin/init.js"
+  },
   "files": [
     "dist/assets",
     "dist/components",
@@ -17,6 +20,7 @@
     "dist/index.js",
     "dist/index.es.js",
     "dist/cyberui-2045.css",
+    "bin/",
     "README.md"
   ],
   "sideEffects": [
