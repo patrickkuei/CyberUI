@@ -1,6 +1,6 @@
 {
   "name": "cyberui-2045",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "description": "A cyberpunk-themed React UI library with neon-styled components. Also known as CyberUI.",
   "private": false,
   "type": "module",
@@ -58,6 +58,7 @@
   },
   "homepage": "https://patrickkuei.github.io/CyberUI",
   "scripts": {
+    "postinstall": "node -e \"process.stdout.isTTY && console.log('\\n  cyberui-2045 installed\\n\\n  AI coding setup \\u2192 npx cyberui-2045 init\\n  Docs           \\u2192 https://patrickkuei.github.io/CyberUI\\n')\"",
     "dev": "vite",
     "build": "vite build --mode library",
     "build:demo": "vite build",

@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.4] - 2026-04-07
+
+### Added
+
+- **postinstall tip** — after `npm install`, prints a two-line message pointing to `npx cyberui-2045 init` and the docs. Only shown in interactive terminals (TTY), silent in CI. Ensures both humans and AI agents discover the init command at the right moment.
+
 ## [2.0.3] - 2026-04-07
 
 ### Fixed
