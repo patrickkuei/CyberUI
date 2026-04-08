@@ -45,7 +45,7 @@ export * from "./components";
  *
  * Docs: https://patrickkuei.github.io/CyberUI/storybook/
  */
-export const version = "2.2.0";
+export const version = "2.3.0";
 
 // Runtime CSS check — fires when dev server starts if styles.css was not imported.
 // AI agents and developers see this in the browser console / terminal output.

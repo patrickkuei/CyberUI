@@ -7,6 +7,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-04-08
+
+### Added
+
+- **`SegmentedProgress` `variant="block"`** — linear discrete-block bar (▮▮▮▯▯) as an alternative to the existing radial gauge. New `segments` prop (default 10) controls the number of blocks. `variant="radial"` remains the default; all existing usage is unchanged. Props typed via discriminated union so `children` is radial-only and `segments` is block-only.
+
+### Fixed
+
+- **Badge font size** — variant classes were hardcoding `text-base` on every variant, overriding the `size` prop's text sizing. Removed the hardcoded value; `sm` → `text-xs`, `md` → `text-sm`, `lg` → `text-base` now work correctly.
+- **Card content text color** — card wrapper had no text color set, leaving children text invisible on dark backgrounds. Added `text-primary` to all three variants (`default`, `accent`, `small`).
+- **Button hover scale** — `hover:scale-105` caused buttons to visually expand on hover, which looks jarring in tight layouts. Replaced with `hover:brightness-110` on primary; removed scale on secondary/danger/ghost. `active:scale-95` (press-down feel) kept on all enabled variants.
+
+### Changed
+
+- **`SegmentedProgress` stories** — rewritten to use the `size` prop (previously used raw `className` for sizing) and to cover both `radial` and `block` variants with full size/segment matrices and an `AllVariants` render story.
+- **`Modal` JSDoc** — `ModalAnimationConfig` and `ModalCallbacks` now include clear descriptions and inline usage examples explaining that callbacks are flat props while animation config is a nested `animation={}` object.
+
+### Docs
+
+- **`AGENT.md`** — added missing `LinearProgress` and `SegmentedProgress` rows to the component table; fixed `Badge` variants (were listed as `default/success/warning/danger`, now correctly `primary/secondary/accent/success/error/warning`); documented `SegmentedProgress` block variant.
+- **`bin/usage-content.js`** — updated `SegmentedProgress` API note to document both `radial` and `block` variants.
+- **`CLAUDE.md`** — bumped component inventory to v2.2.0; added rules: update stories/tests when modifying a component, and update `AGENT.md` + `bin/usage-content.js` when changing public API.
+
 ## [2.2.0] - 2026-04-07
 
 ### Added
