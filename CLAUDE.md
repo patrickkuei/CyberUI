@@ -25,7 +25,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 > `npm run build` runs in `--mode library` — it bundles to `dist/` and generates `.d.ts` files.
 > Unit tests use jsdom; Storybook tests use Playwright/Chromium headless.
 
-## Component Inventory (v1.4.0)
+## Component Inventory (v2.2.0)
 
 | Category    | Components |
 |-------------|-----------|
@@ -73,6 +73,8 @@ Key rules from `.claude/settings.json` — Claude Code respects these in every s
 - Styling: Tailwind v4 + CSS variable tokens only
 - Responsive props must use `ResponsiveValue<T>` from `src/utils/responsive.ts`
 - Run `lint && type-check` after every component/hook change
+- When modifying an existing component: update its `*.stories.tsx` and `*.test.tsx` to cover the changed/new behaviour
+- When adding or modifying a component's public API (props, variants, hooks): update `AGENT.md`'s component table and the matching entry in `bin/usage-content.js`
 - Stories are required — Default + variants + sizes + disabled + AllVariants render story
 - Use cyberpunk-flavored copy in stories (not generic placeholder text)
 

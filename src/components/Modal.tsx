@@ -10,15 +10,35 @@ import { createPortal } from "react-dom";
 import Button from "./Button";
 import { cn } from "../utils/cn";
 
+/**
+ * Controls CRT animation timing and effects.
+ * Pass this as the `animation` prop on `<Modal>`:
+ * ```tsx
+ * <Modal animation={{ openDuration: 300, crtEffects: false }} ... />
+ * ```
+ */
 export interface ModalAnimationConfig {
+  /** Duration of the open (CRT boot) animation in ms. @default 600 */
   openDuration?: number;
+  /** Duration of the close (CRT off) animation in ms. @default 400 */
   closeDuration?: number;
+  /** Enable CRT scanline power-on/off effects. @default true */
   crtEffects?: boolean;
 }
 
+/**
+ * Lifecycle event handlers for the modal.
+ * These are flat props on `<Modal>` — not nested under `animation`:
+ * ```tsx
+ * <Modal onOpen={track} onClose={cleanup} ... />
+ * ```
+ */
 export interface ModalCallbacks {
+  /** Fired when the modal begins opening (before animation completes). */
   onOpen?: () => void;
+  /** Fired when the modal has fully closed. Alias of `onClose` for clarity. */
   onClose?: () => void;
+  /** Fired when the CRT boot animation finishes and the modal is fully visible. */
   onCRTBootComplete?: () => void;
 }
 

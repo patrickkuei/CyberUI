@@ -31,9 +31,11 @@ import "cyberui-2045/styles.css";
 | `Input` | Cyberpunk text input with focus glows. |
 | `Modal` | CRT-style modal dialog. |
 | `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
-| `CircularProgress` | Dual-ring progress indicator. |
+| `CircularProgress` | Dual-ring circular progress indicator. |
+| `LinearProgress` | Smooth horizontal progress bar. |
+| `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
 | `TabNavigation` | Animated tab bar. |
-| `Badge` | Status indicator. Variants: `default`, `success`, `warning`, `danger`. |
+| `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
 | `Toggle` | Cyberpunk switch. |
 | `Select` | Styled dropdown. |
 | `Skeleton` | Loading placeholder. |

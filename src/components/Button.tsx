@@ -78,7 +78,6 @@ const Button: React.FC<ButtonProps> = ({
     'transition-all',
     'duration-300',
     'ease-in-out',
-    'transform',
     'focus:outline-none',
     disabled ? 'cursor-not-allowed' : 'cursor-pointer'
   ].join(' ');
@@ -90,20 +89,20 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantClasses = (variant: string, disabled: boolean): string => {
     const variants = {
       primary: {
-        enabled: 'bg-linear-(--gradient-accent) text-base shadow-primary border-none hover:shadow-lg-accent hover:scale-105 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
-        disabled: 'bg-base border-2 border-accent/20 text-accent/40 shadow-none opacity-50 hover:scale-100'
+        enabled: 'bg-linear-(--gradient-accent) text-base shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        disabled: 'bg-base border-2 border-accent/20 text-accent/40 shadow-none opacity-50'
       },
       secondary: {
-        enabled: 'bg-surface border-2 border-secondary text-secondary shadow-secondary/30 hover:bg-secondary hover:text-base hover:shadow-secondary hover:scale-105 focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95',
-        disabled: 'bg-base border-2 border-secondary/20 text-secondary/40 shadow-none opacity-50 hover:bg-base hover:text-secondary/40 hover:scale-100'
+        enabled: 'bg-surface border-2 border-secondary text-secondary shadow-secondary/30 hover:bg-secondary hover:text-base hover:shadow-secondary focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95',
+        disabled: 'bg-base border-2 border-secondary/20 text-secondary/40 shadow-none opacity-50'
       },
       danger: {
-        enabled: 'bg-surface border-2 border-error text-error shadow-error/30 hover:bg-error hover:text-base hover:shadow-error hover:scale-105 focus-visible:ring-2 focus-visible:ring-error/50 active:scale-95',
-        disabled: 'bg-base border-2 border-error/20 text-error/40 shadow-none opacity-50 hover:bg-base hover:text-error/40 hover:scale-100'
+        enabled: 'bg-surface border-2 border-error text-error shadow-error/30 hover:bg-error hover:text-base hover:shadow-error focus-visible:ring-2 focus-visible:ring-error/50 active:scale-95',
+        disabled: 'bg-base border-2 border-error/20 text-error/40 shadow-none opacity-50'
       },
       ghost: {
-        enabled: 'bg-surface border-2 border-accent text-accent shadow-secondary hover:bg-accent hover:text-base hover:shadow-lg-accent hover:scale-105 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
-        disabled: 'bg-base border-2 border-accent/10 text-muted/60 shadow-none opacity-40 hover:bg-base hover:text-muted/60 hover:scale-100'
+        enabled: 'bg-surface border-2 border-accent text-accent shadow-secondary hover:bg-accent hover:text-base hover:shadow-lg-accent focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        disabled: 'bg-base border-2 border-accent/10 text-muted/60 shadow-none opacity-40'
       }
     };
 

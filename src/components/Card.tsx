@@ -72,9 +72,9 @@ const Card: React.FC<CardProps> = ({
   const getVariantClasses = (variant: string): string => {
     const baseSize = getSizeClasses(size);
     const variants = {
-      default: `bg-base border border-border-default rounded-xl ${baseSize}`,
-      accent: `bg-surface border-2 border-accent rounded-xl shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform ${baseSize}`,
-      small: `bg-base rounded-lg border border-border-default ${baseSize}`
+      default: `bg-base border border-border-default rounded-xl text-primary ${baseSize}`,
+      accent: `bg-surface border-2 border-accent rounded-xl shadow-input-accent/50 hover:shadow-lg-accent transition-all duration-300 transform text-primary ${baseSize}`,
+      small: `bg-base rounded-lg border border-border-default text-primary ${baseSize}`
     };
     return variants[variant as keyof typeof variants];
   };

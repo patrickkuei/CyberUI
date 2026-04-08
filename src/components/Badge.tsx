@@ -74,12 +74,12 @@ const Badge: React.FC<BadgeProps> = ({
 
   const getVariantClasses = (variant: string): string => {
     const variants = {
-      primary: 'text-base bg-primary shadow-lg',
-      secondary: 'text-base bg-secondary shadow-lg',
-      accent: 'text-base bg-accent shadow-lg',
-      success: 'text-base bg-success shadow-lg',
-      error: 'text-base bg-error shadow-lg',
-      warning: 'text-base bg-warning shadow-lg'
+      primary: 'bg-primary shadow-lg',
+      secondary: 'bg-secondary shadow-lg',
+      accent: 'bg-accent shadow-lg',
+      success: 'bg-success shadow-lg',
+      error: 'bg-error shadow-lg',
+      warning: 'bg-warning shadow-lg'
     };
     return variants[variant as keyof typeof variants];
   };

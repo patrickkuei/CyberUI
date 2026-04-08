@@ -73,10 +73,14 @@ import { Button, Card, Modal } from 'cyberui-2045';
 <LinearProgress progress={60} />
 <div className="w-64"><LinearProgress progress={60} /></div>
 
-// SegmentedProgress — use size prop (sm/md/lg/xl); fills container without it
+// SegmentedProgress — two variants:
+//   variant="radial" (default): circular arc-segment gauge; children render in the center
+//   variant="block": linear discrete-block bar (▮▮▮▯▯); use segments prop (default 10)
+// Both support size prop (sm/md/lg/xl)
 <SegmentedProgress progress={80} size="md">
   <span className="text-accent font-bold text-xs">80%</span>
 </SegmentedProgress>
+<SegmentedProgress variant="block" progress={60} segments={10} size="md" />
 
 // TabNavigation — tabs is a plain string array (NOT {id, label}[])
 <TabNavigation
