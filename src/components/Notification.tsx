@@ -151,4 +151,6 @@ const Notification: React.FC<NotificationProps> = ({
   );
 };
 
+Notification.displayName = "CyberUI.Notification";
+
 export default Notification;

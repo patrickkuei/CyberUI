@@ -71,4 +71,6 @@ const Divider: React.FC<DividerProps> = ({
   return <div className={dividerClasses} />;
 };
 
+Divider.displayName = "CyberUI.Divider";
+
 export default Divider;

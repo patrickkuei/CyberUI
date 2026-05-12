@@ -209,4 +209,6 @@ const Select: React.FC<SelectProps> = ({
   );
 };
 
+Select.displayName = "CyberUI.Select";
+
 export default Select;

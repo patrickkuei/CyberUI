@@ -162,5 +162,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   );
 };
 
+Checkbox.displayName = "CyberUI.Checkbox";
+
 export default Checkbox;
 

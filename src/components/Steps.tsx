@@ -233,5 +233,7 @@ const Steps: React.FC<StepsProps> = ({
   );
 };
 
+Steps.displayName = "CyberUI.Steps";
+
 export default Steps;
 

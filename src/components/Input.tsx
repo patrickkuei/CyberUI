@@ -188,4 +188,6 @@ const Input: React.FC<InputProps> = ({
   );
 };
 
+Input.displayName = "CyberUI.Input";
+
 export default Input;

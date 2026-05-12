@@ -891,4 +891,6 @@ const Carousel: React.FC<CarouselProps> = ({
   );
 };
 
+Carousel.displayName = "CyberUI.Carousel";
+
 export default memo(Carousel);

@@ -127,4 +127,6 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   );
 };
 
+CircularProgress.displayName = "CyberUI.CircularProgress";
+
 export default CircularProgress;

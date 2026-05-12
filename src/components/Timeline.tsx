@@ -199,5 +199,7 @@ const Timeline: React.FC<TimelineProps> = ({
   );
 };
 
+Timeline.displayName = "CyberUI.Timeline";
+
 export default Timeline;
 

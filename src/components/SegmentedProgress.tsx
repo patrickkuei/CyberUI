@@ -187,4 +187,6 @@ const SegmentedProgress: React.FC<SegmentedProgressProps> = (props) => {
   return <RadialProgress {...props} />;
 };
 
+SegmentedProgress.displayName = "CyberUI.SegmentedProgress";
+
 export default SegmentedProgress;

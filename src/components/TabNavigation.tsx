@@ -337,4 +337,6 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   );
 };
 
+TabNavigation.displayName = "CyberUI.TabNavigation";
+
 export default TabNavigation;
