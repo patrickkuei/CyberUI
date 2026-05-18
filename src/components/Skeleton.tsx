@@ -220,4 +220,6 @@ const Skeleton: React.FC<SkeletonProps> = ({
   );
 };
 
+Skeleton.displayName = "CyberUI.Skeleton";
+
 export default Skeleton;

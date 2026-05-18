@@ -72,4 +72,6 @@ const GradientText: React.FC<GradientTextProps> = ({
   );
 };
 
+GradientText.displayName = "CyberUI.GradientText";
+
 export default GradientText;

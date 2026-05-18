@@ -97,4 +97,6 @@ const Card: React.FC<CardProps> = ({
   );
 };
 
+Card.displayName = "CyberUI.Card";
+
 export default Card;

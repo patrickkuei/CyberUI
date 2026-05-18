@@ -85,5 +85,7 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
   );
 };
 
+SectionTitle.displayName = "CyberUI.SectionTitle";
+
 export default SectionTitle;
 

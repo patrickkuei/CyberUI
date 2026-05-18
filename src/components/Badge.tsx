@@ -113,4 +113,6 @@ const Badge: React.FC<BadgeProps> = ({
   );
 };
 
+Badge.displayName = "CyberUI.Badge";
+
 export default Badge;

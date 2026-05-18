@@ -84,4 +84,6 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   );
 };
 
+LinearProgress.displayName = "CyberUI.LinearProgress";
+
 export default LinearProgress;

@@ -131,4 +131,6 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
+Button.displayName = "CyberUI.Button";
+
 export default Button;

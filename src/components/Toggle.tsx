@@ -138,4 +138,6 @@ const Toggle: React.FC<ToggleProps> = ({
   );
 };
 
+Toggle.displayName = "CyberUI.Toggle";
+
 export default Toggle;
