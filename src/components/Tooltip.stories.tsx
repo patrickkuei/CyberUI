@@ -61,7 +61,7 @@ const [open, setOpen] = React.useState(false);
 | \`onOpenChange\` | \`(open: boolean) => void\` | ❌ | - | Fired on visibility change attempts |
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes for the panel |
 
-Stories below force \`open\` for visual documentation — in real usage the tooltip opens on hover/focus.
+Most stories below force \`open\` for visual documentation. See **Interactive** for the real hover/focus/Escape behavior.
 `,
       },
     },
@@ -216,6 +216,31 @@ export const Disabled: Story = {
     <div className="p-16">
       <Tooltip {...args}>
         <Button variant="ghost">No Tooltip</Button>
+      </Tooltip>
+    </div>
+  ),
+};
+
+export const Interactive: Story = {
+  args: {
+    // Overrides meta's forced `open: true` so this story runs uncontrolled —
+    // hover or keyboard-focus the button below to see the real show/hide/delay/Escape behavior.
+    open: undefined,
+    content: 'Neural link status: stable.',
+    placement: 'top',
+    variant: 'primary',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Uncontrolled — hover or Tab-focus the trigger to open, move away or press Escape to close.',
+      },
+    },
+  },
+  render: (args) => (
+    <div className="p-16">
+      <Tooltip {...args}>
+        <Button variant="primary">Hover or Focus Me</Button>
       </Tooltip>
     </div>
   ),
