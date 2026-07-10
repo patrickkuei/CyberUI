@@ -22,6 +22,8 @@ Update the version string to `$ARGUMENTS` in:
 3. `bin/init.js` → `let version = '...'` fallback (used only if `package.json` can't be read)
 4. `bin/usage-content.js` → `getUsageContent(version = '...')` default param
 
+Then run `npm install` (no package changes expected — this just re-syncs `package-lock.json`'s version fields to match `package.json`). Confirm `git diff package-lock.json` only shows version-string changes, not dependency changes, before proceeding.
+
 ---
 
 ## Step 3 — Update CHANGELOG.md
@@ -58,7 +60,7 @@ Show the list of files that would be included in the npm package. Verify that:
 
 Print a release summary:
 - Version: `$ARGUMENTS`
-- Files changed: package.json, src/index.ts, bin/init.js, bin/usage-content.js, CHANGELOG.md
+- Files changed: package.json, package-lock.json, src/index.ts, bin/init.js, bin/usage-content.js, CHANGELOG.md
 - Build: PASS/FAIL
 - Pack check: PASS/FAIL
 
@@ -66,7 +68,7 @@ Then ask: **"Ready to commit and tag? Reply yes to proceed, or tell me what to f
 
 If the user confirms, run:
 ```bash
-git add package.json src/index.ts bin/init.js bin/usage-content.js CHANGELOG.md
+git add package.json package-lock.json src/index.ts bin/init.js bin/usage-content.js CHANGELOG.md
 git commit -m "chore: release v$ARGUMENTS"
 git tag v$ARGUMENTS
 ```
