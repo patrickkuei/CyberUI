@@ -23,6 +23,10 @@ const TARGETS = {
     label: 'GitHub Copilot → .github/copilot-instructions.md',
     file: '.github/copilot-instructions.md',
   },
+  agents: {
+    label: 'AGENTS.md standard → AGENTS.md',
+    file: 'AGENTS.md',
+  },
 };
 
 // ─── Arg parsing ──────────────────────────────────────────────────────────────
@@ -37,6 +41,7 @@ if (args.includes('--all')) {
   if (args.includes('--claude')) selectedKeys.push('claude');
   if (args.includes('--cursor')) selectedKeys.push('cursor');
   if (args.includes('--copilot')) selectedKeys.push('copilot');
+  if (args.includes('--agents')) selectedKeys.push('agents');
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -51,6 +56,7 @@ async function main() {
       console.log('    npx cyberui-2045 init --claude');
       console.log('    npx cyberui-2045 init --cursor');
       console.log('    npx cyberui-2045 init --copilot');
+      console.log('    npx cyberui-2045 init --agents');
       console.log('    npx cyberui-2045 init --all\n');
       process.exit(0);
     }

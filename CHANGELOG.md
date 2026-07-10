@@ -7,8 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`npx cyberui-2045 init --agents`** — new target writing the usage guide to `AGENTS.md`, the open cross-tool standard (read by Codex, Windsurf, Amp, and others). `--all` now covers four targets instead of three.
+
 ### Fixed
 
+- **`public/llms.txt`** — "Key Components" list hadn't been updated since the file was first added and only named 5 of the library's 21 components. Now lists all components by category plus hooks/context, matching `AGENT.md` and `README.md`.
 - **`ModalProps` JSDoc gap** — 15 props (`title`, `children`, `footer`, `onCancel`, `onConfirm`, `cancelText`, `confirmText`, `confirmLoading`, `showCancel`, `showConfirm`, `closeOnOverlayClick`, `closeOnEscape`, `animation`, `className`, `overlayClassName`, `showCloseButton`) had no per-prop documentation, unlike every other component's props interface. Added JSDoc with `@default` tags matching the component's actual defaults, so editor hover/autocomplete and the generated `.d.ts` now describe them.
 - **Stale version fallbacks** — `bin/init.js`'s fallback version (used only if `package.json` can't be read) and `bin/usage-content.js`'s default parameter were still `1.3.2` and `2.2.0` respectively, several releases behind. Bumped both to `2.3.1` and added them to the `/release` checklist so future bumps don't miss them.
 

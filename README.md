@@ -68,19 +68,20 @@ Also includes hooks (`useCyberNotifications`, `useAnimatedProgress`, `useCyberSc
 
 ## AI Coding Setup
 
-If you use an AI coding assistant (Claude Code, Cursor, GitHub Copilot), run this once after installing:
+If you use an AI coding assistant (Claude Code, Cursor, GitHub Copilot, or any tool that reads the open `AGENTS.md` standard), run this once after installing:
 
 ```bash
 npx cyberui-2045 init
 ```
 
-It writes a concise CyberUI usage guide — components, hooks, tokens, and patterns — directly into your AI config file (`CLAUDE.md`, `.cursorrules`, or `.github/copilot-instructions.md`). Idempotent: safe to re-run after upgrades.
+It writes a concise CyberUI usage guide — components, hooks, tokens, and patterns — directly into your AI config file (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`, or `AGENTS.md`). Idempotent: safe to re-run after upgrades.
 
 ```bash
 npx cyberui-2045 init --claude    # Claude Code only
 npx cyberui-2045 init --cursor    # Cursor only
 npx cyberui-2045 init --copilot   # GitHub Copilot only
-npx cyberui-2045 init --all       # all three
+npx cyberui-2045 init --agents    # AGENTS.md standard only
+npx cyberui-2045 init --all       # all four
 npx cyberui-2045 init --dry-run   # preview without writing
 ```
 
