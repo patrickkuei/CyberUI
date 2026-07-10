@@ -2,6 +2,7 @@ import React from "react";
 import type { ResponsiveValue } from "../utils/responsive";
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from "../utils/responsive";
 import { cn } from "../utils/cn";
+import { warnOnce } from "../utils/devWarn";
 
 /**
  * A linear progress bar with gradient and glow effects.
@@ -60,6 +61,13 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   const getHeightClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
     return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.linearProgress.height);
   };
+
+  if (progress < 0 || progress > 100) {
+    warnOnce(
+      `linearprogress-range-${progress}`,
+      `LinearProgress: progress={${progress}} is outside the 0-100 range — the bar is not clamped and will visually overflow its container. Pass a percentage value, e.g. (loaded / total) * 100.`
+    );
+  }
 
   const widthClasses = getWidthClasses(size);
   const heightClasses = getHeightClasses(size);

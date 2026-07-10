@@ -4,6 +4,8 @@ import "./index.css";
 // Export all components and types
 export * from "./components";
 
+import { warnOnce } from "./utils/devWarn";
+
 /**
  * cyberui-2045 — AI-first cyberpunk React UI library.
  *
@@ -55,8 +57,9 @@ if (typeof window !== 'undefined') {
       .getPropertyValue('--color-primary')
       .trim();
     if (!loaded) {
-      console.warn(
-        '[cyberui-2045] Stylesheet not detected.\n' +
+      warnOnce(
+        'stylesheet-missing',
+        'Stylesheet not detected.\n' +
         'Add this line to your app entry file (e.g. main.tsx / index.tsx):\n\n' +
         "  import 'cyberui-2045/styles.css';\n\n" +
         'Without it all components lose colors, backgrounds, and animations.'

@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import CircularProgress from './CircularProgress';
 
 describe('CircularProgress', () => {
@@ -42,5 +42,26 @@ describe('CircularProgress', () => {
   it('applies custom className', () => {
     render(<CircularProgress progress={50} radius={20} className="w-20 h-20" />);
     expect(screen.getByRole('progressbar')).toHaveClass('w-20', 'h-20');
+  });
+
+  it('warns when progress is above 100', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<CircularProgress progress={150} radius={20} />);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('outside the 0-100 range'));
+    warnSpy.mockRestore();
+  });
+
+  it('warns when progress is negative', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<CircularProgress progress={-25} radius={20} />);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('outside the 0-100 range'));
+    warnSpy.mockRestore();
+  });
+
+  it('does not warn for in-range progress', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<CircularProgress progress={45} radius={20} />);
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 });

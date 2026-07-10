@@ -1,5 +1,6 @@
 import React from 'react';
 import { cn } from '../utils/cn';
+import { warnOnce } from '../utils/devWarn';
 
 /**
  * A circular progress indicator with neon glow effects.
@@ -67,6 +68,13 @@ const CircularProgress: React.FC<CircularProgressProps> = ({
   children,
   ariaLabel
 }) => {
+  if (progress < 0 || progress > 100) {
+    warnOnce(
+      `circularprogress-range-${progress}`,
+      `CircularProgress: progress={${progress}} is outside the 0-100 range and will render an incorrect arc. Pass a percentage value, e.g. (loaded / total) * 100.`
+    );
+  }
+
   const circumference = 2 * Math.PI * radius;
   const halfCircumference = circumference / 2;
   const leftOffset = halfCircumference * (1 - progress / 100);

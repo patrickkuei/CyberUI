@@ -2,6 +2,7 @@ import React from 'react';
 import type { ResponsiveValue } from "../utils/responsive";
 import { useResponsiveValue } from "../utils/responsive";
 import { cn } from '../utils/cn';
+import { warnOnce } from '../utils/devWarn';
 
 /**
  * Individual step item data.
@@ -85,6 +86,16 @@ const Steps: React.FC<StepsProps> = ({
 }) => {
   const currentOrientation = useResponsiveValue(orientation, 'vertical');
   const isVertical = currentOrientation === 'vertical';
+
+  if (items.length > 0 && (current < 0 || current >= items.length)) {
+    const hint = current === items.length
+      ? ' Did you mean 1-based indexing? Steps is 0-based — subtract 1.'
+      : '';
+    warnOnce(
+      `steps-oob-${current}-${items.length}`,
+      `Steps: current={${current}} is out of range for ${items.length} step(s) (valid: 0-${items.length - 1}).${hint} No step will render as "current".`
+    );
+  }
 
   const getStepStatus = (item: StepItem, index: number): { isCompleted: boolean; isCurrent: boolean; isError: boolean } => {
     const isCompleted = item.status === 'completed' || (item.status === undefined && index < current);

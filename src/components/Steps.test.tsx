@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import Steps from './Steps';
 
 const basicSteps = [
@@ -83,5 +83,26 @@ describe('Steps', () => {
     // current step (index 0) title should have current styling
     const loginEl = screen.getByText('Login');
     expect(loginEl).toBeInTheDocument();
+  });
+
+  it('warns when current equals items.length (common 1-based mistake)', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Steps items={basicSteps} current={3} />);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('1-based indexing'));
+    warnSpy.mockRestore();
+  });
+
+  it('warns when current is negative', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Steps items={basicSteps} current={-1} />);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('out of range'));
+    warnSpy.mockRestore();
+  });
+
+  it('does not warn when current is a valid index', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Steps items={basicSteps} current={1} />);
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 });
