@@ -38,6 +38,7 @@ import "cyberui-2045/styles.css";
 | `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
 | `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
 | `Skeleton` | Loading placeholder. |
+| `Tooltip` | Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`. |
 | `CircularProgress` | Dual-ring circular progress indicator. |
 | `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
 | `LinearProgress` | Smooth horizontal progress bar. |

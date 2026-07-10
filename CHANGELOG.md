@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`Tooltip`** component — a neon-bordered popover that reveals supplemental info on hover or keyboard focus. Supports `placement` (`top`/`bottom`/`left`/`right`, responsive), `variant` (`primary`/`secondary`/`accent`, reusing Button/Card's palette), `size`, a configurable show `delay`, `disabled`, and controlled (`open`/`onOpenChange`) or uncontrolled usage. Wires `aria-describedby` onto the trigger and dismisses on Escape.
+
 ## [2.4.0] - 2026-07-10
 
 ### Added

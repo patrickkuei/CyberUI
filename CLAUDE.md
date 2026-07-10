@@ -32,7 +32,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 |-------------|-----------|
 | Forms | Button, Input, Toggle, Select, Checkbox |
 | Layout | Card, Modal, Divider |
-| Feedback | Notification, Badge, Skeleton |
+| Feedback | Notification, Badge, Skeleton, Tooltip |
 | Progress | CircularProgress, SegmentedProgress, LinearProgress |
 | Navigation | TabNavigation, Carousel, Steps |
 | Typography | GradientText, SectionTitle |

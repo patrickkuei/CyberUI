@@ -23,7 +23,7 @@ const CATEGORY_ORDER = ['Forms', 'Layout', 'Feedback', 'Progress', 'Navigation',
 const CATEGORY_MAP = {
   Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms',
   Card: 'Layout', Modal: 'Layout', Divider: 'Layout',
-  Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback',
+  Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
   TabNavigation: 'Navigation', Carousel: 'Navigation', Steps: 'Navigation',
   GradientText: 'Typography', SectionTitle: 'Typography',
@@ -57,6 +57,7 @@ const DOC_SUMMARIES = {
   SectionTitle: 'Title with decorative gradient line.',
   Steps: 'Multi-step progress indicator.',
   Timeline: 'Vertical event history display.',
+  Tooltip: 'Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,

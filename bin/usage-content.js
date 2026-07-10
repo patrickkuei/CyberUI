@@ -42,6 +42,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | Notification | Feedback | \`dist/components/Notification.d.ts\` |
 | Badge | Feedback | \`dist/components/Badge.d.ts\` |
 | Skeleton | Feedback | \`dist/components/Skeleton.d.ts\` |
+| Tooltip | Feedback | \`dist/components/Tooltip.d.ts\` |
 | CircularProgress | Progress | \`dist/components/CircularProgress.d.ts\` |
 | SegmentedProgress | Progress | \`dist/components/SegmentedProgress.d.ts\` |
 | LinearProgress | Progress | \`dist/components/LinearProgress.d.ts\` |
