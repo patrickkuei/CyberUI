@@ -15,12 +15,30 @@ CyberUI 2045 is a React component library built with Tailwind CSS v4. It provide
 npm install cyberui-2045
 ```
 
-## Key Components
-- `Button`: Neon-styled action button.
-- `Card`: Glassmorphism container.
-- `Input`: Glowing text input.
-- `Modal`: CRT-style dialog.
-- `Notification`: Toast system.
+<!-- cyberui-2045:manifest:start -->
+## Components (21)
+- Forms: `Button`, `Input`, `Toggle`, `Select`, `Checkbox`
+- Layout: `Card`, `Modal`, `Divider`
+- Feedback: `Notification`, `Badge`, `Skeleton`
+- Progress: `CircularProgress`, `SegmentedProgress`, `LinearProgress`
+- Navigation: `TabNavigation`, `Carousel`, `Steps`
+- Typography: `GradientText`, `SectionTitle`
+- Display: `Timeline`
+- Media: `Image`
+
+## Hooks & Context
+- `useCyberScrollbar`: applies cyberpunk scrollbar styling to a scrollable ref.
+- `useCyberNotifications`: `showNotification(type, title, message, options?)` toast trigger; requires `CyberNotificationProvider`.
+- `useAnimatedProgress`: oscillating value generator for pulse/loading animations.
+- `CyberNotificationProvider`: wraps the app once to enable `useCyberNotifications`.
+<!-- cyberui-2045:manifest:end -->
+
+## AI Coding Assistant Setup
+Run once after install to inject a full usage guide (props, gotchas, theming tokens) into your AI config file:
+```bash
+npx cyberui-2045 init
+```
+Supports Claude Code (`CLAUDE.md`), Cursor (`.cursorrules`), GitHub Copilot (`.github/copilot-instructions.md`), and the open `AGENTS.md` standard. Idempotent — safe to re-run after upgrades.
 
 ## Usage Example
 ```tsx
