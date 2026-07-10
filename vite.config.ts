@@ -55,16 +55,35 @@ export default defineConfig(({ mode }) => ({
           sourcemap: true,
           rollupOptions: {
             external: ["react", "react-dom"],
-            output: {
-              globals: {
-                react: "React",
-                "react-dom": "ReactDOM",
+            output: [
+              {
+                format: "es",
+                preserveModules: true,
+                preserveModulesRoot: "src",
+                entryFileNames: (chunkInfo) => chunkInfo.name === "index" ? "index.es.js" : "[name].js",
+                globals: {
+                  react: "React",
+                  "react-dom": "ReactDOM",
+                },
+                assetFileNames: (assetInfo) => {
+                  if (assetInfo.name === "style.css") return "cyberui-2045.css";
+                  return assetInfo.name as string;
+                },
               },
-              assetFileNames: (assetInfo) => {
-                if (assetInfo.name === "style.css") return "cyberui-2045.css";
-                return assetInfo.name as string;
+              {
+                format: "umd",
+                entryFileNames: "index.js",
+                name: "CyberUI2045",
+                globals: {
+                  react: "React",
+                  "react-dom": "ReactDOM",
+                },
+                assetFileNames: (assetInfo) => {
+                  if (assetInfo.name === "style.css") return "cyberui-2045.css";
+                  return assetInfo.name as string;
+                },
               },
-            },
+            ],
           },
           cssCodeSplit: false,
         }

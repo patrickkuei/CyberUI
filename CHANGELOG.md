@@ -9,12 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- **`.github/workflows/ci.yml`** — the repo's first PR-gating CI. `validate` job mirrors the already-documented `npm run lint && npm run type-check && npm test -- --project=unit` gate from `CLAUDE.md`. Triggers on `pull_request` and `push: master` — the push trigger matters because `master` has zero required status checks today (confirmed via `gh api .../branches/master/protection` → 404), so it's the only thing validating a direct push.
-- **`engines` field in `package.json`** (`"node": ">=20"`) — matches the Node version both CI workflows already pinned; permissive lower bound since nothing in the build actually requires an upper bound.
+- **`bundle-size` job added to `ci.yml`** (needs: `validate`) — builds the library and runs the new `npm run size` check.
+- **Bundle-size regression guard** (`size-limit` + `@size-limit/esbuild` + `@size-limit/file`, `npm run size`) — three checks: a single-component import (`{ Button }` from `dist/index.es.js`, guards specifically against a tree-shaking regression), the full library, and the CSS stylesheet. Thresholds set with ~40% headroom over measured gzip sizes.
 
 ### Fixed
 
-- **`deploy-demo.yml`/`storybook.yml` package manager mismatch** — both ran `yarn install` despite the repo's lockfile being `package-lock.json` (npm), with no `yarn.lock` anywhere. Since there's no yarn.lock, `yarn install` silently ignored the lockfile and resolved its own dependency graph from `package.json`'s semver ranges — meaning production/Storybook deploys were not built from the exact versions the repo has locked. Both now use `npm ci`.
+- **Tree-shaking was completely broken** — confirmed empirically (a synthetic bundle importing only `Button` pulled in all 21 components, 86.65 KB minified instead of a few KB) before assuming any bundle work was needed. Root cause: `src/index.ts`'s styles.css-missing check runs unconditionally at module top level, and since `package.json`'s `sideEffects` array only excludes `*.css` (not `dist/index.es.js` itself), any bundler doing conservative tree-shaking had to treat the *entire* single merged output file as side-effecting, and couldn't safely drop the other 20 unused components bundled alongside it. Fixed by adding `rollupOptions.output.preserveModules: true` for the ES build in `vite.config.ts` (UMD is unaffected — it can't be split, since it must stay one self-contained file for direct `<script>` usage) — Rollup now emits one file per source module (`dist/components/Button.js`, etc., mirroring the existing `dist/components/*.d.ts` structure) instead of one merged blob, so the side-effecting check no longer poisons the other components' tree-shakeability. Re-verified after the fix: same synthetic Button-only bundle dropped to 30.49 KB (or 10.15 KB gzip, per the new size-limit check) with zero other component code present. `dist/index.es.js` itself is now a ~2.9 KB re-export barrel instead of a 196 KB merged bundle.
 
 ### Changed
 
