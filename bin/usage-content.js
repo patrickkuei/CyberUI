@@ -26,30 +26,32 @@ import { Button, Card, Modal } from 'cyberui-2045';
 
 ### Component Reference
 
+Paths below are relative to \`node_modules/cyberui-2045/\`.
+
 <!-- cyberui-2045:manifest:start -->
-| Component | Category | Storybook |
-|-----------|----------|-----------|
-| Button | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-button--docs |
-| Input | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-input--docs |
-| Toggle | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-toggle--docs |
-| Select | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-select--docs |
-| Checkbox | Forms | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-checkbox--docs |
-| Card | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-card--docs |
-| Modal | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs |
-| Divider | Layout | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs |
-| Notification | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-notification--docs |
-| Badge | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs |
-| Skeleton | Feedback | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-skeleton--docs |
-| CircularProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-circularprogress--docs |
-| SegmentedProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-segmentedprogress--docs |
-| LinearProgress | Progress | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-linearprogress--docs |
-| TabNavigation | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-tabnavigation--docs |
-| Carousel | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-carousel--docs |
-| Steps | Navigation | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-steps--docs |
-| GradientText | Typography | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-gradienttext--docs |
-| SectionTitle | Typography | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs |
-| Timeline | Display | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs |
-| Image | Media | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs |
+| Component | Category | Types |
+|-----------|----------|-------|
+| Button | Forms | \`dist/components/Button.d.ts\` |
+| Input | Forms | \`dist/components/Input.d.ts\` |
+| Toggle | Forms | \`dist/components/Toggle.d.ts\` |
+| Select | Forms | \`dist/components/Select.d.ts\` |
+| Checkbox | Forms | \`dist/components/Checkbox.d.ts\` |
+| Card | Layout | \`dist/components/Card.d.ts\` |
+| Modal | Layout | \`dist/components/Modal.d.ts\` |
+| Divider | Layout | \`dist/components/Divider.d.ts\` |
+| Notification | Feedback | \`dist/components/Notification.d.ts\` |
+| Badge | Feedback | \`dist/components/Badge.d.ts\` |
+| Skeleton | Feedback | \`dist/components/Skeleton.d.ts\` |
+| CircularProgress | Progress | \`dist/components/CircularProgress.d.ts\` |
+| SegmentedProgress | Progress | \`dist/components/SegmentedProgress.d.ts\` |
+| LinearProgress | Progress | \`dist/components/LinearProgress.d.ts\` |
+| TabNavigation | Navigation | \`dist/components/TabNavigation.d.ts\` |
+| Carousel | Navigation | \`dist/components/Carousel.d.ts\` |
+| Steps | Navigation | \`dist/components/Steps.d.ts\` |
+| GradientText | Typography | \`dist/components/GradientText.d.ts\` |
+| SectionTitle | Typography | \`dist/components/SectionTitle.d.ts\` |
+| Timeline | Display | \`dist/components/Timeline.d.ts\` |
+| Image | Media | \`dist/components/Image.d.ts\` |
 <!-- cyberui-2045:manifest:end -->
 
 ### Critical API notes

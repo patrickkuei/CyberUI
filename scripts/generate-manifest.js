@@ -297,9 +297,9 @@ function renderLlmsTxtBlock(manifest) {
 
 function renderUsageContentTable(manifest) {
   const rows = manifest.components.map(
-    (c) => `| ${c.name} | ${c.category} | ${storybookUrl(c.storybookPath)} |`
+    (c) => `| ${c.name} | ${c.category} | \`dist/components/${c.name}.d.ts\` |`
   );
-  return ['| Component | Category | Storybook |', '|-----------|----------|-----------|', ...rows].join('\n');
+  return ['| Component | Category | Types |', '|-----------|----------|-------|', ...rows].join('\n');
 }
 
 // ─── Write ───────────────────────────────────────────────────────────────────
@@ -307,7 +307,11 @@ function renderUsageContentTable(manifest) {
 function updateDocFile(relPath, block) {
   const filePath = join(ROOT, relPath);
   const existing = readFileSync(filePath, 'utf8');
-  const updated = replaceMarkedBlock(existing, MANIFEST_MARKER_START, MANIFEST_MARKER_END, block);
+  // bin/usage-content.js's content is a JS template literal — a literal
+  // backtick would break out of the outer string, so escape any backticks
+  // the block introduces (e.g. `dist/components/Button.d.ts`) before writing.
+  const safeBlock = relPath.endsWith('.js') ? block.replace(/`/g, '\\`') : block;
+  const updated = replaceMarkedBlock(existing, MANIFEST_MARKER_START, MANIFEST_MARKER_END, safeBlock);
   const changed = updated !== existing;
   if (changed) writeFileSync(filePath, updated, 'utf8');
   return changed;

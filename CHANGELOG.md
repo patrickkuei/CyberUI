@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`bin/usage-content.js`'s Component Reference table now points at local `.d.ts` files instead of production Storybook URLs.** Storybook's docs pages are a client-side-rendered SPA, so a raw fetch mostly returns an empty HTML shell — low value for an agent, and many coding agents lack web access at all anyway. Since the package already ships per-component type declarations separately (`dist/components/<Name>.d.ts`, confirmed by inspecting the actual build output), each row now points there instead — local, reliable, and scoped to just that component. README.md keeps its Storybook links, since those serve human readers browsing docs, not agents.
+- **Generator now escapes backticks when writing into `bin/usage-content.js`** — its content sits inside a JS template literal, so a literal backtick in generated content (e.g. `` `dist/components/Button.d.ts` ``) would otherwise break out of the string. Fixed generally in `updateDocFile()` rather than per-caller, so future generated content with backticks can't reintroduce this.
+
 ### Added
 
 - **Runtime dev warnings for silent-wrong states that TypeScript can't catch** — `Steps` now warns (once per distinct case) when `current` is out of range, calling out the classic 1-based-indexing mistake specifically when `current === items.length`; `LinearProgress` and `CircularProgress` now warn when `progress` is outside 0-100, since both previously rendered visibly broken output (an overflowing bar / skewed arc) with no signal why. Shares a new `warnOnce` helper (`src/utils/devWarn.ts`) with the existing styles.css-missing check in `src/index.ts`, deduped by a stable key so a misconfigured component re-rendering doesn't spam the console.
