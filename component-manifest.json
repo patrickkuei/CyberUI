@@ -1,0 +1,1454 @@
+{
+  "schemaVersion": 1,
+  "packageVersion": "2.3.1",
+  "generatedAt": "2026-07-10T05:23:33.463Z",
+  "categoryOrder": [
+    "Forms",
+    "Layout",
+    "Feedback",
+    "Progress",
+    "Navigation",
+    "Typography",
+    "Display",
+    "Media"
+  ],
+  "components": [
+    {
+      "name": "Button",
+      "category": "Forms",
+      "sourceFile": "src/components/Button.tsx",
+      "displayName": "CyberUI.Button",
+      "description": "A highly customizable Cyberpunk-themed button with neon effects and animations.",
+      "docSummary": "Neon-styled button. Variants: `primary`, `secondary`, `danger`, `ghost`.",
+      "storybookPath": "components-button--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style of the button.\n- `primary`: Main action, neon glow.\n- `secondary`: Alternative action, bordered.\n- `danger`: Destructive action, red glow.\n- `ghost`: Subtle action, transparent background."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the button. Can be a static value or a responsive object."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The content to be rendered inside the button"
+        }
+      ]
+    },
+    {
+      "name": "Input",
+      "category": "Forms",
+      "sourceFile": "src/components/Input.tsx",
+      "displayName": "CyberUI.Input",
+      "description": "A highly customizable Cyberpunk input field with support for icons, labels, and error states.",
+      "docSummary": "Cyberpunk text input with focus glows.",
+      "storybookPath": "components-input--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style of the input."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the input (height and padding)."
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label for the input"
+        },
+        {
+          "name": "helperText",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional helper text shown below the input"
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message that overrides helper text and highlights the input"
+        },
+        {
+          "name": "leftIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Icon to render on the left side of the input"
+        },
+        {
+          "name": "rightIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Icon to render on the right side of the input"
+        }
+      ]
+    },
+    {
+      "name": "Toggle",
+      "category": "Forms",
+      "sourceFile": "src/components/Toggle.tsx",
+      "displayName": "CyberUI.Toggle",
+      "description": "A futuristic cyberpunk-themed toggle switch with neon glow and smooth transitions.",
+      "docSummary": "Cyberpunk switch.",
+      "storybookPath": "components-toggle--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional label text to display next to the toggle"
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the toggle."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style variant."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name"
+        },
+        {
+          "name": "checked",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Whether the toggle is currently checked"
+        },
+        {
+          "name": "onChange",
+          "type": "((checked: boolean) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Callback fired when the toggle state changes"
+        }
+      ]
+    },
+    {
+      "name": "Select",
+      "category": "Forms",
+      "sourceFile": "src/components/Select.tsx",
+      "displayName": "CyberUI.Select",
+      "description": "A futuristic Cyberpunk-themed dropdown select component with support for labels and error states.",
+      "docSummary": "Styled dropdown.",
+      "storybookPath": "components-select--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label for the select field"
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the select input."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style variant."
+        },
+        {
+          "name": "options",
+          "type": "SelectOption[]",
+          "required": true,
+          "default": null,
+          "description": "List of options to choose from"
+        },
+        {
+          "name": "placeholder",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Placeholder text shown when no option is selected"
+        },
+        {
+          "name": "helperText",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional helper text shown below the select"
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message that highlights the select and overrides helper text"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name"
+        },
+        {
+          "name": "onValueChange",
+          "type": "((value: string) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Convenience callback that receives the selected string value directly.\nUse instead of onChange when you only need the value (not the raw event)."
+        }
+      ]
+    },
+    {
+      "name": "Checkbox",
+      "category": "Forms",
+      "sourceFile": "src/components/Checkbox.tsx",
+      "displayName": "CyberUI.Checkbox",
+      "description": "",
+      "docSummary": "Neon-styled checkbox with SVG icons.",
+      "storybookPath": "components-checkbox--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label text displayed next to the checkbox."
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message to display below the checkbox."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the checkbox. Supports responsive values."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        },
+        {
+          "name": "onCheckedChange",
+          "type": "((checked: boolean) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Convenience callback that receives the boolean checked value directly.\nMirrors Toggle's onChange API — use this instead of onChange when you only need the value."
+        }
+      ]
+    },
+    {
+      "name": "Card",
+      "category": "Layout",
+      "sourceFile": "src/components/Card.tsx",
+      "displayName": "CyberUI.Card",
+      "description": "A cyberpunk-themed container with glassmorphism, neon borders, and responsive spacing.",
+      "docSummary": "Glassmorphism container with borders.",
+      "storybookPath": "components-card--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"default\" | \"accent\" | \"small\" | undefined",
+          "required": false,
+          "default": "default",
+          "description": "Visual style of the card.\n- `default`: Standard glassmorphism.\n- `accent`: Glowing border and hover effects.\n- `small`: Compact padding for tight spaces."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Padding size of the card content."
+        },
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional title for the card"
+        },
+        {
+          "name": "titleBorder",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to show a border under the title."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The content to be rendered inside the card"
+        }
+      ]
+    },
+    {
+      "name": "Modal",
+      "category": "Layout",
+      "sourceFile": "src/components/Modal.tsx",
+      "displayName": "Modal",
+      "description": "A cinematic Cyberpunk modal with CRT boot-up effects, RGB glow, and immersive animations.",
+      "docSummary": "CRT-style modal dialog.",
+      "storybookPath": "components-modal--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "isOpen",
+          "type": "boolean",
+          "required": true,
+          "default": null,
+          "description": "Whether the modal is visible."
+        },
+        {
+          "name": "onClose",
+          "type": "() => void",
+          "required": true,
+          "default": null,
+          "description": "Callback when the modal requests to close."
+        },
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Title text shown in the modal header."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The content to be rendered inside the modal body."
+        },
+        {
+          "name": "footer",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Custom footer content. Overrides the default Cancel/Confirm action buttons\n(`onCancel`/`onConfirm` and related props are ignored when `footer` is set)."
+        },
+        {
+          "name": "onCancel",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the Cancel button is clicked. Only rendered if provided."
+        },
+        {
+          "name": "onConfirm",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the Confirm button is clicked. Only rendered if provided."
+        },
+        {
+          "name": "cancelText",
+          "type": "string | undefined",
+          "required": false,
+          "default": "'Cancel'",
+          "description": "Label for the Cancel button."
+        },
+        {
+          "name": "confirmText",
+          "type": "string | undefined",
+          "required": false,
+          "default": "'Confirm'",
+          "description": "Label for the Confirm button."
+        },
+        {
+          "name": "confirmLoading",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "false",
+          "description": "Shows a loading state and disables the Confirm button."
+        },
+        {
+          "name": "showCancel",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether to render the Cancel button (requires `onCancel`)."
+        },
+        {
+          "name": "showConfirm",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether to render the Confirm button (requires `onConfirm`)."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"fullscreen\" | undefined",
+          "required": false,
+          "default": "'lg'",
+          "description": "Width of the modal.\n- sm: 448px, md: 512px, lg: 672px, xl: 896px\nUse `lg` or `xl` for content-heavy modals (forms, tables, multi-step flows)."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"danger\" | undefined",
+          "required": false,
+          "default": "'default'",
+          "description": "Visual variant of the modal.\n- `default`: Standard RGB glow border.\n- `danger`: Red error glow — use for destructive confirmations."
+        },
+        {
+          "name": "closeOnOverlayClick",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether clicking the overlay backdrop closes the modal."
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether pressing Escape closes the modal."
+        },
+        {
+          "name": "animation",
+          "type": "ModalAnimationConfig | undefined",
+          "required": false,
+          "default": null,
+          "description": "CRT open/close animation timing and effects."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Additional CSS classes for the modal panel."
+        },
+        {
+          "name": "overlayClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Additional CSS classes for the overlay backdrop."
+        },
+        {
+          "name": "showCloseButton",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether to render the header close (×) button."
+        },
+        {
+          "name": "onOpen",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the modal begins opening (before animation completes)."
+        },
+        {
+          "name": "onCRTBootComplete",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the CRT boot animation finishes and the modal is fully visible."
+        }
+      ]
+    },
+    {
+      "name": "Divider",
+      "category": "Layout",
+      "sourceFile": "src/components/Divider.tsx",
+      "displayName": "CyberUI.Divider",
+      "description": "",
+      "docSummary": "Gradient/solid/dashed content separator.",
+      "storybookPath": "components-divider--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"gradient\" | \"solid\" | \"dashed\" | undefined",
+          "required": false,
+          "default": "gradient",
+          "description": "Visual style of the divider.\n- `gradient`: Gradient fade from center (default).\n- `solid`: Solid semi-transparent line.\n- `dashed`: Dashed border style."
+        },
+        {
+          "name": "orientation",
+          "type": "\"horizontal\" | \"vertical\" | undefined",
+          "required": false,
+          "default": "horizontal",
+          "description": "Orientation of the divider."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "Notification",
+      "category": "Feedback",
+      "sourceFile": "src/components/Notification.tsx",
+      "displayName": "CyberUI.Notification",
+      "description": "A cyberpunk-themed toast or inline notification for system alerts and status updates.",
+      "docSummary": "Toast notifications. Use `useCyberNotifications` hook.",
+      "storybookPath": "components-notification--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "type",
+          "type": "\"success\" | \"warning\" | \"error\"",
+          "required": true,
+          "default": null,
+          "description": "Semantic type of the notification."
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Bold title for the notification"
+        },
+        {
+          "name": "message",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Detailed message content"
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the notification."
+        },
+        {
+          "name": "onClose",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional callback for when the close button is clicked"
+        }
+      ]
+    },
+    {
+      "name": "Badge",
+      "category": "Feedback",
+      "sourceFile": "src/components/Badge.tsx",
+      "displayName": "CyberUI.Badge",
+      "description": "A compact Cyberpunk-style tag or indicator used for status, categories, or metrics.",
+      "docSummary": "Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`.",
+      "storybookPath": "components-badge--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | \"success\" | \"error\" | \"warning\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Semantic style of the badge."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the badge."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The label or content of the badge"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name"
+        },
+        {
+          "name": "leftIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Icon to render on the left side of the label"
+        },
+        {
+          "name": "rightIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Icon to render on the right side of the label"
+        },
+        {
+          "name": "clickable",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Whether the badge should show hover effects and a pointer cursor"
+        },
+        {
+          "name": "onClick",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional click handler"
+        }
+      ]
+    },
+    {
+      "name": "Skeleton",
+      "category": "Feedback",
+      "sourceFile": "src/components/Skeleton.tsx",
+      "displayName": "CyberUI.Skeleton",
+      "description": "A versatile skeleton loading indicator with multiple layout variants and pulse animation.",
+      "docSummary": "Loading placeholder.",
+      "storybookPath": "components-skeleton--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "variant",
+          "type": "\"text\" | \"circular\" | \"rectangular\" | \"card\" | \"avatar-text\" | \"button-group\" | undefined",
+          "required": false,
+          "default": "text",
+          "description": "Shape variant of the skeleton."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the skeleton element."
+        },
+        {
+          "name": "width",
+          "type": "string | number | undefined",
+          "required": false,
+          "default": null,
+          "description": "Custom width for the skeleton"
+        },
+        {
+          "name": "height",
+          "type": "string | number | undefined",
+          "required": false,
+          "default": null,
+          "description": "Custom height for the skeleton"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name"
+        },
+        {
+          "name": "lines",
+          "type": "number | undefined",
+          "required": false,
+          "default": 3,
+          "description": "Number of lines for text variant."
+        },
+        {
+          "name": "animate",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to show the pulse animation."
+        }
+      ]
+    },
+    {
+      "name": "CircularProgress",
+      "category": "Progress",
+      "sourceFile": "src/components/CircularProgress.tsx",
+      "displayName": "CircularProgress",
+      "description": "A beautiful circular progress indicator with neon glow and dual-tone stroke.",
+      "docSummary": "Dual-ring circular progress indicator.",
+      "storybookPath": "components-circularprogress--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "progress",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "Progress value (0-100)."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Preset container size. Sets width and height of the component automatically.\n- sm: 64px, md: 96px, lg: 128px, xl: 160px"
+        },
+        {
+          "name": "radius",
+          "type": "number | undefined",
+          "required": false,
+          "default": 20,
+          "description": "Radius of the SVG circle in SVG units (viewBox is 50×50, center at 25,25).\nDefault 20 fits cleanly within the viewBox. Only override for custom layouts."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name"
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Optional content to render in the center of the circle"
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible label for screen readers"
+        }
+      ]
+    },
+    {
+      "name": "SegmentedProgress",
+      "category": "Progress",
+      "sourceFile": "src/components/SegmentedProgress.tsx",
+      "displayName": "CyberUI.SegmentedProgress",
+      "description": "A segmented progress indicator with two display modes.",
+      "docSummary": "Segmented progress: `variant=\"radial\"` (circular arc gauge, default) or `variant=\"block\"` (discrete filled blocks ▮▮▮▯▯).",
+      "storybookPath": "components-segmentedprogress--docs",
+      "manifestOverride": true,
+      "variants": [
+        {
+          "variant": "radial",
+          "isDefault": true,
+          "description": "Circular gauge — discrete arc segments arranged in a ring. Original behaviour, and the default.",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"radial\"",
+              "required": false,
+              "default": "radial",
+              "description": "Discriminant — omit or set to 'radial' for the circular gauge."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | \"lg\" | \"xl\"",
+              "required": false,
+              "default": "md",
+              "description": "sm: 64px, md: 96px, lg: 128px, xl: 160px."
+            },
+            {
+              "name": "children",
+              "type": "ReactNode",
+              "required": false,
+              "default": null,
+              "description": "Optional content rendered in the center of the gauge."
+            },
+            {
+              "name": "progress",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Progress value (0–100)."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Optional custom class name."
+            }
+          ]
+        },
+        {
+          "variant": "block",
+          "isDefault": false,
+          "description": "Linear discrete-block bar (▮▮▮▮▯▯) — health bars, step-based loading.",
+          "props": [
+            {
+              "name": "variant",
+              "type": "\"block\"",
+              "required": true,
+              "default": null,
+              "description": "Discriminant — must be 'block'."
+            },
+            {
+              "name": "segments",
+              "type": "number",
+              "required": false,
+              "default": 10,
+              "description": "Number of discrete blocks."
+            },
+            {
+              "name": "size",
+              "type": "\"sm\" | \"md\" | \"lg\" | \"xl\"",
+              "required": false,
+              "default": "md",
+              "description": "Controls block height: sm h-3, md h-5, lg h-7, xl h-9."
+            },
+            {
+              "name": "progress",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "Progress value (0–100)."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Optional custom class name."
+            },
+            {
+              "name": "children",
+              "type": "never",
+              "required": false,
+              "default": null,
+              "description": "Not valid in block mode."
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "LinearProgress",
+      "category": "Progress",
+      "sourceFile": "src/components/LinearProgress.tsx",
+      "displayName": "CyberUI.LinearProgress",
+      "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nThe bar is `w-full` by default — it fills its container width.\nWrap it in a constrained element to control its width.",
+      "docSummary": "Smooth horizontal progress bar.",
+      "storybookPath": "components-linearprogress--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "progress",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "Progress value (0-100)."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Height of the progress bar."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name to override default styles"
+        }
+      ]
+    },
+    {
+      "name": "TabNavigation",
+      "category": "Navigation",
+      "sourceFile": "src/components/TabNavigation.tsx",
+      "displayName": "TabNavigation",
+      "description": "A highly adaptive tabbed navigation system with cyberpunk animations and multiple layout modes.",
+      "docSummary": "Animated tab bar.",
+      "storybookPath": "components-tabnavigation--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "tabs",
+          "type": "readonly string[]",
+          "required": true,
+          "default": null,
+          "description": "List of tab labels."
+        },
+        {
+          "name": "activeTab",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Currently active tab label."
+        },
+        {
+          "name": "onTabChange",
+          "type": "(tab: string) => void",
+          "required": true,
+          "default": null,
+          "description": "Callback when a tab is selected."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the tabs."
+        },
+        {
+          "name": "mode",
+          "type": "ResponsiveValue<TabNavigationMode> | undefined",
+          "required": false,
+          "default": "scroll",
+          "description": "Responsive display mode.\n- `scroll`: Horizontal scrolling container.\n- `wrap`: Wraps to new lines.\n- `dropdown`: Collapses into a dropdown menu."
+        },
+        {
+          "name": "containerClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class for the outer container"
+        },
+        {
+          "name": "tabsClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class for the tab buttons"
+        },
+        {
+          "name": "dropdownLabel",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Label for the dropdown anchor (mode=\"dropdown\" only)"
+        },
+        {
+          "name": "anchorIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Custom icon for the dropdown anchor (mode=\"dropdown\" only)"
+        },
+        {
+          "name": "showAnchorLabel",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to show the label text next to the anchor icon"
+        },
+        {
+          "name": "anchorAriaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "ARIA label for the dropdown anchor"
+        },
+        {
+          "name": "closeOnSelect",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to close the dropdown after choosing a tab"
+        },
+        {
+          "name": "anchorClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional class for the dropdown anchor button"
+        },
+        {
+          "name": "menuClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional class for the dropdown menu container"
+        },
+        {
+          "name": "menuItemClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional class for items in the dropdown menu"
+        }
+      ]
+    },
+    {
+      "name": "Carousel",
+      "category": "Navigation",
+      "sourceFile": "src/components/Carousel.tsx",
+      "displayName": "CyberUI.Carousel",
+      "description": "",
+      "docSummary": "Image carousel.",
+      "storybookPath": "components-carousel--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "images",
+          "type": "CarouselImageData[]",
+          "required": true,
+          "default": null,
+          "description": "Array of images to display"
+        },
+        {
+          "name": "currentIndex",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "Current slide index (controlled)"
+        },
+        {
+          "name": "onChange",
+          "type": "(index: number) => void",
+          "required": true,
+          "default": null,
+          "description": "Callback when slide changes"
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<CarouselSize> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size variant with responsive support"
+        },
+        {
+          "name": "autoPlay",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Enable auto-play functionality"
+        },
+        {
+          "name": "interval",
+          "type": "number | undefined",
+          "required": false,
+          "default": 3000,
+          "description": "Auto-play interval in milliseconds"
+        },
+        {
+          "name": "infinite",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Enable infinite loop"
+        },
+        {
+          "name": "transition",
+          "type": "CarouselTransition | undefined",
+          "required": false,
+          "default": "slide",
+          "description": "Transition effect"
+        },
+        {
+          "name": "objectFit",
+          "type": "CarouselObjectFit | undefined",
+          "required": false,
+          "default": "cover",
+          "description": "Image object fit behavior"
+        },
+        {
+          "name": "showArrows",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Show navigation arrows"
+        },
+        {
+          "name": "showIndicators",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Show slide indicators"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes"
+        },
+        {
+          "name": "disableImagePreview",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disable click-to-expand on images"
+        },
+        {
+          "name": "glitchRate",
+          "type": "number | boolean | undefined",
+          "required": false,
+          "default": 1,
+          "description": "Control signal-glitch effect frequency. Float (0.0-1.0) for probability, boolean for on/off"
+        },
+        {
+          "name": "onBeforeChange",
+          "type": "((fromIndex: number, toIndex: number) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired before slide change (fromIndex, toIndex)"
+        },
+        {
+          "name": "onAfterChange",
+          "type": "((index: number) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired after slide change"
+        }
+      ]
+    },
+    {
+      "name": "Steps",
+      "category": "Navigation",
+      "sourceFile": "src/components/Steps.tsx",
+      "displayName": "CyberUI.Steps",
+      "description": "",
+      "docSummary": "Multi-step progress indicator.",
+      "storybookPath": "components-steps--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "items",
+          "type": "StepItem[]",
+          "required": true,
+          "default": null,
+          "description": "Array of step items to display."
+        },
+        {
+          "name": "current",
+          "type": "number | undefined",
+          "required": false,
+          "default": 0,
+          "description": "Current active step index. **0-based** — first step is `current={0}`, second is `current={1}`.\nA common mistake is passing a 1-based value which skips the first step."
+        },
+        {
+          "name": "orientation",
+          "type": "ResponsiveValue<\"horizontal\" | \"vertical\"> | undefined",
+          "required": false,
+          "default": "{ base: 'vertical', md: 'horizontal' }",
+          "description": "Layout orientation. Supports responsive values."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "GradientText",
+      "category": "Typography",
+      "sourceFile": "src/components/GradientText.tsx",
+      "displayName": "CyberUI.GradientText",
+      "description": "",
+      "docSummary": "Text with cyberpunk gradient effects.",
+      "storybookPath": "components-gradienttext--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The text content to render."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style of the gradient.\n- `primary`: Cyan to pink gradient (secondary → primary).\n- `secondary`: Pink to yellow gradient (primary → accent).\n- `accent`: Yellow to cyan gradient (accent → secondary)."
+        },
+        {
+          "name": "as",
+          "type": "\"span\" | \"h1\" | \"h2\" | \"h3\" | \"h4\" | \"h5\" | \"h6\" | \"p\" | \"div\" | undefined",
+          "required": false,
+          "default": "span",
+          "description": "The HTML element to render as."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "SectionTitle",
+      "category": "Typography",
+      "sourceFile": "src/components/SectionTitle.tsx",
+      "displayName": "CyberUI.SectionTitle",
+      "description": "",
+      "docSummary": "Title with decorative gradient line.",
+      "storybookPath": "components-sectiontitle--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The title text content."
+        },
+        {
+          "name": "showLine",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to show a decorative gradient line after the title."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the section title. Supports responsive values."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "Timeline",
+      "category": "Display",
+      "sourceFile": "src/components/Timeline.tsx",
+      "displayName": "CyberUI.Timeline",
+      "description": "",
+      "docSummary": "Vertical event history display.",
+      "storybookPath": "components-timeline--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "events",
+          "type": "TimelineEvent[]",
+          "required": true,
+          "default": null,
+          "description": "Array of timeline events to display."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the timeline. Supports responsive values."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "Image",
+      "category": "Media",
+      "sourceFile": "src/components/Image.tsx",
+      "displayName": "Image",
+      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations.",
+      "docSummary": "Image with cyberpunk frame/effects.",
+      "storybookPath": "components-image--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "src",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Image source URL (required)"
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Alternative text for accessibility (required)"
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<ImageSize> | undefined",
+          "required": false,
+          "default": null,
+          "description": "Size of the image container"
+        },
+        {
+          "name": "preview",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "false",
+          "description": "Enable click-to-expand fullscreen preview on click.\nMust be explicitly set to `true` — disabled by default."
+        },
+        {
+          "name": "fallback",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fallback image URL when main image fails to load"
+        },
+        {
+          "name": "placeholder",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Custom loading placeholder component"
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Additional CSS classes"
+        },
+        {
+          "name": "animation",
+          "type": "ImageAnimationConfig | undefined",
+          "required": false,
+          "default": null,
+          "description": "Animation configuration"
+        },
+        {
+          "name": "eager",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": null,
+          "description": "Disable lazy loading (images load immediately)"
+        },
+        {
+          "name": "previewClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Custom preview container styles"
+        },
+        {
+          "name": "onPreviewOpen",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when preview opens"
+        },
+        {
+          "name": "onPreviewClose",
+          "type": "(() => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when preview closes"
+        },
+        {
+          "name": "onLoad",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image loads successfully"
+        },
+        {
+          "name": "onError",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image fails to load"
+        }
+      ]
+    }
+  ],
+  "hooks": [
+    {
+      "name": "useCyberScrollbar",
+      "kind": "hook",
+      "description": "Custom hook that creates a cyberpunk-themed scrollbar with animated arrows that respond to scroll velocity and direction.",
+      "docSummary": "applies cyberpunk scrollbar styling to a scrollable ref.",
+      "signature": "useCyberScrollbar<T extends HTMLElement>(options?: UseCyberScrollbarOptions): React.RefObject<T>",
+      "requiresProvider": null
+    },
+    {
+      "name": "useCyberNotifications",
+      "kind": "hook",
+      "description": "Access the notification context to show toast notifications. Must be used within a CyberNotificationProvider.",
+      "docSummary": "`showNotification(type, title, message, options?)` toast trigger; requires `CyberNotificationProvider`.",
+      "signature": "useCyberNotifications(): { showNotification: (type: 'success' | 'warning' | 'error', title: string, message: string, options?: NotificationOptions) => string }",
+      "requiresProvider": "CyberNotificationProvider"
+    },
+    {
+      "name": "useAnimatedProgress",
+      "kind": "hook",
+      "description": "A hook that oscillates a value between a min and max range. Useful for creating \"breathing\" or \"pulse\" animations.",
+      "docSummary": "oscillating value generator for pulse/loading animations.",
+      "signature": "useAnimatedProgress(options?: { min?: number; max?: number; speed?: number }): number",
+      "requiresProvider": null
+    }
+  ],
+  "context": [
+    {
+      "name": "CyberNotificationProvider",
+      "kind": "context-provider",
+      "sourceFile": "src/contexts/NotificationContext.tsx",
+      "description": "Context provider for the Cyberpunk notification system.\nWrap your application root with this provider to enable toasts.",
+      "docSummary": "wraps the app once to enable `useCyberNotifications`.",
+      "props": [
+        {
+          "name": "position",
+          "type": "\"top-right\" | \"top-left\" | \"bottom-right\" | \"bottom-left\" | undefined",
+          "required": false,
+          "default": "top-right",
+          "description": ""
+        },
+        {
+          "name": "defaultDuration",
+          "type": "number | undefined",
+          "required": false,
+          "default": 2500,
+          "description": ""
+        }
+      ]
+    }
+  ]
+}
