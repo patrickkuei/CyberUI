@@ -123,7 +123,7 @@ function writeTarget(key) {
   const filePath = join(cwd, target.file);
 
   // Read current package version
-  let version = '1.3.2';
+  let version = '2.3.1';
   try {
     const pkgPath = new URL('../package.json', import.meta.url).pathname;
     const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));

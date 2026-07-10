@@ -19,6 +19,8 @@ If anything fails, stop and report. Do not proceed until all checks pass.
 Update the version string to `$ARGUMENTS` in:
 1. `package.json` → `"version"` field
 2. `src/index.ts` → `export const version = "..."` line
+3. `bin/init.js` → `let version = '...'` fallback (used only if `package.json` can't be read)
+4. `bin/usage-content.js` → `getUsageContent(version = '...')` default param
 
 ---
 
@@ -56,7 +58,7 @@ Show the list of files that would be included in the npm package. Verify that:
 
 Print a release summary:
 - Version: `$ARGUMENTS`
-- Files changed: package.json, src/index.ts, CHANGELOG.md
+- Files changed: package.json, src/index.ts, bin/init.js, bin/usage-content.js, CHANGELOG.md
 - Build: PASS/FAIL
 - Pack check: PASS/FAIL
 
@@ -64,7 +66,7 @@ Then ask: **"Ready to commit and tag? Reply yes to proceed, or tell me what to f
 
 If the user confirms, run:
 ```bash
-git add package.json src/index.ts CHANGELOG.md
+git add package.json src/index.ts bin/init.js bin/usage-content.js CHANGELOG.md
 git commit -m "chore: release v$ARGUMENTS"
 git tag v$ARGUMENTS
 ```

@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- **Stale version fallbacks** — `bin/init.js`'s fallback version (used only if `package.json` can't be read) and `bin/usage-content.js`'s default parameter were still `1.3.2` and `2.2.0` respectively, several releases behind. Bumped both to `2.3.1` and added them to the `/release` checklist so future bumps don't miss them.
+
 ## [2.3.1] - 2026-05-19
 
 ### Fixed
