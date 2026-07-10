@@ -22,14 +22,13 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '20'
+        cache: 'npm'
 
-    - name: Install dependencies with yarn
-      run: |
-        npm install -g yarn
-        yarn install
+    - name: Install dependencies
+      run: npm ci
 
     - name: Build Storybook
-      run: yarn build-storybook
+      run: npm run build-storybook
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v4

@@ -57,6 +57,9 @@
   ],
   "author": "Patrick Yang <azureroki@gmail.com>",
   "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/patrickkuei/CyberUI.git"

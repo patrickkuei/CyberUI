@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`.github/workflows/ci.yml`** — the repo's first PR-gating CI. `validate` job mirrors the already-documented `npm run lint && npm run type-check && npm test -- --project=unit` gate from `CLAUDE.md`. Triggers on `pull_request` and `push: master` — the push trigger matters because `master` has zero required status checks today (confirmed via `gh api .../branches/master/protection` → 404), so it's the only thing validating a direct push.
+- **`engines` field in `package.json`** (`"node": ">=20"`) — matches the Node version both CI workflows already pinned; permissive lower bound since nothing in the build actually requires an upper bound.
+
+### Fixed
+
+- **`deploy-demo.yml`/`storybook.yml` package manager mismatch** — both ran `yarn install` despite the repo's lockfile being `package-lock.json` (npm), with no `yarn.lock` anywhere. Since there's no yarn.lock, `yarn install` silently ignored the lockfile and resolved its own dependency graph from `package.json`'s semver ranges — meaning production/Storybook deploys were not built from the exact versions the repo has locked. Both now use `npm ci`.
+
 ### Changed
 
 - **`bin/usage-content.js`'s Component Reference table now points at local `.d.ts` files instead of production Storybook URLs.** Storybook's docs pages are a client-side-rendered SPA, so a raw fetch mostly returns an empty HTML shell — low value for an agent, and many coding agents lack web access at all anyway. Since the package already ships per-component type declarations separately (`dist/components/<Name>.d.ts`, confirmed by inspecting the actual build output), each row now points there instead — local, reliable, and scoped to just that component. README.md keeps its Storybook links, since those serve human readers browsing docs, not agents.
