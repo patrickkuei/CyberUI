@@ -54,6 +54,7 @@ function App() {
 | Notification | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-notification--docs) |
 | Badge | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs) |
 | Skeleton | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-skeleton--docs) |
+| Tooltip | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-tooltip--docs) |
 | CircularProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-circularprogress--docs) |
 | SegmentedProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-segmentedprogress--docs) |
 | LinearProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-linearprogress--docs) |

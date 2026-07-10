@@ -19,6 +19,7 @@ export { default as Timeline } from './Timeline';
 export { default as Steps } from './Steps';
 export { default as Divider } from './Divider';
 export { default as Checkbox } from './Checkbox';
+export { default as Tooltip } from './Tooltip';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -41,6 +42,7 @@ export type { TimelineProps, TimelineEvent } from './Timeline';
 export type { StepsProps, StepItem } from './Steps';
 export type { DividerProps } from './Divider';
 export type { CheckboxProps } from './Checkbox';
+export type { TooltipProps, TooltipPlacement } from './Tooltip';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

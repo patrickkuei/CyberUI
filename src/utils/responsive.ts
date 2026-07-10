@@ -133,6 +133,11 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "h-64",
     lg: "h-80",
   },
+  tooltip: {
+    sm: "text-xs px-2 py-1",
+    md: "text-sm px-3 py-1.5",
+    lg: "text-base px-4 py-2",
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults
