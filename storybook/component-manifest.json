@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packageVersion": "2.3.1",
-  "generatedAt": "2026-07-10T05:23:33.463Z",
+  "packageVersion": "2.4.0",
+  "generatedAt": "2026-07-10T06:59:23.331Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -702,6 +702,95 @@
           "required": false,
           "default": true,
           "description": "Whether to show the pulse animation."
+        }
+      ]
+    },
+    {
+      "name": "Tooltip",
+      "category": "Feedback",
+      "sourceFile": "src/components/Tooltip.tsx",
+      "displayName": "Tooltip",
+      "description": "A neon-bordered popover that reveals supplemental info on hover or keyboard focus.",
+      "docSummary": "Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.",
+      "storybookPath": "components-tooltip--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "children",
+          "type": "ReactElement<{ 'aria-describedby'?: string | undefined; }, string | JSXElementConstructor<any>>",
+          "required": true,
+          "default": null,
+          "description": "The trigger element. Must be a single React element that accepts an\n`aria-describedby` attribute (native elements, `Button`, `Badge`, etc).\nWrap plain text/icons in a `<span tabIndex={0}>` so the trigger is\nkeyboard-focusable — the tooltip only opens on hover or focus."
+        },
+        {
+          "name": "content",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "Content rendered inside the tooltip panel."
+        },
+        {
+          "name": "placement",
+          "type": "ResponsiveValue<TooltipPlacement> | undefined",
+          "required": false,
+          "default": "top",
+          "description": "Side of the trigger the tooltip is anchored to. Supports responsive values."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style, reusing the neon palette from Button/Card."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the tooltip panel (text size + padding). Supports responsive values."
+        },
+        {
+          "name": "delay",
+          "type": "number | undefined",
+          "required": false,
+          "default": 200,
+          "description": "Delay in ms before the tooltip appears after hover/focus starts.\nHiding is always immediate so the panel doesn't linger."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables the tooltip — the trigger renders as-is with no hover/focus behavior."
+        },
+        {
+          "name": "open",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled visibility. When set, the tooltip stops managing its own open\nstate and `onOpenChange` becomes the only way to react to hover/focus/Escape."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired whenever hover, focus, blur, or Escape would change visibility."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the tooltip panel."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Id for the tooltip panel. Auto-generated when omitted."
         }
       ]
     },
