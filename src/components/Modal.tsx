@@ -73,16 +73,29 @@ export interface ModalProps extends ModalCallbacks {
    * Callback when the modal requests to close.
    */
   onClose: () => void;
+  /** Title text shown in the modal header. */
   title?: string;
+  /** The content to be rendered inside the modal body. */
   children: React.ReactNode;
+  /**
+   * Custom footer content. Overrides the default Cancel/Confirm action buttons
+   * (`onCancel`/`onConfirm` and related props are ignored when `footer` is set).
+   */
   footer?: React.ReactNode;
-  // Action props (Ant Design pattern)
+  // Action props (Ant Design pattern) — rendered as the default footer when `footer` is not set.
+  /** Fired when the Cancel button is clicked. Only rendered if provided. */
   onCancel?: () => void;
+  /** Fired when the Confirm button is clicked. Only rendered if provided. */
   onConfirm?: () => void;
+  /** Label for the Cancel button. @default 'Cancel' */
   cancelText?: string;
+  /** Label for the Confirm button. @default 'Confirm' */
   confirmText?: string;
+  /** Shows a loading state and disables the Confirm button. @default false */
   confirmLoading?: boolean;
+  /** Whether to render the Cancel button (requires `onCancel`). @default true */
   showCancel?: boolean;
+  /** Whether to render the Confirm button (requires `onConfirm`). @default true */
   showConfirm?: boolean;
   /**
    * Width of the modal.
@@ -98,11 +111,17 @@ export interface ModalProps extends ModalCallbacks {
    * @default 'default'
    */
   variant?: "default" | "danger";
+  /** Whether clicking the overlay backdrop closes the modal. @default true */
   closeOnOverlayClick?: boolean;
+  /** Whether pressing Escape closes the modal. @default true */
   closeOnEscape?: boolean;
+  /** CRT open/close animation timing and effects. */
   animation?: ModalAnimationConfig;
+  /** Additional CSS classes for the modal panel. */
   className?: string;
+  /** Additional CSS classes for the overlay backdrop. */
   overlayClassName?: string;
+  /** Whether to render the header close (×) button. @default true */
   showCloseButton?: boolean;
 }
 
