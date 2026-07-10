@@ -15,11 +15,12 @@ CyberUI 2045 is a React component library built with Tailwind CSS v4. It provide
 npm install cyberui-2045
 ```
 
+<!-- cyberui-2045:manifest:start -->
 ## Components (21)
-- Forms: `Button`, `Input`, `Select`, `Toggle`, `Checkbox`
+- Forms: `Button`, `Input`, `Toggle`, `Select`, `Checkbox`
 - Layout: `Card`, `Modal`, `Divider`
 - Feedback: `Notification`, `Badge`, `Skeleton`
-- Progress: `CircularProgress`, `LinearProgress`, `SegmentedProgress`
+- Progress: `CircularProgress`, `SegmentedProgress`, `LinearProgress`
 - Navigation: `TabNavigation`, `Carousel`, `Steps`
 - Typography: `GradientText`, `SectionTitle`
 - Display: `Timeline`
@@ -30,6 +31,7 @@ npm install cyberui-2045
 - `useCyberNotifications`: `showNotification(type, title, message, options?)` toast trigger; requires `CyberNotificationProvider`.
 - `useAnimatedProgress`: oscillating value generator for pulse/loading animations.
 - `CyberNotificationProvider`: wraps the app once to enable `useCyberNotifications`.
+<!-- cyberui-2045:manifest:end -->
 
 ## AI Coding Assistant Setup
 Run once after install to inject a full usage guide (props, gotchas, theming tokens) into your AI config file:

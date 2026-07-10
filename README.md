@@ -40,31 +40,33 @@ function App() {
 
 ## Components
 
+<!-- cyberui-2045:manifest:start -->
 | Component | Category | Docs |
 |-----------|----------|------|
 | Button | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-button--docs) |
 | Input | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-input--docs) |
-| Select | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-select--docs) |
 | Toggle | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-toggle--docs) |
+| Select | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-select--docs) |
+| Checkbox | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-checkbox--docs) |
 | Card | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-card--docs) |
 | Modal | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs) |
-| Badge | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs) |
+| Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs) |
 | Notification | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-notification--docs) |
+| Badge | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs) |
 | Skeleton | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-skeleton--docs) |
 | CircularProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-circularprogress--docs) |
-| LinearProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-linearprogress--docs) |
 | SegmentedProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-segmentedprogress--docs) |
+| LinearProgress | Progress | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-linearprogress--docs) |
 | TabNavigation | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-tabnavigation--docs) |
 | Carousel | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-carousel--docs) |
 | Steps | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-steps--docs) |
-| Image | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs) |
-| Checkbox | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-checkbox--docs) |
-| Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs) |
 | GradientText | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-gradienttext--docs) |
 | SectionTitle | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs) |
 | Timeline | Display | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs) |
+| Image | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs) |
 
-Also includes hooks (`useCyberNotifications`, `useAnimatedProgress`, `useCyberScrollbar`) and `CyberNotificationProvider` context.
+Also includes hooks (`useCyberScrollbar`, `useCyberNotifications`, `useAnimatedProgress`) and `CyberNotificationProvider` context.
+<!-- cyberui-2045:manifest:end -->
 
 ## AI Coding Setup
 

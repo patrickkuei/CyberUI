@@ -14,7 +14,17 @@ If anything fails, stop and report. Do not proceed until all checks pass.
 
 ---
 
-## Step 2 — Bump version
+## Step 2 — Regenerate component docs
+
+Run: `npm run docs:generate`
+
+This regenerates `public/component-manifest.json` and the component table/list block in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, and `bin/usage-content.js` from the current component types.
+
+Run `git diff CLAUDE.md AGENT.md README.md public/llms.txt bin/usage-content.js public/component-manifest.json` and show the user. If anything changed beyond what's expected from work done since the last release (e.g. a new component that was never regenerated), stop and ask before proceeding.
+
+---
+
+## Step 3 — Bump version
 
 Update the version string to `$ARGUMENTS` in:
 1. `package.json` → `"version"` field
@@ -26,7 +36,7 @@ Then run `npm install` (no package changes expected — this just re-syncs `pack
 
 ---
 
-## Step 3 — Update CHANGELOG.md
+## Step 4 — Update CHANGELOG.md
 
 Move all items from the `## [Unreleased]` section into a new dated section:
 
@@ -38,7 +48,7 @@ Use today's date. If there is no `[Unreleased]` section or it is empty, ask the 
 
 ---
 
-## Step 4 — Build the library
+## Step 5 — Build the library
 
 Run: `npm run build`
 
@@ -46,7 +56,7 @@ Confirm the build succeeds and `dist/` is populated. Report the output file size
 
 ---
 
-## Step 5 — Pre-publish dry run
+## Step 6 — Pre-publish dry run
 
 Run: `npm pack --dry-run`
 
@@ -56,11 +66,11 @@ Show the list of files that would be included in the npm package. Verify that:
 
 ---
 
-## Step 6 — Summary
+## Step 7 — Summary
 
 Print a release summary:
 - Version: `$ARGUMENTS`
-- Files changed: package.json, package-lock.json, src/index.ts, bin/init.js, bin/usage-content.js, CHANGELOG.md
+- Files changed: package.json, package-lock.json, src/index.ts, bin/init.js, bin/usage-content.js, public/component-manifest.json, CLAUDE.md, AGENT.md, README.md, public/llms.txt, CHANGELOG.md
 - Build: PASS/FAIL
 - Pack check: PASS/FAIL
 
@@ -68,7 +78,7 @@ Then ask: **"Ready to commit and tag? Reply yes to proceed, or tell me what to f
 
 If the user confirms, run:
 ```bash
-git add package.json package-lock.json src/index.ts bin/init.js bin/usage-content.js CHANGELOG.md
+git add package.json package-lock.json src/index.ts bin/init.js bin/usage-content.js public/component-manifest.json CLAUDE.md AGENT.md README.md public/llms.txt CHANGELOG.md
 git commit -m "chore: release v$ARGUMENTS"
 git tag v$ARGUMENTS
 ```

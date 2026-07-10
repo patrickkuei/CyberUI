@@ -4,6 +4,7 @@ import { createInterface } from 'node:readline';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { getUsageContent } from './usage-content.js';
+import { replaceMarkedBlock } from './markers.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -138,7 +139,8 @@ function writeTarget(key) {
     // fallback to hardcoded version
   }
 
-  const block = `${MARKER_START}\n${getUsageContent(version)}\n${MARKER_END}`;
+  const content = getUsageContent(version);
+  const block = `${MARKER_START}\n${content}\n${MARKER_END}`;
 
   if (isDryRun) {
     console.log(`  ── ${target.file} ──\n${block}\n`);
@@ -158,9 +160,7 @@ function writeTarget(key) {
 
     if (existing.includes(MARKER_START) && existing.includes(MARKER_END)) {
       // Replace existing section
-      const before = existing.slice(0, existing.indexOf(MARKER_START));
-      const after = existing.slice(existing.indexOf(MARKER_END) + MARKER_END.length);
-      finalContent = `${before}${block}${after}`;
+      finalContent = replaceMarkedBlock(existing, MARKER_START, MARKER_END, content);
       console.log(`  ✓  Updated  ${target.file}`);
     } else {
       // Append new section

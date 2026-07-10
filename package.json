@@ -75,6 +75,7 @@
     "type-check": "tsc --noEmit",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
+    "docs:generate": "node scripts/generate-manifest.js",
     "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist",
     "prepublishOnly": "npm run build"
@@ -111,6 +112,7 @@
     "jsdom": "^29.0.1",
     "playwright": "^1.54.2",
     "postcss": "^8.5.6",
+    "react-docgen-typescript": "^2.4.0",
     "storybook": "^9.1.0",
     "tailwindcss": "^4.1.11",
     "typescript": "~5.8.3",

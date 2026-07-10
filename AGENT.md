@@ -24,29 +24,31 @@ import "cyberui-2045/styles.css";
 
 ## 3. Component Reference
 
+<!-- cyberui-2045:manifest:start -->
 | Component | Description |
 | :--- | :--- |
 | `Button` | Neon-styled button. Variants: `primary`, `secondary`, `danger`, `ghost`. |
-| `Card` | Glassmorphism container with borders. |
 | `Input` | Cyberpunk text input with focus glows. |
-| `Modal` | CRT-style modal dialog. |
-| `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
-| `CircularProgress` | Dual-ring circular progress indicator. |
-| `LinearProgress` | Smooth horizontal progress bar. |
-| `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
-| `TabNavigation` | Animated tab bar. |
-| `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
 | `Toggle` | Cyberpunk switch. |
 | `Select` | Styled dropdown. |
-| `Skeleton` | Loading placeholder. |
-| `Image` | Image with cyberpunk frame/effects. |
-| `Carousel` | Image carousel. |
 | `Checkbox` | Neon-styled checkbox with SVG icons. |
+| `Card` | Glassmorphism container with borders. |
+| `Modal` | CRT-style modal dialog. |
 | `Divider` | Gradient/solid/dashed content separator. |
+| `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
+| `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
+| `Skeleton` | Loading placeholder. |
+| `CircularProgress` | Dual-ring circular progress indicator. |
+| `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
+| `LinearProgress` | Smooth horizontal progress bar. |
+| `TabNavigation` | Animated tab bar. |
+| `Carousel` | Image carousel. |
+| `Steps` | Multi-step progress indicator. |
 | `GradientText` | Text with cyberpunk gradient effects. |
 | `SectionTitle` | Title with decorative gradient line. |
-| `Steps` | Multi-step progress indicator. |
 | `Timeline` | Vertical event history display. |
+| `Image` | Image with cyberpunk frame/effects. |
+<!-- cyberui-2045:manifest:end -->
 
 ## 4. Usage Patterns (Few-Shot)
 

@@ -25,20 +25,22 @@ npm test              # All tests (unit + Storybook/Playwright)
 > `npm run build` runs in `--mode library` — it bundles to `dist/` and generates `.d.ts` files.
 > Unit tests use jsdom; Storybook tests use Playwright/Chromium headless.
 
-## Component Inventory (v2.2.0)
+## Component Inventory
 
+<!-- cyberui-2045:manifest:start -->
 | Category    | Components |
 |-------------|-----------|
-| Forms       | Button, Input, Select, Toggle, Checkbox |
-| Layout      | Card, Modal, Divider |
-| Feedback    | Notification, Badge, Skeleton |
-| Progress    | CircularProgress, LinearProgress, SegmentedProgress |
-| Navigation  | TabNavigation, Carousel, Steps |
-| Typography  | GradientText, SectionTitle |
-| Display     | Timeline |
-| Media       | Image |
-| Hooks       | useCyberScrollbar, useCyberNotifications, useAnimatedProgress |
-| Context     | CyberNotificationProvider |
+| Forms | Button, Input, Toggle, Select, Checkbox |
+| Layout | Card, Modal, Divider |
+| Feedback | Notification, Badge, Skeleton |
+| Progress | CircularProgress, SegmentedProgress, LinearProgress |
+| Navigation | TabNavigation, Carousel, Steps |
+| Typography | GradientText, SectionTitle |
+| Display | Timeline |
+| Media | Image |
+| Hooks | useCyberScrollbar, useCyberNotifications, useAnimatedProgress |
+| Context | CyberNotificationProvider |
+<!-- cyberui-2045:manifest:end -->
 
 ## Key Conventions
 

@@ -82,3 +82,14 @@ Use `@testing-library/react` + `vitest`. Cover:
 Run: `npm run lint && npm run type-check`
 
 Fix any errors before finishing. Report the final lint + type-check result.
+
+---
+
+## Step 6 — Regenerate docs
+
+The component table/list in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, and `bin/usage-content.js` is generated from `scripts/generate-manifest.js`, not hand-edited. Before finishing:
+
+1. Add `$ARGUMENTS` to `CATEGORY_MAP` in `scripts/generate-manifest.js` (pick from the existing categories: Forms, Layout, Feedback, Progress, Navigation, Typography, Display, Media — or ask the user if none fit).
+2. Add a `docSummary` entry for `$ARGUMENTS` to `DOC_SUMMARIES` in the same script — a short, one-line description matching the style of existing entries (see `AGENT.md`'s Component Reference table for examples).
+3. Run `npm run docs:generate`.
+4. Run `git diff CLAUDE.md AGENT.md README.md public/llms.txt bin/usage-content.js public/component-manifest.json` and confirm only `$ARGUMENTS`-related lines changed. If anything else changed, stop and investigate before finishing.
