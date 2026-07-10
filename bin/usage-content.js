@@ -52,93 +52,15 @@ import { Button, Card, Modal } from 'cyberui-2045';
 | Image | Media | https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs |
 <!-- cyberui-2045:manifest:end -->
 
-### Critical API notes (read before coding)
+### Critical API notes
 
-\`\`\`tsx
-// Button — variants: 'primary' | 'secondary' | 'danger' | 'ghost'  (NO 'accent')
-<Button variant="primary">Jack In</Button>
-<Button variant="danger">Purge</Button>
+Every prop carries full JSDoc (types, \`@default\`, gotchas) — hover it in your editor or read
+\`node_modules/cyberui-2045/dist/index.d.ts\` before using an unfamiliar component. Don't guess.
 
-// Badge — uses children, NOT a label prop
-<Badge variant="success">Online</Badge>
-<Badge variant="error">Offline</Badge>
-// variants: 'primary' | 'secondary' | 'accent' | 'success' | 'error' | 'warning'
+Only cross-cutting facts that don't belong to any single component's own types are listed here:
 
-// CircularProgress — use size prop (sm/md/lg/xl); prop is 'progress' not 'value'
-// center content goes as children; do NOT pass a large radius — default 20 is correct
-<CircularProgress progress={75} size="md">
-  <span className="text-xs font-mono text-accent">75%</span>
-</CircularProgress>
-
-// LinearProgress — prop is 'progress' (not 'value'); fills container width (w-full) by default
-// wrap in a constrained div to control width
-<LinearProgress progress={60} />
-<div className="w-64"><LinearProgress progress={60} /></div>
-
-// SegmentedProgress — two variants:
-//   variant="radial" (default): circular arc-segment gauge; children render in the center
-//   variant="block": linear discrete-block bar (▮▮▮▯▯); use segments prop (default 10)
-// Both support size prop (sm/md/lg/xl)
-<SegmentedProgress progress={80} size="md">
-  <span className="text-accent font-bold text-xs">80%</span>
-</SegmentedProgress>
-<SegmentedProgress variant="block" progress={60} segments={10} size="md" />
-
-// TabNavigation — tabs is a plain string array (NOT {id, label}[])
-<TabNavigation
-  tabs={['Overview', 'Stats', 'History']}
-  activeTab="Overview"
-  onTabChange={setTab}
-/>
-
-// SectionTitle — NO subtitle prop; use children for the heading text
-<SectionTitle>System Status</SectionTitle>
-
-// Select — use onValueChange for a simple string callback (like Toggle/Checkbox pattern)
-// or use standard HTML onChange for the raw event
-<Select
-  options={[{ value: 'a', label: 'Option A' }]}
-  onValueChange={(val) => setSelected(val)}
-/>
-
-// Toggle — onChange receives boolean directly
-<Toggle checked={on} onChange={setOn} />
-
-// Checkbox — use onCheckedChange for a simple boolean callback
-<Checkbox checked={val} onCheckedChange={setVal} />
-
-// Modal — default size is 'lg' (672px); use 'xl' for forms/tables, 'sm' only for simple alerts
-// variant="danger" for destructive confirmations
-<Modal title="Settings" size="lg" isOpen={open} onClose={close}>
-  content here
-</Modal>
-<Modal variant="danger" title="Delete?" size="md" onConfirm={handleDelete} onCancel={close}>
-  This cannot be undone.
-</Modal>
-
-// Card — supports onClick and all standard div HTML attributes
-<Card onClick={() => select(item)}>content</Card>
-
-// Image — preview={true} must be explicit to enable click-to-expand fullscreen (disabled by default)
-<Image src="/photo.jpg" alt="Description" size="md" preview={true} />
-
-// Carousel — images takes CarouselImageData[]: { src, alt, fallbackSrc?, caption? }
-<Carousel
-  images={[
-    { src: 'img1.jpg', alt: 'Cyber City', caption: 'Night District' },
-    { src: 'img2.jpg', alt: 'Neon Lights', fallbackSrc: 'fallback.jpg' }
-  ]}
-  currentIndex={idx}
-  onIndexChange={setIdx}
-/>
-
-// Steps — current is 0-BASED. First step = current={0}, second = current={1}.
-// Passing 1-based values is a common mistake that skips the first step.
-<Steps
-  current={0}
-  items={[{ title: 'Login' }, { title: 'Verify' }, { title: 'Complete' }]}
-/>
-\`\`\`
+- \`Button\` variants: \`primary | secondary | danger | ghost\`. \`Badge\` variants: \`primary | secondary | accent | success | error | warning\`. Different sets — \`Button\` has no \`accent\`, \`Badge\` has no \`danger\`. Easy to mix up since both are status/action-ish components.
+- Full machine-readable prop reference for all 21 components + hooks: \`node_modules/cyberui-2045/dist/component-manifest.json\`. Grep it for a component name before writing code against it if you're not confident of its exact props.
 
 ### Hooks
 
