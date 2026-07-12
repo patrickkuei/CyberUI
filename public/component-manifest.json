@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.4.0",
-  "generatedAt": "2026-07-10T06:59:23.331Z",
+  "generatedAt": "2026-07-12T10:38:21.998Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -280,6 +280,88 @@
           "required": false,
           "default": null,
           "description": "Convenience callback that receives the boolean checked value directly.\nMirrors Toggle's onChange API — use this instead of onChange when you only need the value."
+        }
+      ]
+    },
+    {
+      "name": "FormField",
+      "category": "Forms",
+      "sourceFile": "src/components/FormField.tsx",
+      "displayName": "FormField",
+      "description": "A cyberpunk-styled wrapper that gives any form control a consistent\nlabel, helper text, and error/success validation state — without\nrequiring the control itself to know about labels or messages.\n\nBuilt-in CyberUI controls like `Input` and `Select` already manage their\nown label/error wiring; FormField is for wrapping native elements\n(`<textarea>`, a raw `<input>`) or custom/third-party controls that don't.",
+      "docSummary": "Label/helper/error/success wrapper for any form control.",
+      "storybookPath": "components-formfield--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label text rendered above the field."
+        },
+        {
+          "name": "helperText",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Helper text shown below the field. Overridden by `error` or `success` when set."
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message. Overrides `helperText`/`success`, sets validation state to `'error'`, and marks the field `aria-invalid`."
+        },
+        {
+          "name": "success",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Success message. Overrides `helperText` (but not `error`), sets validation state to `'success'`."
+        },
+        {
+          "name": "required",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Marks the field as required — appends a `*` indicator to the label and\nsets `aria-required` on the child control."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables the field — dims the label/message and sets `disabled` on the\nchild control (unless the child already sets its own `disabled` prop,\nwhich takes precedence)."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Font size of the label and helper/error/success message. Supports responsive values."
+        },
+        {
+          "name": "children",
+          "type": "ReactElement<FormFieldChildProps, string | JSXElementConstructor<any>>",
+          "required": true,
+          "default": null,
+          "description": "The form control this field wraps — a single React element that accepts\n`id`, `disabled`, `aria-invalid`, `aria-required`, and `aria-describedby`\n(native form elements, or a custom control that forwards them)."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Id applied to the child control and referenced by the label's `htmlFor`. Auto-generated when omitted."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional class name for the outer wrapper."
         }
       ]
     },

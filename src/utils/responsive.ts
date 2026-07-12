@@ -138,6 +138,18 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "text-sm px-3 py-1.5",
     lg: "text-base px-4 py-2",
   },
+  formField: {
+    label: {
+      sm: "text-xs",
+      md: "text-sm",
+      lg: "text-base",
+    },
+    message: {
+      sm: "text-[11px]",
+      md: "text-xs",
+      lg: "text-sm",
+    },
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults
