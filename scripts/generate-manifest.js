@@ -22,7 +22,7 @@ const CATEGORY_ORDER = ['Forms', 'Layout', 'Feedback', 'Progress', 'Navigation',
 
 const CATEGORY_MAP = {
   Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms',
-  Card: 'Layout', Modal: 'Layout', Divider: 'Layout',
+  Card: 'Layout', Modal: 'Layout', Divider: 'Layout', Accordion: 'Layout',
   Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
   TabNavigation: 'Navigation', Carousel: 'Navigation', Steps: 'Navigation',
@@ -59,6 +59,7 @@ const DOC_SUMMARIES = {
   Timeline: 'Vertical event history display.',
   Tooltip: 'Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.',
   FormField: 'Label/helper/error/success wrapper for any form control.',
+  Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,
