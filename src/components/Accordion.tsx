@@ -173,10 +173,7 @@ const Accordion: React.FC<AccordionProps> = ({
     }
   };
 
-  const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string =>
-    getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.accordion);
-
-  const sizeClasses = getSizeClasses(size);
+  const sizeClasses = getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.accordion);
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
@@ -202,7 +199,6 @@ const Accordion: React.FC<AccordionProps> = ({
                 id={headerId}
                 aria-expanded={isOpen}
                 aria-controls={panelId}
-                aria-disabled={item.disabled || undefined}
                 disabled={item.disabled}
                 onClick={() => toggleItem(item.resolvedId)}
                 onKeyDown={(e) => handleKeyDown(e, index)}
@@ -236,6 +232,7 @@ const Accordion: React.FC<AccordionProps> = ({
                   role="region"
                   aria-labelledby={headerId}
                   aria-hidden={!isOpen}
+                  inert={!isOpen}
                   className="px-4 pb-4 text-sm text-muted"
                 >
                   {item.content}

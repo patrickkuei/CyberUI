@@ -159,4 +159,18 @@ describe('Accordion', () => {
     render(<Accordion items={ITEMS} size={{ base: 'sm', md: 'lg' }} />);
     expect(screen.getByText('Section A')).toBeInTheDocument();
   });
+
+  it('marks a collapsed panel inert so focusable content is unreachable, and clears it when open', () => {
+    const items: AccordionItem[] = [
+      { id: 'a', title: 'Section A', content: <a href="#x">A link</a> },
+    ];
+    render(<Accordion items={items} />);
+    const headerA = screen.getByRole('button', { name: 'Section A' });
+    const panelId = headerA.getAttribute('aria-controls') as string;
+    const panel = document.getElementById(panelId) as HTMLElement;
+    expect(panel).toHaveAttribute('inert');
+
+    fireEvent.click(headerA);
+    expect(panel).not.toHaveAttribute('inert');
+  });
 });
