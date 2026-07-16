@@ -40,6 +40,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | Card | Layout | \`dist/components/Card.d.ts\` |
 | Modal | Layout | \`dist/components/Modal.d.ts\` |
 | Divider | Layout | \`dist/components/Divider.d.ts\` |
+| Accordion | Layout | \`dist/components/Accordion.d.ts\` |
 | Notification | Feedback | \`dist/components/Notification.d.ts\` |
 | Badge | Feedback | \`dist/components/Badge.d.ts\` |
 | Skeleton | Feedback | \`dist/components/Skeleton.d.ts\` |

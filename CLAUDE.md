@@ -31,7 +31,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 | Category    | Components |
 |-------------|-----------|
 | Forms | Button, Input, Toggle, Select, Checkbox, FormField |
-| Layout | Card, Modal, Divider |
+| Layout | Card, Modal, Divider, Accordion |
 | Feedback | Notification, Badge, Skeleton, Tooltip |
 | Progress | CircularProgress, SegmentedProgress, LinearProgress |
 | Navigation | TabNavigation, Carousel, Steps |

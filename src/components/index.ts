@@ -21,6 +21,7 @@ export { default as Divider } from './Divider';
 export { default as Checkbox } from './Checkbox';
 export { default as Tooltip } from './Tooltip';
 export { default as FormField } from './FormField';
+export { default as Accordion } from './Accordion';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -45,6 +46,7 @@ export type { DividerProps } from './Divider';
 export type { CheckboxProps } from './Checkbox';
 export type { TooltipProps, TooltipPlacement } from './Tooltip';
 export type { FormFieldProps, FormFieldState, FormFieldChildProps } from './FormField';
+export type { AccordionProps, AccordionItem } from './Accordion';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

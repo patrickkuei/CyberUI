@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.4.0",
-  "generatedAt": "2026-07-12T10:38:21.998Z",
+  "generatedAt": "2026-07-16T06:24:12.695Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -312,28 +312,28 @@
           "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Error message. Overrides `helperText`/`success`, sets validation state to `'error'`, and marks the field `aria-invalid`."
+          "description": "Error message. Takes priority over `success` and `helperText` (in that order) when more than one is set, sets validation state to `'error'`, and marks the field `aria-invalid`."
         },
         {
           "name": "success",
           "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Success message. Overrides `helperText` (but not `error`), sets validation state to `'success'`."
+          "description": "Success message. Overrides `helperText`, but is itself overridden by `error` when both are set."
         },
         {
           "name": "required",
           "type": "boolean | undefined",
           "required": false,
           "default": false,
-          "description": "Marks the field as required — appends a `*` indicator to the label and\nsets `aria-required` on the child control."
+          "description": "Marks the field as required — appends a `*` indicator to the label (only\nrendered when `label` is also set) and sets `aria-required` on the child\ncontrol."
         },
         {
           "name": "disabled",
           "type": "boolean | undefined",
           "required": false,
           "default": false,
-          "description": "Disables the field — dims the label/message and sets `disabled` on the\nchild control (unless the child already sets its own `disabled` prop,\nwhich takes precedence)."
+          "description": "Disables the field — dims the label/message and sets `disabled` on the\nchild control. The control ends up disabled if either this prop or the\nchild's own `disabled` prop is true."
         },
         {
           "name": "size",
@@ -608,6 +608,67 @@
           "required": false,
           "default": "",
           "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "Accordion",
+      "category": "Layout",
+      "sourceFile": "src/components/Accordion.tsx",
+      "displayName": "CyberUI.Accordion",
+      "description": "A cyberpunk-styled collapsible section list for FAQs, settings panels,\nand other grouped content. Expanded panels get a neon accent border and\na rotating glyph indicator; height transitions are pure CSS (no JS\nmeasuring).",
+      "docSummary": "Collapsible section list. `mode`: `single` (default) or `multiple` open panels.",
+      "storybookPath": "components-accordion--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "items",
+          "type": "AccordionItem[]",
+          "required": true,
+          "default": null,
+          "description": "Sections to render, in order."
+        },
+        {
+          "name": "mode",
+          "type": "\"single\" | \"multiple\" | undefined",
+          "required": false,
+          "default": "single",
+          "description": "Whether one panel or several panels can be open at once.\n- `single`: opening a panel closes any other open panel.\n- `multiple`: panels open and close independently."
+        },
+        {
+          "name": "defaultOpenIds",
+          "type": "string[] | undefined",
+          "required": false,
+          "default": null,
+          "description": "Initial open item id(s) for uncontrolled usage. Ignored when `openIds`\nis provided."
+        },
+        {
+          "name": "openIds",
+          "type": "string[] | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled open item id(s). When set, the Accordion stops managing its\nown open state and `onOpenIdsChange` becomes the only way to react to\nheader toggles."
+        },
+        {
+          "name": "onOpenIdsChange",
+          "type": "((openIds: string[]) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired whenever a header is toggled, with the resulting open id(s) —\na single-element (or empty) array in `single` mode, any length in\n`multiple` mode."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Header padding and text size. Supports responsive values."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer container."
         }
       ]
     },
