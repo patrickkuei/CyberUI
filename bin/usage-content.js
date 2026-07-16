@@ -36,6 +36,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | Toggle | Forms | \`dist/components/Toggle.d.ts\` |
 | Select | Forms | \`dist/components/Select.d.ts\` |
 | Checkbox | Forms | \`dist/components/Checkbox.d.ts\` |
+| FormField | Forms | \`dist/components/FormField.d.ts\` |
 | Card | Layout | \`dist/components/Card.d.ts\` |
 | Modal | Layout | \`dist/components/Modal.d.ts\` |
 | Divider | Layout | \`dist/components/Divider.d.ts\` |

@@ -32,6 +32,7 @@ import "cyberui-2045/styles.css";
 | `Toggle` | Cyberpunk switch. |
 | `Select` | Styled dropdown. |
 | `Checkbox` | Neon-styled checkbox with SVG icons. |
+| `FormField` | Label/helper/error/success wrapper for any form control. |
 | `Card` | Glassmorphism container with borders. |
 | `Modal` | CRT-style modal dialog. |
 | `Divider` | Gradient/solid/dashed content separator. |

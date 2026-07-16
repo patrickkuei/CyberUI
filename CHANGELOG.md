@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - **`Tooltip`** component — a neon-bordered popover that reveals supplemental info on hover or keyboard focus. Supports `placement` (`top`/`bottom`/`left`/`right`, responsive), `variant` (`primary`/`secondary`/`accent`, reusing Button/Card's palette), `size`, a configurable show `delay`, `disabled`, and controlled (`open`/`onOpenChange`) or uncontrolled usage. Wires `aria-describedby` onto the trigger and dismisses on Escape.
+- **`FormField`** component — a generic label/helper-text/error/success wrapper for any form control, for wrapping native elements (`<textarea>`, a raw `<input>`) or custom/third-party controls that don't manage their own label wiring the way `Input`/`Select` already do. Clones its single child to inject `id`, `disabled`, `aria-invalid`, `aria-required`, and a merged `aria-describedby`; adds a `success` validation state (green, via the existing `--color-success` token) alongside `error`, which `Input`/`Select` don't have. Supports `required` (adds a `*` indicator + `aria-required`), `disabled`, and a responsive `size` controlling label/message text size.
 
 ## [2.4.0] - 2026-07-10
 
