@@ -44,7 +44,7 @@ export type { StepsProps, StepItem } from './Steps';
 export type { DividerProps } from './Divider';
 export type { CheckboxProps } from './Checkbox';
 export type { TooltipProps, TooltipPlacement } from './Tooltip';
-export type { FormFieldProps, FormFieldState } from './FormField';
+export type { FormFieldProps, FormFieldState, FormFieldChildProps } from './FormField';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

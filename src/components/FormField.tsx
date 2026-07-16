@@ -8,7 +8,7 @@ import { cn } from '../utils/cn';
  * Any element accepting these (a native `<input>`/`<textarea>`/`<select>`, or a
  * custom control that forwards them) works as a child.
  */
-type FormFieldChildProps = {
+export type FormFieldChildProps = {
   id?: string;
   disabled?: boolean;
   'aria-invalid'?: boolean | 'true' | 'false';
@@ -29,20 +29,21 @@ export interface FormFieldProps {
   label?: string;
   /** Helper text shown below the field. Overridden by `error` or `success` when set. */
   helperText?: string;
-  /** Error message. Overrides `helperText`/`success`, sets validation state to `'error'`, and marks the field `aria-invalid`. */
+  /** Error message. Takes priority over `success` and `helperText` (in that order) when more than one is set, sets validation state to `'error'`, and marks the field `aria-invalid`. */
   error?: string;
-  /** Success message. Overrides `helperText` (but not `error`), sets validation state to `'success'`. */
+  /** Success message. Overrides `helperText`, but is itself overridden by `error` when both are set. */
   success?: string;
   /**
-   * Marks the field as required — appends a `*` indicator to the label and
-   * sets `aria-required` on the child control.
+   * Marks the field as required — appends a `*` indicator to the label (only
+   * rendered when `label` is also set) and sets `aria-required` on the child
+   * control.
    * @default false
    */
   required?: boolean;
   /**
    * Disables the field — dims the label/message and sets `disabled` on the
-   * child control (unless the child already sets its own `disabled` prop,
-   * which takes precedence).
+   * child control. The control ends up disabled if either this prop or the
+   * child's own `disabled` prop is true.
    * @default false
    */
   disabled?: boolean;
@@ -142,7 +143,7 @@ const FormField: React.FC<FormFieldProps> = ({
 
   const field = React.cloneElement(children, {
     id: fieldId,
-    disabled: children.props.disabled ?? disabled,
+    disabled: disabled || !!children.props.disabled,
     'aria-invalid': state === 'error' || undefined,
     'aria-required': required || undefined,
     'aria-describedby': describedBy,

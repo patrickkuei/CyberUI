@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import FormField from './FormField';
 
-const fieldInputClasses =
+const fieldClasses =
   'w-full rounded-lg bg-surface text-default placeholder-muted border-2 border-accent px-4 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent';
 
 const meta: Meta<typeof FormField> = {
@@ -15,6 +15,12 @@ const meta: Meta<typeof FormField> = {
 
 Built-in CyberUI controls like \`Input\` and \`Select\` already manage their own label/error wiring; \`FormField\` is for wrapping native elements (\`<textarea>\`, a raw \`<input>\`) or custom/third-party controls that don't.
 
+**When to use \`Input\`/\`Select\` vs \`FormField\`:**
+
+- **Use \`Input\`/\`Select\` directly** whenever your control is one of those two. They already accept \`label\`/\`helperText\`/\`error\`, and their border/background actively react to their own \`error\` prop — you get more polished, integrated visual feedback for less code. Don't wrap them in \`FormField\`; the two systems would be redundant and \`FormField\` won't add anything (only clutter the DOM with an extra label).
+- **Use \`FormField\`** only for what \`Input\`/\`Select\` don't cover: a native \`<textarea>\`, a native \`<input type="range">\`/\`type="date"\`, or a third-party/custom control (date picker, rich text editor, combobox) that doesn't manage its own label wiring.
+- **Know the limit:** \`FormField\` only recolors the *label* and *helper/error/success message* text, and sets \`aria-invalid\`/\`aria-required\`/\`aria-describedby\` on the child. It has no way to restyle the child's own border/background on error/success, since it doesn't own that element's class list. If you want the wrapped control itself to visually flag an error (e.g. a red border), wire that up yourself — conditionally apply your own error class based on the same \`error\`/\`success\` value you pass to \`FormField\`.
+
 **Usage:**
 
 \`\`\`tsx
@@ -23,7 +29,7 @@ import { FormField } from 'cyberui-2045';
 import 'cyberui-2045/styles.css';
 
 <FormField label="Transmission Log" helperText="Max 500 characters">
-  <textarea className="w-full rounded-lg bg-surface border-2 border-accent p-3" />
+  <textarea maxLength={500} className="w-full rounded-lg bg-surface border-2 border-accent p-3" />
 </FormField>
 
 <FormField label="Access Code" error="Invalid — access denied">
@@ -98,7 +104,7 @@ export const Default: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <input className={fieldInputClasses} placeholder="Enter callsign..." />
+        <input className={fieldClasses} placeholder="Enter callsign..." />
       </FormField>
     </div>
   ),
@@ -112,7 +118,7 @@ export const ErrorState: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <input className={fieldInputClasses} defaultValue="000-XXX" />
+        <input className={fieldClasses} defaultValue="000-XXX" />
       </FormField>
     </div>
   ),
@@ -126,7 +132,7 @@ export const SuccessState: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <input className={fieldInputClasses} defaultValue="synced" />
+        <input className={fieldClasses} defaultValue="synced" />
       </FormField>
     </div>
   ),
@@ -141,7 +147,7 @@ export const Required: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <input className={fieldInputClasses} placeholder="Enter designation..." />
+        <input className={fieldClasses} placeholder="Enter designation..." />
       </FormField>
     </div>
   ),
@@ -156,7 +162,7 @@ export const Disabled: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <input className={fieldInputClasses} defaultValue="connection_lost" />
+        <input className={fieldClasses} defaultValue="connection_lost" />
       </FormField>
     </div>
   ),
@@ -170,7 +176,7 @@ export const WithTextarea: Story = {
   render: (args) => (
     <div className="min-w-96">
       <FormField {...args}>
-        <textarea className={fieldInputClasses} rows={4} placeholder="Log transmission details..." />
+        <textarea className={fieldClasses} rows={4} maxLength={500} placeholder="Log transmission details..." />
       </FormField>
     </div>
   ),
@@ -180,13 +186,13 @@ export const Sizes: Story = {
   render: () => (
     <div className="flex flex-col gap-6 p-6 bg-base min-w-96">
       <FormField label="Small Field" size="sm" helperText="Compact label and message text">
-        <input className={fieldInputClasses} placeholder="Small..." />
+        <input className={fieldClasses} placeholder="Small..." />
       </FormField>
       <FormField label="Medium Field" size="md" helperText="Default label and message text">
-        <input className={fieldInputClasses} placeholder="Medium..." />
+        <input className={fieldClasses} placeholder="Medium..." />
       </FormField>
       <FormField label="Large Field" size="lg" helperText="Large label and message text">
-        <input className={fieldInputClasses} placeholder="Large..." />
+        <input className={fieldClasses} placeholder="Large..." />
       </FormField>
     </div>
   ),
@@ -198,23 +204,23 @@ export const AllVariants: Story = {
       <h4 className="text-secondary font-semibold">FormField Validation States</h4>
 
       <FormField label="Default State" helperText="Awaiting neural input...">
-        <input className={fieldInputClasses} placeholder="Enter command..." />
+        <input className={fieldClasses} placeholder="Enter command..." />
       </FormField>
 
       <FormField label="Required Field" required helperText="Required for grid clearance">
-        <input className={fieldInputClasses} placeholder="Enter designation..." />
+        <input className={fieldClasses} placeholder="Enter designation..." />
       </FormField>
 
       <FormField label="Error State" error="Invalid sequence — access denied">
-        <input className={fieldInputClasses} defaultValue="000-XXX" />
+        <input className={fieldClasses} defaultValue="000-XXX" />
       </FormField>
 
       <FormField label="Success State" success="Handshake verified — link established">
-        <input className={fieldInputClasses} defaultValue="synced" />
+        <input className={fieldClasses} defaultValue="synced" />
       </FormField>
 
       <FormField label="Disabled State" helperText="Neural interface disconnected" disabled>
-        <input className={fieldInputClasses} defaultValue="connection_lost" />
+        <input className={fieldClasses} defaultValue="connection_lost" />
       </FormField>
     </div>
   ),

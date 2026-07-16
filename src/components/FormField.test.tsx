@@ -116,7 +116,7 @@ describe('FormField Component', () => {
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
-  it("does not override a child's own explicit disabled prop", () => {
+  it("honors a child's own explicit disabled prop even when FormField itself isn't disabled", () => {
     render(
       <FormField label="System Online" disabled={false}>
         <input disabled />
@@ -125,13 +125,43 @@ describe('FormField Component', () => {
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
+  it('disables the child even if the child explicitly sets disabled={false}', () => {
+    render(
+      <FormField label="System Offline" disabled>
+        <input disabled={false} />
+      </FormField>
+    );
+    expect(screen.getByRole('textbox')).toBeDisabled();
+  });
+
+  it('prioritizes error over success when both are set', () => {
+    render(
+      <FormField label="Access Code" success="All clear" error="Access denied">
+        <input />
+      </FormField>
+    );
+    expect(screen.getByText('Access denied')).toBeInTheDocument();
+    expect(screen.queryByText('All clear')).not.toBeInTheDocument();
+    expect(screen.getByRole('textbox')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('prioritizes success over helperText when both are set', () => {
+    render(
+      <FormField label="Handshake" helperText="Awaiting input" success="Link established">
+        <input />
+      </FormField>
+    );
+    expect(screen.getByText('Link established')).toBeInTheDocument();
+    expect(screen.queryByText('Awaiting input')).not.toBeInTheDocument();
+  });
+
   it('renders without a label when none is provided', () => {
     render(
       <FormField helperText="No label here">
         <input />
       </FormField>
     );
-    expect(screen.queryByRole('label')).not.toBeInTheDocument();
+    expect(document.querySelector('label')).not.toBeInTheDocument();
     expect(screen.getByText('No label here')).toBeInTheDocument();
   });
 
