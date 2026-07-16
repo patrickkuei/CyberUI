@@ -16,9 +16,9 @@ npm install cyberui-2045
 ```
 
 <!-- cyberui-2045:manifest:start -->
-## Components (23)
+## Components (24)
 - Forms: `Button`, `Input`, `Toggle`, `Select`, `Checkbox`, `FormField`
-- Layout: `Card`, `Modal`, `Divider`
+- Layout: `Card`, `Modal`, `Divider`, `Accordion`
 - Feedback: `Notification`, `Badge`, `Skeleton`, `Tooltip`
 - Progress: `CircularProgress`, `SegmentedProgress`, `LinearProgress`
 - Navigation: `TabNavigation`, `Carousel`, `Steps`
