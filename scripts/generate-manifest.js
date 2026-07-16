@@ -28,7 +28,7 @@ const CATEGORY_MAP = {
   TabNavigation: 'Navigation', Carousel: 'Navigation', Steps: 'Navigation',
   GradientText: 'Typography', SectionTitle: 'Typography',
   Timeline: 'Display',
-  Image: 'Media',
+  Image: 'Media', Avatar: 'Media',
 };
 
 // Hand-curated one-liners, pre-seeded from today's AGENT.md/llms.txt copy.
@@ -60,6 +60,7 @@ const DOC_SUMMARIES = {
   Tooltip: 'Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.',
   FormField: 'Label/helper/error/success wrapper for any form control.',
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
+  Avatar: 'Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,

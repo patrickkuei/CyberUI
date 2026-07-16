@@ -67,6 +67,7 @@ function App() {
 | SectionTitle | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs) |
 | Timeline | Display | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs) |
 | Image | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs) |
+| Avatar | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-avatar--docs) |
 
 Also includes hooks (`useCyberScrollbar`, `useCyberNotifications`, `useAnimatedProgress`) and `CyberNotificationProvider` context.
 <!-- cyberui-2045:manifest:end -->
