@@ -56,6 +56,17 @@ describe('Avatar Component', () => {
     expect(screen.getAllByText('CP').length).toBeGreaterThan(0);
   });
 
+  it('retries a new src after a previous src failed to load', () => {
+    const { rerender } = render(<Avatar src="/broken.png" alt="Case Pollard" />);
+    fireEvent.error(document.querySelector('img')!);
+    expect(document.querySelector('img')).not.toBeInTheDocument();
+
+    rerender(<Avatar src="/operatives/case.png" alt="Case Pollard" />);
+    const image = document.querySelector('img');
+    expect(image).toBeInTheDocument();
+    expect(image).toHaveAttribute('src', '/operatives/case.png');
+  });
+
   it('renders no status dot by default', () => {
     render(<Avatar alt="Ghost" />);
     expect(screen.queryByRole('status')).not.toBeInTheDocument();

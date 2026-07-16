@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 import { cn } from '../utils/cn';
@@ -102,6 +102,12 @@ const Avatar: React.FC<AvatarProps> = ({
 }) => {
   const [imageError, setImageError] = useState(false);
 
+  // Reset the error flag when `src` changes so a later valid URL isn't
+  // permanently blocked by an earlier failed load on the same instance.
+  useEffect(() => {
+    setImageError(false);
+  }, [src]);
+
   const showImage = !!src && !imageError;
   const resolvedInitials = initials ?? deriveInitials(alt);
 
@@ -146,7 +152,10 @@ const Avatar: React.FC<AvatarProps> = ({
             </span>
           </span>
         ) : (
-          <span className="text-accent" aria-hidden="true">
+          <span
+            className="flex h-full w-full items-center justify-center text-accent"
+            aria-hidden="true"
+          >
             {fallbackIcon ?? (
               <svg
                 viewBox="0 0 24 24"
