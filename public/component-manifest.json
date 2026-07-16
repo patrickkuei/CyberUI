@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.4.0",
-  "generatedAt": "2026-07-16T06:24:12.695Z",
+  "generatedAt": "2026-07-16T07:12:50.077Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -1628,6 +1628,67 @@
           "required": false,
           "default": null,
           "description": "Fired when image fails to load"
+        }
+      ]
+    },
+    {
+      "name": "Avatar",
+      "category": "Media",
+      "sourceFile": "src/components/Avatar.tsx",
+      "displayName": "Avatar",
+      "description": "A cyberpunk-styled circular avatar for user profile images, comment threads,\nand team lists. Falls back to glitch-style initials (or a custom icon) when\nno image is available, and can surface a glowing online/offline/away status dot.",
+      "docSummary": "Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot.",
+      "storybookPath": "components-avatar--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "src",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Image source URL. When omitted, or when the image fails to load,\nthe avatar falls back to `initials` (or initials derived from `alt`)\n— or to `fallbackIcon` if no initials can be derived."
+        },
+        {
+          "name": "alt",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "description": "Accessible name for the avatar, and the source for auto-derived initials\n(e.g. \"Case Pollard\" → \"CP\"). Required for screen reader users even\nwhen `src` is set."
+        },
+        {
+          "name": "initials",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Explicit fallback initials (max 2 characters shown). Overrides initials\nderived from `alt`. Useful when `alt` is a full sentence rather than a name."
+        },
+        {
+          "name": "fallbackIcon",
+          "type": "ReactNode",
+          "required": false,
+          "default": null,
+          "description": "Custom fallback content rendered when there's no `src` (or it fails to\nload) and no initials can be derived. Defaults to a generic operative icon."
+        },
+        {
+          "name": "status",
+          "type": "AvatarStatus | undefined",
+          "required": false,
+          "default": null,
+          "description": "Presence indicator dot rendered on the bottom-right edge. Omit to render\nno indicator at all."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\" | \"xl\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the avatar circle."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Optional custom class name applied to the outer container."
         }
       ]
     }

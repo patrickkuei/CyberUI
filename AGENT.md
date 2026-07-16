@@ -51,6 +51,7 @@ import "cyberui-2045/styles.css";
 | `SectionTitle` | Title with decorative gradient line. |
 | `Timeline` | Vertical event history display. |
 | `Image` | Image with cyberpunk frame/effects. |
+| `Avatar` | Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot. |
 <!-- cyberui-2045:manifest:end -->
 
 ## 4. Usage Patterns (Few-Shot)

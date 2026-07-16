@@ -155,6 +155,12 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "px-4 py-3 text-base",
     lg: "px-5 py-4 text-lg",
   },
+  avatar: {
+    sm: "w-8 h-8 text-xs",
+    md: "w-12 h-12 text-sm",
+    lg: "w-16 h-16 text-lg",
+    xl: "w-24 h-24 text-2xl",
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults

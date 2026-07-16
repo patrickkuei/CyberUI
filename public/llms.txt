@@ -16,7 +16,7 @@ npm install cyberui-2045
 ```
 
 <!-- cyberui-2045:manifest:start -->
-## Components (24)
+## Components (25)
 - Forms: `Button`, `Input`, `Toggle`, `Select`, `Checkbox`, `FormField`
 - Layout: `Card`, `Modal`, `Divider`, `Accordion`
 - Feedback: `Notification`, `Badge`, `Skeleton`, `Tooltip`
@@ -24,7 +24,7 @@ npm install cyberui-2045
 - Navigation: `TabNavigation`, `Carousel`, `Steps`
 - Typography: `GradientText`, `SectionTitle`
 - Display: `Timeline`
-- Media: `Image`
+- Media: `Image`, `Avatar`
 
 ## Hooks & Context
 - `useCyberScrollbar`: applies cyberpunk scrollbar styling to a scrollable ref.

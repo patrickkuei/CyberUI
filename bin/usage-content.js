@@ -55,6 +55,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | SectionTitle | Typography | \`dist/components/SectionTitle.d.ts\` |
 | Timeline | Display | \`dist/components/Timeline.d.ts\` |
 | Image | Media | \`dist/components/Image.d.ts\` |
+| Avatar | Media | \`dist/components/Avatar.d.ts\` |
 <!-- cyberui-2045:manifest:end -->
 
 ### Critical API notes
