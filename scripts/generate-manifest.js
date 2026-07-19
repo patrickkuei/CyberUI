@@ -21,7 +21,7 @@ const ROOT = join(__dirname, '..');
 const CATEGORY_ORDER = ['Forms', 'Layout', 'Feedback', 'Progress', 'Navigation', 'Typography', 'Display', 'Media'];
 
 const CATEGORY_MAP = {
-  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms',
+  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms', RadioGroup: 'Forms',
   Card: 'Layout', Modal: 'Layout', Divider: 'Layout', Accordion: 'Layout',
   Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
@@ -61,6 +61,7 @@ const DOC_SUMMARIES = {
   FormField: 'Label/helper/error/success wrapper for any form control.',
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
   Avatar: 'Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot.',
+  RadioGroup: 'Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,

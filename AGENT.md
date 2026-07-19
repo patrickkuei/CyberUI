@@ -33,6 +33,7 @@ import "cyberui-2045/styles.css";
 | `Select` | Styled dropdown. |
 | `Checkbox` | Neon-styled checkbox with SVG icons. |
 | `FormField` | Label/helper/error/success wrapper for any form control. |
+| `RadioGroup` | Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex. |
 | `Card` | Glassmorphism container with borders. |
 | `Modal` | CRT-style modal dialog. |
 | `Divider` | Gradient/solid/dashed content separator. |

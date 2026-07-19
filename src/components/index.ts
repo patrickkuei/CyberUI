@@ -23,6 +23,7 @@ export { default as Tooltip } from './Tooltip';
 export { default as FormField } from './FormField';
 export { default as Accordion } from './Accordion';
 export { default as Avatar } from './Avatar';
+export { default as RadioGroup } from './RadioGroup';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -49,6 +50,7 @@ export type { TooltipProps, TooltipPlacement } from './Tooltip';
 export type { FormFieldProps, FormFieldState, FormFieldChildProps } from './FormField';
 export type { AccordionProps, AccordionItem } from './Accordion';
 export type { AvatarProps, AvatarStatus } from './Avatar';
+export type { RadioGroupProps, RadioOption } from './RadioGroup';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
