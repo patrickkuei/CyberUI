@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.5.0] - 2026-07-23
+
 ### Added
 
 - **`Accordion`** component — a collapsible section list for FAQs, settings panels, and grouped content. `items` takes `{ id?, title, content, disabled? }` pairs; `mode` controls whether `single` (default, opening one panel closes any other) or `multiple` panels can be open at once, with `defaultOpenIds`/`openIds`/`onOpenIdsChange` for uncontrolled or controlled usage. Keyboard support follows the WAI-ARIA accordion pattern: `ArrowDown`/`ArrowUp` move focus between headers (wrapping, and skipping disabled items), `Home`/`End` jump to the first/last header, `Enter`/`Space` toggle natively via the underlying `<button>`. Each header wires `aria-expanded`/`aria-controls`, and each panel gets `role="region"`/`aria-labelledby`/`aria-hidden`, plus `inert` while collapsed so focusable panel content can't be tabbed into while hidden. Height transitions use a pure-CSS `grid-template-rows` 0fr/1fr trick (no JS measuring, no new dependency). Expanded panels get an accent neon border/glow and the trailing chevron rotates 180°, matching the existing token system.

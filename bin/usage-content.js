@@ -1,7 +1,7 @@
 // Consumer-facing AI usage guide for cyberui-2045.
 // Injected into CLAUDE.md / .cursorrules / copilot-instructions.md by `init`.
 
-export function getUsageContent(version = '2.4.0') {
+export function getUsageContent(version = '2.5.0') {
   return `## CyberUI (cyberui-2045 v${version})
 
 Cyberpunk-themed React UI library. Docs & live examples: https://patrickkuei.github.io/CyberUI/storybook/
