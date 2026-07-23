@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.4.0",
-  "generatedAt": "2026-07-16T07:12:50.077Z",
+  "generatedAt": "2026-07-19T06:09:35.742Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -362,6 +362,102 @@
           "required": false,
           "default": "",
           "description": "Additional class name for the outer wrapper."
+        }
+      ]
+    },
+    {
+      "name": "RadioGroup",
+      "category": "Forms",
+      "sourceFile": "src/components/RadioGroup.tsx",
+      "displayName": "RadioGroup",
+      "description": "A cyberpunk-styled radio group for mutually-exclusive single-choice\nselection, matching Checkbox's neon SVG icon treatment. Supports both\ncontrolled and uncontrolled modes, and arrow-key navigation between\noptions via a roving tabindex.",
+      "docSummary": "Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex.",
+      "storybookPath": "components-radiogroup--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "options",
+          "type": "RadioOption[]",
+          "required": true,
+          "default": null,
+          "description": "Options to render, in order."
+        },
+        {
+          "name": "value",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled selected value. When set, RadioGroup stops managing its own\nselection state and `onValueChange` becomes the only way to react to\noption changes."
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Initial selected value for uncontrolled usage. Ignored when `value` is\nprovided."
+        },
+        {
+          "name": "onValueChange",
+          "type": "((value: string) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired with the newly selected option's value whenever selection changes."
+        },
+        {
+          "name": "name",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Name for the underlying native `<input type=\"radio\">` group. Auto-generated\nwhen omitted — pass an explicit name if this RadioGroup is submitted\ninside a native `<form>` and the field name matters server-side."
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Group label, rendered as a `<legend>` above the options."
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message to display below the options."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of each radio dot and its label. Supports responsive values."
+        },
+        {
+          "name": "orientation",
+          "type": "ResponsiveValue<\"horizontal\" | \"vertical\"> | undefined",
+          "required": false,
+          "default": "vertical",
+          "description": "Layout direction of the options. Supports responsive values."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables every option in the group."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer `<fieldset>`."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional id override for the group's `<fieldset>` element."
         }
       ]
     },
