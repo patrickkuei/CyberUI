@@ -78,6 +78,12 @@ const labelSizeMap = {
   lg: 'text-base',
 };
 
+const legendSizeMap = {
+  sm: 'text-sm',
+  md: 'text-base',
+  lg: 'text-lg',
+};
+
 const orientationMap = {
   horizontal: 'flex-row flex-wrap gap-x-6 gap-y-3',
   vertical: 'flex-col gap-3',
@@ -187,6 +193,7 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
 
   const dotSizeClasses = getResponsiveClasses(size, sizeMap);
   const labelSizeClasses = getResponsiveClasses(size, labelSizeMap);
+  const legendSizeClasses = getResponsiveClasses(size, legendSizeMap);
   const orientationClasses = getResponsiveClasses(orientation, orientationMap);
 
   const firstEnabledIndex = options.findIndex((option) => !option.disabled);
@@ -196,11 +203,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
       id={groupId}
       className={cn('flex flex-col gap-2 border-0 m-0 p-0', className, disabled && 'opacity-50 cursor-not-allowed')}
       disabled={disabled}
-      aria-label={!label ? groupName : undefined}
-      aria-describedby={error ? `${groupId}-error` : undefined}
+      aria-label={!label && name ? name : undefined}
+      aria-describedby={error && !disabled ? `${groupId}-error` : undefined}
     >
       {label && (
-        <legend className={cn('p-0 text-sm font-medium', error ? 'text-error' : 'text-default')}>
+        <legend className={cn('p-0 mb-2 font-medium', legendSizeClasses, error ? 'text-error' : 'text-default')}>
           {label}
         </legend>
       )}
@@ -235,11 +242,11 @@ const RadioGroup: React.FC<RadioGroupProps> = ({
                   tabIndex={isTabbable ? 0 : -1}
                   onChange={() => handleChange(option.value, option.disabled)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="absolute opacity-0 w-0 h-0"
+                  className="peer absolute opacity-0 w-0 h-0"
                 />
 
                 <svg
-                  className="absolute inset-0 w-full h-full pointer-events-none"
+                  className="absolute inset-0 w-full h-full pointer-events-none rounded-full peer-focus-visible:ring-2 peer-focus-visible:ring-secondary"
                   viewBox="0 0 20 20"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"

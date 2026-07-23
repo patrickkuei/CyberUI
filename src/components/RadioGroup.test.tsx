@@ -162,8 +162,29 @@ describe('RadioGroup', () => {
   });
 
   it('does not render error message when disabled', () => {
-    render(<RadioGroup options={OPTIONS} error="Selection required" disabled />);
+    render(<RadioGroup options={OPTIONS} label="Access Tier" error="Selection required" disabled />);
     expect(screen.queryByText('Selection required')).toBeNull();
+    const fieldset = screen.getByText('Access Tier').closest('fieldset') as HTMLElement;
+    expect(fieldset).not.toHaveAttribute('aria-describedby');
+  });
+
+  it('does not set a meaningless auto-generated aria-label when no label or name is given', () => {
+    render(<RadioGroup options={OPTIONS} />);
+    expect(screen.getByRole('group')).not.toHaveAttribute('aria-label');
+  });
+
+  it('uses the explicit name as aria-label fallback when no label is given', () => {
+    render(<RadioGroup options={OPTIONS} name="tier" />);
+    expect(screen.getByRole('group')).toHaveAttribute('aria-label', 'tier');
+  });
+
+  it('wires a visible keyboard focus ring on each option', () => {
+    render(<RadioGroup options={OPTIONS} />);
+    const streetInput = screen.getByRole('radio', { name: 'Street' });
+    expect(streetInput).toHaveClass('peer');
+    const dot = streetInput.nextElementSibling as HTMLElement;
+    expect(dot.tagName.toLowerCase()).toBe('svg');
+    expect(dot).toHaveClass('peer-focus-visible:ring-2', 'peer-focus-visible:ring-secondary');
   });
 
   it('shares a common name attribute across all option inputs', () => {

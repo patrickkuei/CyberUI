@@ -227,7 +227,11 @@ export const AllVariants: Story = {
       </div>
       <div>
         <h4 className="text-secondary font-semibold mb-3">Error state</h4>
-        <RadioGroup label="Security Protocol" error="You must select a clearance tier to continue" />
+        <RadioGroup
+          label="Security Protocol"
+          options={CLEARANCE_OPTIONS}
+          error="You must select a clearance tier to continue"
+        />
       </div>
     </div>
   ),
