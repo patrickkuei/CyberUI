@@ -25,7 +25,7 @@ const CATEGORY_MAP = {
   Card: 'Layout', Modal: 'Layout', Divider: 'Layout', Accordion: 'Layout',
   Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
-  TabNavigation: 'Navigation', Carousel: 'Navigation', Steps: 'Navigation',
+  TabNavigation: 'Navigation', Carousel: 'Navigation', Steps: 'Navigation', DropdownMenu: 'Navigation',
   GradientText: 'Typography', SectionTitle: 'Typography',
   Timeline: 'Display',
   Image: 'Media', Avatar: 'Media',
@@ -62,6 +62,7 @@ const DOC_SUMMARIES = {
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
   Avatar: 'Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot.',
   RadioGroup: 'Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex.',
+  DropdownMenu: 'Dropdown/context menu anchored to a trigger element. Arrow-key navigation, `danger` item styling, click-outside/Escape dismissal.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,
