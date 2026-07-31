@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packageVersion": "2.4.0",
-  "generatedAt": "2026-07-23T09:48:52.965Z",
+  "packageVersion": "2.5.0",
+  "generatedAt": "2026-07-26T06:11:37.769Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -1501,6 +1501,95 @@
           "required": false,
           "default": "",
           "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "DropdownMenu",
+      "category": "Navigation",
+      "sourceFile": "src/components/DropdownMenu.tsx",
+      "displayName": "DropdownMenu",
+      "description": "A cyberpunk-styled dropdown/context menu anchored to a trigger element,\nreusing TabNavigation's dropdown anchor+menu pattern (click-outside close,\nviewport-aware alignment, staged open/close transition) with full arrow-key\nnavigation and single/danger item styling.",
+      "docSummary": "Dropdown/context menu anchored to a trigger element. Arrow-key navigation, `danger` item styling, click-outside/Escape dismissal.",
+      "storybookPath": "components-dropdownmenu--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "items",
+          "type": "DropdownMenuItem[]",
+          "required": true,
+          "default": null,
+          "description": "Actions to render, in order."
+        },
+        {
+          "name": "trigger",
+          "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ((triggerProps: DropdownMenuTriggerProps) => ReactElement<...>)",
+          "required": true,
+          "default": null,
+          "description": "The trigger that opens the menu. Pass a single React element (e.g. a\n`Button`) to have it cloned with the required `onClick`/`aria-*`\nwiring, or a render prop for full control over how those props are\napplied.\n@example // Element trigger\n<DropdownMenu trigger={<Button variant=\"secondary\">Actions</Button>} items={items} />\n@example // Render-prop trigger\n<DropdownMenu\n  trigger={(triggerProps) => <button {...triggerProps}>Actions</button>}\n  items={items}\n/>"
+        },
+        {
+          "name": "align",
+          "type": "\"start\" | \"end\" | undefined",
+          "required": false,
+          "default": "start",
+          "description": "Horizontal alignment of the menu panel relative to the trigger.\nAutomatically flips to `end` if the panel would overflow the right\nedge of the viewport when opened."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Padding and text size of each menu item. Supports responsive values."
+        },
+        {
+          "name": "closeOnSelect",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether selecting an item closes the menu."
+        },
+        {
+          "name": "open",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled open state. When set, DropdownMenu stops managing its own\nopen state and `onOpenChange` becomes the only way to react to\ntrigger clicks, item selection, Escape, and outside clicks."
+        },
+        {
+          "name": "onOpenChange",
+          "type": "((open: boolean) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired whenever a trigger click, item selection, Escape, or outside click would change visibility."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables the trigger and prevents the menu from opening."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": "Menu",
+          "description": "Accessible label for the menu panel (`aria-label`)."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer wrapper."
+        },
+        {
+          "name": "menuClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the menu panel."
         }
       ]
     },
