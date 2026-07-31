@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`DropdownMenu`** component — a cyberpunk-styled dropdown/context menu anchored to a trigger element, for row actions and context menus attached to a button. Reuses `TabNavigation`'s dropdown anchor+menu pattern internally (click-outside close, viewport-aware alignment, staged open/close transition). `trigger` accepts either a single React element (cloned with the required `onClick`/`aria-*` wiring) or a render prop for full control. `items` takes `{ label, icon?, onClick?, disabled?, danger? }` entries, with `danger` reusing `Button`'s destructive-action styling. Supports controlled (`open`/`onOpenChange`) or uncontrolled usage, `align` (`start`/`end`, auto-flips on overflow), and a responsive `size` (new `RESPONSIVE_SIZE_MAPS.dropdownMenu` entry). Full keyboard support: `ArrowDown`/`ArrowUp` on the trigger opens the menu focused on the first/last item; inside the menu, `ArrowDown`/`ArrowUp` move focus via roving tabindex (wrapping, skipping disabled items), `Home`/`End` jump to the first/last item, `Enter`/`Space` activates the focused item, and `Escape` closes the menu and returns focus to the trigger.
+
 ## [2.5.0] - 2026-07-23
 
 ### Added
