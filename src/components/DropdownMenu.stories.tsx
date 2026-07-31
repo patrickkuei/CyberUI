@@ -1,8 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { useState } from 'react';
 import DropdownMenu from './DropdownMenu';
-import type { DropdownMenuItem } from './DropdownMenu';
+import type { DropdownMenuItem, DropdownMenuProps } from './DropdownMenu';
 import Button from './Button';
+
+/**
+ * Wraps DropdownMenu with real controlled state (defaulting open) so
+ * "always open" demo stories still close correctly on outside click,
+ * Escape, or item selection instead of snapping back open.
+ */
+const OpenDemo = (props: Omit<DropdownMenuProps, 'open' | 'onOpenChange'>) => {
+  const [open, setOpen] = useState(true);
+  return <DropdownMenu {...props} open={open} onOpenChange={setOpen} />;
+};
 
 const ROW_ACTIONS: DropdownMenuItem[] = [
   { label: 'Edit Profile', onClick: () => {} },
@@ -103,7 +113,6 @@ const [open, setOpen] = React.useState(false);
   },
   args: {
     items: ROW_ACTIONS,
-    open: true,
   },
 } satisfies Meta<typeof DropdownMenu>;
 
@@ -115,54 +124,60 @@ export const Default: Story = {
     align: 'start',
     size: 'md',
   },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button variant="secondary">Row Actions</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button variant="secondary">Row Actions</Button>} />
     </div>
   ),
 };
 
 export const AlignStart: Story = {
   args: { align: 'start' },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button variant="secondary">Left-Aligned</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button variant="secondary">Left-Aligned</Button>} />
     </div>
   ),
 };
 
 export const AlignEnd: Story = {
   args: { align: 'end' },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20 flex justify-end w-96">
-      <DropdownMenu {...args} trigger={<Button variant="secondary">Right-Aligned</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-end w-96">
+      <OpenDemo {...args} trigger={<Button variant="secondary">Right-Aligned</Button>} />
     </div>
   ),
 };
 
 export const Small: Story = {
-  args: { size: 'sm', items: SYSTEM_ACTIONS },
+  args: { size: 'sm' },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button size="sm" variant="secondary">System</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button size="sm" variant="secondary">Row Actions</Button>} />
     </div>
   ),
 };
 
 export const Medium: Story = {
-  args: { size: 'md', items: SYSTEM_ACTIONS },
+  args: { size: 'md' },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button size="md" variant="secondary">System</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button size="md" variant="secondary">Row Actions</Button>} />
     </div>
   ),
 };
 
 export const Large: Story = {
-  args: { size: 'lg', items: SYSTEM_ACTIONS },
+  args: { size: 'lg' },
+  parameters: { layout: 'padded' },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button size="lg" variant="secondary">System</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button size="lg" variant="secondary">Row Actions</Button>} />
     </div>
   ),
 };
@@ -179,6 +194,7 @@ export const Disabled: Story = {
 export const WithDangerAndDisabledItems: Story = {
   args: { items: SYSTEM_ACTIONS },
   parameters: {
+    layout: 'padded',
     docs: {
       description: {
         story: '"Firmware Update" is locked and skipped by keyboard navigation; "Purge Local Cache" is a destructive action styled with the `danger` treatment.',
@@ -186,17 +202,16 @@ export const WithDangerAndDisabledItems: Story = {
     },
   },
   render: (args) => (
-    <div className="p-20">
-      <DropdownMenu {...args} trigger={<Button variant="secondary">System</Button>} />
+    <div className="min-h-[320px] pt-4 flex items-start justify-center">
+      <OpenDemo {...args} trigger={<Button variant="secondary">System</Button>} />
     </div>
   ),
 };
 
 export const Interactive: Story = {
   args: {
-    // Overrides meta's forced `open: true` so this story runs uncontrolled —
-    // click the trigger below, or focus it and press ArrowDown/ArrowUp/Enter/Escape.
-    open: undefined,
+    // Runs uncontrolled (no `open` in meta.args anymore) — click the
+    // trigger below, or focus it and press ArrowDown/ArrowUp/Enter/Escape.
     items: ROW_ACTIONS,
   },
   parameters: {
@@ -241,27 +256,28 @@ export const ControlledDemo: Story = {
 };
 
 export const AllVariants: Story = {
+  parameters: { layout: 'padded' },
   render: () => (
-    <div className="flex flex-col gap-16 p-16 bg-base">
+    <div className="flex flex-col gap-64 p-16 bg-base">
       <div>
         <h4 className="text-secondary font-semibold mb-4">Alignment</h4>
         <div className="flex gap-16 flex-wrap items-start">
-          <DropdownMenu open items={ROW_ACTIONS} align="start" trigger={<Button variant="secondary">Start</Button>} />
-          <DropdownMenu open items={ROW_ACTIONS} align="end" trigger={<Button variant="secondary">End</Button>} />
+          <OpenDemo items={ROW_ACTIONS} align="start" trigger={<Button variant="secondary">Start</Button>} />
+          <OpenDemo items={ROW_ACTIONS} align="end" trigger={<Button variant="secondary">End</Button>} />
         </div>
       </div>
       <div>
         <h4 className="text-secondary font-semibold mb-4">Sizes</h4>
         <div className="flex gap-16 flex-wrap items-start">
-          <DropdownMenu open size="sm" items={ROW_ACTIONS} trigger={<Button size="sm" variant="secondary">SM</Button>} />
-          <DropdownMenu open size="md" items={ROW_ACTIONS} trigger={<Button size="md" variant="secondary">MD</Button>} />
-          <DropdownMenu open size="lg" items={ROW_ACTIONS} trigger={<Button size="lg" variant="secondary">LG</Button>} />
+          <OpenDemo size="sm" items={ROW_ACTIONS} trigger={<Button size="sm" variant="secondary">SM</Button>} />
+          <OpenDemo size="md" items={ROW_ACTIONS} trigger={<Button size="md" variant="secondary">MD</Button>} />
+          <OpenDemo size="lg" items={ROW_ACTIONS} trigger={<Button size="lg" variant="secondary">LG</Button>} />
         </div>
       </div>
       <div>
         <h4 className="text-secondary font-semibold mb-4">Danger + Disabled Items</h4>
         <div className="flex gap-16 flex-wrap items-start">
-          <DropdownMenu open items={SYSTEM_ACTIONS} trigger={<Button variant="secondary">System</Button>} />
+          <OpenDemo items={SYSTEM_ACTIONS} trigger={<Button variant="secondary">System</Button>} />
         </div>
       </div>
       <div>

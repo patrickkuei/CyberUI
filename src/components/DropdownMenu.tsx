@@ -46,7 +46,8 @@ export interface DropdownMenuProps {
    * The trigger that opens the menu. Pass a single React element (e.g. a
    * `Button`) to have it cloned with the required `onClick`/`aria-*`
    * wiring, or a render prop for full control over how those props are
-   * applied.
+   * applied. If the element already has its own `onClick`/`onKeyDown`,
+   * they're called first, before the dropdown's own handling runs.
    *
    * @example
    * // Element trigger
@@ -155,6 +156,15 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const menuRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const triggerRef = useRef<HTMLElement | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+    };
+  }, []);
 
   const enabledIndices = items
     .map((item, i) => (item.disabled ? -1 : i))
@@ -171,7 +181,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const closeMenu = useCallback(
     (focusTrigger: boolean) => {
       setIsClosing(true);
-      setTimeout(() => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = setTimeout(() => {
         setOpen(false);
         setIsClosing(false);
         if (focusTrigger) triggerRef.current?.focus();
@@ -185,7 +196,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
       setIsOpening(true);
       setActiveIndex(focusIndex);
       setOpen(true);
-      setTimeout(() => setIsOpening(false), 30);
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = setTimeout(() => setIsOpening(false), 30);
     },
     [setOpen]
   );
@@ -304,6 +316,14 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const renderedTrigger = isElement(trigger)
     ? React.cloneElement(trigger, {
         ...triggerProps,
+        onClick: (event: React.MouseEvent) => {
+          (trigger.props as { onClick?: React.MouseEventHandler }).onClick?.(event);
+          toggleMenu();
+        },
+        onKeyDown: (event: React.KeyboardEvent) => {
+          (trigger.props as { onKeyDown?: React.KeyboardEventHandler }).onKeyDown?.(event);
+          handleTriggerKeyDown(event);
+        },
         'aria-disabled': disabled || undefined,
         ref: (node: HTMLElement | null) => {
           triggerRef.current = node;
@@ -367,8 +387,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
                     : cn(
                         'cursor-pointer',
                         item.danger
-                          ? 'text-error hover:bg-error hover:text-base'
-                          : 'text-default hover:bg-base/70 hover:text-secondary'
+                          ? 'text-error hover:bg-error hover:text-base focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-error/70'
+                          : 'text-default hover:bg-base/70 hover:text-secondary focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary/70'
                       )
                 )}
               >

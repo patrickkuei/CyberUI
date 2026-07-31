@@ -102,6 +102,13 @@ describe('DropdownMenu', () => {
     expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveClass('text-error');
   });
 
+  it('gives items a keyboard-only focus ring (focus-visible), not just outline-none', () => {
+    render(<DropdownMenu items={ITEMS} trigger={trigger} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Actions' }));
+    expect(screen.getByRole('menuitem', { name: 'Edit' })).toHaveClass('focus-visible:ring-2', 'focus-visible:ring-secondary/70');
+    expect(screen.getByRole('menuitem', { name: 'Delete' })).toHaveClass('focus-visible:ring-2', 'focus-visible:ring-error/70');
+  });
+
   it('opens focused on the first item when ArrowDown is pressed on the trigger', async () => {
     render(<DropdownMenu items={ITEMS} trigger={trigger} />);
     const triggerButton = screen.getByRole('button', { name: 'Actions' });
@@ -181,6 +188,54 @@ describe('DropdownMenu', () => {
     await waitFor(() => expect(editItem).toHaveFocus());
     fireEvent.keyDown(editItem, { key: 'Enter' });
     expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('selects the focused item on Space', async () => {
+    const handleClick = vi.fn();
+    const items: DropdownMenuItem[] = [{ label: 'Edit', onClick: handleClick }];
+    render(<DropdownMenu items={items} trigger={trigger} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Actions' }));
+
+    const editItem = await screen.findByRole('menuitem', { name: 'Edit' });
+    await waitFor(() => expect(editItem).toHaveFocus());
+    fireEvent.keyDown(editItem, { key: ' ' });
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes the menu on Tab without preventing the default focus-out', async () => {
+    render(<DropdownMenu items={ITEMS} trigger={trigger} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Actions' }));
+
+    const editItem = await screen.findByRole('menuitem', { name: 'Edit' });
+    await waitFor(() => expect(editItem).toHaveFocus());
+    const tabEvent = fireEvent.keyDown(editItem, { key: 'Tab' });
+
+    expect(tabEvent).toBe(true); // preventDefault() was NOT called, so Tab still moves focus natively
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
+  });
+
+  it('composes the trigger element\'s own onClick/onKeyDown instead of overwriting them', async () => {
+    const ownOnClick = vi.fn();
+    const ownOnKeyDown = vi.fn();
+    render(
+      <DropdownMenu
+        items={ITEMS}
+        trigger={
+          <Button variant="secondary" onClick={ownOnClick} onKeyDown={ownOnKeyDown}>
+            Actions
+          </Button>
+        }
+      />
+    );
+    const triggerButton = screen.getByRole('button', { name: 'Actions' });
+
+    fireEvent.click(triggerButton);
+    expect(ownOnClick).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('menu')).toBeInTheDocument();
+
+    fireEvent.keyDown(triggerButton, { key: 'Escape' });
+    expect(ownOnKeyDown).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
   });
 
   it('closes on Escape and returns focus to the trigger', async () => {
