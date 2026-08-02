@@ -49,6 +49,7 @@ import "cyberui-2045/styles.css";
 | `Carousel` | Image carousel. |
 | `Steps` | Multi-step progress indicator. |
 | `DropdownMenu` | Dropdown/context menu anchored to a trigger element. Arrow-key navigation, `danger` item styling, click-outside/Escape dismissal. |
+| `Pagination` | Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls. |
 | `GradientText` | Text with cyberpunk gradient effects. |
 | `SectionTitle` | Title with decorative gradient line. |
 | `Timeline` | Vertical event history display. |
