@@ -21,7 +21,7 @@ const ROOT = join(__dirname, '..');
 const CATEGORY_ORDER = ['Forms', 'Layout', 'Feedback', 'Progress', 'Navigation', 'Typography', 'Display', 'Media'];
 
 const CATEGORY_MAP = {
-  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms', RadioGroup: 'Forms',
+  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms', RadioGroup: 'Forms', Slider: 'Forms',
   Card: 'Layout', Modal: 'Layout', Divider: 'Layout', Accordion: 'Layout',
   Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
@@ -64,6 +64,7 @@ const DOC_SUMMARIES = {
   RadioGroup: 'Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex.',
   DropdownMenu: 'Dropdown/context menu anchored to a trigger element. Arrow-key navigation, `danger` item styling, click-outside/Escape dismissal.',
   Pagination: 'Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls.',
+  Slider: 'Neon-glow track/thumb slider. Single-value or two-thumb range mode, drag or keyboard (arrows, Home/End, Page Up/Down).',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,
