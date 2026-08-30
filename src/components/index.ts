@@ -27,6 +27,7 @@ export { default as RadioGroup } from './RadioGroup';
 export { default as DropdownMenu } from './DropdownMenu';
 export { default as Pagination } from './Pagination';
 export { default as Slider } from './Slider';
+export { default as Drawer } from './Drawer';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -57,6 +58,7 @@ export type { RadioGroupProps, RadioOption } from './RadioGroup';
 export type { DropdownMenuProps, DropdownMenuItem, DropdownMenuTriggerProps } from './DropdownMenu';
 export type { PaginationProps } from './Pagination';
 export type { SliderProps, SliderValue } from './Slider';
+export type { DrawerProps, DrawerSide } from './Drawer';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

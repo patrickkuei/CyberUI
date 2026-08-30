@@ -39,6 +39,7 @@ import "cyberui-2045/styles.css";
 | `Modal` | CRT-style modal dialog. |
 | `Divider` | Gradient/solid/dashed content separator. |
 | `Accordion` | Collapsible section list. `mode`: `single` (default) or `multiple` open panels. |
+| `Drawer` | Slide-in side panel from any edge (`left`/`right`/`top`/`bottom`). Shares Modal's controlled `isOpen`/`onClose` pattern and overlay behavior. |
 | `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
 | `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
 | `Skeleton` | Loading placeholder. |
