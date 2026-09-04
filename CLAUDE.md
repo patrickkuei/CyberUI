@@ -34,7 +34,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 | Layout | Card, Modal, Divider, Accordion |
 | Feedback | Notification, Badge, Skeleton, Tooltip |
 | Progress | CircularProgress, SegmentedProgress, LinearProgress |
-| Navigation | TabNavigation, Carousel, Steps, DropdownMenu |
+| Navigation | TabNavigation, Carousel, Steps, DropdownMenu, Pagination |
 | Typography | GradientText, SectionTitle |
 | Display | Timeline |
 | Media | Image, Avatar |

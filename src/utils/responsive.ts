@@ -166,6 +166,11 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "px-4 py-2 text-base",
     lg: "px-5 py-2.5 text-lg",
   },
+  pagination: {
+    sm: "w-8 h-8 text-xs",
+    md: "w-10 h-10 text-sm",
+    lg: "w-12 h-12 text-base",
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults

@@ -53,6 +53,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | Carousel | Navigation | \`dist/components/Carousel.d.ts\` |
 | Steps | Navigation | \`dist/components/Steps.d.ts\` |
 | DropdownMenu | Navigation | \`dist/components/DropdownMenu.d.ts\` |
+| Pagination | Navigation | \`dist/components/Pagination.d.ts\` |
 | GradientText | Typography | \`dist/components/GradientText.d.ts\` |
 | SectionTitle | Typography | \`dist/components/SectionTitle.d.ts\` |
 | Timeline | Display | \`dist/components/Timeline.d.ts\` |

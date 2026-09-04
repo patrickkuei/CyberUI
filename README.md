@@ -65,6 +65,7 @@ function App() {
 | Carousel | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-carousel--docs) |
 | Steps | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-steps--docs) |
 | DropdownMenu | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-dropdownmenu--docs) |
+| Pagination | Navigation | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-pagination--docs) |
 | GradientText | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-gradienttext--docs) |
 | SectionTitle | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs) |
 | Timeline | Display | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs) |
