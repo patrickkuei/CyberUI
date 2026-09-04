@@ -5,6 +5,18 @@ import DatePicker from './DatePicker';
 const meta: Meta<typeof DatePicker> = {
   title: 'Components/DatePicker',
   component: DatePicker,
+  // The calendar popover is ~350px tall when open (header + weekday row + up
+  // to 6 week rows); without reserved canvas height every story renders at
+  // just the trigger's collapsed height and the opened calendar gets clipped
+  // by Storybook's canvas, matching the min-h wrapper DropdownMenu.stories.tsx
+  // uses for the same reason (its own popover would otherwise clip too).
+  decorators: [
+    (Story) => (
+      <div className="min-h-[420px] pt-4">
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     layout: 'padded',
     docs: {
