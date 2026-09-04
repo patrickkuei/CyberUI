@@ -35,6 +35,7 @@ import "cyberui-2045/styles.css";
 | `FormField` | Label/helper/error/success wrapper for any form control. |
 | `RadioGroup` | Neon-styled radio group for mutually-exclusive selection. Arrow-key navigation via roving tabindex. |
 | `Slider` | Neon-glow track/thumb slider. Single-value or two-thumb range mode, drag or keyboard (arrows, Home/End, Page Up/Down). |
+| `Combobox` | Searchable select — text input filters `options` as you type. WAI-ARIA combobox pattern, optional `allowCustomValue` for free-text entry. |
 | `Card` | Glassmorphism container with borders. |
 | `Modal` | CRT-style modal dialog. |
 | `Divider` | Gradient/solid/dashed content separator. |

@@ -51,6 +51,7 @@ function App() {
 | FormField | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-formfield--docs) |
 | RadioGroup | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-radiogroup--docs) |
 | Slider | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-slider--docs) |
+| Combobox | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-combobox--docs) |
 | Card | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-card--docs) |
 | Modal | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs) |
 | Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs) |
