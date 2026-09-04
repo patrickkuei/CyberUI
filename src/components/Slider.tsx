@@ -101,6 +101,26 @@ const THUMB_VARIANT_CLASSES: Record<'primary' | 'secondary' | 'accent', string> 
 
 type ThumbIndex = 0 | 1;
 
+/** The thumb currently being dragged, and the pointer that started the drag. */
+type DragState = { index: ThumbIndex; pointerId: number };
+
+/**
+ * Captures the pointer on `el` so drag events keep targeting it even when the
+ * cursor leaves the element (or the viewport). Feature-detected and wrapped
+ * in try/catch since some environments (e.g. jsdom in tests) don't implement
+ * the Pointer Capture API, and browsers can throw for an already-released
+ * pointerId.
+ */
+function capturePointer(el: Element, pointerId: number) {
+  if (typeof el.setPointerCapture === 'function') {
+    try {
+      el.setPointerCapture(pointerId);
+    } catch {
+      // Ignore — unsupported or the pointer is no longer active.
+    }
+  }
+}
+
 /**
  * A cyberpunk-styled slider for single-value or two-thumb range selection —
  * volume, brightness, price range, and similar numeric inputs.
@@ -170,11 +190,25 @@ const Slider: React.FC<SliderProps> = ({
   );
 
   const trackRef = useRef<HTMLDivElement>(null);
-  const [draggingIndex, setDraggingIndex] = useState<ThumbIndex | null>(null);
+  const [dragState, setDragState] = useState<DragState | null>(null);
+
+  // Latest values, read (not subscribed to) by commitValue so that callback's
+  // identity stays stable across drag ticks instead of changing on every
+  // value update — the window pointermove/pointerup effect below depends on
+  // commitValue, so keeping it stable avoids unbinding/rebinding those
+  // listeners on every single move event during a drag.
+  const valuesRef = useRef(values);
+  valuesRef.current = values;
 
   const clampToStep = useCallback(
     (raw: number) => {
-      const stepped = Math.round((raw - min) / step) * step + min;
+      // Guard against a non-positive step: dividing by it would produce NaN
+      // (step === 0) or an unstable/backwards stepping (step < 0), which
+      // would otherwise corrupt `value`, `aria-valuenow`, and the thumb's
+      // inline `left` style. Fall back to a step of 1 in that case; the dev
+      // warning above still fires so the misconfiguration is visible.
+      const safeStep = step > 0 ? step : 1;
+      const stepped = Math.round((raw - min) / safeStep) * safeStep + min;
       const clamped = Math.min(max, Math.max(min, stepped));
       // Round away floating-point noise from the step math above.
       return Math.round(clamped * 1e10) / 1e10;
@@ -185,7 +219,7 @@ const Slider: React.FC<SliderProps> = ({
   const commitValue = useCallback(
     (index: ThumbIndex, rawVal: number) => {
       const stepped = clampToStep(rawVal);
-      const next: [number, number] = [...values];
+      const next: [number, number] = [...valuesRef.current];
       if (isRange) {
         if (index === 0) {
           next[0] = Math.min(stepped, next[1]);
@@ -199,7 +233,7 @@ const Slider: React.FC<SliderProps> = ({
       if (!isControlled) setInternalValue(nextValue);
       onValueChange?.(nextValue);
     },
-    [values, isRange, isControlled, onValueChange, clampToStep]
+    [isRange, isControlled, onValueChange, clampToStep]
   );
 
   const valueFromClientX = useCallback(
@@ -214,16 +248,43 @@ const Slider: React.FC<SliderProps> = ({
   );
 
   useEffect(() => {
-    if (draggingIndex === null) return;
-    const handleMove = (e: PointerEvent) => commitValue(draggingIndex, valueFromClientX(e.clientX));
-    const handleUp = () => setDraggingIndex(null);
+    if (!dragState) return;
+    // If `disabled` flips to true mid-drag (e.g. a consumer locking the
+    // control during an async save triggered by onValueChange), end the
+    // drag immediately instead of leaving the window listeners attached.
+    if (disabled) {
+      setDragState(null);
+      return;
+    }
+    const { index, pointerId } = dragState;
+    const handleMove = (e: PointerEvent) => {
+      // Ignore events from any pointer other than the one that started this
+      // drag, so a second simultaneous touch-drag (e.g. the other thumb on
+      // a touchscreen range slider) can't hijack this thumb's movement.
+      if (e.pointerId !== pointerId) return;
+      // No button/contact is actually down — most commonly because the
+      // pointer was released outside the browser viewport, where `window`
+      // never receives a `pointerup`. Without this check the thumb would
+      // keep following the cursor on any later hover.
+      if (disabled || e.buttons === 0) {
+        setDragState(null);
+        return;
+      }
+      commitValue(index, valueFromClientX(e.clientX));
+    };
+    const endDrag = (e: PointerEvent) => {
+      if (e.pointerId !== pointerId) return;
+      setDragState(null);
+    };
     window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerup', handleUp);
+    window.addEventListener('pointerup', endDrag);
+    window.addEventListener('pointercancel', endDrag);
     return () => {
       window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerup', handleUp);
+      window.removeEventListener('pointerup', endDrag);
+      window.removeEventListener('pointercancel', endDrag);
     };
-  }, [draggingIndex, commitValue, valueFromClientX]);
+  }, [dragState, disabled, commitValue, valueFromClientX]);
 
   const handleTrackPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
     if (disabled) return;
@@ -231,14 +292,16 @@ const Slider: React.FC<SliderProps> = ({
     const index: ThumbIndex =
       isRange && Math.abs(rawVal - values[1]) < Math.abs(rawVal - values[0]) ? 1 : 0;
     commitValue(index, rawVal);
-    setDraggingIndex(index);
+    setDragState({ index, pointerId: e.pointerId });
+    capturePointer(e.currentTarget, e.pointerId);
   };
 
   const handleThumbPointerDown = (e: React.PointerEvent<HTMLDivElement>, index: ThumbIndex) => {
     if (disabled) return;
     e.stopPropagation();
     e.currentTarget.focus();
-    setDraggingIndex(index);
+    setDragState({ index, pointerId: e.pointerId });
+    capturePointer(e.currentTarget, e.pointerId);
   };
 
   const pageStep = step * 10;
@@ -278,7 +341,27 @@ const Slider: React.FC<SliderProps> = ({
     }
   };
 
-  const percentOf = (v: number) => ((v - min) / (max - min)) * 100;
+  const percentOf = (v: number) => {
+    // Guard against max <= min (an invalid but only dev-warned config):
+    // dividing by a zero or negative range would produce NaN/Infinity,
+    // which would otherwise land directly in the thumb's `left` style and
+    // the fill's left/width styles.
+    const range = max - min;
+    if (range <= 0) return 0;
+    return ((v - min) / range) * 100;
+  };
+
+  /**
+   * Stacking order for a thumb. The min thumb (index 0) sits above the max
+   * thumb by default so that when both are at the same position (e.g. an
+   * equal-value range), it stays independently clickable instead of the
+   * later-rendered max thumb always winning the hit-test. Whichever thumb
+   * is actively being dragged is raised above both.
+   */
+  const thumbZIndex = (index: ThumbIndex) => {
+    if (dragState?.index === index) return 3;
+    return index === 0 ? 2 : 1;
+  };
 
   const trackHeightClasses = getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.slider.track);
   const thumbSizeClasses = getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.slider.thumb);
@@ -318,7 +401,7 @@ const Slider: React.FC<SliderProps> = ({
           trackHeightClasses,
           disabled ? 'cursor-not-allowed' : 'cursor-pointer'
         )}
-        onPointerDown={disabled ? undefined : handleTrackPointerDown}
+        onPointerDown={handleTrackPointerDown}
       >
         <div
           className={cn('absolute top-0 h-full rounded-full transition-[left,width] duration-100', TRACK_VARIANT_CLASSES[variant])}
@@ -345,9 +428,9 @@ const Slider: React.FC<SliderProps> = ({
               thumbSizeClasses,
               THUMB_VARIANT_CLASSES[variant]
             )}
-            style={{ left: `${percentOf(values[index])}%` }}
-            onPointerDown={disabled ? undefined : (e) => handleThumbPointerDown(e, index)}
-            onKeyDown={disabled ? undefined : (e) => handleKeyDown(e, index)}
+            style={{ left: `${percentOf(values[index])}%`, zIndex: thumbZIndex(index) }}
+            onPointerDown={(e) => handleThumbPointerDown(e, index)}
+            onKeyDown={(e) => handleKeyDown(e, index)}
           />
         ))}
       </div>

@@ -150,4 +150,119 @@ describe('Slider', () => {
     render(<Slider defaultValue={50} size={{ base: 'sm', md: 'lg' }} />);
     expect(screen.getByRole('slider')).toBeInTheDocument();
   });
+
+  // Regression tests for a code review that found real bugs in the
+  // drag-to-set pointer handling and the NaN-producing invalid-prop paths.
+
+  it('stops an in-progress drag once disabled becomes true (regression: the window pointermove/pointerup listener never checked `disabled`, so flipping it mid-drag never stopped the thumb from following the pointer)', () => {
+    const handleChange = vi.fn();
+    const { rerender } = render(
+      <Slider min={0} max={100} defaultValue={20} onValueChange={handleChange} />
+    );
+    const thumb = screen.getByRole('slider');
+    fireEvent.pointerDown(thumb, { pointerId: 1 });
+
+    rerender(<Slider min={0} max={100} defaultValue={20} disabled onValueChange={handleChange} />);
+    handleChange.mockClear();
+
+    fireEvent.pointerMove(window, { clientX: 150, pointerId: 1, buttons: 1 });
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('does not throw starting a drag in environments without Pointer Capture support (regression: an unguarded setPointerCapture call would throw in jsdom, which does not implement it)', () => {
+    render(<Slider defaultValue={20} />);
+    const thumb = screen.getByRole('slider');
+    expect(() => fireEvent.pointerDown(thumb, { pointerId: 1 })).not.toThrow();
+  });
+
+  it('stops following the pointer once no button is held (regression: releasing the pointer outside the viewport never fires a window pointerup, so draggingIndex never reset and the thumb kept tracking the cursor on any later hover)', () => {
+    const handleChange = vi.fn();
+    render(<Slider min={0} max={100} defaultValue={20} onValueChange={handleChange} />);
+    const thumb = screen.getByRole('slider');
+    const track = thumb.parentElement as HTMLElement;
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      right: 200,
+      width: 200,
+      top: 0,
+      bottom: 10,
+      height: 10,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+    fireEvent.pointerDown(thumb, { pointerId: 7 });
+    handleChange.mockClear();
+
+    // No button held — simulates the pointer having been released elsewhere.
+    fireEvent.pointerMove(window, { clientX: 150, pointerId: 7, buttons: 0 });
+    expect(handleChange).not.toHaveBeenCalled();
+
+    // The drag has ended, so even a later move with a button held is ignored.
+    fireEvent.pointerMove(window, { clientX: 180, pointerId: 7, buttons: 1 });
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('never produces NaN in value/aria-valuenow when step is 0 (regression: clampToStep divided by step, so step=0 produced NaN)', () => {
+    const handleChange = vi.fn();
+    render(<Slider min={0} max={100} step={0} defaultValue={20} onValueChange={handleChange} />);
+    const thumb = screen.getByRole('slider');
+    fireEvent.keyDown(thumb, { key: 'ArrowRight' });
+
+    expect(handleChange).toHaveBeenCalled();
+    const lastValue = handleChange.mock.calls[handleChange.mock.calls.length - 1][0];
+    expect(Number.isNaN(lastValue)).toBe(false);
+    expect(thumb.getAttribute('aria-valuenow')).not.toBe('NaN');
+  });
+
+  it('never produces NaN/Infinity in the thumb position when max <= min (regression: percentOf divided by (max - min), producing NaN/Infinity in the inline `left` style)', () => {
+    render(<Slider min={50} max={50} defaultValue={50} />);
+    const thumb = screen.getByRole('slider') as HTMLElement;
+    expect(thumb.style.left).not.toContain('NaN');
+    expect(thumb.style.left).not.toContain('Infinity');
+  });
+
+  it('ignores pointermove events from a different pointerId than the one that started the drag (regression: draggingIndex was a shared scalar with no pointerId tracking, so a second simultaneous touch-drag on the other thumb hijacked the first finger\'s moves)', () => {
+    const handleChange = vi.fn();
+    render(<Slider min={0} max={100} defaultValue={[20, 80]} onValueChange={handleChange} />);
+    const [lower] = screen.getAllByRole('slider');
+    const track = lower.parentElement as HTMLElement;
+    vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      left: 0,
+      right: 200,
+      width: 200,
+      top: 0,
+      bottom: 10,
+      height: 10,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    });
+
+    // Finger 1 starts dragging the lower thumb.
+    fireEvent.pointerDown(lower, { pointerId: 1 });
+    handleChange.mockClear();
+
+    // A different pointerId (a second finger dragging the other thumb)
+    // moves — must not affect this drag.
+    fireEvent.pointerMove(window, { clientX: 160, pointerId: 2, buttons: 1 });
+    expect(handleChange).not.toHaveBeenCalled();
+
+    // The original finger's move is still honored.
+    fireEvent.pointerMove(window, { clientX: 60, pointerId: 1, buttons: 1 });
+    expect(handleChange).toHaveBeenLastCalledWith([30, 80]);
+  });
+
+  it('keeps the min thumb above the max thumb by default so it stays independently clickable when both sit at the same position (regression: DOM order alone made the later-rendered max thumb always win the hit-test)', () => {
+    render(<Slider min={0} max={100} defaultValue={[50, 50]} />);
+    const [lower, upper] = screen.getAllByRole('slider') as HTMLElement[];
+    expect(Number(lower.style.zIndex)).toBeGreaterThan(Number(upper.style.zIndex));
+  });
+
+  it('raises the actively-dragged thumb above the other thumb', () => {
+    render(<Slider min={0} max={100} defaultValue={[20, 80]} />);
+    const [lower, upper] = screen.getAllByRole('slider') as HTMLElement[];
+    fireEvent.pointerDown(upper, { pointerId: 1 });
+    expect(Number(upper.style.zIndex)).toBeGreaterThan(Number(lower.style.zIndex));
+  });
 });
