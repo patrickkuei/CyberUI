@@ -35,9 +35,14 @@ const addDays = (date: Date, amount: number): Date => {
 };
 
 const addMonths = (date: Date, amount: number): Date => {
+  const day = date.getDate();
   const d = new Date(date);
+  // Pin to day 1 while shifting the month so a short target month (e.g.
+  // landing on Feb from Jan 31) can't roll over into the month after it.
   d.setDate(1);
   d.setMonth(d.getMonth() + amount);
+  const daysInTargetMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+  d.setDate(Math.min(day, daysInTargetMonth));
   return d;
 };
 
@@ -216,6 +221,13 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   const openCalendar = useCallback(() => {
     if (disabled) return;
+    // Cancel any pending close (we may be re-opening mid close-animation)
+    // so it can't fire after the fact and yank the calendar shut again.
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+    setIsClosing(false);
     const anchor = startOfDay(selectedValue ?? new Date());
     setViewDate(anchor);
     setFocusedDate(anchor);
@@ -224,12 +236,15 @@ const DatePicker: React.FC<DatePickerProps> = ({
   }, [disabled, selectedValue]);
 
   const toggleCalendar = useCallback(() => {
-    if (open) {
+    // While closing, `open` is still true for the duration of the close
+    // animation — treat that window as effectively closed so a re-toggle
+    // reopens immediately instead of just restarting the close timer.
+    if (open && !isClosing) {
       closeCalendar(false);
     } else {
       openCalendar();
     }
-  }, [open, openCalendar, closeCalendar]);
+  }, [open, isClosing, openCalendar, closeCalendar]);
 
   useEffect(() => {
     if (!open) return;
@@ -256,9 +271,28 @@ const DatePicker: React.FC<DatePickerProps> = ({
   }, [focusedDate, open]);
 
   const moveFocus = (nextDate: Date) => {
-    setFocusedDate(nextDate);
-    if (nextDate.getMonth() !== viewDate.getMonth() || nextDate.getFullYear() !== viewDate.getFullYear()) {
-      setViewDate(nextDate);
+    let target = nextDate;
+    if (isDateDisabled(target, minDate, maxDate)) {
+      // `focusedDate` (the day the move started from) is always enabled, so
+      // stepping one day at a time back toward it is guaranteed to either
+      // land on an enabled day or reach `focusedDate` itself — never an
+      // infinite walk into disabled territory (a `<button disabled>` can't
+      // take DOM focus, so landing there would silently strand keyboard nav).
+      const stepDays = target.getTime() < focusedDate.getTime() ? 1 : -1;
+      let attempts = 0;
+      const maxAttempts = 3660; // safety cap (~10 years of days); the walk toward focusedDate always finishes long before this
+      while (isDateDisabled(target, minDate, maxDate) && attempts < maxAttempts) {
+        target = addDays(target, stepDays);
+        attempts++;
+      }
+      if (isDateDisabled(target, minDate, maxDate)) {
+        // No enabled day found in that direction — leave focus where it is.
+        return;
+      }
+    }
+    setFocusedDate(target);
+    if (target.getMonth() !== viewDate.getMonth() || target.getFullYear() !== viewDate.getFullYear()) {
+      setViewDate(target);
     }
   };
 
@@ -273,8 +307,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
     if (disabled) return;
     if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      if (!open) openCalendar();
-    } else if (event.key === 'Escape' && open) {
+      if (!open || isClosing) openCalendar();
+    } else if (event.key === 'Escape' && open && !isClosing) {
       event.preventDefault();
       closeCalendar(false);
     }
@@ -323,6 +357,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
         event.preventDefault();
         closeCalendar(true);
         break;
+      case 'Tab':
+        closeCalendar(false);
+        break;
       default:
         break;
     }
@@ -345,7 +382,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
 
   const getVariantClasses = (variant: string, hasError: boolean, disabled: boolean): string => {
     if (hasError) {
-      return 'border-2 border-error shadow-error/30 hover:shadow-error focus:ring-2 focus:ring-error focus:shadow-error';
+      return 'border-2 border-error shadow-error/30 hover:shadow-error focus:ring-2 focus:ring-error focus:shadow-error active:bg-base';
     }
     if (disabled) {
       const variants = {
@@ -358,11 +395,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
     }
     const variants = {
       primary:
-        'border-2 border-accent shadow-input-accent hover:shadow-lg-accent focus:ring-2 focus:ring-accent focus:shadow-lg-accent',
+        'border-2 border-accent shadow-input-accent hover:shadow-lg-accent focus:ring-2 focus:ring-accent focus:shadow-lg-accent active:bg-base',
       secondary:
-        'border-2 border-secondary shadow-secondary/30 hover:shadow-secondary focus:ring-2 focus:ring-secondary focus:shadow-secondary',
-      danger: 'border-2 border-error shadow-error/30 hover:shadow-error focus:ring-2 focus:ring-error focus:shadow-error',
-      ghost: 'border border-border-default shadow-none hover:border-accent focus:ring-2 focus:ring-accent focus:border-accent',
+        'border-2 border-secondary shadow-secondary/30 hover:shadow-secondary focus:ring-2 focus:ring-secondary focus:shadow-secondary active:bg-base',
+      danger: 'border-2 border-error shadow-error/30 hover:shadow-error focus:ring-2 focus:ring-error focus:shadow-error active:bg-base',
+      ghost: 'border border-border-default shadow-none hover:border-accent focus:ring-2 focus:ring-accent focus:border-accent active:bg-base',
     };
     return variants[variant as keyof typeof variants];
   };

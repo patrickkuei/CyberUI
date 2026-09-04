@@ -187,4 +187,128 @@ describe('DatePicker', () => {
     fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
     expect(screen.getByRole('dialog')).toBeInTheDocument();
   });
+
+  it('preserves the day-of-month when paging months with PageUp/PageDown', () => {
+    // Regression: addMonths called d.setDate(1) before shifting the month,
+    // so PageDown from day 15 silently jumped focus to day 1 of the next
+    // month instead of day 15.
+    render(<DatePicker label="Deployment Date" defaultValue={ANCHOR_DATE} />);
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+
+    fireEvent.keyDown(screen.getByRole('gridcell', { name: '15' }), { key: 'PageDown' });
+    expect(screen.getByText('February 2026')).toBeInTheDocument();
+    expect(screen.getByRole('gridcell', { name: '15' })).toHaveFocus();
+  });
+
+  it('clamps to the last valid day when paging into a shorter month', () => {
+    // Regression companion: Jan 31 + 1 month has no Feb 31, so addMonths
+    // must clamp to the last day of the target month (Feb 28 in 2026)
+    // rather than overflowing into March.
+    render(<DatePicker label="Deployment Date" defaultValue={new Date(2026, 0, 31)} />);
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+
+    // The January grid also shows a leading, dimmed "31" from December
+    // (padding for a full week) — disambiguate to the in-month Jan 31 cell.
+    const jan31 = screen
+      .getAllByRole('gridcell', { name: '31' })
+      .find((el) => !el.className.includes('text-muted/30'))!;
+    fireEvent.keyDown(jan31, { key: 'PageDown' });
+    expect(screen.getByText('February 2026')).toBeInTheDocument();
+    expect(screen.getByRole('gridcell', { name: '28' })).toHaveFocus();
+  });
+
+  it('preserves the day-of-month when using the header Previous/Next month buttons', () => {
+    // Regression: goToPreviousMonth/goToNextMonth both route through
+    // addMonths via moveFocus, so they inherited the same day-of-month reset.
+    render(<DatePicker label="Deployment Date" defaultValue={ANCHOR_DATE} />);
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next month' }));
+    expect(screen.getByText('February 2026')).toBeInTheDocument();
+    expect(screen.getByRole('gridcell', { name: '15' })).toHaveFocus();
+  });
+
+  it('reopens immediately when re-toggled during the close animation instead of getting stuck closed', async () => {
+    // Regression: `open` stayed true for the whole 180ms close-animation
+    // window (only `isClosing` flips first), so toggleCalendar's `if (open)`
+    // branch treated a click during that window as "still open" and just
+    // restarted the close timer — a rapid click-click within 180ms of a
+    // close could never reopen the calendar.
+    render(<DatePicker label="Deployment Date" defaultValue={ANCHOR_DATE} />);
+    const trigger = screen.getByRole('combobox', { name: 'Deployment Date' });
+
+    fireEvent.click(trigger); // open
+    fireEvent.click(trigger); // start closing (isClosing: true, open still true)
+    fireEvent.click(trigger); // re-toggle mid-close — should reopen, not restart the close
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    // Give the old (pre-fix) close timeout a chance to fire; the calendar
+    // must still be open afterwards.
+    await new Promise((resolve) => setTimeout(resolve, 200));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+  });
+
+  it('skips a disabled day when arrow-key navigation would land on one, instead of stranding DOM focus', () => {
+    // Regression: moveFocus set focusedDate to a day disabled by
+    // minDate/maxDate, and the focus-sync effect then called .focus() on a
+    // <button disabled>, which browsers refuse — DOM focus stayed on the
+    // previous button while roving tabIndex moved on, stalling further
+    // keyboard navigation at the boundary.
+    render(
+      <DatePicker
+        label="Deployment Date"
+        defaultValue={new Date(2026, 0, 12)}
+        minDate={new Date(2026, 0, 10)}
+      />
+    );
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+
+    // ArrowUp from day 12 naively lands on day 5 (12 - 7), which is before
+    // minDate (10) and disabled — focus should skip forward to day 10.
+    fireEvent.keyDown(screen.getByRole('gridcell', { name: '12' }), { key: 'ArrowUp' });
+    const day10 = screen.getByRole('gridcell', { name: '10' });
+    expect(day10).not.toBeDisabled();
+    expect(day10).toHaveFocus();
+  });
+
+  it('stays put when arrow-key navigation has no enabled day left in that direction', () => {
+    // Companion to the disabled-day-skip fix: if every remaining day in the
+    // direction of travel is disabled, focus should simply not move rather
+    // than landing on (or getting stuck near) a disabled day.
+    render(
+      <DatePicker
+        label="Deployment Date"
+        defaultValue={new Date(2026, 0, 10)}
+        minDate={new Date(2026, 0, 10)}
+      />
+    );
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+
+    const day10 = screen.getByRole('gridcell', { name: '10' });
+    fireEvent.keyDown(day10, { key: 'ArrowLeft' });
+    expect(day10).toHaveFocus();
+  });
+
+  it('includes active:bg-base in the trigger classes, matching Input\'s variant styling', () => {
+    // Regression: getVariantClasses was copy-pasted from Input.tsx and
+    // dropped active:bg-base from every enabled/error variant string.
+    render(<DatePicker label="Deployment Date" variant="primary" />);
+    expect(screen.getByRole('combobox', { name: 'Deployment Date' }).className).toMatch(/active:bg-base/);
+  });
+
+  it('includes active:bg-base on the trigger when in the error state', () => {
+    render(<DatePicker label="Deployment Date" error="Selected date has already lapsed" />);
+    expect(screen.getByRole('combobox', { name: 'Deployment Date' }).className).toMatch(/active:bg-base/);
+  });
+
+  it('closes the calendar on Tab out of a day cell', async () => {
+    render(<DatePicker label="Deployment Date" defaultValue={ANCHOR_DATE} />);
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(screen.getByRole('gridcell', { name: '15' }), { key: 'Tab' });
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+  });
 });
