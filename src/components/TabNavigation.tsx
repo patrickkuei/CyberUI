@@ -45,6 +45,15 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   const [alignRight, setAlignRight] = useState(false);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
+  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     if (!open) return;
@@ -55,7 +64,8 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
       ) {
         // JS-staged close to align with Image component behavior
         setIsClosing(true);
-        setTimeout(() => {
+        if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+        closeTimeoutRef.current = setTimeout(() => {
           setOpen(false);
           setIsClosing(false);
         }, 180);
@@ -76,14 +86,16 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   const toggleOpen = () => {
     if (open) {
       setIsClosing(true);
-      setTimeout(() => {
+      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = setTimeout(() => {
         setOpen(false);
         setIsClosing(false);
       }, 180);
     } else {
       setIsOpening(true);
       setOpen(true);
-      setTimeout(() => setIsOpening(false), 30);
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = setTimeout(() => setIsOpening(false), 30);
     }
   };
 
@@ -130,7 +142,8 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
                     onTabChange(tab);
                     if (closeOnSelect) {
                       setIsClosing(true);
-                      setTimeout(() => {
+                      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+                      closeTimeoutRef.current = setTimeout(() => {
                         setOpen(false);
                         setIsClosing(false);
                       }, 180);
