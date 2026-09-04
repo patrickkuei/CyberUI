@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-08-02T06:15:31.179Z",
+  "generatedAt": "2026-09-04T08:52:53.766Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -458,6 +458,137 @@
           "required": false,
           "default": null,
           "description": "Optional id override for the group's `<fieldset>` element."
+        }
+      ]
+    },
+    {
+      "name": "Slider",
+      "category": "Forms",
+      "sourceFile": "src/components/Slider.tsx",
+      "displayName": "Slider",
+      "description": "A cyberpunk-styled slider for single-value or two-thumb range selection —\nvolume, brightness, price range, and similar numeric inputs.",
+      "docSummary": "Neon-glow track/thumb slider. Single-value or two-thumb range mode, drag or keyboard (arrows, Home/End, Page Up/Down).",
+      "storybookPath": "components-slider--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "min",
+          "type": "number | undefined",
+          "required": false,
+          "default": 0,
+          "description": "Minimum allowed value."
+        },
+        {
+          "name": "max",
+          "type": "number | undefined",
+          "required": false,
+          "default": 100,
+          "description": "Maximum allowed value."
+        },
+        {
+          "name": "step",
+          "type": "number | undefined",
+          "required": false,
+          "default": 1,
+          "description": "Increment between selectable values. Also used as the Arrow key step;\nPage Up/Page Down move by `step * 10`."
+        },
+        {
+          "name": "value",
+          "type": "SliderValue | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled value. Pass a single number for a single-thumb slider, or a\n`[min, max]` tuple for a two-thumb range slider. Whichever shape is used\non mount (via `value` or `defaultValue`) decides the mode for the\ncomponent's lifetime — switching between number and tuple afterwards is\nnot supported."
+        },
+        {
+          "name": "defaultValue",
+          "type": "SliderValue | undefined",
+          "required": false,
+          "default": "min",
+          "description": "Initial value for uncontrolled usage, and what determines single- vs\nrange-mode when `value` is never passed. Ignored once `value` is set."
+        },
+        {
+          "name": "onValueChange",
+          "type": "((value: SliderValue) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired with the next value on every drag move and keyboard adjustment."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | undefined",
+          "required": false,
+          "default": "accent",
+          "description": "Visual style, reusing the neon palette from Button/Badge/Tooltip.\n`accent` matches LinearProgress's default accent-to-primary gradient\ntreatment on the filled track."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Track thickness and thumb diameter. Supports responsive values."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables dragging and keyboard interaction."
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label rendered above the track, and used to build each thumb's accessible name."
+        },
+        {
+          "name": "showValue",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Renders the current numeric value(s) next to the label."
+        },
+        {
+          "name": "formatValue",
+          "type": "((value: number) => string) | undefined",
+          "required": false,
+          "default": "(v: number) => String(v)",
+          "description": "Formats the value(s) rendered by `showValue`."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible name for the thumb in single-value mode. Falls back to `label`, then `\"Slider\"`."
+        },
+        {
+          "name": "ariaLabelMin",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible name for the lower thumb in range mode. Falls back to `${label} minimum`."
+        },
+        {
+          "name": "ariaLabelMax",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible name for the upper thumb in range mode. Falls back to `${label} maximum`."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer container."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional id override for the outer container."
         }
       ]
     },
@@ -1598,7 +1729,7 @@
       "category": "Navigation",
       "sourceFile": "src/components/Pagination.tsx",
       "displayName": "Pagination",
-      "description": "A cyberpunk-styled page control for list/table views with more results\nthan fit on one page. Always controlled via `currentPage`/`onPageChange`,\nwith a compact ellipsis-collapsing mode for large page counts.",
+      "description": "",
       "docSummary": "Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls.",
       "storybookPath": "components-pagination--docs",
       "manifestOverride": false,
