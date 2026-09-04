@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-09-04T10:06:16.886Z",
+  "generatedAt": "2026-09-04T10:17:56.924Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -589,6 +589,137 @@
           "required": false,
           "default": null,
           "description": "Optional id override for the outer container."
+        }
+      ]
+    },
+    {
+      "name": "Combobox",
+      "category": "Forms",
+      "sourceFile": "src/components/Combobox.tsx",
+      "displayName": "CyberUI.Combobox",
+      "description": "A cyberpunk-styled searchable dropdown — a text input that filters a list\nof options as the user types, extending Select's controlled-value pattern\nwith Input's focus-glow styling. Follows the WAI-ARIA combobox pattern\n(role=\"combobox\" + a listbox popup with `aria-activedescendant`) so arrow\nkeys move a highlight without moving DOM focus off the input.",
+      "docSummary": "Searchable select — text input filters `options` as you type. WAI-ARIA combobox pattern, optional `allowCustomValue` for free-text entry.",
+      "storybookPath": "components-combobox--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label rendered above the input."
+        },
+        {
+          "name": "options",
+          "type": "ComboboxOption[]",
+          "required": true,
+          "default": null,
+          "description": "Full list of options to filter and choose from."
+        },
+        {
+          "name": "value",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Controlled selected value. Pass alongside `onValueChange` to fully\ncontrol selection — the displayed text always reflects this value's\nmatching option label (or the raw string itself when `allowCustomValue`\nis set and no option matches it)."
+        },
+        {
+          "name": "defaultValue",
+          "type": "string | undefined",
+          "required": false,
+          "default": "''",
+          "description": "Initial value for uncontrolled usage."
+        },
+        {
+          "name": "onValueChange",
+          "type": "((value: string) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the value is committed: on option selection (click or Enter),\nand on blur/Enter with unmatched text when `allowCustomValue` is set."
+        },
+        {
+          "name": "placeholder",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Placeholder text shown when the input is empty."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style variant, matching Input/Select's palette vocabulary."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the input and dropdown option text. Supports responsive values."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables the input and prevents opening the dropdown."
+        },
+        {
+          "name": "helperText",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional helper text shown below the input."
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message that overrides helper text and highlights the input."
+        },
+        {
+          "name": "allowCustomValue",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Allows committing free text that doesn't match any option, instead of\nrequiring a selection from the list. A typed value is committed as-is\non Enter (when no option is highlighted) or on blur; text that exactly\nmatches an option's label (case-insensitive) selects that option\ninstead. When `false` (the default), unmatched text reverts to the\nlast committed value's label on blur or Escape."
+        },
+        {
+          "name": "noOptionsText",
+          "type": "string | undefined",
+          "required": false,
+          "default": "No matches found",
+          "description": "Message shown in the dropdown when no options match the current query."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible label for the input and listbox, used when `label` isn't descriptive enough on its own."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer wrapper."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Element id for the input. Auto-generated via `useId` when omitted."
+        },
+        {
+          "name": "name",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Name attribute for native form submission. Applied to a hidden input\nthat carries the committed option `value` (not the display label), so\n`FormData`/uncontrolled form libraries read the same thing `Select`'s\nnative `<select>` would."
         }
       ]
     },
