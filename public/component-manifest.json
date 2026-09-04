@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-09-04T08:52:53.766Z",
+  "generatedAt": "2026-09-04T10:06:16.886Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -896,6 +896,109 @@
           "required": false,
           "default": "",
           "description": "Additional CSS classes for the outer container."
+        }
+      ]
+    },
+    {
+      "name": "Drawer",
+      "category": "Layout",
+      "sourceFile": "src/components/Drawer.tsx",
+      "displayName": "Drawer",
+      "description": "A cyberpunk-styled slide-in side panel, for mobile nav, filters, or detail\nviews without a full page navigation. Shares Modal's controlled `isOpen`/\n`onClose` pattern, overlay/focus-restore/scroll-lock behavior, and RGB\nglow border treatment — sliding in from an edge instead of scaling from\nthe center.",
+      "docSummary": "Slide-in side panel from any edge (`left`/`right`/`top`/`bottom`). Shares Modal's controlled `isOpen`/`onClose` pattern and overlay behavior.",
+      "storybookPath": "components-drawer--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "isOpen",
+          "type": "boolean",
+          "required": true,
+          "default": null,
+          "description": "Whether the drawer is visible."
+        },
+        {
+          "name": "onClose",
+          "type": "() => void",
+          "required": true,
+          "default": null,
+          "description": "Callback when the drawer requests to close (overlay click, Escape, or the close button)."
+        },
+        {
+          "name": "side",
+          "type": "DrawerSide | undefined",
+          "required": false,
+          "default": "'right'",
+          "description": "Which viewport edge the drawer slides in from. `left`/`right` size the\npanel by width; `top`/`bottom` size it by height."
+        },
+        {
+          "name": "title",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Title text shown in the drawer header."
+        },
+        {
+          "name": "children",
+          "type": "ReactNode",
+          "required": true,
+          "default": null,
+          "description": "The content to be rendered inside the drawer body."
+        },
+        {
+          "name": "size",
+          "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"full\" | undefined",
+          "required": false,
+          "default": "'md'",
+          "description": "Width of the panel for `side=\"left\"`/`\"right\"`, or height for\n`side=\"top\"`/`\"bottom\"`.\n- sm: 18rem (288px) / 14rem (224px)\n- md: 24rem (384px) / 18rem (288px)\n- lg: 32rem (512px) / 24rem (384px)\n- xl: 40rem (640px) / 32rem (512px)\n- full: 100% of the viewport dimension"
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"danger\" | undefined",
+          "required": false,
+          "default": "'default'",
+          "description": "Visual variant of the drawer.\n- `default`: Standard RGB glow border.\n- `danger`: Red error glow — use for destructive confirmations."
+        },
+        {
+          "name": "closeOnOverlayClick",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether clicking the overlay backdrop closes the drawer."
+        },
+        {
+          "name": "closeOnEscape",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether pressing Escape closes the drawer."
+        },
+        {
+          "name": "showCloseButton",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": "true",
+          "description": "Whether to render the header close (×) button."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": "'Drawer'",
+          "description": "Accessible label for the drawer when no `title` is set. Ignored if\n`title` is provided (the title supplies the accessible name instead)."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Additional CSS classes for the drawer panel."
+        },
+        {
+          "name": "overlayClassName",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Additional CSS classes for the overlay backdrop."
         }
       ]
     },
