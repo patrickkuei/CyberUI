@@ -55,6 +55,7 @@ function App() {
 | Modal | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs) |
 | Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs) |
 | Accordion | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-accordion--docs) |
+| Drawer | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-drawer--docs) |
 | Notification | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-notification--docs) |
 | Badge | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-badge--docs) |
 | Skeleton | Feedback | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-skeleton--docs) |
