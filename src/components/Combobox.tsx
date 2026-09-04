@@ -76,7 +76,12 @@ export interface ComboboxProps {
   className?: string;
   /** Element id for the input. Auto-generated via `useId` when omitted. */
   id?: string;
-  /** Name attribute for the underlying input. */
+  /**
+   * Name attribute for native form submission. Applied to a hidden input
+   * that carries the committed option `value` (not the display label), so
+   * `FormData`/uncontrolled form libraries read the same thing `Select`'s
+   * native `<select>` would.
+   */
   name?: string;
 }
 
@@ -112,7 +117,7 @@ const Combobox: React.FC<ComboboxProps> = ({
   label,
   options,
   value: controlledValue,
-  defaultValue = '',
+  defaultValue,
   onValueChange,
   placeholder,
   variant = 'primary',
@@ -128,25 +133,54 @@ const Combobox: React.FC<ComboboxProps> = ({
   name,
 }) => {
   const isControlled = controlledValue !== undefined;
-  const [internalValue, setInternalValue] = useState(defaultValue);
+  const [internalValue, setInternalValue] = useState(defaultValue ?? '');
+  // Tracks whether the consumer has ever deliberately established a value
+  // (an explicit `defaultValue`, a controlled `value`, or a real
+  // selection/commit) as opposed to merely defaulting to '' because
+  // `defaultValue` was omitted. Without this, an option with `value: ''`
+  // would look pre-selected the moment the component mounts uncontrolled.
+  const [hasCommittedOnce, setHasCommittedOnce] = useState(false);
   const committedValue = isControlled ? controlledValue : internalValue;
+  const isUnset = !isControlled && defaultValue === undefined && !hasCommittedOnce;
 
   const labelForValue = useCallback(
     (val: string): string => {
+      if (isUnset) return '';
       const match = options.find((option) => option.value === val);
       if (match) return match.label;
       return allowCustomValue ? val : '';
     },
-    [options, allowCustomValue]
+    [options, allowCustomValue, isUnset]
   );
 
   const [query, setQuery] = useState(() => labelForValue(committedValue));
   const [open, setOpen] = useState(false);
   const [activeIndex, setActiveIndex] = useState(-1);
 
+  // Holds the latest `labelForValue` so the resync effect below can read
+  // fresh `options`/`allowCustomValue` without depending on the callback's
+  // identity — depending on it directly re-fires the effect (and clobbers
+  // whatever the user is typing) whenever a parent passes a new `options`
+  // array reference, even when the committed value hasn't actually changed.
+  const labelForValueRef = useRef(labelForValue);
   useEffect(() => {
-    setQuery(labelForValue(committedValue));
-  }, [committedValue, labelForValue]);
+    labelForValueRef.current = labelForValue;
+  }, [labelForValue]);
+
+  // When a custom (non-matching) value is committed, records the exact text
+  // that should remain displayed so the resync effect below doesn't
+  // re-derive a label by looking up `committedValue` against `options` —
+  // which could coincidentally match a *different* option's `value` field
+  // and silently relabel what the user typed.
+  const customCommitValueRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (customCommitValueRef.current === committedValue) {
+      customCommitValueRef.current = null;
+      return;
+    }
+    setQuery(labelForValueRef.current(committedValue));
+  }, [committedValue]);
 
   const generatedId = useId();
   const inputId = id || generatedId;
@@ -171,6 +205,24 @@ const Combobox: React.FC<ComboboxProps> = ({
     [filteredOptions]
   );
 
+  // `activeIndex` is a positional index into `filteredOptions`. If `options`
+  // changes identity while the dropdown is open and unfiltered, the index
+  // keeps pointing at whatever position it was on, which may now be a
+  // different option entirely — pressing Enter would then select the wrong
+  // one. Reset it whenever the `options` array itself changes while open.
+  const prevOptionsRef = useRef(options);
+  useEffect(() => {
+    if (prevOptionsRef.current !== options) {
+      prevOptionsRef.current = options;
+      if (open) {
+        setActiveIndex(-1);
+      }
+    }
+    // `open` only guards whether we act on an options change, not a trigger
+    // itself — the ref comparison above ensures this never resets purely
+    // because `open` toggled (e.g. via ArrowDown) with `options` unchanged.
+  }, [options, open]);
+
   useEffect(() => {
     // jsdom (unit tests) doesn't implement scrollIntoView — guard for that environment.
     if (open && activeIndex >= 0) {
@@ -178,9 +230,16 @@ const Combobox: React.FC<ComboboxProps> = ({
     }
   }, [activeIndex, open]);
 
+  const closeAndReset = useCallback(() => {
+    setOpen(false);
+    setActiveIndex(-1);
+    setIsFiltering(false);
+  }, []);
+
   const commit = useCallback(
     (val: string) => {
       if (!isControlled) setInternalValue(val);
+      setHasCommittedOnce(true);
       onValueChange?.(val);
     },
     [isControlled, onValueChange]
@@ -191,11 +250,9 @@ const Combobox: React.FC<ComboboxProps> = ({
       if (option.disabled) return;
       commit(option.value);
       if (!isControlled) setQuery(option.label);
-      setOpen(false);
-      setActiveIndex(-1);
-      setIsFiltering(false);
+      closeAndReset();
     },
-    [commit, isControlled]
+    [commit, isControlled, closeAndReset]
   );
 
   const commitCustomOrRevert = useCallback(() => {
@@ -208,20 +265,21 @@ const Combobox: React.FC<ComboboxProps> = ({
         selectOption(exactMatch);
         return;
       }
+      // Record the exact text being committed so the committed-value resync
+      // effect leaves it displayed as-is, instead of re-deriving a label by
+      // matching `trimmed` against option *values* (which could differ from
+      // the label-based match used here and silently relabel the input).
+      customCommitValueRef.current = trimmed;
       commit(trimmed);
     } else {
       setQuery(labelForValue(committedValue));
     }
-    setOpen(false);
-    setActiveIndex(-1);
-    setIsFiltering(false);
-  }, [query, allowCustomValue, labelForValue, committedValue, options, selectOption, commit]);
+    closeAndReset();
+  }, [query, allowCustomValue, labelForValue, committedValue, options, selectOption, commit, closeAndReset]);
 
   const handleEscape = () => {
     setQuery(labelForValue(committedValue));
-    setOpen(false);
-    setActiveIndex(-1);
-    setIsFiltering(false);
+    closeAndReset();
   };
 
   const moveActive = (direction: 1 | -1) => {
@@ -300,7 +358,7 @@ const Combobox: React.FC<ComboboxProps> = ({
         danger: 'border-2 border-error/20 shadow-none',
         ghost: 'border border-border-default shadow-none',
       };
-      return variants[variantValue as keyof typeof variants];
+      return variants[variantValue as keyof typeof variants] || variants.primary;
     }
 
     const variants = {
@@ -311,7 +369,7 @@ const Combobox: React.FC<ComboboxProps> = ({
       danger: 'border-2 border-error shadow-error/30 hover:shadow-error focus:ring-2 focus:ring-error focus:shadow-error',
       ghost: 'border border-border-default shadow-none hover:border-accent focus:ring-2 focus:ring-accent focus:border-accent',
     };
-    return variants[variantValue as keyof typeof variants];
+    return variants[variantValue as keyof typeof variants] || variants.primary;
   };
 
   const iconColorClass = (): string => {
@@ -323,7 +381,7 @@ const Combobox: React.FC<ComboboxProps> = ({
       danger: 'text-error',
       ghost: 'text-muted',
     };
-    return colors[variant];
+    return colors[variant] || colors.primary;
   };
 
   const inputClasses = cn(
@@ -354,9 +412,11 @@ const Combobox: React.FC<ComboboxProps> = ({
       )}
 
       <div className="relative w-full">
+        {/* Carries the committed option value (not the display label) for
+            native form submission / uncontrolled form-library reads. */}
+        <input type="hidden" name={inputName} value={committedValue} />
         <input
           id={inputId}
-          name={inputName}
           type="text"
           role="combobox"
           aria-expanded={open}
@@ -398,7 +458,13 @@ const Combobox: React.FC<ComboboxProps> = ({
             ) : (
               filteredOptions.map((option, index) => {
                 const isActive = index === activeIndex;
-                const isSelected = option.value === committedValue;
+                // Guard against the "unset" sentinel (see `isUnset` above) and
+                // dedup so that options sharing the same `value` only ever
+                // mark the first match as selected.
+                const isSelected =
+                  !isUnset &&
+                  option.value === committedValue &&
+                  filteredOptions.findIndex((o) => o.value === committedValue) === index;
                 return (
                   <li
                     key={option.value}

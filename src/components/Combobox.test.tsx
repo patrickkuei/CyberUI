@@ -212,4 +212,110 @@ describe('Combobox', () => {
     fireEvent.focus(screen.getByRole('combobox'));
     expect(screen.getByRole('listbox')).toBeInTheDocument();
   });
+
+  it('does not clobber in-progress typed text when the options array gets a new reference', () => {
+    // Regression: `labelForValue` used to be a dep of the committed-value
+    // resync effect, so any parent re-render passing a fresh `options`
+    // array identity (e.g. `options={items.filter(...)}`) re-fired the
+    // effect and silently overwrote whatever the user was actively typing.
+    const { rerender } = render(<Combobox options={OPTIONS} label="Target Sector" defaultValue="sector-1" />);
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: 'sprawl' } });
+    expect(input).toHaveValue('sprawl');
+
+    // Same content, new array reference — simulates an inline-computed options prop.
+    rerender(<Combobox options={[...OPTIONS]} label="Target Sector" defaultValue="sector-1" />);
+    expect(input).toHaveValue('sprawl');
+  });
+
+  it('submits the committed option value (not the display label) via a hidden input', () => {
+    // Regression: the visible text input carried `name`, so FormData/native
+    // form submission and uncontrolled form libraries read the human
+    // readable label instead of the option's actual value.
+    render(<Combobox options={OPTIONS} label="Target Sector" defaultValue="sector-2" name="sector" />);
+    const visibleInput = screen.getByRole('combobox');
+    expect(visibleInput).not.toHaveAttribute('name');
+
+    const hiddenInput = document.querySelector('input[type="hidden"][name="sector"]') as HTMLInputElement | null;
+    expect(hiddenInput).not.toBeNull();
+    expect(hiddenInput).toHaveValue('sector-2');
+  });
+
+  it('resets activeIndex when options change identity while the dropdown is open', () => {
+    // Regression: `activeIndex` is a positional index into `filteredOptions`.
+    // If `options` changed identity while open and unfiltered, the stale
+    // index kept pointing at whatever position it was on, so Enter could
+    // select a completely different (or now-disabled) option.
+    const handleChange = vi.fn();
+    const { rerender } = render(<Combobox options={OPTIONS} label="Target Sector" onValueChange={handleChange} />);
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    fireEvent.keyDown(input, { key: 'ArrowDown' }); // activeIndex -> 0 (sector-1)
+
+    const NEW_OPTIONS: ComboboxOption[] = [
+      { value: 'zone-a', label: 'Zone A' },
+      { value: 'zone-b', label: 'Zone B' },
+    ];
+    rerender(<Combobox options={NEW_OPTIONS} label="Target Sector" onValueChange={handleChange} />);
+
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('keeps typed custom text as-is when it matches another option value (not label)', async () => {
+    // Regression: custom-value commits matched by option LABEL, but the
+    // value-sync effect matched by option VALUE. Typing text that happens
+    // to equal a different option's `value` committed correctly as custom
+    // text, then got silently relabeled to that other option's label.
+    const handleChange = vi.fn();
+    render(<Combobox options={OPTIONS} label="Tag Search" allowCustomValue onValueChange={handleChange} />);
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    // "sector-2" matches OPTIONS[1].value but no option's label.
+    fireEvent.change(input, { target: { value: 'sector-2' } });
+    fireEvent.blur(input);
+
+    await waitFor(() => expect(handleChange).toHaveBeenCalledWith('sector-2'));
+    expect(input).toHaveValue('sector-2');
+  });
+
+  it('does not pre-select an empty-value placeholder option when uncontrolled and unset', () => {
+    // Regression: an uncontrolled Combobox with no `defaultValue` starts
+    // with an internal committed value of ''. An option with `value: ''`
+    // (e.g. a placeholder like "All Sectors") collided with that sentinel,
+    // so it appeared pre-selected before the user ever interacted.
+    const OPTIONS_WITH_PLACEHOLDER: ComboboxOption[] = [{ value: '', label: 'All Sectors' }, ...OPTIONS];
+    const handleChange = vi.fn();
+    render(<Combobox options={OPTIONS_WITH_PLACEHOLDER} label="Target Sector" onValueChange={handleChange} />);
+    const input = screen.getByRole('combobox');
+    expect(input).toHaveValue('');
+
+    fireEvent.focus(input);
+    expect(screen.getByRole('option', { name: 'All Sectors' })).toHaveAttribute('aria-selected', 'false');
+    expect(handleChange).not.toHaveBeenCalled();
+  });
+
+  it('does pre-select an empty-value option when defaultValue is explicitly set to ""', () => {
+    // Complements the regression above: an *explicit* empty-string
+    // defaultValue is a deliberate choice and should still match.
+    const OPTIONS_WITH_PLACEHOLDER: ComboboxOption[] = [{ value: '', label: 'All Sectors' }, ...OPTIONS];
+    render(<Combobox options={OPTIONS_WITH_PLACEHOLDER} label="Target Sector" defaultValue="" />);
+    expect(screen.getByRole('combobox')).toHaveValue('All Sectors');
+  });
+
+  it('marks only the first option as selected when multiple options share the same value', () => {
+    // Regression: `isSelected` had no dedup, so options sharing a `value`
+    // (e.g. merged from two data sources) all rendered aria-selected="true"
+    // simultaneously while the input only ever showed the first one's label.
+    const DUPLICATE_OPTIONS: ComboboxOption[] = [
+      { value: 'sector-2', label: 'Sector 2 — The Sprawl (Primary Feed)' },
+      { value: 'sector-2', label: 'Sector 2 — The Sprawl (Mirror Feed)' },
+    ];
+    render(<Combobox options={DUPLICATE_OPTIONS} label="Target Sector" defaultValue="sector-2" />);
+    fireEvent.focus(screen.getByRole('combobox'));
+    const options = screen.getAllByRole('option');
+    expect(options[0]).toHaveAttribute('aria-selected', 'true');
+    expect(options[1]).toHaveAttribute('aria-selected', 'false');
+  });
 });
