@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, memo } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 import { cn } from '../utils/cn';
@@ -15,7 +15,9 @@ function range(start: number, end: number): number[] {
 /**
  * Computes the collapsed page list for compact mode: `boundaryCount` pages at
  * each edge, `siblingCount` pages around `current`, and an `ELLIPSIS` marker
- * wherever pages were skipped. Falls back to every page when the total fits
+ * wherever pages were skipped. When a gap is exactly one page wide, that page
+ * is shown in place of the ellipsis instead of being collapsed (collapsing a
+ * single page saves no space). Falls back to every page when the total fits
  * within the available slots.
  */
 function getCompactPageItems(
@@ -24,29 +26,36 @@ function getCompactPageItems(
   siblingCount: number,
   boundaryCount: number
 ): PageItem[] {
-  const totalSlots = boundaryCount * 2 + siblingCount * 2 + 3;
+  const totalSlots = boundaryCount * 2 + siblingCount * 2 + 5;
   if (total <= totalSlots) return range(1, total);
 
-  const leftSibling = Math.max(current - siblingCount, boundaryCount + 2);
-  const rightSibling = Math.min(current + siblingCount, total - boundaryCount - 1);
+  const startPages = range(1, Math.min(boundaryCount, total));
+  const endPages = range(Math.max(total - boundaryCount + 1, boundaryCount + 1), total);
 
-  const showLeftEllipsis = leftSibling > boundaryCount + 2;
-  const showRightEllipsis = rightSibling < total - boundaryCount - 1;
+  const siblingsStart = Math.max(
+    Math.min(current - siblingCount, total - boundaryCount - siblingCount * 2 - 1),
+    boundaryCount + 2
+  );
+  const siblingsEnd = Math.min(
+    Math.max(current + siblingCount, boundaryCount + siblingCount * 2 + 2),
+    endPages.length > 0 ? endPages[0] - 2 : total - 1
+  );
 
-  const firstPages = range(1, boundaryCount);
-  const lastPages = range(total - boundaryCount + 1, total);
-
-  if (!showLeftEllipsis && showRightEllipsis) {
-    const leftRange = range(1, boundaryCount + siblingCount * 2 + 1);
-    return [...leftRange, ELLIPSIS, ...lastPages];
-  }
-
-  if (showLeftEllipsis && !showRightEllipsis) {
-    const rightRange = range(total - (boundaryCount + siblingCount * 2), total);
-    return [...firstPages, ELLIPSIS, ...rightRange];
-  }
-
-  return [...firstPages, ELLIPSIS, ...range(leftSibling, rightSibling), ELLIPSIS, ...lastPages];
+  return [
+    ...startPages,
+    ...(siblingsStart > boundaryCount + 2
+      ? [ELLIPSIS]
+      : boundaryCount + 1 < total - boundaryCount
+        ? [boundaryCount + 1]
+        : []),
+    ...range(siblingsStart, siblingsEnd),
+    ...(siblingsEnd < total - boundaryCount - 1
+      ? [ELLIPSIS]
+      : total - boundaryCount > boundaryCount
+        ? [total - boundaryCount]
+        : []),
+    ...endPages,
+  ];
 }
 
 /**
@@ -123,6 +132,44 @@ const variantStyles: Record<
   },
 };
 
+interface NavButtonProps {
+  direction: 'previous' | 'next';
+  disabled: boolean;
+  onClick: () => void;
+  controlBaseClasses: string;
+  inactiveHover: string;
+}
+
+/**
+ * Previous/Next control. Enabled and disabled states use mutually exclusive
+ * class strings (never combined in one `cn()` call) so a `hover:shadow-*`
+ * class can never collide with `hover:shadow-none` — Tailwind-merge doesn't
+ * dedupe this project's custom `--shadow-*` theme tokens, so combining them
+ * would leave both in the DOM with the winner decided by CSS source order.
+ */
+const NavButton: React.FC<NavButtonProps> = ({ direction, disabled, onClick, controlBaseClasses, inactiveHover }) => {
+  const isPrevious = direction === 'previous';
+  return (
+    <li>
+      <button
+        type="button"
+        aria-label={isPrevious ? 'Previous page' : 'Next page'}
+        disabled={disabled}
+        onClick={onClick}
+        className={cn(
+          controlBaseClasses,
+          'bg-surface border border-muted/30',
+          disabled
+            ? 'text-secondary opacity-40 cursor-not-allowed'
+            : cn('text-secondary cursor-pointer', inactiveHover)
+        )}
+      >
+        <span aria-hidden="true">{isPrevious ? '‹' : '›'}</span>
+      </button>
+    </li>
+  );
+};
+
 /**
  * A cyberpunk-styled page control for list/table views with more results
  * than fit on one page. Always controlled via `currentPage`/`onPageChange`,
@@ -178,30 +225,45 @@ const Pagination: React.FC<PaginationProps> = ({
     );
   }
 
+  // Clamped once and reused everywhere below, so an out-of-range `currentPage`
+  // (e.g. a stale prop after a filtered list shrinks) can't leave Previous/Next
+  // and the active-page highlight disagreeing about what's "current".
+  const safeCurrentPage =
+    totalPages > 0 ? Math.min(Math.max(currentPage, 1), totalPages) : currentPage;
+
   const goTo = useCallback(
     (page: number) => {
-      if (disabled || page < 1 || page > totalPages || page === currentPage) return;
+      if (disabled || page < 1 || page > totalPages || page === safeCurrentPage) return;
       onPageChange(page);
     },
-    [disabled, totalPages, currentPage, onPageChange]
+    [disabled, totalPages, safeCurrentPage, onPageChange]
   );
 
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLElement>) => {
-    if (disabled) return;
-    if (event.key === 'Home') {
-      event.preventDefault();
-      goTo(1);
-    } else if (event.key === 'End') {
-      event.preventDefault();
-      goTo(totalPages);
-    }
-  };
+  const handleKeyDown = useCallback(
+    (event: React.KeyboardEvent<HTMLElement>) => {
+      if (disabled) return;
+      if (event.key === 'Home') {
+        event.preventDefault();
+        goTo(1);
+      } else if (event.key === 'End') {
+        event.preventDefault();
+        goTo(totalPages);
+      }
+    },
+    [disabled, goTo, totalPages]
+  );
+
+  const items: PageItem[] = useMemo(
+    () =>
+      totalPages < 1
+        ? []
+        : compact
+          ? getCompactPageItems(safeCurrentPage, totalPages, siblingCount, boundaryCount)
+          : range(1, totalPages),
+    [compact, safeCurrentPage, totalPages, siblingCount, boundaryCount]
+  );
 
   if (totalPages < 1) return null;
-
-  const items: PageItem[] = compact
-    ? getCompactPageItems(currentPage, totalPages, siblingCount, boundaryCount)
-    : range(1, totalPages);
 
   const sizeClasses = getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.pagination);
   const { active: activeClasses, inactiveHover } = variantStyles[variant];
@@ -216,22 +278,13 @@ const Pagination: React.FC<PaginationProps> = ({
     <nav aria-label={ariaLabel} className={cn('inline-flex', className)} onKeyDown={handleKeyDown}>
       <ul className="flex items-center gap-1.5 list-none m-0 p-0">
         {showPrevNext && (
-          <li>
-            <button
-              type="button"
-              aria-label="Previous page"
-              disabled={disabled || currentPage <= 1}
-              onClick={() => goTo(currentPage - 1)}
-              className={cn(
-                controlBaseClasses,
-                'bg-surface border border-muted/30 text-secondary cursor-pointer',
-                inactiveHover,
-                (disabled || currentPage <= 1) && 'opacity-40 cursor-not-allowed hover:shadow-none hover:border-muted/30 hover:text-secondary'
-              )}
-            >
-              <span aria-hidden="true">&#8249;</span>
-            </button>
-          </li>
+          <NavButton
+            direction="previous"
+            disabled={disabled || safeCurrentPage <= 1}
+            onClick={() => goTo(safeCurrentPage - 1)}
+            controlBaseClasses={controlBaseClasses}
+            inactiveHover={inactiveHover}
+          />
         )}
 
         {items.map((item, index) =>
@@ -246,14 +299,14 @@ const Pagination: React.FC<PaginationProps> = ({
               <button
                 type="button"
                 aria-label={`Page ${item}`}
-                aria-current={item === currentPage ? 'page' : undefined}
+                aria-current={item === safeCurrentPage ? 'page' : undefined}
                 disabled={disabled}
                 onClick={() => goTo(item)}
                 className={cn(
                   controlBaseClasses,
                   disabled
                     ? 'bg-base border border-muted/20 text-muted/40 cursor-not-allowed opacity-50'
-                    : item === currentPage
+                    : item === safeCurrentPage
                       ? cn(activeClasses, 'cursor-default')
                       : cn('bg-surface border border-muted/30 text-muted cursor-pointer', inactiveHover)
                 )}
@@ -265,22 +318,13 @@ const Pagination: React.FC<PaginationProps> = ({
         )}
 
         {showPrevNext && (
-          <li>
-            <button
-              type="button"
-              aria-label="Next page"
-              disabled={disabled || currentPage >= totalPages}
-              onClick={() => goTo(currentPage + 1)}
-              className={cn(
-                controlBaseClasses,
-                'bg-surface border border-muted/30 text-secondary cursor-pointer',
-                inactiveHover,
-                (disabled || currentPage >= totalPages) && 'opacity-40 cursor-not-allowed hover:shadow-none hover:border-muted/30 hover:text-secondary'
-              )}
-            >
-              <span aria-hidden="true">&#8250;</span>
-            </button>
-          </li>
+          <NavButton
+            direction="next"
+            disabled={disabled || safeCurrentPage >= totalPages}
+            onClick={() => goTo(safeCurrentPage + 1)}
+            controlBaseClasses={controlBaseClasses}
+            inactiveHover={inactiveHover}
+          />
         )}
       </ul>
     </nav>
@@ -289,4 +333,4 @@ const Pagination: React.FC<PaginationProps> = ({
 
 Pagination.displayName = 'CyberUI.Pagination';
 
-export default Pagination;
+export default memo(Pagination);

@@ -149,4 +149,39 @@ describe('Pagination', () => {
     );
     expect(screen.getByRole('button', { name: 'Page 1' })).toBeInTheDocument();
   });
+
+  it('keeps the current page\'s siblings visible when the ellipsis is transitioning near a boundary', () => {
+    // Regression: the near-boundary branches used to compute a fixed-width
+    // range instead of [leftSibling, rightSibling], silently dropping the
+    // sibling adjacent to currentPage.
+    const { rerender } = render(<Pagination currentPage={17} totalPages={20} onPageChange={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Page 16' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 17' })).toBeInTheDocument();
+
+    rerender(<Pagination currentPage={4} totalPages={20} onPageChange={() => {}} />);
+    expect(screen.getByRole('button', { name: 'Page 4' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Page 5' })).toBeInTheDocument();
+  });
+
+  it('clamps an out-of-range currentPage instead of leaving Previous enabled but inert', () => {
+    // Regression: an unclamped currentPage let Previous render enabled while
+    // goTo() silently no-op'd on click, with no visible explanation.
+    const handleChange = vi.fn();
+    render(<Pagination currentPage={999} totalPages={5} onPageChange={handleChange} />);
+    expect(screen.getByRole('button', { name: 'Page 5' })).toHaveAttribute('aria-current', 'page');
+    expect(screen.getByRole('button', { name: 'Next page' })).toBeDisabled();
+    fireEvent.click(screen.getByRole('button', { name: 'Previous page' }));
+    expect(handleChange).toHaveBeenCalledWith(4);
+  });
+
+  it('never renders a hover-shadow class on a disabled Prev/Next control', () => {
+    // Regression: tailwind-merge doesn't dedupe this project's custom
+    // --shadow-* theme tokens, so a disabled button that combined an active
+    // hover:shadow-<variant> class with a hover:shadow-none override left
+    // both in the DOM, with CSS source order (not the override) deciding
+    // which one applied on hover.
+    render(<Pagination currentPage={1} totalPages={5} onPageChange={() => {}} />);
+    const previous = screen.getByRole('button', { name: 'Previous page' });
+    expect(previous.className).not.toMatch(/hover:shadow-/);
+  });
 });
