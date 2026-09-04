@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-07-26T06:11:37.769Z",
+  "generatedAt": "2026-08-02T06:15:31.179Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -1526,7 +1526,7 @@
           "type": "ReactElement<unknown, string | JSXElementConstructor<any>> | ((triggerProps: DropdownMenuTriggerProps) => ReactElement<...>)",
           "required": true,
           "default": null,
-          "description": "The trigger that opens the menu. Pass a single React element (e.g. a\n`Button`) to have it cloned with the required `onClick`/`aria-*`\nwiring, or a render prop for full control over how those props are\napplied.\n@example // Element trigger\n<DropdownMenu trigger={<Button variant=\"secondary\">Actions</Button>} items={items} />\n@example // Render-prop trigger\n<DropdownMenu\n  trigger={(triggerProps) => <button {...triggerProps}>Actions</button>}\n  items={items}\n/>"
+          "description": "The trigger that opens the menu. Pass a single React element (e.g. a\n`Button`) to have it cloned with the required `onClick`/`aria-*`\nwiring, or a render prop for full control over how those props are\napplied. If the element already has its own `onClick`/`onKeyDown`,\nthey're called first, before the dropdown's own handling runs.\n@example // Element trigger\n<DropdownMenu trigger={<Button variant=\"secondary\">Actions</Button>} items={items} />\n@example // Render-prop trigger\n<DropdownMenu\n  trigger={(triggerProps) => <button {...triggerProps}>Actions</button>}\n  items={items}\n/>"
         },
         {
           "name": "align",
@@ -1590,6 +1590,102 @@
           "required": false,
           "default": "",
           "description": "Additional CSS classes for the menu panel."
+        }
+      ]
+    },
+    {
+      "name": "Pagination",
+      "category": "Navigation",
+      "sourceFile": "src/components/Pagination.tsx",
+      "displayName": "Pagination",
+      "description": "A cyberpunk-styled page control for list/table views with more results\nthan fit on one page. Always controlled via `currentPage`/`onPageChange`,\nwith a compact ellipsis-collapsing mode for large page counts.",
+      "docSummary": "Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls.",
+      "storybookPath": "components-pagination--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "currentPage",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "Current active page, 1-based. Pagination is always controlled by this value."
+        },
+        {
+          "name": "totalPages",
+          "type": "number",
+          "required": true,
+          "default": null,
+          "description": "Total number of pages available."
+        },
+        {
+          "name": "onPageChange",
+          "type": "(page: number) => void",
+          "required": true,
+          "default": null,
+          "description": "Fired with the newly selected page number when the user clicks a page, Previous/Next, or uses Home/End."
+        },
+        {
+          "name": "compact",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Collapses distant page numbers behind an ellipsis for large page counts,\nalways keeping `boundaryCount` pages at each edge and `siblingCount`\npages around `currentPage` visible. When `false`, every page renders."
+        },
+        {
+          "name": "siblingCount",
+          "type": "number | undefined",
+          "required": false,
+          "default": 1,
+          "description": "Number of page buttons shown on each side of `currentPage` when `compact` is true."
+        },
+        {
+          "name": "boundaryCount",
+          "type": "number | undefined",
+          "required": false,
+          "default": 1,
+          "description": "Number of page buttons always shown at the start and end when `compact` is true."
+        },
+        {
+          "name": "showPrevNext",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether to render Previous/Next controls alongside the page numbers."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style for the active page and hover glow, matching Button/Badge's variant vocabulary."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of each page control. Can be a static value or a responsive object."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables every control in the group — no page can be selected."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": "Pagination",
+          "description": "Accessible label for the containing `<nav>` landmark."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer `<nav>`."
         }
       ]
     },
