@@ -142,7 +142,8 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
                     onTabChange(tab);
                     if (closeOnSelect) {
                       setIsClosing(true);
-                      setTimeout(() => {
+                      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
+                      closeTimeoutRef.current = setTimeout(() => {
                         setOpen(false);
                         setIsClosing(false);
                       }, 180);
