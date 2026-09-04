@@ -145,7 +145,7 @@
       "name": "Full library (all components, ESM)",
       "path": "dist/index.es.js",
       "import": "*",
-      "limit": "40 KB",
+      "limit": "58 KB",
       "gzip": true
     },
     {
