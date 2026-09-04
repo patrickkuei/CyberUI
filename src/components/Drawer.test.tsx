@@ -224,13 +224,15 @@ describe('Drawer Component', () => {
     expect(document.body.style.overflow).toBe('');
   });
 
-  it('starts the open transition immediately instead of sitting hidden with duration-0 for the whole timer window', () => {
+  it('renders one genuine hidden frame, then starts transitioning on the next frame, instead of sitting hidden for the whole timer window', () => {
     // Regression: the panel used to render fully hidden with a `duration-0`
     // transition class for the entire OPEN_DURATION window, then snap to
     // `duration-300` only once the timer fired — a ~350ms-late pop instead
-    // of a continuous slide-in. Right after mount (before the open timer
-    // fires) the panel should already be transitioning toward its visible
-    // position with an active transition duration.
+    // of a slide-in. The fix needs a real "before" frame for the CSS
+    // transition to animate from, so the very first commit is still hidden
+    // (duration-0) — it's the *next* animation frame that should already be
+    // transitioning toward the visible position, well before the
+    // OPEN_DURATION settle timer fires.
     render(
       <Drawer isOpen={true} onClose={vi.fn()}>
         <div>Content</div>
@@ -238,6 +240,12 @@ describe('Drawer Component', () => {
     );
 
     const panel = screen.getByRole('dialog');
+    expect(panel.className).toContain('duration-0');
+
+    act(() => {
+      vi.advanceTimersByTime(16);
+    });
+
     expect(panel.className).not.toContain('duration-0');
     expect(panel.className).toContain('duration-300');
     expect(panel.className).toContain('translate-x-0');
@@ -349,5 +357,54 @@ describe('Drawer Component', () => {
     fireEvent.click(screen.getByTestId('force-rerender'));
 
     expect(input).toHaveFocus();
+  });
+
+  it('replays the slide-in transition on a reopen, not just the very first open', () => {
+    // Regression: `hasEntered` is component state, not DOM state — it isn't
+    // reset by the panel's conditional unmount (isOpen -> null vs the
+    // portal'd div), so it was left `true` from the previous open cycle.
+    // Reopening mounted a fresh DOM node straight into that stale "entered"
+    // state, with nothing to transition from, so the slide-in silently
+    // didn't play on anything but the very first open.
+    const handleClose = vi.fn();
+    const { rerender } = render(
+      <Drawer isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+
+    // Let the first open fully settle.
+    act(() => {
+      vi.advanceTimersByTime(300);
+    });
+
+    // Close it and let the close animation actually finish, so onClose fires
+    // the way a real controlled consumer would experience it.
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Drawer isOpen={false} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+    expect(screen.queryByRole('dialog')).toBeNull();
+
+    // Reopen.
+    rerender(
+      <Drawer isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+
+    // Immediately after mount — before the settle timer or the next
+    // animation frame fires — it must start hidden again, not already
+    // sitting in the fully-entered state.
+    const panel = screen.getByRole('dialog');
+    expect(panel.className).toContain('duration-0');
+    expect(panel.className).not.toContain('duration-300');
   });
 });

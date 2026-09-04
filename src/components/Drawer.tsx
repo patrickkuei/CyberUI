@@ -1,6 +1,7 @@
 import React, {
   useState,
   useEffect,
+  useLayoutEffect,
   useRef,
   useCallback,
   useId,
@@ -181,12 +182,24 @@ const Drawer: React.FC<DrawerProps> = memo(
       }, CLOSE_DURATION);
     }, [onClose]);
 
-    useEffect(() => {
+    // Runs synchronously before the browser paints. The panel/overlay `<div>`
+    // is conditionally mounted ({(isOpen || isClosing) && ...}), so reopening
+    // after a previous close/open cycle mounts a brand-new DOM node — one
+    // that would otherwise render straight into a *stale* `hasEntered=true`
+    // (left over from the prior open) with nothing to transition from, i.e.
+    // it just pops fully visible with no slide-in. A plain `useEffect` reset
+    // here would run too late, after that stale-visible frame already
+    // painted; `useLayoutEffect` corrects it before the user ever sees it.
+    useLayoutEffect(() => {
       if (isOpen && !isClosing) {
         previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
         setIsOpening(true);
         setHasEntered(false);
+      }
+    }, [isOpen, isClosing]);
 
+    useEffect(() => {
+      if (isOpen && !isClosing) {
         if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
         openTimeoutRef.current = setTimeout(() => {
           setIsOpening(false);
@@ -195,13 +208,18 @@ const Drawer: React.FC<DrawerProps> = memo(
       }
     }, [isOpen, isClosing]);
 
-    // Kicks the entrance transition on the next paint after the hidden frame
-    // above has committed, so the panel/overlay actively animate from hidden
-    // to visible for the whole OPEN_DURATION window instead of sitting fully
-    // hidden with a zero-length transition until the timer fires.
+    // Kicks the entrance transition on the next animation frame after the
+    // hidden frame from the layout effect above has actually been painted,
+    // so the CSS transition always has a real "before" frame to animate
+    // from. (A second `useEffect` chasing the overlapping
+    // [isOpen, isClosing, isOpening, hasEntered] deps raced on reopen here
+    // too — its closure could still observe a stale `hasEntered`, which is
+    // why the slide-in sometimes didn't play on anything but the very first
+    // open. requestAnimationFrame instead guarantees a real painted frame.)
     useEffect(() => {
       if (isOpen && !isClosing && isOpening && !hasEntered) {
-        setHasEntered(true);
+        const raf = requestAnimationFrame(() => setHasEntered(true));
+        return () => cancelAnimationFrame(raf);
       }
     }, [isOpen, isClosing, isOpening, hasEntered]);
 
