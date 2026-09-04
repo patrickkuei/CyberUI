@@ -18,7 +18,11 @@ const meta: Meta<typeof DatePicker> = {
     ),
   ],
   parameters: {
-    layout: 'padded',
+    // 'centered' (not 'padded') matches Input/Select/Combobox — the trigger
+    // is `w-full` (fills whatever container the consumer gives it, same as
+    // every other form control here), so under 'padded' it stretched to the
+    // full canvas width and looked comically wide for a short date string.
+    layout: 'centered',
     docs: {
       description: {
         component: `A cyberpunk-styled single-date picker — a text-input trigger (matching Input's styling) that opens a keyboard-navigable calendar grid popover (matching Modal/Select's overlay treatment). Range selection is a natural follow-up once single-date selection is proven out.
