@@ -29,6 +29,18 @@ const tagOptions = [
 const meta: Meta<typeof Combobox> = {
   title: "Components/Combobox",
   component: Combobox,
+  // The filtered listbox is up to ~290px tall (max-h-60 + the input above
+  // it) when open; without reserved canvas height every story renders at
+  // just the input's collapsed height and the opened listbox gets clipped
+  // by Storybook's canvas — the same class of issue DropdownMenu.stories.tsx
+  // and DatePicker.stories.tsx already guard against for their own popovers.
+  decorators: [
+    (Story) => (
+      <div className="min-h-[320px] pt-4">
+        <Story />
+      </div>
+    ),
+  ],
   parameters: {
     layout: "centered",
     docs: {
