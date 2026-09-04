@@ -26,6 +26,7 @@ export { default as Avatar } from './Avatar';
 export { default as RadioGroup } from './RadioGroup';
 export { default as DropdownMenu } from './DropdownMenu';
 export { default as Pagination } from './Pagination';
+export { default as Slider } from './Slider';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -55,6 +56,7 @@ export type { AvatarProps, AvatarStatus } from './Avatar';
 export type { RadioGroupProps, RadioOption } from './RadioGroup';
 export type { DropdownMenuProps, DropdownMenuItem, DropdownMenuTriggerProps } from './DropdownMenu';
 export type { PaginationProps } from './Pagination';
+export type { SliderProps, SliderValue } from './Slider';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

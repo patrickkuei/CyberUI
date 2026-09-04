@@ -171,6 +171,18 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "w-10 h-10 text-sm",
     lg: "w-12 h-12 text-base",
   },
+  slider: {
+    track: {
+      sm: "h-1.5",
+      md: "h-2",
+      lg: "h-3",
+    },
+    thumb: {
+      sm: "w-4 h-4",
+      md: "w-5 h-5",
+      lg: "w-6 h-6",
+    },
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults
