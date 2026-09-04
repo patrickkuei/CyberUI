@@ -30,7 +30,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 <!-- cyberui-2045:manifest:start -->
 | Category    | Components |
 |-------------|-----------|
-| Forms | Button, Input, Toggle, Select, Checkbox, FormField, RadioGroup, Slider, Combobox |
+| Forms | Button, Input, Toggle, Select, Checkbox, FormField, RadioGroup, Slider, Combobox, DatePicker |
 | Layout | Card, Modal, Divider, Accordion, Drawer |
 | Feedback | Notification, Badge, Skeleton, Tooltip |
 | Progress | CircularProgress, SegmentedProgress, LinearProgress |

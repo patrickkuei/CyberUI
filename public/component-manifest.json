@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-09-04T10:17:56.924Z",
+  "generatedAt": "2026-09-04T10:26:14.669Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -720,6 +720,130 @@
           "required": false,
           "default": null,
           "description": "Name attribute for native form submission. Applied to a hidden input\nthat carries the committed option `value` (not the display label), so\n`FormData`/uncontrolled form libraries read the same thing `Select`'s\nnative `<select>` would."
+        }
+      ]
+    },
+    {
+      "name": "DatePicker",
+      "category": "Forms",
+      "sourceFile": "src/components/DatePicker.tsx",
+      "displayName": "DatePicker",
+      "description": "A cyberpunk-styled single-date picker: a text-input trigger (matching\nInput's styling) that opens a keyboard-navigable calendar grid popover\n(matching Modal/Select's overlay treatment). Range selection is not yet\nsupported — a natural follow-up once single-date selection is proven out.",
+      "docSummary": "Single-date picker with a text-input trigger and a keyboard-navigable calendar grid popover. `minDate`/`maxDate` bounds, neon-highlighted selected day, glow on today.",
+      "storybookPath": "components-datepicker--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "value",
+          "type": "Date | null | undefined",
+          "required": false,
+          "default": null,
+          "description": "Selected date (controlled). Pass `null` to represent no selection."
+        },
+        {
+          "name": "defaultValue",
+          "type": "Date | null | undefined",
+          "required": false,
+          "default": null,
+          "description": "Initial selected date for uncontrolled usage."
+        },
+        {
+          "name": "onValueChange",
+          "type": "((date: Date | null) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when the user selects a day in the calendar grid."
+        },
+        {
+          "name": "minDate",
+          "type": "Date | undefined",
+          "required": false,
+          "default": null,
+          "description": "Earliest selectable date (inclusive). Days before it render dimmed and disabled."
+        },
+        {
+          "name": "maxDate",
+          "type": "Date | undefined",
+          "required": false,
+          "default": null,
+          "description": "Latest selectable date (inclusive). Days after it render dimmed and disabled."
+        },
+        {
+          "name": "label",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Label rendered above the trigger input."
+        },
+        {
+          "name": "placeholder",
+          "type": "string | undefined",
+          "required": false,
+          "default": "Select a date...",
+          "description": "Placeholder text shown in the trigger when no date is selected."
+        },
+        {
+          "name": "variant",
+          "type": "\"primary\" | \"secondary\" | \"danger\" | \"ghost\" | undefined",
+          "required": false,
+          "default": "primary",
+          "description": "Visual style of the trigger input, reusing Input's variant vocabulary."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Size of the trigger input (height and padding)."
+        },
+        {
+          "name": "disabled",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Disables the trigger and prevents the calendar from opening."
+        },
+        {
+          "name": "helperText",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Optional helper text shown below the trigger."
+        },
+        {
+          "name": "error",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Error message that overrides helper text and highlights the trigger."
+        },
+        {
+          "name": "formatDate",
+          "type": "((date: Date) => string) | undefined",
+          "required": false,
+          "default": "(date: Date): string => {\r\n  const y = date.getFullYear();\r\n  const m = String(date.getMonth() + 1).padStart(2, '0');\r\n  const d = String(date.getDate()).padStart(2, '0');\r\n  return `${y}-${m}-${d}`;\r\n}",
+          "description": "Formats the selected date for display in the trigger input."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": "Choose date",
+          "description": "Accessible label for the calendar dialog."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer wrapper."
+        },
+        {
+          "name": "id",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "id applied to the trigger input."
         }
       ]
     },
