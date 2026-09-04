@@ -102,7 +102,10 @@ const HIDDEN_TRANSFORM: Record<DrawerSide, string> = {
   bottom: "translate-y-full",
 };
 
-const OPEN_DURATION = 350;
+// Matches the panel/overlay's `duration-300` transition class below — keep
+// these in sync so the JS settle timer fires exactly when the CSS
+// transition finishes.
+const OPEN_DURATION = 300;
 const CLOSE_DURATION = 250;
 
 /**
@@ -149,6 +152,12 @@ const Drawer: React.FC<DrawerProps> = memo(
   }) => {
     const [isClosing, setIsClosing] = useState(false);
     const [isOpening, setIsOpening] = useState(true);
+    // Tracks whether the entrance transition has been kicked off yet. Starts
+    // `false` so the very first paint commits the panel/overlay in their
+    // hidden position; a follow-up effect then flips this to `true` on the
+    // next paint so the CSS transition has a real "before" frame to animate
+    // from instead of snapping into place once OPEN_DURATION elapses.
+    const [hasEntered, setHasEntered] = useState(false);
 
     const overlayRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
@@ -159,6 +168,11 @@ const Drawer: React.FC<DrawerProps> = memo(
 
     const closeDrawer = useCallback(() => {
       setIsClosing(true);
+      // Cancel any pending open-settle timer — without this, closing while
+      // the initial open animation is still in flight let the stale open
+      // timer fire later, flipping isOpening back and yanking focus into a
+      // panel that's now closing (or already gone).
+      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
       if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = setTimeout(() => {
         setIsClosing(false);
@@ -171,6 +185,7 @@ const Drawer: React.FC<DrawerProps> = memo(
       if (isOpen && !isClosing) {
         previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
         setIsOpening(true);
+        setHasEntered(false);
 
         if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
         openTimeoutRef.current = setTimeout(() => {
@@ -179,6 +194,16 @@ const Drawer: React.FC<DrawerProps> = memo(
         }, OPEN_DURATION);
       }
     }, [isOpen, isClosing]);
+
+    // Kicks the entrance transition on the next paint after the hidden frame
+    // above has committed, so the panel/overlay actively animate from hidden
+    // to visible for the whole OPEN_DURATION window instead of sitting fully
+    // hidden with a zero-length transition until the timer fires.
+    useEffect(() => {
+      if (isOpen && !isClosing && isOpening && !hasEntered) {
+        setHasEntered(true);
+      }
+    }, [isOpen, isClosing, isOpening, hasEntered]);
 
     useEffect(() => {
       return () => {
@@ -199,14 +224,25 @@ const Drawer: React.FC<DrawerProps> = memo(
       [closeDrawer, closeOnOverlayClick]
     );
 
-    const handleKeyDown = useCallback(
-      (e: KeyboardEvent) => {
-        if (closeOnEscape && e.key === "Escape") {
-          closeDrawer();
-        }
-      },
-      [closeDrawer, closeOnEscape]
-    );
+    // Latest-value refs for closeOnEscape/closeDrawer so handleKeyDown below
+    // can stay referentially stable across renders. Without this, a fresh
+    // inline `onClose` from the consumer (the exact pattern shown in this
+    // component's own JSDoc usage example) recreates `closeDrawer` and thus
+    // `handleKeyDown` on every render, which re-runs the scroll-lock/
+    // focus-restore effect below on every unrelated parent re-render — and
+    // that effect's cleanup unconditionally restores focus, so it yanked
+    // focus back to the trigger mid-interaction even though the drawer never
+    // actually closed.
+    const closeOnEscapeRef = useRef(closeOnEscape);
+    closeOnEscapeRef.current = closeOnEscape;
+    const closeDrawerRef = useRef(closeDrawer);
+    closeDrawerRef.current = closeDrawer;
+
+    const handleKeyDown = useCallback((e: KeyboardEvent) => {
+      if (closeOnEscapeRef.current && e.key === "Escape") {
+        closeDrawerRef.current();
+      }
+    }, []);
 
     useEffect(() => {
       if (isOpen) {
@@ -242,12 +278,14 @@ const Drawer: React.FC<DrawerProps> = memo(
         border,
         isClosing
           ? `${HIDDEN_TRANSFORM[side]} duration-[250ms]`
-          : isOpening
+          : isOpening && !hasEntered
           ? `${HIDDEN_TRANSFORM[side]} duration-0`
+          : isOpening
+          ? "translate-x-0 translate-y-0 duration-300"
           : `translate-x-0 translate-y-0 duration-300 ${glow} ${idleAnim}`,
         className
       );
-    }, [side, size, variant, isClosing, isOpening, className]);
+    }, [side, size, variant, isClosing, isOpening, hasEntered, className]);
 
     if (!isOpen) return null;
 
@@ -258,7 +296,7 @@ const Drawer: React.FC<DrawerProps> = memo(
           "fixed inset-0 z-50 transition-all ease-out",
           isClosing
             ? "bg-black/0 backdrop-blur-none opacity-0 duration-[250ms]"
-            : isOpening
+            : isOpening && !hasEntered
             ? "bg-black/0 backdrop-blur-none opacity-0 duration-0"
             : "bg-black/30 backdrop-blur-sm opacity-100 duration-300",
           overlayClassName
