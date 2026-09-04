@@ -40,6 +40,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | RadioGroup | Forms | \`dist/components/RadioGroup.d.ts\` |
 | Slider | Forms | \`dist/components/Slider.d.ts\` |
 | Combobox | Forms | \`dist/components/Combobox.d.ts\` |
+| DatePicker | Forms | \`dist/components/DatePicker.d.ts\` |
 | Card | Layout | \`dist/components/Card.d.ts\` |
 | Modal | Layout | \`dist/components/Modal.d.ts\` |
 | Divider | Layout | \`dist/components/Divider.d.ts\` |

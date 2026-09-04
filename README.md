@@ -52,6 +52,7 @@ function App() {
 | RadioGroup | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-radiogroup--docs) |
 | Slider | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-slider--docs) |
 | Combobox | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-combobox--docs) |
+| DatePicker | Forms | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-datepicker--docs) |
 | Card | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-card--docs) |
 | Modal | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-modal--docs) |
 | Divider | Layout | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-divider--docs) |

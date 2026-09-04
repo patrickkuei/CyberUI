@@ -21,7 +21,7 @@ const ROOT = join(__dirname, '..');
 const CATEGORY_ORDER = ['Forms', 'Layout', 'Feedback', 'Progress', 'Navigation', 'Typography', 'Display', 'Media'];
 
 const CATEGORY_MAP = {
-  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms', RadioGroup: 'Forms', Slider: 'Forms', Combobox: 'Forms',
+  Button: 'Forms', Input: 'Forms', Select: 'Forms', Toggle: 'Forms', Checkbox: 'Forms', FormField: 'Forms', RadioGroup: 'Forms', Slider: 'Forms', Combobox: 'Forms', DatePicker: 'Forms',
   Card: 'Layout', Modal: 'Layout', Divider: 'Layout', Accordion: 'Layout', Drawer: 'Layout',
   Notification: 'Feedback', Badge: 'Feedback', Skeleton: 'Feedback', Tooltip: 'Feedback',
   CircularProgress: 'Progress', LinearProgress: 'Progress', SegmentedProgress: 'Progress',
@@ -67,6 +67,7 @@ const DOC_SUMMARIES = {
   Slider: 'Neon-glow track/thumb slider. Single-value or two-thumb range mode, drag or keyboard (arrows, Home/End, Page Up/Down).',
   Drawer: 'Slide-in side panel from any edge (`left`/`right`/`top`/`bottom`). Shares Modal\'s controlled `isOpen`/`onClose` pattern and overlay behavior.',
   Combobox: 'Searchable select — text input filters `options` as you type. WAI-ARIA combobox pattern, optional `allowCustomValue` for free-text entry.',
+  DatePicker: 'Single-date picker with a text-input trigger and a keyboard-navigable calendar grid popover. `minDate`/`maxDate` bounds, neon-highlighted selected day, glow on today.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,
