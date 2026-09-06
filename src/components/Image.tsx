@@ -369,7 +369,7 @@ const Image: React.FC<ImageProps> = memo(
               className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100"
               aria-hidden="true"
             >
-              <div className="bg-accent/90 text-base px-3 py-1 rounded-md text-sm font-semibold tracking-wider uppercase">
+              <div className="bg-accent/90 text-inverse px-3 py-1 rounded-md text-sm font-semibold tracking-wider uppercase">
                 Preview
               </div>
             </div>

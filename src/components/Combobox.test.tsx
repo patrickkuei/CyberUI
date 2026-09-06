@@ -226,6 +226,14 @@ describe('Combobox', () => {
     );
   });
 
+  it('applies both the size tier\'s font-size class and the selected-option color without either overriding the other', () => {
+    render(<Combobox options={OPTIONS} label="Target Sector" defaultValue="sector-2" size="md" />);
+    fireEvent.focus(screen.getByRole('combobox'));
+    const option = screen.getByRole('option', { name: 'Sector 2 — The Sprawl' });
+    expect(option).toHaveClass('text-(length:--text-base)');
+    expect(option).toHaveClass('text-accent');
+  });
+
   it('renders an error message and sets aria-invalid', () => {
     render(<Combobox options={OPTIONS} label="Target Sector" error="Selection required" />);
     const input = screen.getByRole('combobox');

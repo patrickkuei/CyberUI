@@ -75,12 +75,12 @@ const sizeMap = {
 const labelSizeMap = {
   sm: 'text-xs',
   md: 'text-sm',
-  lg: 'text-base',
+  lg: 'text-(length:--text-base)',
 };
 
 const legendSizeMap = {
   sm: 'text-sm',
-  md: 'text-base',
+  md: 'text-(length:--text-base)',
   lg: 'text-lg',
 };
 

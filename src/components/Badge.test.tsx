@@ -26,6 +26,17 @@ describe('Badge', () => {
     });
   });
 
+  it('applies both the size prop\'s font-size class and the variant\'s contrast text color without either overriding the other', () => {
+    render(
+      <Badge variant="primary" size="md">
+        Contrast
+      </Badge>
+    );
+    const el = getBadgeEl('Contrast');
+    expect(el).toHaveClass('text-sm');
+    expect(el).toHaveClass('text-inverse');
+  });
+
   it('renders leftIcon and rightIcon', () => {
     render(
       <Badge leftIcon={<span data-testid="left-icon" />} rightIcon={<span data-testid="right-icon" />}>

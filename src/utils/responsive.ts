@@ -80,6 +80,7 @@ export const combineResponsiveClasses = (
   return classes.filter(Boolean).join(" ");
 };
 
+// `text-(length:--text-base)`, never bare `text-base` — see src/index.css's top comment.
 export const RESPONSIVE_SIZE_MAPS = {
   button: {
     sm: "py-1 px-4 text-sm",
@@ -89,16 +90,16 @@ export const RESPONSIVE_SIZE_MAPS = {
   badge: {
     sm: "px-2 py-1 text-xs gap-1",
     md: "px-4 py-2 text-sm gap-2",
-    lg: "px-6 py-3 text-base gap-3",
+    lg: "px-6 py-3 text-(length:--text-base) gap-3",
   },
   input: {
     sm: "py-2 text-sm",
-    md: "py-3 text-base",
+    md: "py-3 text-(length:--text-base)",
     lg: "py-4 text-lg",
   },
   card: {
     sm: "p-3 space-y-3 text-sm",
-    md: "p-6 space-y-6 text-base",
+    md: "p-6 space-y-6 text-(length:--text-base)",
     lg: "p-8 space-y-8 text-lg",
   },
   notification: {
@@ -125,7 +126,7 @@ export const RESPONSIVE_SIZE_MAPS = {
   },
   skeleton: {
     sm: "text-sm",
-    md: "text-base",
+    md: "text-(length:--text-base)",
     lg: "text-lg",
   },
   carousel: {
@@ -136,13 +137,13 @@ export const RESPONSIVE_SIZE_MAPS = {
   tooltip: {
     sm: "text-xs px-2 py-1",
     md: "text-sm px-3 py-1.5",
-    lg: "text-base px-4 py-2",
+    lg: "text-(length:--text-base) px-4 py-2",
   },
   formField: {
     label: {
       sm: "text-xs",
       md: "text-sm",
-      lg: "text-base",
+      lg: "text-(length:--text-base)",
     },
     message: {
       sm: "text-[11px]",
@@ -152,7 +153,7 @@ export const RESPONSIVE_SIZE_MAPS = {
   },
   accordion: {
     sm: "px-3 py-2 text-sm",
-    md: "px-4 py-3 text-base",
+    md: "px-4 py-3 text-(length:--text-base)",
     lg: "px-5 py-4 text-lg",
   },
   avatar: {
@@ -163,13 +164,13 @@ export const RESPONSIVE_SIZE_MAPS = {
   },
   dropdownMenu: {
     sm: "px-3 py-1.5 text-sm",
-    md: "px-4 py-2 text-base",
+    md: "px-4 py-2 text-(length:--text-base)",
     lg: "px-5 py-2.5 text-lg",
   },
   pagination: {
     sm: "w-8 h-8 text-xs",
     md: "w-10 h-10 text-sm",
-    lg: "w-12 h-12 text-base",
+    lg: "w-12 h-12 text-(length:--text-base)",
   },
   slider: {
     track: {

@@ -73,13 +73,16 @@ const Badge: React.FC<BadgeProps> = ({
   };
 
   const getVariantClasses = (variant: string): string => {
+    // `text-inverse`, not `text-default` — every variant here is a solid
+    // color fill, so the label needs the dedicated "readable on a bright
+    // background" token rather than the page's default text color.
     const variants = {
-      primary: 'bg-primary shadow-lg',
-      secondary: 'bg-secondary shadow-lg',
-      accent: 'bg-accent shadow-lg',
-      success: 'bg-success shadow-lg',
-      error: 'bg-error shadow-lg',
-      warning: 'bg-warning shadow-lg'
+      primary: 'bg-primary text-inverse shadow-lg',
+      secondary: 'bg-secondary text-inverse shadow-lg',
+      accent: 'bg-accent text-inverse shadow-lg',
+      success: 'bg-success text-inverse shadow-lg',
+      error: 'bg-error text-inverse shadow-lg',
+      warning: 'bg-warning text-inverse shadow-lg'
     };
     return variants[variant as keyof typeof variants];
   };

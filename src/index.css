@@ -1,5 +1,30 @@
 @import "tailwindcss";
 
+/**
+ * Design tokens for the cyberpunk theme. Before adding a new one:
+ *  - Never name a token after a Tailwind default keyword (a color name like
+ *    `red`/`slate`, or a scale step like `sm`/`base`/`lg` used for font-size,
+ *    spacing, etc.) — `text-{name}`/`bg-{name}` would then set two unrelated
+ *    things at once, and which one wins isn't predictable from reading the
+ *    code (verified — see `src/utils/tokens.test.ts`, which fails the build
+ *    if a new token repeats this). Grep this file's names against Tailwind's
+ *    own theme before picking one.
+ *  - `--color-base` is a known, permanent exception: it collides with
+ *    Tailwind's `base` font-size step exactly this way, but it's a published,
+ *    "guaranteed stable" theming token (see README.md's Customization
+ *    section) and can't be renamed away without breaking real consumers'
+ *    overrides. When a size scale needs its "medium" step alongside this
+ *    color, use `text-(length:--text-base)` instead of `text-base` for the size, and
+ *    `text-inverse` (below) instead of `text-base` for the color — never the
+ *    bare `text-base` keyword. See CHANGELOG.md for the bugs this caused in
+ *    Badge/Combobox/DropdownMenu/DatePicker.
+ *  - `base` and `inverse` are two different concepts that happen to share a
+ *    value today: `bg-base`/`border-base` are for surfaces (the page/panel
+ *    background); `text-inverse` is for text that must stay legible sitting
+ *    on a bright/colored fill (an active pagination button, a solid Badge).
+ *    Keep using the one that matches your actual intent — they're allowed to
+ *    diverge later.
+ */
 @theme {
   /* Primary color palette */
   --color-primary: #ff005d; /* Pink neon */
@@ -7,14 +32,14 @@
   --color-accent: #fffb00; /* Highlight electric yellow */
 
   /* Background & surfaces */
-  --color-base: #1a1a2e; /* Base background */
+  --color-base: #1a1a2e; /* Page/panel background */
   --color-surface: #2d2d44; /* Component / card surface */
   --color-border-default: #3c3c5e; /* Border */
 
   /* Typography */
   --color-default: #e0e0e0; /* Primary text */
   --color-muted: #8888aa; /* Secondary text */
-  --color-inverse: #1a1a2e; /* Inverted text (for bright backgrounds) */
+  --color-inverse: #1a1a2e; /* Text on a bright/colored fill (e.g. active Button, Badge) */
 
   /* Status colors */
   --color-success: #00ff9e; /* Success */

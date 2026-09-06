@@ -53,6 +53,6 @@ describe('SectionTitle', () => {
   it('applies lg text size class for size="lg"', () => {
     render(<SectionTitle size="lg">Large Title</SectionTitle>);
     const h2 = screen.getByRole('heading', { level: 2 });
-    expect(h2.className).toContain('text-base');
+    expect(h2.className).toContain('text-(length:--text-base)');
   });
 });

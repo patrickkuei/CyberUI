@@ -50,7 +50,7 @@ const SectionTitle: React.FC<SectionTitleProps> = ({
   const textSizeMap = {
     sm: 'text-xs',
     md: 'text-sm',
-    lg: 'text-base',
+    lg: 'text-(length:--text-base)',
   };
 
   const marginMap = {

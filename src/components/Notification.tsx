@@ -66,9 +66,9 @@ const Notification: React.FC<NotificationProps> = ({
       case 'success':
         return {
           container: 'bg-linear-(--gradient-accent) shadow-lg-accent',
-          textColor: 'text-base',
+          textColor: 'text-inverse',
           icon: (
-            <svg className="w-6 h-6 text-base" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-6 h-6 text-inverse" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
@@ -94,9 +94,9 @@ const Notification: React.FC<NotificationProps> = ({
       case 'error':
         return {
           container: 'bg-error shadow-error',
-          textColor: 'text-base',
+          textColor: 'text-inverse',
           icon: (
-            <svg className="w-6 h-6 text-base" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-6 h-6 text-inverse" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
@@ -117,7 +117,7 @@ const Notification: React.FC<NotificationProps> = ({
   const styles = getNotificationStyles();
   const sizeClasses = getSizeClasses(size);
   const role = type === 'error' ? 'alert' : 'status';
-  const hoverTextClass = type === 'warning' ? 'hover:text-default/70' : 'hover:text-base/70';
+  const hoverTextClass = type === 'warning' ? 'hover:text-default/70' : 'hover:text-inverse/70';
 
   return (
     <div className={`flex items-start rounded-lg ${sizeClasses} ${styles.container}`} role={role} aria-atomic="true">
@@ -128,7 +128,7 @@ const Notification: React.FC<NotificationProps> = ({
         <h4 className={`font-bold ${styles.textColor}`}>
           {title}
         </h4>
-        <p className={`${type === 'success' || type === 'error' ? 'text-base/80' : 'text-muted'} text-sm mt-1`}>
+        <p className={`${type === 'success' || type === 'error' ? 'text-inverse/80' : 'text-muted'} text-sm mt-1`}>
           {message}
         </p>
       </div>

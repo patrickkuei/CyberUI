@@ -387,7 +387,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
                     : cn(
                         'cursor-pointer',
                         item.danger
-                          ? 'text-error hover:bg-error hover:text-base focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-error/70'
+                          ? 'text-error hover:bg-error hover:text-inverse focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-error/70'
                           : 'text-default hover:bg-base/70 hover:text-secondary focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-secondary/70'
                       )
                 )}

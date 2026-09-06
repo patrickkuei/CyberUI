@@ -85,7 +85,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   const labelSizeMap = {
     sm: 'text-xs',
     md: 'text-sm',
-    lg: 'text-base',
+    lg: 'text-(length:--text-base)',
   };
 
   const errorMarginMap = {

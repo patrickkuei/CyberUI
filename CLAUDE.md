@@ -46,6 +46,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 
 - **Add component**: `src/components/ComponentName.tsx` → export from `src/components/index.ts` → add `*.stories.tsx`
 - **Styling**: Tailwind v4 classes + CSS variables only; no new style systems
+- **Design tokens**: defined in `src/index.css`'s `@theme` block — check there (it's well-commented) before adding a new color/size token or reaching for an existing one you're not sure about. Never name a token after a Tailwind default keyword (a color name, or a scale step like `sm`/`base`/`lg`) — see that file's top comment for why. `src/utils/tokens.test.ts` fails the build if this happens anyway, but check first rather than relying on the test to catch it.
 - **Responsiveness**: use `ResponsiveValue` / helpers from `src/utils/responsive.ts`
 - **Types**: strict, no `any`, no `@ts-ignore` without justification
 - **Tests**: `*.test.tsx` for unit (jsdom), Storybook stories auto-run via `@storybook/addon-vitest`

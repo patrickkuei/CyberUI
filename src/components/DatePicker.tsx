@@ -549,7 +549,11 @@ const DatePicker: React.FC<DatePickerProps> = ({
                             : day.inCurrentMonth
                               ? 'cursor-pointer text-default hover:bg-base/70 hover:text-secondary'
                               : 'cursor-pointer',
-                          selected && 'bg-accent text-base font-bold shadow-primary hover:bg-accent hover:text-base',
+                          // `text-inverse`, not `text-default` — the selected day needs to stay
+                          // readable against its own bg-accent fill, overriding the
+                          // text-default set by the day.inCurrentMonth branch above.
+                          selected &&
+                            'bg-accent text-inverse font-bold shadow-primary hover:bg-accent hover:text-inverse',
                           !selected && isToday && 'border border-accent text-accent shadow-primary/50'
                         )}
                       >

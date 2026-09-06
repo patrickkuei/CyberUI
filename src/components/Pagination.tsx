@@ -119,15 +119,15 @@ const variantStyles: Record<
   { active: string; inactiveHover: string }
 > = {
   primary: {
-    active: 'bg-linear-(--gradient-accent) text-base shadow-primary border-transparent',
+    active: 'bg-linear-(--gradient-accent) text-inverse shadow-primary border-transparent',
     inactiveHover: 'hover:border-accent hover:text-accent hover:shadow-primary',
   },
   secondary: {
-    active: 'bg-secondary text-base shadow-secondary border-transparent',
+    active: 'bg-secondary text-inverse shadow-secondary border-transparent',
     inactiveHover: 'hover:border-secondary hover:text-secondary hover:shadow-secondary',
   },
   accent: {
-    active: 'bg-accent text-base shadow-lg-accent border-transparent',
+    active: 'bg-accent text-inverse shadow-lg-accent border-transparent',
     inactiveHover: 'hover:border-accent hover:text-accent hover:shadow-lg-accent',
   },
 };
