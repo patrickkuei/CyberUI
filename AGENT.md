@@ -57,6 +57,7 @@ import "cyberui-2045/styles.css";
 | `GradientText` | Text with cyberpunk gradient effects. |
 | `SectionTitle` | Title with decorative gradient line. |
 | `Timeline` | Vertical event history display. |
+| `Table` | Semantic `columns`/`data` table. Neon header row, hover-glow rows, optional `variant="striped"` alternating tint. |
 | `Image` | Image with cyberpunk frame/effects. |
 | `Avatar` | Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot. |
 <!-- cyberui-2045:manifest:end -->

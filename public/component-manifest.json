@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-09-04T10:26:14.669Z",
+  "generatedAt": "2026-09-06T06:11:03.676Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -821,7 +821,7 @@
           "name": "formatDate",
           "type": "((date: Date) => string) | undefined",
           "required": false,
-          "default": "(date: Date): string => {\r\n  const y = date.getFullYear();\r\n  const m = String(date.getMonth() + 1).padStart(2, '0');\r\n  const d = String(date.getDate()).padStart(2, '0');\r\n  return `${y}-${m}-${d}`;\r\n}",
+          "default": "(date: Date): string => {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, '0');\n  const d = String(date.getDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}",
           "description": "Formats the selected date for display in the trigger input."
         },
         {
@@ -2288,6 +2288,88 @@
           "required": false,
           "default": "",
           "description": "Additional CSS classes."
+        }
+      ]
+    },
+    {
+      "name": "Table",
+      "category": "Display",
+      "sourceFile": "src/components/Table.tsx",
+      "displayName": "Table",
+      "description": "A cyberpunk-styled, semantic data table: neon header row, hover-glow rows,\nand an optional alternating row tint. Sorting, filtering, pagination, and\nvirtualization are intentionally out of scope — pair with `Pagination` for\npaged data.",
+      "docSummary": "Semantic `columns`/`data` table. Neon header row, hover-glow rows, optional `variant=\"striped\"` alternating tint.",
+      "storybookPath": "components-table--docs",
+      "manifestOverride": false,
+      "props": [
+        {
+          "name": "columns",
+          "type": "TableColumn[]",
+          "required": true,
+          "default": null,
+          "description": "Column definitions, in display order."
+        },
+        {
+          "name": "data",
+          "type": "TableRowData[]",
+          "required": true,
+          "default": null,
+          "description": "Row data, one entry per rendered row."
+        },
+        {
+          "name": "getRowId",
+          "type": "((row: TableRowData, rowIndex: number) => string | number) | undefined",
+          "required": false,
+          "default": "(_row, index) => index — pass a real id accessor (e.g. `(row) => row.id`) whenever rows can be added, removed, or reordered, otherwise React can misattribute focus/animation state across re-renders.",
+          "description": "Derives a stable React key per row."
+        },
+        {
+          "name": "variant",
+          "type": "\"default\" | \"striped\" | undefined",
+          "required": false,
+          "default": "default",
+          "description": "Visual style.\n- `default`: flat body rows.\n- `striped`: alternating row background tint."
+        },
+        {
+          "name": "size",
+          "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
+          "required": false,
+          "default": "md",
+          "description": "Header/cell padding and text size."
+        },
+        {
+          "name": "caption",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Caption rendered above the table, visible to sighted and screen-reader users. Takes precedence over `ariaLabel`."
+        },
+        {
+          "name": "ariaLabel",
+          "type": "string | undefined",
+          "required": false,
+          "default": null,
+          "description": "Accessible name for the table when no `caption` is given. No-op if `caption` is set."
+        },
+        {
+          "name": "emptyMessage",
+          "type": "ReactNode",
+          "required": false,
+          "default": "No data available.",
+          "description": "Content shown in place of rows when `data` is empty."
+        },
+        {
+          "name": "onRowClick",
+          "type": "((row: TableRowData, rowIndex: number) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when a row is clicked, or activated via Enter/Space while it has\nfocus. Providing this makes every row keyboard-focusable (`tabIndex={0}`)\n— rows keep their native `row` semantics rather than switching to\n`role=\"button\"`, since overriding a `<tr>`'s role breaks its `<td>`\nchildren's column association for assistive tech. The click affordance\nis visual + keyboard only, not announced as a button."
+        },
+        {
+          "name": "className",
+          "type": "string | undefined",
+          "required": false,
+          "default": "",
+          "description": "Additional CSS classes for the outer scroll container."
         }
       ]
     },
