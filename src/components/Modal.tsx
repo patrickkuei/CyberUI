@@ -182,12 +182,12 @@ const Modal: React.FC<ModalProps> = memo(
       [animation]
     );
 
-    const overlayRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
     const titleIdRef = useRef<string>(`modal-title-${Math.random().toString(36).slice(2)}`);
     const wasOpenRef = useRef(false);
 
     const {
+      overlayRef,
       isOpening,
       isClosing,
       close: closeModal,

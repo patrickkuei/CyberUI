@@ -89,7 +89,7 @@ export interface UseDialogBehaviorResult {
    */
   open: () => void;
   /** Begins the staged close: cancels any pending open, starts the close timer, and calls `onClose` when it completes. */
-  close: (opts?: { focusTarget?: HTMLElement | null }) => void;
+  close: () => void;
   /** Overlay/backdrop onClick handler for full-overlay dialogs — closes only if the click landed on the backdrop itself, not the panel. */
   handleOverlayClick: (e: React.MouseEvent) => void;
 }
@@ -176,7 +176,6 @@ export function useDialogBehavior(
   const overlayRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedRef = useRef<HTMLElement | null>(null);
-  const explicitFocusTargetRef = useRef<HTMLElement | null>(null);
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   // This component instance is never actually unmounted between open/close
@@ -201,8 +200,14 @@ export function useDialogBehavior(
   }, []);
 
   const pendingOpenSettleRef = useRef(false);
+  // Self-managed callers call open() directly from their trigger handler,
+  // then also update the isOpen state that drives the transition effect
+  // below — set here so that effect can tell it already ran for this cycle
+  // and skip its own redundant call, instead of both paths invoking open().
+  const openCalledDirectlyRef = useRef(false);
 
   const open = useCallback(() => {
+    openCalledDirectlyRef.current = true;
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = null;
@@ -244,44 +249,40 @@ export function useDialogBehavior(
 
   const pendingRestoreRef = useRef(false);
 
-  const close = useCallback(
-    (opts?: { focusTarget?: HTMLElement | null }) => {
-      if (closeTimeoutRef.current) {
-        // Already closing — ignore. Escape/outside-click stay live for the
-        // whole close-animation window (isOpen doesn't flip to false until
-        // the close timer completes), so a repeated dismissal attempt
-        // during that window would otherwise clear-and-reschedule this same
-        // timer for a fresh full closeDuration, over and over, deferring
-        // completion indefinitely instead of just being a no-op.
-        return;
-      }
-      if (opts) explicitFocusTargetRef.current = opts.focusTarget ?? null;
-      if (openTimeoutRef.current) {
-        clearTimeout(openTimeoutRef.current);
-        openTimeoutRef.current = null;
-      }
-      pendingOpenSettleRef.current = false;
-      setIsClosing(true);
-      closeTimeoutRef.current = setTimeout(() => {
-        setIsClosing(false);
-        setIsOpening(false);
-        onCloseRef.current();
-        // Defer the actual focus check to an effect (below) instead of
-        // doing it here inline: onClose() above only *schedules* the
-        // caller's state update (e.g. setOpen(false)), which hasn't been
-        // committed to the DOM yet at this point in the callback — the
-        // dialog's content (and whatever inside it still holds focus) is
-        // still mounted. Checking document.activeElement this early sees
-        // that still-mounted, about-to-be-removed element as "claiming"
-        // focus, so the restore never fires — even though the browser is
-        // about to evict focus to document.body the instant React actually
-        // removes it. An effect runs after that removal has been committed
-        // and painted, so the check sees the real post-close state.
-        pendingRestoreRef.current = true;
-      }, closeDuration);
-    },
-    [closeDuration]
-  );
+  const close = useCallback(() => {
+    if (closeTimeoutRef.current) {
+      // Already closing — ignore. Escape/outside-click stay live for the
+      // whole close-animation window (isOpen doesn't flip to false until
+      // the close timer completes), so a repeated dismissal attempt
+      // during that window would otherwise clear-and-reschedule this same
+      // timer for a fresh full closeDuration, over and over, deferring
+      // completion indefinitely instead of just being a no-op.
+      return;
+    }
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = null;
+    }
+    pendingOpenSettleRef.current = false;
+    setIsClosing(true);
+    closeTimeoutRef.current = setTimeout(() => {
+      setIsClosing(false);
+      setIsOpening(false);
+      onCloseRef.current();
+      // Defer the actual focus check to an effect (below) instead of
+      // doing it here inline: onClose() above only *schedules* the
+      // caller's state update (e.g. setOpen(false)), which hasn't been
+      // committed to the DOM yet at this point in the callback — the
+      // dialog's content (and whatever inside it still holds focus) is
+      // still mounted. Checking document.activeElement this early sees
+      // that still-mounted, about-to-be-removed element as "claiming"
+      // focus, so the restore never fires — even though the browser is
+      // about to evict focus to document.body the instant React actually
+      // removes it. An effect runs after that removal has been committed
+      // and painted, so the check sees the real post-close state.
+      pendingRestoreRef.current = true;
+    }, closeDuration);
+  }, [closeDuration]);
 
   const closeRef = useRef(close);
   closeRef.current = close;
@@ -291,9 +292,7 @@ export function useDialogBehavior(
     pendingRestoreRef.current = false;
 
     const mode = restoreFocusRef.current;
-    const target =
-      explicitFocusTargetRef.current ?? getRestoreFocusTargetRef.current?.() ?? previouslyFocusedRef.current;
-    explicitFocusTargetRef.current = null;
+    const target = getRestoreFocusTargetRef.current?.() ?? previouslyFocusedRef.current;
     if (mode !== 'never' && target) {
       const focusUnclaimed = document.activeElement === document.body || document.activeElement === null;
       if (mode === 'always' || (focusUnclaimed && isKeyboardModality)) {
@@ -304,11 +303,14 @@ export function useDialogBehavior(
 
   // Genuine closed->open transition, for externally-controlled callers
   // (Modal/Drawer) that only ever flip a prop rather than calling open()
-  // directly.
+  // directly. Self-managed callers already called open() directly for this
+  // same transition (see openCalledDirectlyRef above) — skip the redundant
+  // second call for them.
   useLayoutEffect(() => {
-    if (isOpen && !wasOpenRef.current) {
+    if (isOpen && !wasOpenRef.current && !openCalledDirectlyRef.current) {
       openRef.current();
     }
+    openCalledDirectlyRef.current = false;
     wasOpenRef.current = isOpen;
   }, [isOpen]);
 
