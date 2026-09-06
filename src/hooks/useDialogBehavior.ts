@@ -6,8 +6,17 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react
 export interface UseDialogBehaviorOptions {
   /** Duration of the staged-close animation in ms, before `onClose` fires. */
   closeDuration: number;
-  /** Duration of the staged-open animation in ms, before `onOpenSettle` fires. */
-  openDuration: number;
+  /**
+   * Duration of the staged-open animation in ms, before `onOpenSettle` fires
+   * and `isOpening` flips back to `false`.
+   *
+   * Omit entirely if the caller has no open-in animation to stage and
+   * doesn't need `onOpenSettle` — an omitted `openDuration` skips the
+   * isOpening timer/state machinery altogether (`isOpening` stays `false`,
+   * `onOpenSettle` fires synchronously from `open()` if provided), instead
+   * of scheduling a timer purely to flip state nothing reads.
+   */
+  openDuration?: number;
   /** Whether pressing Escape triggers a close. @default true */
   closeOnEscape?: boolean;
   /** Whether a mousedown outside `containerRef` triggers a close. @default true */
@@ -191,6 +200,8 @@ export function useDialogBehavior(
     trackInputModality();
   }, []);
 
+  const pendingOpenSettleRef = useRef(false);
+
   const open = useCallback(() => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -198,13 +209,35 @@ export function useDialogBehavior(
     }
     previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
     setIsClosing(false);
+    if (openTimeoutRef.current) {
+      clearTimeout(openTimeoutRef.current);
+      openTimeoutRef.current = null;
+    }
+    if (openDuration === undefined) {
+      // No isOpening consumer and no onOpenSettle timing to stage — settle
+      // via an effect instead of scheduling a timer purely to flip state
+      // nothing reads (that timer firing outside any caller-driven act()
+      // window is exactly what caused DatePicker's spurious act() warning).
+      // Self-managed callers call open() twice per open cycle (once
+      // directly, once from the isOpen-transition effect below) — the timer
+      // path coalesces that for free (the second call just reschedules the
+      // same timer), so this has to coalesce it too, via the pending-flag
+      // effect, or onOpenSettle would fire twice for one open.
+      pendingOpenSettleRef.current = true;
+      return;
+    }
     setIsOpening(true);
-    if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
     openTimeoutRef.current = setTimeout(() => {
       setIsOpening(false);
       onOpenSettleRef.current?.();
     }, openDuration);
   }, [openDuration]);
+
+  useEffect(() => {
+    if (!pendingOpenSettleRef.current) return;
+    pendingOpenSettleRef.current = false;
+    onOpenSettleRef.current?.();
+  });
 
   const openRef = useRef(open);
   openRef.current = open;
@@ -218,6 +251,7 @@ export function useDialogBehavior(
         clearTimeout(openTimeoutRef.current);
         openTimeoutRef.current = null;
       }
+      pendingOpenSettleRef.current = false;
       setIsClosing(true);
       if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = setTimeout(() => {

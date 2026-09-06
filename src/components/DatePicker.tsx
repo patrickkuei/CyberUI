@@ -208,7 +208,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
     containerRef,
   } = useDialogBehavior(open, {
     closeDuration: 180,
-    openDuration: 30,
+    // No openDuration: the calendar has no open-in animation and doesn't
+    // read isOpening/onOpenSettle — pendingFocusRef below moves focus into
+    // the grid immediately instead.
     onClose: () => setOpen(false),
     // A document.activeElement snapshot at open-time is unreliable here:
     // opening is driven by a trigger click, and a click doesn't always move

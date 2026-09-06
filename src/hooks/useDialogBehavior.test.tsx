@@ -67,6 +67,40 @@ function Harness({
   );
 }
 
+/** Mimics DatePicker: no openDuration, no isOpening/onOpenSettle animation staging. */
+function ImmediateSettleHarness({
+  onOpenSettleSpy,
+  closeDuration = 100,
+}: {
+  onOpenSettleSpy?: () => void;
+  closeDuration?: number;
+}) {
+  const [open, setOpen] = useState(false);
+  const dialog = useDialogBehavior(open, {
+    closeDuration,
+    onOpenSettle: onOpenSettleSpy,
+    onClose: () => setOpen(false),
+  });
+
+  const toggle = () => {
+    if (open && !dialog.isClosing) {
+      dialog.close();
+    } else {
+      setOpen(true);
+      dialog.open();
+    }
+  };
+
+  return (
+    <>
+      <button data-testid="trigger" onClick={toggle}>
+        Trigger
+      </button>
+      <span data-testid="opening-state">{String(dialog.isOpening)}</span>
+    </>
+  );
+}
+
 /** Mimics Modal/Drawer's purely externally-controlled usage. */
 function ControlledHarness({
   closeDuration = 100,
@@ -135,6 +169,28 @@ describe('useDialogBehavior', () => {
       vi.advanceTimersByTime(1);
     });
     expect(onOpenSettle).toHaveBeenCalledTimes(1);
+  });
+
+  it('omitting openDuration settles immediately: onOpenSettle fires synchronously and isOpening never becomes true', () => {
+    const onOpenSettle = vi.fn();
+    render(<ImmediateSettleHarness onOpenSettleSpy={onOpenSettle} />);
+    fireEvent.click(screen.getByTestId('trigger'));
+
+    expect(onOpenSettle).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('opening-state')).toHaveTextContent('false');
+  });
+
+  it('omitting openDuration schedules no timer, so no state update lands outside act() under real timers (regression: DatePicker had a spurious act() warning from an open-settle timer it never consumed)', async () => {
+    vi.useRealTimers();
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      render(<ImmediateSettleHarness />);
+      fireEvent.click(screen.getByTestId('trigger'));
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      expect(errorSpy).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 
   it('stages close: the panel stays mounted until closeDuration elapses, then onClose fires exactly once', () => {
