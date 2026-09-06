@@ -52,6 +52,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 - **Tests**: `*.test.tsx` for unit (jsdom), Storybook stories auto-run via `@storybook/addon-vitest`
 - **No new runtime deps** without approval
 - **Component and Storybook docs**: read `.claude/commands/new-component.md` (Step 3) and `.claude/commands/component-review.md` (Stories checklist) before writing or editing a `*.stories.tsx` file's `docs.description` text — Storybook is published to GitHub Pages and read by humans
+- **CHANGELOG.md**: follow `.claude/commands/changelog.md`'s format and one-bullet-per-change rule whenever you touch this file — including editing it directly, not just when the user runs `/changelog`
 
 ## Slash Commands
 
