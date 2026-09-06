@@ -51,6 +51,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 - **Types**: strict, no `any`, no `@ts-ignore` without justification
 - **Tests**: `*.test.tsx` for unit (jsdom), Storybook stories auto-run via `@storybook/addon-vitest`
 - **No new runtime deps** without approval
+- **Component and Storybook docs**: read `.claude/commands/new-component.md` (Step 3) and `.claude/commands/component-review.md` (Stories checklist) before writing or editing a `*.stories.tsx` file's `docs.description` text — Storybook is published to GitHub Pages and read by humans
 
 ## Slash Commands
 

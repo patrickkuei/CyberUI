@@ -35,7 +35,8 @@ Go through each item. For each one, output **PASS**, **WARN**, or **FAIL** with 
 - [ ] `docs.description.component` has usage code block + props table
 - [ ] Stories cover: Default, all variants, sizes (sm/md/lg), disabled state
 - [ ] `AllVariants` render story exists
-- [ ] Copy is cyberpunk-flavored
+- [ ] In-story copy (labels, demo data) is cyberpunk-flavored
+- [ ] `docs.description` prose (component and story level) is factual sentences only — no adjectives, adverbs, or rationale clauses
 
 ### Tests (`$ARGUMENTS.test.tsx`)
 - [ ] Renders without crashing
