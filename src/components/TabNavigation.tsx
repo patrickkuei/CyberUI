@@ -5,6 +5,7 @@ import {
   RESPONSIVE_SIZE_MAPS,
   useResponsiveValue,
 } from "../utils/responsive";
+import { useDialogBehavior } from "../hooks/useDialogBehavior";
 
 export type TabNavigationMode = "scroll" | "wrap" | "dropdown" | "collapsible";
 
@@ -40,40 +41,26 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   closeOnSelect = true,
 }) => {
   const [open, setOpen] = useState(false);
-  const [isOpening, setIsOpening] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [alignRight, setAlignRight] = useState(false);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const anchorRef = useRef<HTMLButtonElement | null>(null);
 
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (
-        wrapperRef.current &&
-        !wrapperRef.current.contains(e.target as Node)
-      ) {
-        // JS-staged close to align with Image component behavior
-        setIsClosing(true);
-        if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-        closeTimeoutRef.current = setTimeout(() => {
-          setOpen(false);
-          setIsClosing(false);
-        }, 180);
-      }
-    };
-    document.addEventListener("mousedown", handleMouseDown);
-    return () => document.removeEventListener("mousedown", handleMouseDown);
-  }, [open]);
+  const {
+    isOpening,
+    isClosing,
+    open: openDialog,
+    close: closeDialog,
+    containerRef,
+  } = useDialogBehavior(open, {
+    closeDuration: 180,
+    openDuration: 30,
+    onClose: () => setOpen(false),
+    // A document.activeElement snapshot at open-time is unreliable here:
+    // opening is driven by a trigger click, and a click doesn't always move
+    // real DOM focus. The anchor ref is a stable, always-correct restore
+    // target instead.
+    getRestoreFocusTarget: () => anchorRef.current,
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -84,25 +71,19 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
   }, [open]);
 
   const toggleOpen = () => {
-    if (open) {
-      setIsClosing(true);
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = setTimeout(() => {
-        setOpen(false);
-        setIsClosing(false);
-      }, 180);
+    if (open && !isClosing) {
+      closeDialog();
     } else {
-      setIsOpening(true);
       setOpen(true);
-      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-      openTimeoutRef.current = setTimeout(() => setIsOpening(false), 30);
+      openDialog();
     }
   };
 
   return (
     <div className={`${containerClassName}`}>
-      <div ref={wrapperRef} className="relative inline-block">
+      <div ref={containerRef} className="relative inline-block">
         <button
+          ref={anchorRef}
           onClick={toggleOpen}
           className={`inline-flex items-center gap-2 ${sizeClasses} bg-surface text-default border-2 border-border-default rounded-lg transition-all duration-300 hover:text-secondary hover:border-secondary hover:cursor-pointer shadow-secondary/30 ${anchorClassName}`}
           aria-haspopup="menu"
@@ -141,12 +122,7 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
                   onClick={() => {
                     onTabChange(tab);
                     if (closeOnSelect) {
-                      setIsClosing(true);
-                      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-                      closeTimeoutRef.current = setTimeout(() => {
-                        setOpen(false);
-                        setIsClosing(false);
-                      }, 180);
+                      closeDialog();
                     }
                   }}
                 className={`w-full flex items-center justify-between text-left px-4 py-2 font-bold transition-colors duration-200 outline-none hover:cursor-pointer ${
