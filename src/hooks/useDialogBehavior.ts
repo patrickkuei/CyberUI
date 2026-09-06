@@ -20,13 +20,32 @@ export interface UseDialogBehaviorOptions {
   onClose: () => void;
   /**
    * Focus-restore behavior after close:
-   * - `'if-unclaimed'` (default): only refocus the pre-open element if focus
+   * - `'if-unclaimed'` (default): only refocus the restore target if focus
    *   didn't already land somewhere else (e.g. the user clicked into another
    *   field) — checked via `document.activeElement`.
-   * - `'always'`: always refocus the pre-open element.
+   * - `'always'`: always refocus the restore target.
    * - `'never'`: never touch focus.
    */
   restoreFocus?: 'always' | 'if-unclaimed' | 'never';
+  /**
+   * Overrides what "the restore target" means for `restoreFocus`, in place
+   * of the default `document.activeElement` snapshot captured on open.
+   *
+   * Anchored-popover callers with a stable, known trigger element
+   * (DropdownMenu, DatePicker, TabNavigation) should set this to read their
+   * trigger ref — a captured-on-open snapshot is unreliable for them
+   * specifically because opening is often driven by a click rather than a
+   * real focus change (e.g. Testing Library's `fireEvent.click` doesn't
+   * move focus the way a real click does, so the snapshot can silently be
+   * `document.body` instead of the trigger). Externally-controlled
+   * full-overlay callers (Modal, Drawer) should leave this unset — there's
+   * no single fixed "trigger" for them, so the activeElement snapshot is
+   * the correct semantic.
+   *
+   * Called lazily at close-settle time, not captured eagerly, so it always
+   * reads the ref's current value.
+   */
+  getRestoreFocusTarget?: () => HTMLElement | null;
 }
 
 export interface UseDialogBehaviorResult {
@@ -114,6 +133,7 @@ export function useDialogBehavior(
     onOpenSettle,
     onClose,
     restoreFocus = 'if-unclaimed',
+    getRestoreFocusTarget,
   } = options;
 
   const [isOpening, setIsOpening] = useState(false);
@@ -139,6 +159,8 @@ export function useDialogBehavior(
   closeOnEscapeRef.current = closeOnEscape;
   const restoreFocusRef = useRef(restoreFocus);
   restoreFocusRef.current = restoreFocus;
+  const getRestoreFocusTargetRef = useRef(getRestoreFocusTarget);
+  getRestoreFocusTargetRef.current = getRestoreFocusTarget;
 
   const open = useCallback(() => {
     if (closeTimeoutRef.current) {
@@ -158,6 +180,8 @@ export function useDialogBehavior(
   const openRef = useRef(open);
   openRef.current = open;
 
+  const pendingRestoreRef = useRef(false);
+
   const close = useCallback(
     (opts?: { focusTarget?: HTMLElement | null }) => {
       if (opts) explicitFocusTargetRef.current = opts.focusTarget ?? null;
@@ -171,17 +195,18 @@ export function useDialogBehavior(
         setIsClosing(false);
         setIsOpening(false);
         onCloseRef.current();
-
-        const mode = restoreFocusRef.current;
-        const target = explicitFocusTargetRef.current ?? previouslyFocusedRef.current;
-        explicitFocusTargetRef.current = null;
-        if (mode !== 'never' && target) {
-          const focusUnclaimed =
-            document.activeElement === document.body || document.activeElement === null;
-          if (mode === 'always' || focusUnclaimed) {
-            target.focus?.();
-          }
-        }
+        // Defer the actual focus check to an effect (below) instead of
+        // doing it here inline: onClose() above only *schedules* the
+        // caller's state update (e.g. setOpen(false)), which hasn't been
+        // committed to the DOM yet at this point in the callback — the
+        // dialog's content (and whatever inside it still holds focus) is
+        // still mounted. Checking document.activeElement this early sees
+        // that still-mounted, about-to-be-removed element as "claiming"
+        // focus, so the restore never fires — even though the browser is
+        // about to evict focus to document.body the instant React actually
+        // removes it. An effect runs after that removal has been committed
+        // and painted, so the check sees the real post-close state.
+        pendingRestoreRef.current = true;
       }, closeDuration);
     },
     [closeDuration]
@@ -189,6 +214,22 @@ export function useDialogBehavior(
 
   const closeRef = useRef(close);
   closeRef.current = close;
+
+  useEffect(() => {
+    if (!pendingRestoreRef.current) return;
+    pendingRestoreRef.current = false;
+
+    const mode = restoreFocusRef.current;
+    const target =
+      explicitFocusTargetRef.current ?? getRestoreFocusTargetRef.current?.() ?? previouslyFocusedRef.current;
+    explicitFocusTargetRef.current = null;
+    if (mode !== 'never' && target) {
+      const focusUnclaimed = document.activeElement === document.body || document.activeElement === null;
+      if (mode === 'always' || focusUnclaimed) {
+        target.focus?.();
+      }
+    }
+  });
 
   // Genuine closed->open transition, for externally-controlled callers
   // (Modal/Drawer) that only ever flip a prop rather than calling open()

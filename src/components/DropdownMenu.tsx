@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 import { cn } from '../utils/cn';
+import { useDialogBehavior } from '../hooks/useDialogBehavior';
 
 /**
  * A single action within a DropdownMenu.
@@ -141,8 +142,6 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   menuClassName = '',
 }) => {
   const [internalOpen, setInternalOpen] = useState(false);
-  const [isOpening, setIsOpening] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
   const [alignEnd, setAlignEnd] = useState(align === 'end');
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -152,19 +151,9 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   const generatedId = useId();
   const menuId = `dropdown-menu-${generatedId}`;
 
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const triggerRef = useRef<HTMLElement | null>(null);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-    };
-  }, []);
 
   const enabledIndices = items
     .map((item, i) => (item.disabled ? -1 : i))
@@ -178,49 +167,40 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     [isControlled, onOpenChange]
   );
 
-  const closeMenu = useCallback(
-    (focusTrigger: boolean) => {
-      setIsClosing(true);
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = setTimeout(() => {
-        setOpen(false);
-        setIsClosing(false);
-        if (focusTrigger) triggerRef.current?.focus();
-      }, 180);
-    },
-    [setOpen]
-  );
+  const {
+    isOpening: menuIsOpening,
+    isClosing: menuIsClosing,
+    open: openDialog,
+    close: closeDialog,
+    containerRef,
+  } = useDialogBehavior(open, {
+    closeDuration: 180,
+    openDuration: 30,
+    onClose: () => setOpen(false),
+    // A snapshot of document.activeElement at open-time is unreliable here:
+    // opening is driven by a trigger click, and a click doesn't always move
+    // real DOM focus (e.g. Testing Library's fireEvent.click doesn't). The
+    // trigger ref is a stable, always-correct restore target instead.
+    getRestoreFocusTarget: () => triggerRef.current,
+  });
 
   const openMenu = useCallback(
     (focusIndex: number) => {
-      setIsOpening(true);
       setActiveIndex(focusIndex);
       setOpen(true);
-      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-      openTimeoutRef.current = setTimeout(() => setIsOpening(false), 30);
+      openDialog();
     },
-    [setOpen]
+    [setOpen, openDialog]
   );
 
   const toggleMenu = useCallback(() => {
     if (disabled) return;
-    if (open) {
-      closeMenu(false);
+    if (open && !menuIsClosing) {
+      closeDialog();
     } else {
       openMenu(enabledIndices[0] ?? 0);
     }
-  }, [disabled, open, closeMenu, openMenu, enabledIndices]);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        closeMenu(false);
-      }
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [open, closeMenu]);
+  }, [disabled, open, menuIsClosing, closeDialog, openMenu, enabledIndices]);
 
   useEffect(() => {
     if (!open) return;
@@ -231,15 +211,15 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
   }, [open, align]);
 
   useEffect(() => {
-    if (open && !isOpening) {
+    if (open && !menuIsOpening) {
       itemRefs.current[activeIndex]?.focus();
     }
-  }, [open, isOpening, activeIndex]);
+  }, [open, menuIsOpening, activeIndex]);
 
   const selectItem = (item: DropdownMenuItem) => {
     if (item.disabled) return;
     item.onClick?.();
-    if (closeOnSelect) closeMenu(true);
+    if (closeOnSelect) closeDialog();
   };
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent) => {
@@ -250,9 +230,6 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     } else if (event.key === 'ArrowUp') {
       event.preventDefault();
       openMenu(enabledIndices[enabledIndices.length - 1] ?? 0);
-    } else if (event.key === 'Escape' && open) {
-      event.preventDefault();
-      closeMenu(false);
     }
   };
 
@@ -289,13 +266,8 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
         selectItem(items[index]);
         break;
       }
-      case 'Escape': {
-        event.preventDefault();
-        closeMenu(true);
-        break;
-      }
       case 'Tab': {
-        closeMenu(false);
+        closeDialog();
         break;
       }
       default:
@@ -335,7 +307,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     : trigger(triggerProps);
 
   return (
-    <div ref={wrapperRef} className={cn('relative inline-block', className)}>
+    <div ref={containerRef} className={cn('relative inline-block', className)}>
       {!isElement(trigger) ? (
         <span
           ref={(node) => {
@@ -348,7 +320,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
         renderedTrigger
       )}
 
-      {(open || isClosing) && (
+      {(open || menuIsClosing) && (
         <div
           ref={menuRef}
           id={menuId}
@@ -359,7 +331,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
             'absolute z-50 mt-2 min-w-44 overflow-hidden rounded-lg border-2 border-border-default bg-surface shadow-secondary',
             alignEnd ? 'right-0' : 'left-0',
             'transition-transform transition-opacity duration-200 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
-            isOpening || isClosing
+            menuIsOpening || menuIsClosing
               ? 'pointer-events-none scale-y-0 opacity-0'
               : 'pointer-events-auto scale-y-100 opacity-100',
             menuClassName
