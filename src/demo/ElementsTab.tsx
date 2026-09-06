@@ -9,6 +9,17 @@ import SectionTitle from "../components/SectionTitle";
 import Checkbox from "../components/Checkbox";
 import Divider from "../components/Divider";
 import GradientText from "../components/GradientText";
+import Combobox from "../components/Combobox";
+import DatePicker from "../components/DatePicker";
+import Slider from "../components/Slider";
+
+const CALLSIGN_OPTIONS = [
+  { value: "ghost", label: "Ghost" },
+  { value: "wraith", label: "Wraith" },
+  { value: "nomad", label: "Nomad" },
+  { value: "cipher", label: "Cipher" },
+  { value: "vex", label: "Vex" },
+];
 
 const ElementsTab: React.FC = () => {
   const [stealthMode, setStealthMode] = useState(false);
@@ -79,6 +90,36 @@ const ElementsTab: React.FC = () => {
                 label="Subscribe to neural network updates"
               />
             </div>
+          </div>
+        </div>
+      </Card>
+
+      <Divider />
+
+      <SectionTitle>Advanced Controls</SectionTitle>
+      <Card>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Combobox
+            label="Operative Callsign"
+            options={CALLSIGN_OPTIONS}
+            placeholder="Search callsigns..."
+            allowCustomValue
+            helperText="Search the roster, or enter an unlisted callsign."
+          />
+
+          <DatePicker
+            label="Mission Deploy Date"
+            placeholder="Select deployment date..."
+            helperText="Deployment window opens post-authorization."
+          />
+
+          <div className="md:col-span-2">
+            <Slider
+              label="Signal Strength Threshold"
+              defaultValue={65}
+              showValue
+              formatValue={(value) => `${value}%`}
+            />
           </div>
         </div>
       </Card>

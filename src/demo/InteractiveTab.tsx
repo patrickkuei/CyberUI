@@ -4,6 +4,7 @@ import Input from "../components/Input";
 import Card from "../components/Card";
 import Carousel from "../components/Carousel";
 import Modal from "../components/Modal";
+import Drawer from "../components/Drawer";
 import SectionTitle from "../components/SectionTitle";
 import Steps from "../components/Steps";
 import Divider from "../components/Divider";
@@ -21,6 +22,9 @@ const InteractiveTab: React.FC = () => {
   const [diagnosticsModal, setDiagnosticsModal] = useState(false);
   const [syncModal, setSyncModal] = useState(false);
   const [monitorModal, setMonitorModal] = useState(false);
+
+  // Drawer state
+  const [overlayDrawer, setOverlayDrawer] = useState(false);
 
   const { showNotification } = useCyberNotifications();
 
@@ -217,6 +221,24 @@ const InteractiveTab: React.FC = () => {
             </span>
             <span className="font-mono">AUTO-SCAN: ACTIVE</span>
           </div>
+        </div>
+      </Card>
+
+      <Divider />
+
+      <SectionTitle>Side Panel Access</SectionTitle>
+      <Card>
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="text-muted">
+            Slide out the tactical overlay without leaving the current view.
+          </p>
+          <Button
+            variant="primary"
+            size="sm"
+            onClick={() => setOverlayDrawer(true)}
+          >
+            Open Tactical Overlay
+          </Button>
         </div>
       </Card>
 
@@ -586,6 +608,43 @@ const InteractiveTab: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Tactical Overlay Drawer */}
+      <Drawer
+        isOpen={overlayDrawer}
+        onClose={() => setOverlayDrawer(false)}
+        title="Tactical Overlay"
+        side="right"
+        size="md"
+      >
+        <div className="space-y-4">
+          <p className="text-muted text-sm">
+            Live operative status feed, streamed directly from the field.
+          </p>
+          <div className="grid grid-cols-2 gap-4 text-sm">
+            <Card variant="small">
+              <div className="text-primary font-mono font-bold">3</div>
+              <div className="text-muted">Active Operatives</div>
+            </Card>
+            <Card variant="small">
+              <div className="text-secondary font-mono font-bold">1</div>
+              <div className="text-muted">Compromised</div>
+            </Card>
+          </div>
+          <div className="bg-surface/30 p-4 rounded border border-primary/30">
+            <div className="space-y-2 text-sm font-mono">
+              <div className="flex justify-between">
+                <span className="text-muted">Uplink:</span>
+                <span className="text-success">STABLE</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-muted">Last Ping:</span>
+                <span className="text-accent">4s ago</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Drawer>
     </div>
   );
 };

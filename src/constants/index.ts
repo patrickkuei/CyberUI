@@ -1,5 +1,5 @@
 // Demo tabs for Storybook stories - not part of the component API
-export const DEMO_TABS = ['Home', 'Interactive', 'Elements', 'Feedback'] as const;
+export const DEMO_TABS = ['Home', 'Interactive', 'Elements', 'Feedback', 'Console'] as const;
 
 export const PROGRESS_CONFIG = {
   RADIUS: 20,

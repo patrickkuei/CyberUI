@@ -6,6 +6,7 @@ import HomeTab from "./demo/HomeTab";
 import InteractiveTab from "./demo/InteractiveTab";
 import ElementsTab from "./demo/ElementsTab";
 import FeedbackTab from "./demo/FeedbackTab";
+import ConsoleTab from "./demo/ConsoleTab";
 import { useCyberScrollbar } from "./hooks/useCyberScrollbar";
 import { CyberNotificationProvider } from "./contexts/NotificationContext";
 
@@ -27,6 +28,8 @@ const DemoPage: React.FC = () => {
         return <ElementsTab />;
       case "Feedback":
         return <FeedbackTab />;
+      case "Console":
+        return <ConsoleTab />;
       default:
         return null;
     }
