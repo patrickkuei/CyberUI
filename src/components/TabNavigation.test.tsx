@@ -54,21 +54,34 @@ describe('TabNavigation Component', () => {
     await waitFor(() => expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument());
   });
 
-  it('restores focus to the anchor button after closing, via outside-click, Escape, or tab-select (new behavior — TabDropdown previously had no focus-restore at all)', async () => {
+  it('restores focus to the anchor button after closing via Escape (keyboard-driven dismissal)', async () => {
     render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="dropdown" />);
     const anchor = screen.getByRole('button', { expanded: false });
 
     fireEvent.click(anchor);
     fireEvent.keyDown(document, { key: 'Escape' });
     await waitFor(() => expect(anchor).toHaveFocus());
+  });
+
+  it('does not restore focus to the anchor button after a pointer-driven dismissal (outside-click or tab-select by click) — only keyboard dismissal restores focus', async () => {
+    // A mouse user already knows where their pointer is; forcing focus back
+    // to the anchor after a click-driven close would be the surprising
+    // move. Restore is keyboard-only — see useDialogBehavior.ts.
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="dropdown" />);
+    const anchor = screen.getByRole('button', { expanded: false });
 
     fireEvent.click(anchor);
     fireEvent.mouseDown(document.body);
-    await waitFor(() => expect(anchor).toHaveFocus());
+    fireEvent.click(document.body);
+    await waitFor(() => expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument());
+    expect(anchor).not.toHaveFocus();
 
+    fireEvent.mouseDown(anchor);
     fireEvent.click(anchor);
+    fireEvent.mouseDown(screen.getByText('SIGNAL', { selector: 'button span' }));
     fireEvent.click(screen.getByText('SIGNAL', { selector: 'button span' }));
-    await waitFor(() => expect(anchor).toHaveFocus());
+    await waitFor(() => expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument());
+    expect(anchor).not.toHaveFocus();
   });
 
   it('does not update state after unmount from a pending tab-select close timer', () => {

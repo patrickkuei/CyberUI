@@ -237,6 +237,11 @@ export const DropdownMode: Story = {
   },
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        story: 'Click the anchor to open the tab list. Escape closes it and restores focus to the anchor; an outside click or selecting a tab by clicking also closes it, but doesn\'t restore focus — only a keyboard-driven dismissal does, since a pointer dismissal already told the browser where focus should go.',
+      },
+    },
   },
   render: (args) => (
     <div

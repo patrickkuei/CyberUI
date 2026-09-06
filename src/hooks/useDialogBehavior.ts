@@ -22,9 +22,20 @@ export interface UseDialogBehaviorOptions {
    * Focus-restore behavior after close:
    * - `'if-unclaimed'` (default): only refocus the restore target if focus
    *   didn't already land somewhere else (e.g. the user clicked into another
-   *   field) — checked via `document.activeElement`.
-   * - `'always'`: always refocus the restore target.
+   *   field) — checked via `document.activeElement` — *and* the most recent
+   *   input was a keyboard interaction (see below). A mouse/touch user
+   *   already knows where their pointer is; forcing focus back after they
+   *   dismissed something with a click is the surprising move, not the
+   *   helpful one. A keyboard user has no such spatial anchor, so restoring
+   *   focus is what keeps them oriented.
+   * - `'always'`: always refocus the restore target, regardless of input
+   *   modality. No current caller uses this — it exists as an escape hatch.
    * - `'never'`: never touch focus.
+   *
+   * Input modality is tracked globally (one `document`-level listener pair,
+   * shared across every `useDialogBehavior` instance on the page) the same
+   * way native `:focus-visible` does it: any `keydown` marks the current
+   * modality as keyboard, any `mousedown`/`touchstart` marks it as pointer.
    */
   restoreFocus?: 'always' | 'if-unclaimed' | 'never';
   /**
@@ -72,6 +83,20 @@ export interface UseDialogBehaviorResult {
   close: (opts?: { focusTarget?: HTMLElement | null }) => void;
   /** Overlay/backdrop onClick handler for full-overlay dialogs — closes only if the click landed on the backdrop itself, not the panel. */
   handleOverlayClick: (e: React.MouseEvent) => void;
+}
+
+// Tracks whether the most recent user input was keyboard- or pointer-driven,
+// page-wide — the same heuristic native `:focus-visible` uses. Read by the
+// focus-restore effect below; see the `restoreFocus` option's JSDoc.
+let isKeyboardModality = true;
+let modalityTrackingAttached = false;
+
+function trackInputModality(): void {
+  if (modalityTrackingAttached || typeof document === 'undefined') return;
+  modalityTrackingAttached = true;
+  document.addEventListener('keydown', () => { isKeyboardModality = true; }, true);
+  document.addEventListener('mousedown', () => { isKeyboardModality = false; }, true);
+  document.addEventListener('touchstart', () => { isKeyboardModality = false; }, true);
 }
 
 let scrollLockCount = 0;
@@ -162,6 +187,10 @@ export function useDialogBehavior(
   const getRestoreFocusTargetRef = useRef(getRestoreFocusTarget);
   getRestoreFocusTargetRef.current = getRestoreFocusTarget;
 
+  useEffect(() => {
+    trackInputModality();
+  }, []);
+
   const open = useCallback(() => {
     if (closeTimeoutRef.current) {
       clearTimeout(closeTimeoutRef.current);
@@ -225,7 +254,7 @@ export function useDialogBehavior(
     explicitFocusTargetRef.current = null;
     if (mode !== 'never' && target) {
       const focusUnclaimed = document.activeElement === document.body || document.activeElement === null;
-      if (mode === 'always' || focusUnclaimed) {
+      if (mode === 'always' || (focusUnclaimed && isKeyboardModality)) {
         target.focus?.();
       }
     }

@@ -106,6 +106,10 @@ function ControlledHarness({
 describe('useDialogBehavior', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+    // Input-modality tracking is a module-level singleton shared by every
+    // hook instance (see useDialogBehavior.ts) — reset it to a known state
+    // so no test's mousedown/keydown activity leaks into the next one.
+    fireEvent.keyDown(document, { key: 'Tab' });
   });
 
   afterEach(() => {
@@ -356,6 +360,52 @@ describe('useDialogBehavior', () => {
 
     expect(elsewhere).toHaveFocus();
     expect(trigger).not.toHaveFocus();
+  });
+
+  it('restoreFocus "if-unclaimed": does not restore focus after a pointer-driven dismissal, even when focus is unclaimed', () => {
+    // A mouse/touch user already knows where their pointer is — forcing
+    // focus back to the trigger after a click-driven close is the
+    // surprising move, not the helpful one. Keyboard-only is the whole
+    // point of this option; see useDialogBehavior.ts's restoreFocus JSDoc.
+    render(<Harness closeDuration={100} />);
+    const trigger = screen.getByTestId('trigger');
+    trigger.focus();
+    fireEvent.click(trigger);
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // A real pointer click always fires mousedown before click, and moves
+    // focus away from the trigger as a default browser action — fireEvent
+    // doesn't simulate that default action, so it's done explicitly here.
+    trigger.blur();
+    fireEvent.mouseDown(document.body);
+    fireEvent.click(document.body);
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(trigger).not.toHaveFocus();
+  });
+
+  it('restoreFocus "if-unclaimed": does restore focus after a keyboard-driven dismissal (Escape)', () => {
+    render(<Harness closeDuration={100} />);
+    const trigger = screen.getByTestId('trigger');
+    trigger.focus();
+    fireEvent.click(trigger);
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    // Prime modality as pointer first, to prove Escape's own keydown flips
+    // it back to keyboard rather than the restore relying on stale state.
+    fireEvent.mouseDown(screen.getByTestId('panel'));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(100);
+    });
+
+    expect(trigger).toHaveFocus();
   });
 
   it('ref-counts body scroll lock: stays locked until every open dialog has closed, regardless of order', () => {

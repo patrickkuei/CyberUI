@@ -217,7 +217,7 @@ export const Interactive: Story = {
   parameters: {
     docs: {
       description: {
-        story: 'Uncontrolled — click to open, arrow keys to navigate, Enter/Space to select, Escape or an outside click to dismiss.',
+        story: 'Uncontrolled — click to open, arrow keys to navigate, Enter/Space to select, Escape or an outside click to dismiss. Escape restores focus to the trigger; an outside click doesn\'t — the click already told the browser where focus should go.',
       },
     },
   },
