@@ -14,7 +14,7 @@ const meta: Meta<typeof Drawer> = {
       description: {
         component: `A cyberpunk-styled slide-in side panel for mobile nav, filters, or detail views without a full page navigation. Shares Modal's controlled \`isOpen\`/\`onClose\` pattern, overlay backdrop, focus restoration, and RGB glow border — sliding in from an edge instead of scaling from the center.
 
-Focus restoration only fires after a keyboard-driven dismissal (Escape) — a click on the overlay doesn't restore focus, since the click itself already tells the browser where focus should go.
+Escape restores focus to the trigger. Overlay click does not restore focus.
 
 **Usage:**
 
