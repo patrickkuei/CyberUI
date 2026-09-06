@@ -1,5 +1,4 @@
 import React, {
-  useState,
   useEffect,
   useRef,
   useCallback,
@@ -9,6 +8,7 @@ import React, {
 import { createPortal } from "react-dom";
 import Button from "./Button";
 import { cn } from "../utils/cn";
+import { useDialogBehavior } from "../hooks/useDialogBehavior";
 
 /**
  * Controls CRT animation timing and effects.
@@ -182,44 +182,39 @@ const Modal: React.FC<ModalProps> = memo(
       [animation]
     );
 
-    const [isClosing, setIsClosing] = useState(false);
-    const [isOpening, setIsOpening] = useState(true);
-
     const overlayRef = useRef<HTMLDivElement>(null);
     const modalRef = useRef<HTMLDivElement>(null);
-    const previouslyFocusedRef = useRef<HTMLElement | null>(null);
     const titleIdRef = useRef<string>(`modal-title-${Math.random().toString(36).slice(2)}`);
+    const wasOpenRef = useRef(false);
 
-    const closeModal = useCallback(() => {
-      setIsClosing(true);
-
-      setTimeout(() => {
-        setIsClosing(false);
-        setIsOpening(true);
-        onClose();
-      }, animationConfig.closeDuration);
-    }, [onClose, animationConfig.closeDuration]);
-
-    useEffect(() => {
-      if (isOpen && !isClosing) {
-        previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
-        setIsOpening(true);
-        onOpen?.();
-
-        setTimeout(() => {
-          setIsOpening(false);
-          onCRTBootComplete?.();
-          // Focus the modal container for accessibility
-          modalRef.current?.focus();
-        }, animationConfig.openDuration);
-      }
-    }, [
-      isOpen,
+    const {
+      isOpening,
       isClosing,
-      onOpen,
-      onCRTBootComplete,
-      animationConfig.openDuration,
-    ]);
+      close: closeModal,
+      handleOverlayClick,
+    } = useDialogBehavior(isOpen, {
+      closeDuration: animationConfig.closeDuration,
+      openDuration: animationConfig.openDuration,
+      closeOnEscape,
+      closeOnOutsideClick: closeOnOverlayClick,
+      lockScroll: true,
+      onOpenSettle: () => {
+        onCRTBootComplete?.();
+        // Focus the modal container for accessibility
+        modalRef.current?.focus();
+      },
+      onClose,
+    });
+
+    // onOpen fires once per genuine open, immediately — unlike
+    // onOpenSettle/onCRTBootComplete above, which fire once the animation
+    // finishes.
+    useEffect(() => {
+      if (isOpen && !wasOpenRef.current) {
+        onOpen?.();
+      }
+      wasOpenRef.current = isOpen;
+    }, [isOpen, onOpen]);
 
     // Wrapped footer actions that use closeModal logic
     const wrappedCancel = useCallback(() => {
@@ -231,47 +226,6 @@ const Modal: React.FC<ModalProps> = memo(
       onConfirm?.();
       closeModal();
     }, [onConfirm, closeModal]);
-
-    const handleOverlayClick = useCallback(
-      (e: React.MouseEvent) => {
-        if (
-          closeOnOverlayClick &&
-          (e.target === overlayRef.current || e.target === e.currentTarget)
-        ) {
-          closeModal();
-        }
-      },
-      [closeModal, closeOnOverlayClick]
-    );
-
-    const handleKeyDown = useCallback(
-      (e: KeyboardEvent) => {
-        if (closeOnEscape && e.key === "Escape") {
-          closeModal();
-        }
-      },
-      [closeModal, closeOnEscape]
-    );
-
-    useEffect(() => {
-      if (isOpen) {
-        document.addEventListener("keydown", handleKeyDown);
-        const originalOverflow = document.body.style.overflow;
-        const scrollbarWidth =
-          window.innerWidth - document.documentElement.clientWidth;
-
-        document.body.style.overflow = "hidden";
-        document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-        return () => {
-          document.removeEventListener("keydown", handleKeyDown);
-          document.body.style.overflow = originalOverflow;
-          document.body.style.paddingRight = "";
-          // Restore focus to the previously focused element if possible
-          previouslyFocusedRef.current?.focus?.();
-        };
-      }
-    }, [isOpen, handleKeyDown]);
 
     const modalClasses = useMemo(() => {
       const danger = variant === "danger";

@@ -1,5 +1,5 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Modal from './Modal';
 
 // Mock the portal to render into the container for testing
@@ -14,6 +14,10 @@ vi.mock('react-dom', async (importOriginal) => {
 describe('Modal Component', () => {
   beforeEach(() => {
     vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
   it('renders nothing when closed', () => {
@@ -78,7 +82,146 @@ describe('Modal Component', () => {
     
     const cancelButton = screen.getByText('Abort');
     fireEvent.click(cancelButton);
-    
+
     expect(handleCancel).toHaveBeenCalled();
+  });
+
+  it('calls onClose on overlay click by default, and not when closeOnOverlayClick is false', () => {
+    const handleClose1 = vi.fn();
+    const { unmount } = render(
+      <Modal isOpen={true} onClose={handleClose1}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.click(screen.getByRole('dialog', { hidden: true }).parentElement as HTMLElement);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(handleClose1).toHaveBeenCalled();
+    unmount();
+
+    const handleClose2 = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={handleClose2} closeOnOverlayClick={false}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.click(screen.getByRole('dialog', { hidden: true }).parentElement as HTMLElement);
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(handleClose2).not.toHaveBeenCalled();
+  });
+
+  it('does not close when clicking inside the panel', () => {
+    const handleClose = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.click(screen.getByRole('dialog', { hidden: true }));
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(handleClose).not.toHaveBeenCalled();
+  });
+
+  it('calls onClose on Escape by default, and not when closeOnEscape is false', () => {
+    const handleClose1 = vi.fn();
+    const { unmount } = render(
+      <Modal isOpen={true} onClose={handleClose1}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(handleClose1).toHaveBeenCalled();
+    unmount();
+
+    const handleClose2 = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={handleClose2} closeOnEscape={false}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+    expect(handleClose2).not.toHaveBeenCalled();
+  });
+
+  it('restores focus to the previously-focused element after closing', () => {
+    render(<button data-testid="trigger">Open</button>);
+    const trigger = screen.getByTestId('trigger');
+    trigger.focus();
+
+    const handleClose = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Modal>
+    );
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(500);
+    });
+
+    expect(handleClose).toHaveBeenCalled();
+    expect(trigger).toHaveFocus();
+  });
+
+  it('locks body scroll while open and restores it on unmount', () => {
+    const { unmount } = render(
+      <Modal isOpen={true} onClose={vi.fn()}>
+        <div>Content</div>
+      </Modal>
+    );
+    expect(document.body.style.overflow).toBe('hidden');
+    unmount();
+    expect(document.body.style.overflow).toBe('');
+  });
+
+  it('clears the pending open-settle timer on unmount, with no post-unmount state update', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { unmount } = render(
+        <Modal isOpen={true} onClose={vi.fn()}>
+          <div>Content</div>
+        </Modal>
+      );
+      unmount();
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(errorSpy).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
+  });
+
+  it('clears the pending close timer on unmount, with no post-unmount state update', () => {
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    try {
+      const { unmount } = render(
+        <Modal isOpen={true} onClose={vi.fn()}>
+          <div>Content</div>
+        </Modal>
+      );
+      act(() => {
+        vi.advanceTimersByTime(700);
+      });
+      fireEvent.click(screen.getByLabelText('Close modal'));
+      unmount();
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      expect(errorSpy).not.toHaveBeenCalled();
+    } finally {
+      errorSpy.mockRestore();
+    }
   });
 });
