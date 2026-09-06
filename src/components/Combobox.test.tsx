@@ -153,6 +153,40 @@ describe('Combobox', () => {
     await waitFor(() => expect(handleChange).toHaveBeenCalledWith('brand-new-tag'));
   });
 
+  it('commits an empty value on blur when the field is cleared and allowCustomValue is true (regression: emptying used to silently revert to the old label)', async () => {
+    const handleChange = vi.fn();
+    render(
+      <Combobox
+        options={OPTIONS}
+        label="Tag Search"
+        defaultValue="sector-1"
+        allowCustomValue
+        onValueChange={handleChange}
+      />
+    );
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.blur(input);
+
+    await waitFor(() => expect(handleChange).toHaveBeenCalledWith(''));
+    expect(input).toHaveValue('');
+  });
+
+  it('still reverts an emptied field to the last committed value on blur when allowCustomValue is false', async () => {
+    const handleChange = vi.fn();
+    render(
+      <Combobox options={OPTIONS} label="Target Sector" defaultValue="sector-1" onValueChange={handleChange} />
+    );
+    const input = screen.getByRole('combobox');
+    fireEvent.focus(input);
+    fireEvent.change(input, { target: { value: '' } });
+    fireEvent.blur(input);
+
+    expect(handleChange).not.toHaveBeenCalled();
+    await waitFor(() => expect(input).toHaveValue('Sector 1 — Corporate Plaza'));
+  });
+
   it('selects the matching option instead of a raw commit when custom text exactly matches a label', () => {
     const handleChange = vi.fn();
     render(<Combobox options={OPTIONS} label="Target Sector" allowCustomValue onValueChange={handleChange} />);

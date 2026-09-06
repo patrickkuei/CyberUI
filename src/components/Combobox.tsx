@@ -257,10 +257,16 @@ const Combobox: React.FC<ComboboxProps> = ({
 
   const commitCustomOrRevert = useCallback(() => {
     const trimmed = query.trim();
-    if (allowCustomValue && trimmed && trimmed !== labelForValue(committedValue)) {
-      const exactMatch = options.find(
-        (option) => !option.disabled && option.label.toLowerCase() === trimmed.toLowerCase()
-      );
+    // Dropping the `trimmed &&` guard that used to sit here made emptying the
+    // field (backspacing to nothing) fall into the revert branch below even
+    // in free-edit mode — silently restoring the old label right after the
+    // user visibly cleared it. `allowCustomValue` means typed text *is* the
+    // value, so an empty edit is itself a value (clearing the selection),
+    // not an incomplete one to discard.
+    if (allowCustomValue && trimmed !== labelForValue(committedValue)) {
+      const exactMatch = trimmed
+        ? options.find((option) => !option.disabled && option.label.toLowerCase() === trimmed.toLowerCase())
+        : undefined;
       if (exactMatch) {
         selectOption(exactMatch);
         return;
