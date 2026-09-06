@@ -36,7 +36,7 @@ Go through each item. For each one, output **PASS**, **WARN**, or **FAIL** with 
 - [ ] Stories cover: Default, all variants, sizes (sm/md/lg), disabled state
 - [ ] `AllVariants` render story exists
 - [ ] In-story copy (labels, demo data) is cyberpunk-flavored
-- [ ] `docs.description` prose (component and story level) is factual sentences only — no adjectives, adverbs, or rationale clauses
+- [ ] `docs.description` prose (component and story level) states behavior without tacking on a "why"/rationale clause (brand vocabulary and prescriptive usage guidance, e.g. FormField's "when to use X vs Y", are not violations)
 
 ### Tests (`$ARGUMENTS.test.tsx`)
 - [ ] Renders without crashing
