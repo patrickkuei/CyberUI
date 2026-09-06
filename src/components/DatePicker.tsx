@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useId, useRef, useState } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 import { cn } from '../utils/cn';
+import { useDialogBehavior } from '../hooks/useDialogBehavior';
 
 const WEEKDAY_LABELS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'] as const;
 const MONTH_LABELS = [
@@ -190,73 +191,57 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const [focusedDate, setFocusedDate] = useState<Date>(initialView);
 
   const [open, setOpen] = useState(false);
-  const [isClosing, setIsClosing] = useState(false);
 
   const generatedId = useId();
   const inputId = id || generatedId;
   const calendarId = `datepicker-calendar-${generatedId}`;
   const describedById = error ? `${inputId}-error` : helperText ? `${inputId}-help` : undefined;
 
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
   const triggerRef = useRef<HTMLInputElement | null>(null);
-  const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dayRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const pendingFocusRef = useRef(false);
 
-  useEffect(() => {
-    return () => {
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    };
-  }, []);
-
-  const closeCalendar = useCallback((focusTrigger: boolean) => {
-    setIsClosing(true);
-    if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-    closeTimeoutRef.current = setTimeout(() => {
-      setOpen(false);
-      setIsClosing(false);
-      if (focusTrigger) triggerRef.current?.focus();
-    }, 180);
-  }, []);
+  const {
+    isClosing: calendarIsClosing,
+    open: openDialog,
+    close: closeDialog,
+    containerRef,
+  } = useDialogBehavior(open, {
+    closeDuration: 180,
+    openDuration: 30,
+    onClose: () => setOpen(false),
+    // A document.activeElement snapshot at open-time is unreliable here:
+    // opening is driven by a trigger click, and a click doesn't always move
+    // real DOM focus (e.g. Testing Library's fireEvent.click doesn't). The
+    // trigger ref is a stable, always-correct restore target instead.
+    getRestoreFocusTarget: () => triggerRef.current,
+  });
 
   const openCalendar = useCallback(() => {
     if (disabled) return;
-    // Cancel any pending close (we may be re-opening mid close-animation)
-    // so it can't fire after the fact and yank the calendar shut again.
-    if (closeTimeoutRef.current) {
-      clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = null;
-    }
-    setIsClosing(false);
     const anchor = startOfDay(selectedValue ?? new Date());
     setViewDate(anchor);
     setFocusedDate(anchor);
     setOpen(true);
+    openDialog();
     pendingFocusRef.current = true;
-  }, [disabled, selectedValue]);
+  }, [disabled, selectedValue, openDialog]);
 
   const toggleCalendar = useCallback(() => {
     // While closing, `open` is still true for the duration of the close
     // animation — treat that window as effectively closed so a re-toggle
     // reopens immediately instead of just restarting the close timer.
-    if (open && !isClosing) {
-      closeCalendar(false);
+    if (open && !calendarIsClosing) {
+      closeDialog();
     } else {
       openCalendar();
     }
-  }, [open, isClosing, openCalendar, closeCalendar]);
+  }, [open, calendarIsClosing, openCalendar, closeDialog]);
 
-  useEffect(() => {
-    if (!open) return;
-    const handleMouseDown = (e: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) {
-        closeCalendar(false);
-      }
-    };
-    document.addEventListener('mousedown', handleMouseDown);
-    return () => document.removeEventListener('mousedown', handleMouseDown);
-  }, [open, closeCalendar]);
-
+  // Moves DOM focus into the grid as soon as it's rendered — deliberately
+  // not gated on calendarIsOpening/the hook's open-settle timer, since
+  // keyboard users shouldn't wait on the (purely visual) entrance animation
+  // before they can navigate the grid.
   useEffect(() => {
     if (!open || !pendingFocusRef.current) return;
     pendingFocusRef.current = false;
@@ -300,17 +285,14 @@ const DatePicker: React.FC<DatePickerProps> = ({
     if (isDateDisabled(date, minDate, maxDate)) return;
     if (!isControlled) setInternalValue(date);
     onValueChange?.(date);
-    closeCalendar(true);
+    closeDialog();
   };
 
   const handleTriggerKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (disabled) return;
     if (event.key === 'ArrowDown' || event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      if (!open || isClosing) openCalendar();
-    } else if (event.key === 'Escape' && open && !isClosing) {
-      event.preventDefault();
-      closeCalendar(false);
+      if (!open || calendarIsClosing) openCalendar();
     }
   };
 
@@ -353,12 +335,8 @@ const DatePicker: React.FC<DatePickerProps> = ({
         event.preventDefault();
         selectDate(date);
         break;
-      case 'Escape':
-        event.preventDefault();
-        closeCalendar(true);
-        break;
       case 'Tab':
-        closeCalendar(false);
+        closeDialog();
         break;
       default:
         break;
@@ -421,7 +399,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const today = startOfDay(new Date());
 
   return (
-    <div className={cn('w-full', className)} ref={wrapperRef}>
+    <div className={cn('w-full', className)} ref={containerRef}>
       {label && (
         <label htmlFor={inputId} className="block text-sm font-medium text-default mb-2">
           {label}
@@ -469,7 +447,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
           </svg>
         </button>
 
-        {(open || isClosing) && (
+        {(open || calendarIsClosing) && (
           <div
             id={calendarId}
             role="dialog"
@@ -478,7 +456,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             className={cn(
               'absolute z-50 mt-2 w-72 rounded-lg border-2 border-border-default bg-surface p-4 shadow-secondary',
               'transition-transform transition-opacity duration-200 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
-              isClosing ? 'pointer-events-none scale-y-0 opacity-0' : 'pointer-events-auto scale-y-100 opacity-100'
+              calendarIsClosing ? 'pointer-events-none scale-y-0 opacity-0' : 'pointer-events-auto scale-y-100 opacity-100'
             )}
           >
             <div className="mb-3 flex items-center justify-between">
