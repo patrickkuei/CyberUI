@@ -217,6 +217,36 @@ describe('useDialogBehavior', () => {
     expect(screen.queryByTestId('panel')).not.toBeInTheDocument();
   });
 
+  it('close() is idempotent while already closing — repeated calls do not restart the close timer', () => {
+    // Regression: Escape and outside-click stay live for the whole
+    // close-animation window (isOpen doesn't flip to false until the close
+    // timer completes), and both call close() unconditionally with no
+    // isClosing guard. Before this fix, each repeated call cleared and
+    // rescheduled the same timer for a fresh full closeDuration, so mashing
+    // Escape (or repeatedly clicking outside) during the close window could
+    // defer completion indefinitely instead of being a harmless no-op.
+    const onCloseSpy = vi.fn();
+    render(<Harness closeDuration={100} onCloseSpy={onCloseSpy} />);
+    fireEvent.click(screen.getByTestId('trigger')); // open
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    fireEvent.click(screen.getByTestId('close-btn')); // begin closing
+    act(() => {
+      vi.advanceTimersByTime(50); // halfway through the 100ms close
+    });
+
+    // Repeated close attempts mid-close must be no-ops, not timer restarts.
+    fireEvent.click(screen.getByTestId('close-btn'));
+    fireEvent.click(screen.getByTestId('close-btn'));
+
+    act(() => {
+      vi.advanceTimersByTime(50); // completes the ORIGINAL 100ms window
+    });
+    expect(onCloseSpy).toHaveBeenCalledTimes(1);
+  });
+
   it('reopening mid-close cancels the pending close entirely — onClose never fires for the aborted close, and a fresh open-settle timer starts', () => {
     // Regression scenario DatePicker/Drawer's own comments describe: a fast
     // re-click during the close animation must cancel it, not let it fire

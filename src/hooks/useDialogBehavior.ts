@@ -246,6 +246,15 @@ export function useDialogBehavior(
 
   const close = useCallback(
     (opts?: { focusTarget?: HTMLElement | null }) => {
+      if (closeTimeoutRef.current) {
+        // Already closing — ignore. Escape/outside-click stay live for the
+        // whole close-animation window (isOpen doesn't flip to false until
+        // the close timer completes), so a repeated dismissal attempt
+        // during that window would otherwise clear-and-reschedule this same
+        // timer for a fresh full closeDuration, over and over, deferring
+        // completion indefinitely instead of just being a no-op.
+        return;
+      }
       if (opts) explicitFocusTargetRef.current = opts.focusTarget ?? null;
       if (openTimeoutRef.current) {
         clearTimeout(openTimeoutRef.current);
@@ -253,7 +262,6 @@ export function useDialogBehavior(
       }
       pendingOpenSettleRef.current = false;
       setIsClosing(true);
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
       closeTimeoutRef.current = setTimeout(() => {
         setIsClosing(false);
         setIsOpening(false);
