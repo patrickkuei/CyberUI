@@ -73,6 +73,7 @@ function App() {
 | GradientText | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-gradienttext--docs) |
 | SectionTitle | Typography | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-sectiontitle--docs) |
 | Timeline | Display | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-timeline--docs) |
+| Table | Display | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-table--docs) |
 | Image | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs) |
 | Avatar | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-avatar--docs) |
 
