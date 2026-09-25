@@ -10,9 +10,7 @@ describe('Button', () => {
 
   it('renders with different variants', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByRole('button').querySelector('[aria-hidden="true"]')).toHaveClass(
-      'bg-linear-(--gradient-accent)'
-    );
+    expect(screen.getByRole('button')).toHaveClass('bg-linear-(--gradient-accent)');
 
     rerender(<Button variant="secondary">Secondary</Button>);
     expect(screen.getByRole('button')).toHaveClass('border-secondary');
@@ -65,14 +63,29 @@ describe('Button', () => {
     }
   );
 
-  it('fades the primary gradient out when disabled instead of removing it', () => {
+  it('fades a cover in over the primary gradient when disabled instead of removing it', () => {
     const { rerender } = render(<Button variant="primary">Jack In</Button>);
-    const gradient = screen.getByRole('button').querySelector('[aria-hidden="true"]');
-    expect(gradient).toHaveClass('transition-opacity', 'opacity-100');
+    const button = screen.getByRole('button');
+    const cover = button.querySelector('[aria-hidden="true"]');
+    expect(button).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(cover).toHaveClass('transition-opacity', 'opacity-0');
 
     rerender(<Button variant="primary" disabled>Jack In</Button>);
-    // Same element, still mounted: only its opacity changes, so the switch animates.
-    expect(screen.getByRole('button').querySelector('[aria-hidden="true"]')).toBe(gradient);
-    expect(gradient).toHaveClass('opacity-0');
+    // The gradient stays put and the same cover element only changes opacity,
+    // so the switch animates rather than cutting out.
+    expect(button).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(button.querySelector('[aria-hidden="true"]')).toBe(cover);
+    expect(cover).toHaveClass('opacity-100', 'inset-ring-2');
+  });
+
+  it('lets className override the primary gradient', () => {
+    render(
+      <Button variant="primary" className="bg-linear-to-r from-error to-accent">
+        Override
+      </Button>
+    );
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('bg-linear-to-r');
+    expect(button).not.toHaveClass('bg-linear-(--gradient-accent)');
   });
 });

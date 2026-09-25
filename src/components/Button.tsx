@@ -89,11 +89,11 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantClasses = (variant: string, disabled: boolean): string => {
     const variants = {
       primary: {
-        // The gradient is a separate layer (see below) so it can fade out;
-        // disabled draws its outline as an inset ring rather than a border so
-        // both states keep the same box size (#35).
-        enabled: 'bg-base text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
-        disabled: 'bg-base border-none inset-ring-2 inset-ring-accent/20 text-accent/40 shadow-none opacity-50'
+        // The gradient stays on the button in both states, so `className` can
+        // still override it; disabled fades a cover layer in over it (see
+        // below). No border in either state keeps the box size equal (#35).
+        enabled: 'bg-linear-(--gradient-accent) text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        disabled: 'bg-linear-(--gradient-accent) border-none text-accent/40 shadow-none opacity-50'
       },
       secondary: {
         enabled: 'bg-surface border-2 border-secondary text-secondary shadow-secondary/30 hover:bg-secondary hover:text-inverse hover:shadow-secondary focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95',
@@ -124,13 +124,15 @@ const Button: React.FC<ButtonProps> = ({
       {...props}
     >
       {variant === 'primary' && (
-        // background-image can't transition, so the gradient fades via opacity
-        // instead of cutting out when `disabled` flips.
+        // background-image can't transition, so instead of removing the
+        // gradient, disabled fades this cover in over it. The disabled
+        // outline lives here too: an inset ring on the button itself would be
+        // painted underneath this layer.
         <span
           aria-hidden="true"
           className={cn(
-            'absolute inset-0 bg-linear-(--gradient-accent) transition-opacity duration-300 ease-in-out',
-            disabled ? 'opacity-0' : 'opacity-100'
+            'absolute inset-0 bg-base inset-ring-2 inset-ring-accent/20 transition-opacity duration-300 ease-in-out',
+            disabled ? 'opacity-100' : 'opacity-0'
           )}
         />
       )}
