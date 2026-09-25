@@ -239,3 +239,84 @@ describe('Carousel reduced motion', () => {
     expect(track.className).toContain('motion-reduce:transition-none');
   });
 });
+
+describe('Carousel stand-in (missing src)', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  const mixed = [
+    { src: 'img1.jpg', alt: 'Real slide', caption: 'Caption real' },
+    { alt: 'Stand-in slide', caption: 'Caption stand-in' },
+    { src: '', alt: 'Empty slide', fallbackSrc: 'backup.jpg' },
+  ];
+
+  it('renders a real image and stand-ins together', () => {
+    render(<Carousel images={mixed} currentIndex={0} onChange={vi.fn()} autoPlay={false} />);
+    expect(screen.getByAltText('Real slide')).toHaveAttribute('src', 'img1.jpg');
+    expect(screen.getByRole('img', { name: 'Stand-in slide' })).toBeInTheDocument();
+    expect(screen.queryByAltText('Stand-in slide')).toBeNull();
+    // a missing src with a fallbackSrc shows that URL, not a stand-in
+    expect(screen.getByAltText('Empty slide (fallback)')).toHaveAttribute('src', 'backup.jpg');
+  });
+
+  it('defaults stand-ins to the gradient style', () => {
+    const { container } = render(<Carousel images={mixed} currentIndex={1} onChange={vi.fn()} autoPlay={false} />);
+    expect(container.querySelector('.animate-scanline-sweep')).toBeNull();
+  });
+
+  it('applies fallbackStyle to every slide without a source, and only those', () => {
+    const { container } = render(
+      <Carousel images={mixed} currentIndex={1} onChange={vi.fn()} autoPlay={false} fallbackStyle="scanline" />
+    );
+    expect(container.querySelectorAll('.animate-scanline-sweep')).toHaveLength(1);
+    expect(screen.getByRole('img', { name: 'Stand-in slide' }).querySelector('.animate-scanline-sweep')).not.toBeNull();
+  });
+
+  it('works in every transition', () => {
+    for (const transition of ['slide', 'fade', 'matrix', 'signal-glitch'] as const) {
+      const { container, unmount } = render(
+        <Carousel
+          images={mixed}
+          currentIndex={1}
+          onChange={vi.fn()}
+          autoPlay={false}
+          transition={transition}
+          fallbackStyle="scanline"
+        />
+      );
+      expect(screen.getByRole('img', { name: 'Stand-in slide' })).toBeInTheDocument();
+      expect(container.querySelectorAll('.animate-scanline-sweep')).toHaveLength(1);
+      unmount();
+    }
+  });
+
+  it('keeps captions and navigation for a stand-in slide', () => {
+    const handleChange = vi.fn();
+    render(<Carousel images={mixed} currentIndex={1} onChange={handleChange} autoPlay={false} transition="slide" />);
+    expect(screen.getByText('Caption stand-in')).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText('Next image'));
+    act(() => {
+      vi.runAllTimers();
+    });
+    expect(handleChange).toHaveBeenCalledWith(2);
+  });
+
+  it('renders a carousel of only stand-ins with no assets at all', () => {
+    render(
+      <Carousel
+        images={[{ alt: 'Alpha' }, { alt: 'Beta' }]}
+        currentIndex={0}
+        onChange={vi.fn()}
+        autoPlay={false}
+      />
+    );
+    expect(screen.getByRole('img', { name: 'Alpha' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Beta' })).toBeInTheDocument();
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+});
