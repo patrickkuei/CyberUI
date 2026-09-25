@@ -30,6 +30,7 @@ export { default as Slider } from './Slider';
 export { default as Drawer } from './Drawer';
 export { default as Combobox } from './Combobox';
 export { default as DatePicker } from './DatePicker';
+export { default as Table } from './Table';
 
 export type { CircularProgressProps } from './CircularProgress';
 export type { NotificationProps } from './Notification';
@@ -63,6 +64,7 @@ export type { SliderProps, SliderValue } from './Slider';
 export type { DrawerProps, DrawerSide } from './Drawer';
 export type { ComboboxProps, ComboboxOption } from './Combobox';
 export type { DatePickerProps } from './DatePicker';
+export type { TableProps, TableColumn, TableRowData } from './Table';
 
 export type { ResponsiveValue, Breakpoint } from '../utils/responsive';
 export { getResponsiveClasses, combineResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';

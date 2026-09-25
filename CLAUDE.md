@@ -36,7 +36,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 | Progress | CircularProgress, SegmentedProgress, LinearProgress |
 | Navigation | TabNavigation, Carousel, Steps, DropdownMenu, Pagination |
 | Typography | GradientText, SectionTitle |
-| Display | Timeline |
+| Display | Timeline, Table |
 | Media | Image, Avatar |
 | Hooks | useCyberScrollbar, useCyberNotifications, useAnimatedProgress |
 | Context | CyberNotificationProvider |

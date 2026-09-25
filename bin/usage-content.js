@@ -61,6 +61,7 @@ Paths below are relative to \`node_modules/cyberui-2045/\`.
 | GradientText | Typography | \`dist/components/GradientText.d.ts\` |
 | SectionTitle | Typography | \`dist/components/SectionTitle.d.ts\` |
 | Timeline | Display | \`dist/components/Timeline.d.ts\` |
+| Table | Display | \`dist/components/Table.d.ts\` |
 | Image | Media | \`dist/components/Image.d.ts\` |
 | Avatar | Media | \`dist/components/Avatar.d.ts\` |
 <!-- cyberui-2045:manifest:end -->
