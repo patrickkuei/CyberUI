@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
 
 const QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -10,11 +10,30 @@ const QUERY = '(prefers-reduced-motion: reduce)';
  */
 export const REDUCED_MOTION_DURATION = 150;
 
-function getMatch(): boolean {
-  if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-    return false;
+function hasMatchMedia(): boolean {
+  return typeof window !== 'undefined' && typeof window.matchMedia === 'function';
+}
+
+function subscribe(onChange: () => void): () => void {
+  if (!hasMatchMedia()) return () => {};
+  const mql = window.matchMedia(QUERY);
+  if (typeof mql.addEventListener === 'function') {
+    mql.addEventListener('change', onChange);
+    return () => mql.removeEventListener('change', onChange);
   }
-  return window.matchMedia(QUERY).matches;
+  // Safari < 14 only implements the deprecated listener API.
+  mql.addListener(onChange);
+  return () => mql.removeListener(onChange);
+}
+
+function getSnapshot(): boolean {
+  return hasMatchMedia() && window.matchMedia(QUERY).matches;
+}
+
+// Server render and hydration both use `false`; React then re-renders with
+// the real value, so hydration never mismatches.
+function getServerSnapshot(): boolean {
+  return false;
 }
 
 /**
@@ -30,24 +49,5 @@ function getMatch(): boolean {
  * <div style={{ animation: reduceMotion ? 'none' : 'neon-flicker 1s infinite' }} />
  */
 export function usePrefersReducedMotion(): boolean {
-  const [reduced, setReduced] = useState(getMatch);
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
-      return;
-    }
-    const mql = window.matchMedia(QUERY);
-    const handleChange = () => setReduced(mql.matches);
-    // Resync in case the preference changed between render and subscribe.
-    handleChange();
-    if (typeof mql.addEventListener === 'function') {
-      mql.addEventListener('change', handleChange);
-      return () => mql.removeEventListener('change', handleChange);
-    }
-    // Safari < 14 only implements the deprecated listener API.
-    mql.addListener(handleChange);
-    return () => mql.removeListener(handleChange);
-  }, []);
-
-  return reduced;
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -1,5 +1,6 @@
 import { renderHook, act } from '@testing-library/react';
 import { renderToString } from 'react-dom/server';
+import { hydrateRoot } from 'react-dom/client';
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import { usePrefersReducedMotion, REDUCED_MOTION_DURATION } from './usePrefersReducedMotion';
 
@@ -55,6 +56,57 @@ describe('usePrefersReducedMotion', () => {
       return <span>{usePrefersReducedMotion() ? 'reduce' : 'no-preference'}</span>;
     }
     expect(renderToString(<Probe />)).toContain('no-preference');
+  });
+
+  function HydrationProbe() {
+    const reduce = usePrefersReducedMotion();
+    return (
+      <span data-motion={reduce ? 'reduce' : 'no-preference'} style={{ animation: reduce ? 'none' : 'pulse 2s infinite' }}>
+        {reduce ? 'reduce' : 'no-preference'}
+      </span>
+    );
+  }
+
+  async function hydrateAndExpectReduced(html: string) {
+    const Probe = HydrationProbe;
+    const container = document.createElement('div');
+    container.innerHTML = html;
+    document.body.appendChild(container);
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const onRecoverableError = vi.fn();
+    try {
+      let root: ReturnType<typeof hydrateRoot> | undefined;
+      await act(async () => {
+        root = hydrateRoot(container, <Probe />, { onRecoverableError });
+      });
+      const span = container.querySelector('span')!;
+      expect(span.textContent).toBe('reduce');
+      expect(span.getAttribute('data-motion')).toBe('reduce');
+      expect(span.style.animation).toBe('none');
+      expect(onRecoverableError).not.toHaveBeenCalled();
+      expect(errorSpy).not.toHaveBeenCalled();
+      act(() => root!.unmount());
+    } finally {
+      errorSpy.mockRestore();
+      container.remove();
+    }
+  }
+
+  it('server-renders the no-preference output even when matchMedia reports reduce', async () => {
+    stubMatchMedia(true);
+    const html = renderToString(<HydrationProbe />);
+    expect(html).toContain('no-preference');
+    expect(html).not.toContain('>reduce<');
+    await hydrateAndExpectReduced(html);
+  });
+
+  it('hydrates server HTML (rendered without matchMedia) to the reduced output with no mismatch', async () => {
+    // Real server: no matchMedia at all.
+    const html = renderToString(<HydrationProbe />);
+    expect(html).toContain('no-preference');
+    // Client under reduced motion.
+    stubMatchMedia(true);
+    await hydrateAndExpectReduced(html);
   });
 
   it('queries prefers-reduced-motion: reduce', () => {
