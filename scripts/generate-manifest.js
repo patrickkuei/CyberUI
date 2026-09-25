@@ -68,7 +68,7 @@ const DOC_SUMMARIES = {
   Drawer: 'Slide-in side panel from any edge (`left`/`right`/`top`/`bottom`). Shares Modal\'s controlled `isOpen`/`onClose` pattern and overlay behavior.',
   Combobox: 'Searchable select — text input filters `options` as you type. WAI-ARIA combobox pattern, optional `allowCustomValue` for free-text entry.',
   DatePicker: 'Single-date picker with a text-input trigger and a keyboard-navigable calendar grid popover. `minDate`/`maxDate` bounds, neon-highlighted selected day, glow on today.',
-  Table: 'Semantic `columns`/`data` table. Neon header row, hover-glow rows, optional `variant="striped"` alternating tint.',
+  Table: 'Semantic `columns`/`data` table, generic over your row type (`TableColumn<Row>[]`, typed `render`/`onRowClick`). Neon header row, hover-glow rows, optional `variant="striped"` alternating tint.',
 };
 
 // SegmentedProgress exports `type SegmentedProgressProps = RadialProps | BlockProps`,

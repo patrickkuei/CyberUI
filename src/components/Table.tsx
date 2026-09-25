@@ -4,21 +4,21 @@ import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive'
 import { cn } from '../utils/cn';
 
 /**
- * A single row of data rendered by `Table`. Any JSON-like object works —
- * each column's `key` (or `render`) reads the value(s) it needs off of it.
+ * The default row shape when `Table` isn't given a row type. Pass your own
+ * row type instead (`Table` infers it from `data`) to get typed `render`,
+ * `getRowId` and `onRowClick` callbacks.
  */
 export type TableRowData = Record<string, React.ReactNode>;
 
-/**
- * Defines one column of a `Table`.
- */
-export interface TableColumn {
-  /** Unique id for this column; also the property read off each row via `row[key]` when `render` is omitted. */
-  key: string;
+/** Keys of `T` whose values React can render directly as a cell. */
+type RenderableKey<T> = {
+  [K in keyof T]-?: T[K] extends React.ReactNode ? K : never;
+}[keyof T] &
+  string;
+
+interface TableColumnBase {
   /** Header cell content. */
   header: React.ReactNode;
-  /** Custom cell renderer, overriding the default `row[key]` lookup — use for computed or composite cells. */
-  render?: (row: TableRowData, rowIndex: number) => React.ReactNode;
   /**
    * Text alignment applied to both the header and body cells of this column.
    * @default 'left'
@@ -29,18 +29,38 @@ export interface TableColumn {
 }
 
 /**
+ * Defines one column of a `Table`. Without `render`, `key` must name a
+ * property of the row whose value is directly renderable (string, number,
+ * element…); with `render`, `key` is just a unique column id.
+ */
+export type TableColumn<T = TableRowData> = TableColumnBase &
+  (
+    | {
+        /** Property read off each row via `row[key]`; also the column's unique id. */
+        key: RenderableKey<T>;
+        render?: undefined;
+      }
+    | {
+        /** Unique id for this column. */
+        key: string;
+        /** Custom cell renderer — use for computed, composite, or non-renderable values (dates, booleans, nested objects). */
+        render: (row: T, rowIndex: number) => React.ReactNode;
+      }
+  );
+
+/**
  * Props for the Table component.
  */
-export interface TableProps {
+export interface TableProps<T = TableRowData> {
   /** Column definitions, in display order. */
-  columns: TableColumn[];
+  columns: TableColumn<T>[];
   /** Row data, one entry per rendered row. */
-  data: TableRowData[];
+  data: T[];
   /**
    * Derives a stable React key per row.
    * @default (_row, index) => index — pass a real id accessor (e.g. `(row) => row.id`) whenever rows can be added, removed, or reordered, otherwise React can misattribute focus/animation state across re-renders.
    */
-  getRowId?: (row: TableRowData, rowIndex: number) => string | number;
+  getRowId?: (row: T, rowIndex: number) => string | number;
   /**
    * Visual style.
    * - `default`: flat body rows.
@@ -70,7 +90,7 @@ export interface TableProps {
    * children's column association for assistive tech. The click affordance
    * is visual + keyboard only, not announced as a button.
    */
-  onRowClick?: (row: TableRowData, rowIndex: number) => void;
+  onRowClick?: (row: T, rowIndex: number) => void;
   /** Additional CSS classes for the outer scroll container. */
   className?: string;
 }
@@ -99,7 +119,7 @@ const ALIGN_CLASSES: Record<'left' | 'center' | 'right', string> = {
  *   ]}
  * />
  */
-const Table: React.FC<TableProps> = ({
+function Table<T = TableRowData>({
   columns,
   data,
   getRowId,
@@ -110,12 +130,12 @@ const Table: React.FC<TableProps> = ({
   emptyMessage = 'No data available.',
   onRowClick,
   className = '',
-}) => {
+}: TableProps<T>) {
   const sizeClasses = getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.table);
 
   const handleRowKeyDown = (
     event: React.KeyboardEvent<HTMLTableRowElement>,
-    row: TableRowData,
+    row: T,
     rowIndex: number
   ) => {
     if (!onRowClick) return;
@@ -169,7 +189,8 @@ const Table: React.FC<TableProps> = ({
                     'border-b border-border-default last:border-b-0 transition-colors duration-200',
                     'hover:bg-surface hover:shadow-[inset_0_0_0_1px_var(--color-secondary)]',
                     striped && 'bg-surface/40',
-                    onRowClick && 'cursor-pointer'
+                    onRowClick &&
+                      'cursor-pointer focus-visible:outline-none focus-visible:bg-surface focus-visible:shadow-[inset_0_0_0_2px_var(--color-accent)]'
                   )}
                   tabIndex={onRowClick ? 0 : undefined}
                   onClick={onRowClick ? () => onRowClick(row, rowIndex) : undefined}
@@ -180,7 +201,9 @@ const Table: React.FC<TableProps> = ({
                       key={column.key}
                       className={cn('text-default', sizeClasses, ALIGN_CLASSES[column.align ?? 'left'])}
                     >
-                      {column.render ? column.render(row, rowIndex) : row[column.key]}
+                      {column.render
+                        ? column.render(row, rowIndex)
+                        : (row[column.key as keyof T] as React.ReactNode)}
                     </td>
                   ))}
                 </tr>
@@ -191,7 +214,7 @@ const Table: React.FC<TableProps> = ({
       </table>
     </div>
   );
-};
+}
 
 Table.displayName = "CyberUI.Table";
 

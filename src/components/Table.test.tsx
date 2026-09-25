@@ -116,4 +116,59 @@ describe('Table', () => {
     render(<Table columns={COLUMNS} data={DATA} />);
     expect(screen.getByRole('columnheader', { name: 'Callsign' })).toHaveAttribute('scope', 'col');
   });
+
+  it('gives clickable rows an accent focus-visible style', () => {
+    render(<Table columns={COLUMNS} data={DATA} onRowClick={() => {}} />);
+    const firstRow = screen.getAllByRole('row')[1];
+    expect(firstRow).toHaveClass('focus-visible:outline-none');
+    expect(firstRow).toHaveClass('focus-visible:shadow-[inset_0_0_0_2px_var(--color-accent)]');
+  });
+});
+
+describe('Table with a typed row interface', () => {
+  // An `interface` (unlike a `type` alias) has no implicit index signature,
+  // so this only compiles because Table is generic over the row type.
+  interface Operative {
+    id: number;
+    callsign: string;
+    lastSeen: Date;
+  }
+
+  const OPERATIVES: Operative[] = [
+    { id: 7, callsign: 'Ghost', lastSeen: new Date(2045, 0, 2) },
+    { id: 9, callsign: 'Wraith', lastSeen: new Date(2045, 5, 17) },
+  ];
+
+  const OPERATIVE_COLUMNS: TableColumn<Operative>[] = [
+    { key: 'callsign', header: 'Callsign' },
+    { key: 'lastSeen', header: 'Last seen', render: (row) => `${row.lastSeen.getFullYear()}` },
+  ];
+
+  it('renders keyed and render-function columns from typed rows', () => {
+    render(<Table columns={OPERATIVE_COLUMNS} data={OPERATIVES} />);
+    expect(screen.getByText('Ghost')).toBeInTheDocument();
+    expect(screen.getAllByText('2045')).toHaveLength(2);
+  });
+
+  it('passes the typed row to getRowId and onRowClick', () => {
+    const getRowId = vi.fn((row: Operative) => row.id);
+    const handleClick = vi.fn((row: Operative) => row.id);
+    render(
+      <Table columns={OPERATIVE_COLUMNS} data={OPERATIVES} getRowId={getRowId} onRowClick={handleClick} />
+    );
+    fireEvent.click(screen.getAllByRole('row')[2]);
+    expect(handleClick).toHaveReturnedWith(9);
+    expect(getRowId).toHaveBeenCalledWith(OPERATIVES[0], 0);
+  });
+
+  it('rejects a key whose value is not renderable unless the column has render', () => {
+    const columns: TableColumn<Operative>[] = [
+      // @ts-expect-error — a Date can't be rendered as a cell, so `lastSeen` needs a render function
+      { key: 'lastSeen', header: 'Last seen' },
+      // @ts-expect-error — `rank` isn't a property of Operative
+      { key: 'rank', header: 'Rank' },
+      { key: 'rank', header: 'Rank', render: () => 'Unranked' }, // any column id is fine with render
+    ];
+    expect(columns).toHaveLength(3);
+  });
 });

@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.5.0",
-  "generatedAt": "2026-09-06T06:11:03.676Z",
+  "generatedAt": "2026-09-25T02:11:35.631Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -821,7 +821,7 @@
           "name": "formatDate",
           "type": "((date: Date) => string) | undefined",
           "required": false,
-          "default": "(date: Date): string => {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, '0');\n  const d = String(date.getDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}",
+          "default": "(date: Date): string => {\r\n  const y = date.getFullYear();\r\n  const m = String(date.getMonth() + 1).padStart(2, '0');\r\n  const d = String(date.getDate()).padStart(2, '0');\r\n  return `${y}-${m}-${d}`;\r\n}",
           "description": "Formats the selected date for display in the trigger input."
         },
         {
@@ -2297,27 +2297,27 @@
       "sourceFile": "src/components/Table.tsx",
       "displayName": "Table",
       "description": "A cyberpunk-styled, semantic data table: neon header row, hover-glow rows,\nand an optional alternating row tint. Sorting, filtering, pagination, and\nvirtualization are intentionally out of scope — pair with `Pagination` for\npaged data.",
-      "docSummary": "Semantic `columns`/`data` table. Neon header row, hover-glow rows, optional `variant=\"striped\"` alternating tint.",
+      "docSummary": "Semantic `columns`/`data` table, generic over your row type (`TableColumn<Row>[]`, typed `render`/`onRowClick`). Neon header row, hover-glow rows, optional `variant=\"striped\"` alternating tint.",
       "storybookPath": "components-table--docs",
       "manifestOverride": false,
       "props": [
         {
           "name": "columns",
-          "type": "TableColumn[]",
+          "type": "TableColumn<T>[]",
           "required": true,
           "default": null,
           "description": "Column definitions, in display order."
         },
         {
           "name": "data",
-          "type": "TableRowData[]",
+          "type": "T[]",
           "required": true,
           "default": null,
           "description": "Row data, one entry per rendered row."
         },
         {
           "name": "getRowId",
-          "type": "((row: TableRowData, rowIndex: number) => string | number) | undefined",
+          "type": "((row: T, rowIndex: number) => string | number) | undefined",
           "required": false,
           "default": "(_row, index) => index — pass a real id accessor (e.g. `(row) => row.id`) whenever rows can be added, removed, or reordered, otherwise React can misattribute focus/animation state across re-renders.",
           "description": "Derives a stable React key per row."
@@ -2359,7 +2359,7 @@
         },
         {
           "name": "onRowClick",
-          "type": "((row: TableRowData, rowIndex: number) => void) | undefined",
+          "type": "((row: T, rowIndex: number) => void) | undefined",
           "required": false,
           "default": null,
           "description": "Fired when a row is clicked, or activated via Enter/Space while it has\nfocus. Providing this makes every row keyboard-focusable (`tabIndex={0}`)\n— rows keep their native `row` semantics rather than switching to\n`role=\"button\"`, since overriding a `<tr>`'s role breaks its `<td>`\nchildren's column association for assistive tech. The click affordance\nis visual + keyboard only, not announced as a button."

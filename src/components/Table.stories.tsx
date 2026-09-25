@@ -1,9 +1,16 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import Table from './Table';
-import type { TableColumn, TableRowData } from './Table';
+import type { TableColumn } from './Table';
 import Badge from './Badge';
 
-const OPERATIVE_COLUMNS: TableColumn[] = [
+interface Operative {
+  callsign: string;
+  sector: string;
+  status: 'Online' | 'Offline' | 'Compromised';
+  clearance: string;
+}
+
+const OPERATIVE_COLUMNS: TableColumn<Operative>[] = [
   { key: 'callsign', header: 'Callsign' },
   { key: 'sector', header: 'Sector' },
   {
@@ -22,7 +29,7 @@ const OPERATIVE_COLUMNS: TableColumn[] = [
   { key: 'clearance', header: 'Clearance', align: 'right' },
 ];
 
-const OPERATIVE_DATA: TableRowData[] = [
+const OPERATIVE_DATA: Operative[] = [
   { callsign: 'Ghost', sector: 'Chiba', status: 'Online', clearance: 'Level 5' },
   { callsign: 'Wraith', sector: 'Night City', status: 'Offline', clearance: 'Level 3' },
   { callsign: 'Case', sector: 'Freeside', status: 'Online', clearance: 'Level 4' },
@@ -30,9 +37,9 @@ const OPERATIVE_DATA: TableRowData[] = [
   { callsign: 'Armitage', sector: 'Villa Straylight', status: 'Online', clearance: 'Level 5' },
 ];
 
-const meta: Meta<typeof Table> = {
+const meta: Meta<typeof Table<Operative>> = {
   title: 'Components/Table',
-  component: Table,
+  component: Table<Operative>,
   parameters: {
     layout: 'padded',
     docs: {
@@ -57,14 +64,24 @@ import 'cyberui-2045/styles.css';
     { callsign: 'Wraith', status: 'Offline' },
   ]}
 />
+
+// Typed rows: pass your own row type (inferred from \`data\`) for typed
+// render/getRowId/onRowClick callbacks. Columns without \`render\` only
+// accept keys whose values are directly renderable.
+interface Operative { id: number; callsign: string; lastSeen: Date }
+const columns: TableColumn<Operative>[] = [
+  { key: 'callsign', header: 'Callsign' },
+  { key: 'lastSeen', header: 'Last seen', render: (row) => row.lastSeen.toLocaleDateString() },
+];
+<Table columns={columns} data={operatives} getRowId={(row) => row.id} />
 \`\`\`
 
 **Props:**
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| \`columns\` | \`TableColumn[]\` | ✅ | - | Column definitions, in display order |
-| \`data\` | \`TableRowData[]\` | ✅ | - | Row data, one entry per rendered row |
+| \`columns\` | \`TableColumn<T>[]\` | ✅ | - | Column definitions, in display order |
+| \`data\` | \`T[]\` | ✅ | - | Row data, one entry per rendered row. \`T\` is your row type |
 | \`getRowId\` | \`(row, index) => string \\| number\` | ❌ | index | Stable row key accessor |
 | \`variant\` | \`'default' \\| 'striped'\` | ❌ | \`'default'\` | Flat rows vs. alternating tint |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Cell padding/text size (supports responsive values) |
@@ -96,7 +113,7 @@ import 'cyberui-2045/styles.css';
     columns: OPERATIVE_COLUMNS,
     data: OPERATIVE_DATA,
   },
-} satisfies Meta<typeof Table>;
+} satisfies Meta<typeof Table<Operative>>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
