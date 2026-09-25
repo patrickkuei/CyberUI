@@ -312,3 +312,13 @@ describe('DatePicker', () => {
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
   });
 });
+
+describe('DatePicker reduced motion', () => {
+  it('fades the calendar without scaling in 150ms under prefers-reduced-motion', () => {
+    render(<DatePicker label="Deployment Date" />);
+    fireEvent.click(screen.getByRole('combobox', { name: 'Deployment Date' }));
+    const dialog = screen.getByRole('dialog');
+    expect(dialog.className).toContain('motion-reduce:scale-y-100');
+    expect(dialog.className).toContain('motion-reduce:duration-150');
+  });
+});

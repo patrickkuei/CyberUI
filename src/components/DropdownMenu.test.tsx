@@ -289,3 +289,13 @@ describe('DropdownMenu', () => {
     expect(screen.getByRole('menu')).toBeInTheDocument();
   });
 });
+
+describe('DropdownMenu reduced motion', () => {
+  it('fades without scaling in 150ms under prefers-reduced-motion', () => {
+    render(<DropdownMenu items={ITEMS} trigger={trigger} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Actions' }));
+    const menu = screen.getByRole('menu');
+    expect(menu.className).toContain('motion-reduce:scale-y-100');
+    expect(menu.className).toContain('motion-reduce:duration-150');
+  });
+});

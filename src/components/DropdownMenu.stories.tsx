@@ -36,6 +36,8 @@ const meta: Meta<typeof DropdownMenu> = {
       description: {
         component: `A cyberpunk-styled dropdown/context menu anchored to a trigger element — for row actions, context menus, and command panels attached to a button.
 
+Under \`prefers-reduced-motion: reduce\`, the menu fades in and out in 150ms without scaling.
+
 **Usage:**
 
 \`\`\`tsx

@@ -19,6 +19,7 @@ const meta: Meta<typeof Modal> = {
 - **Multiple Sizes:** From small dialogs to fullscreen modals
 - **Accessibility:** Full ARIA support with focus management and screen reader compatibility. Escape restores focus to the trigger; overlay click does not.
 - **Cyberpunk Aesthetics:** Grid background, scanline effects, corner accents, and neon styling
+- **Reduced Motion:** Under \`prefers-reduced-motion: reduce\`, open and close are a 150ms opacity-only fade (no CRT scaling), \`animation.openDuration\`/\`closeDuration\` are capped at 150ms, and the idle glow holds still
 
 **Usage:**
 
@@ -104,7 +105,7 @@ function MyComponent() {
 | \`closeOnOverlayClick\` | \`boolean\` | ❌ | \`true\` | Allow closing by clicking overlay |
 | \`closeOnEscape\` | \`boolean\` | ❌ | \`true\` | Allow closing with Escape key |
 | \`showCloseButton\` | \`boolean\` | ❌ | \`true\` | Show close button in header |
-| \`animation\` | \`ModalAnimationConfig\` | ❌ | CRT enabled | Animation configuration |
+| \`animation\` | \`ModalAnimationConfig\` | ❌ | CRT enabled | Animation configuration. Durations are capped at 150ms under reduced motion |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional modal CSS classes |
 | \`overlayClassName\` | \`string\` | ❌ | \`''\` | Additional overlay CSS classes |
 | \`onOpen\` | \`() => void\` | ❌ | - | Called when modal opens |
@@ -114,8 +115,8 @@ function MyComponent() {
 
 \`\`\`tsx
 interface ModalAnimationConfig {
-  openDuration?: number;      // Boot sequence duration (ms)
-  closeDuration?: number;     // Shutdown animation duration (ms)  
+  openDuration?: number;      // Boot sequence duration (ms); max 150 under reduced motion
+  closeDuration?: number;     // Shutdown animation duration (ms); max 150 under reduced motion
   crtEffects?: boolean;       // Enable CRT power-on effects
   flickerIntensity?: number;  // Flicker effect intensity (0-2)
 }

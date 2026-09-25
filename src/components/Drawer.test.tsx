@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Drawer from './Drawer';
+import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 // Mock the portal to render into the container for testing
 vi.mock('react-dom', async (importOriginal) => {
@@ -406,5 +407,106 @@ describe('Drawer Component', () => {
     const panel = screen.getByRole('dialog');
     expect(panel.className).toContain('duration-0');
     expect(panel.className).not.toContain('duration-300');
+  });
+
+  it('swaps the slide for an opacity fade with motion-reduce classes', () => {
+    render(
+      <Drawer isOpen={true} onClose={vi.fn()} side="left">
+        <div>Content</div>
+      </Drawer>
+    );
+    const panel = screen.getByRole('dialog');
+    // Hidden "before" frame: untranslated and transparent under reduced motion.
+    expect(panel.className).toContain('motion-reduce:transition-opacity');
+    expect(panel.className).toContain('motion-reduce:translate-x-0');
+    expect(panel.className).toContain('motion-reduce:opacity-0');
+
+    act(() => {
+      vi.advanceTimersByTime(16);
+    });
+    expect(panel.className).toContain('duration-300');
+    expect(panel.className).toContain('motion-reduce:duration-150');
+    expect(panel.className).not.toContain('motion-reduce:opacity-0');
+    expect(panel.parentElement!.className).toContain('motion-reduce:duration-150');
+  });
+});
+
+describe('Drawer under prefers-reduced-motion', () => {
+  let motion: ReducedMotionStub;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    motion = stubReducedMotion(true);
+  });
+
+  afterEach(() => {
+    motion.restore();
+    vi.useRealTimers();
+  });
+
+  it('settles at 150ms and closes at 150ms', () => {
+    const handleClose = vi.fn();
+    render(
+      <Drawer isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+    const panel = screen.getByRole('dialog');
+
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(panel).not.toHaveFocus();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(panel).toHaveFocus();
+
+    fireEvent.click(screen.getByLabelText('Close drawer'));
+    expect(panel.className).toContain('motion-reduce:opacity-0');
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(handleClose).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('replays the fade-in on a reopen', () => {
+    const handleClose = vi.fn();
+    const { rerender } = render(
+      <Drawer isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+
+    rerender(
+      <Drawer isOpen={false} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+    rerender(
+      <Drawer isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Drawer>
+    );
+
+    const panel = screen.getByRole('dialog');
+    expect(panel.className).toContain('duration-0');
+    expect(panel.className).toContain('motion-reduce:opacity-0');
+    act(() => {
+      vi.advanceTimersByTime(16);
+    });
+    expect(panel.className).not.toContain('motion-reduce:opacity-0');
   });
 });

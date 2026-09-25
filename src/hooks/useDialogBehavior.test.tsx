@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useDialogBehavior, type UseDialogBehaviorOptions } from './useDialogBehavior';
+import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 type HarnessProps = Partial<
   Pick<
@@ -540,5 +541,100 @@ describe('useDialogBehavior', () => {
       vi.advanceTimersByTime(50);
     });
     expect(document.body.style.overflow).toBe('');
+  });
+});
+
+describe('useDialogBehavior under prefers-reduced-motion', () => {
+  let motion: ReducedMotionStub;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    motion = stubReducedMotion(true);
+  });
+
+  afterEach(() => {
+    motion.restore();
+    vi.useRealTimers();
+  });
+
+  it('caps the close timer at 150ms', () => {
+    const onCloseSpy = vi.fn();
+    render(<Harness closeDuration={400} openDuration={50} onCloseSpy={onCloseSpy} />);
+    fireEvent.click(screen.getByTestId('trigger'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+
+    fireEvent.click(screen.getByTestId('close-btn'));
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(onCloseSpy).not.toHaveBeenCalled();
+    expect(screen.getByTestId('panel')).toBeInTheDocument();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(onCloseSpy).toHaveBeenCalledTimes(1);
+    expect(screen.queryByTestId('panel')).toBeNull();
+  });
+
+  it('caps the open-settle timer at 150ms and still fires onOpenSettle exactly once', () => {
+    const onOpenSettle = vi.fn();
+    render(<Harness closeDuration={100} openDuration={600} onOpenSettle={onOpenSettle} />);
+    fireEvent.click(screen.getByTestId('trigger'));
+
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(onOpenSettle).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(onOpenSettle).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onOpenSettle).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps durations already shorter than 150ms unchanged', () => {
+    const onCloseSpy = vi.fn();
+    render(<Harness closeDuration={100} openDuration={30} onCloseSpy={onCloseSpy} />);
+    fireEvent.click(screen.getByTestId('trigger'));
+    act(() => {
+      vi.advanceTimersByTime(30);
+    });
+    fireEvent.click(screen.getByTestId('close-btn'));
+    act(() => {
+      vi.advanceTimersByTime(99);
+    });
+    expect(onCloseSpy).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(onCloseSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('uses the full duration again once the preference is turned off', () => {
+    const onCloseSpy = vi.fn();
+    render(<Harness closeDuration={400} openDuration={50} onCloseSpy={onCloseSpy} />);
+    act(() => motion.set(false));
+
+    fireEvent.click(screen.getByTestId('trigger'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    fireEvent.click(screen.getByTestId('close-btn'));
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(onCloseSpy).not.toHaveBeenCalled();
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(onCloseSpy).toHaveBeenCalledTimes(1);
   });
 });

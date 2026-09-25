@@ -335,7 +335,7 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
           className={cn(
             'absolute z-50 mt-2 min-w-44 overflow-hidden rounded-lg border-2 border-border-default bg-surface shadow-secondary',
             alignEnd ? 'right-0' : 'left-0',
-            'transition-transform transition-opacity duration-200 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
+            'transition-transform transition-opacity duration-200 motion-reduce:duration-150 motion-reduce:scale-y-100 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
             menuIsOpening || menuIsClosing
               ? 'pointer-events-none scale-y-0 opacity-0'
               : 'pointer-events-auto scale-y-100 opacity-100',

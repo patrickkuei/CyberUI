@@ -16,6 +16,8 @@ const meta: Meta<typeof Drawer> = {
 
 Escape restores focus to the trigger. Overlay click does not restore focus.
 
+Under \`prefers-reduced-motion: reduce\`, the drawer fades in and out in 150ms instead of sliding, and the idle glow holds still.
+
 **Usage:**
 
 \`\`\`tsx

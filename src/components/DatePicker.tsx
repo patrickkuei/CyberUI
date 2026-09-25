@@ -457,7 +457,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             aria-hidden={!open}
             className={cn(
               'absolute z-50 mt-2 w-72 rounded-lg border-2 border-border-default bg-surface p-4 shadow-secondary',
-              'transition-transform transition-opacity duration-200 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
+              'transition-transform transition-opacity duration-200 motion-reduce:duration-150 motion-reduce:scale-y-100 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity',
               calendarIsClosing ? 'pointer-events-none scale-y-0 opacity-0' : 'pointer-events-auto scale-y-100 opacity-100'
             )}
           >
