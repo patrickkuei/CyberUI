@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
-import React from "react";
+import React, { useState } from "react";
+import { expect, userEvent, waitFor, within } from "storybook/test";
 import { useCyberScrollbar } from "./useCyberScrollbar";
 
 const meta: Meta = {
@@ -61,7 +62,21 @@ const App = () => {
 | \`glowColor\` | \`'primary' \\| 'secondary' \\| 'accent'\` | ❌ | \`'primary'\` | Color theme for the scrollbar glow effects |
 | \`sensitivity\` | \`number\` | ❌ | \`2\` | Scroll velocity sensitivity multiplier (higher = more responsive) |
 | \`disabled\` | \`boolean\` | ❌ | \`false\` | Disable the scrollbar completely |
-| \`pageLevel\` | \`boolean\` | ❌ | \`false\` | Apply to page-level scrolling instead of container scrolling |
+| \`pageLevel\` | \`boolean\` | ❌ | \`undefined\` (auto-detect) | Apply to page-level scrolling instead of container scrolling |
+| \`variant\` | \`'default' \\| 'minimal' \\| 'transparent'\` | ❌ | \`'default'\` | Style variant for the scrollbar background (transparent on mobile) |
+| \`className\` | \`string\` | ❌ | \`''\` | Custom CSS classes for the scrollbar container |
+
+**Page-level or container:**
+
+1. \`pageLevel: true\` scrolls the page and leaves the returned ref unused.
+2. \`pageLevel: false\` is container mode. The container can attach later: the scrollbar appears as soon as the ref points at an element and is removed when it detaches.
+3. \`pageLevel\` omitted is decided once, in the first post-commit effect: container mode if the ref is attached, page-level otherwise.
+
+**Behavior:**
+
+- The scrollbar appears and disappears as the scroll target's content grows and shrinks, and restyles when the viewport crosses the 768px mobile breakpoint.
+- Scrolling does not re-render the component that calls the hook.
+- With \`prefers-reduced-motion: reduce\`, the velocity glow and arrow sequences are skipped and transitions are disabled.
 `,
       },
     },
@@ -85,7 +100,7 @@ const App = () => {
     pageLevel: {
       control: "boolean",
       description:
-        "Apply to page-level scrolling instead of container scrolling",
+        "Apply to page-level scrolling instead of container scrolling. Omitted = auto-detect: container mode if the ref is attached on mount, page-level otherwise.",
     },
     variant: {
       control: "select", 
@@ -101,7 +116,6 @@ const App = () => {
     glowColor: "primary",
     sensitivity: 2,
     disabled: false,
-    pageLevel: false,
     variant: "default",
     className: "",
   },
@@ -281,4 +295,98 @@ export const Default: Story = {
       <CyberScrollDemo {...args} />
     </div>
   ),
+};
+
+const ContentGrowShrinkDemo: React.FC = () => {
+  const [shards, setShards] = useState(3);
+  const scrollRef = useCyberScrollbar({
+    glowColor: "secondary",
+    variant: "minimal",
+    pageLevel: false,
+  });
+
+  return (
+    <div className="w-full max-w-2xl mx-auto">
+      <div className="mb-4 p-4 bg-surface rounded-lg border border-border-default">
+        <h3 className="text-lg font-semibold text-secondary mb-2">
+          Data Shard Buffer
+        </h3>
+        <p className="text-muted text-sm mb-3">
+          Inject shards until the buffer overflows and the cyber scrollbar
+          appears. Purge the cache and it disappears again.
+        </p>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            className="px-3 py-1 text-sm border border-secondary text-secondary rounded"
+            onClick={() => setShards((n) => n + 6)}
+          >
+            Inject shards
+          </button>
+          <button
+            type="button"
+            className="px-3 py-1 text-sm border border-primary text-primary rounded"
+            onClick={() => setShards(3)}
+          >
+            Purge cache
+          </button>
+          <span className="ml-auto self-center text-xs text-muted">
+            {shards} shards loaded
+          </span>
+        </div>
+      </div>
+
+      <div
+        ref={scrollRef}
+        className="border-2 border-border-default rounded-lg bg-base overflow-y-auto"
+        style={{ height: "260px" }}
+        data-testid="shard-buffer"
+      >
+        <div className="p-4 space-y-2">
+          {Array.from({ length: shards }, (_, i) => (
+            <div
+              key={i}
+              className="bg-surface border border-border-default rounded p-3 text-sm text-default"
+            >
+              Shard {String(i + 1).padStart(2, "0")} | checksum{" "}
+              {((i + 1) * 2654435761 % 4294967296).toString(16)} | ICE: STANDBY
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export const ContentGrowShrink: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "The scrollbar follows the container's content: it appears when the buffer overflows and is removed when the content fits again.",
+      },
+      story: {
+        inline: false,
+        iframeHeight: 560,
+      },
+    },
+  },
+  render: () => (
+    <div className="flex items-center justify-center min-h-screen bg-base p-8">
+      <ContentGrowShrinkDemo />
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const scrollbars = () => document.querySelectorAll(".cyber-scrollbar");
+
+    // Starts with content that fits: no scrollbar.
+    await expect(scrollbars()).toHaveLength(0);
+
+    await userEvent.click(canvas.getByRole("button", { name: "Inject shards" }));
+    await waitFor(() => expect(scrollbars()).toHaveLength(1));
+
+    await userEvent.click(canvas.getByRole("button", { name: "Purge cache" }));
+    await waitFor(() => expect(scrollbars()).toHaveLength(0));
+  },
 };
