@@ -149,7 +149,7 @@ function Table<T = TableRowData>({
     <div className={cn('overflow-x-auto rounded-xl border border-border-default bg-base', className)}>
       <table className="w-full border-collapse" aria-label={!caption ? ariaLabel : undefined}>
         {caption && (
-          <caption className="caption-top text-left text-secondary font-semibold pb-3">
+          <caption className={cn('caption-top text-left text-secondary font-semibold', sizeClasses)}>
             {caption}
           </caption>
         )}

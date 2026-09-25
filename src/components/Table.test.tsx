@@ -54,6 +54,15 @@ describe('Table', () => {
     expect(screen.getByText('Active Field Operatives')).toBeInTheDocument();
   });
 
+  it.each(['sm', 'md', 'lg'] as const)('pads the caption like the cells at size %s', (size) => {
+    render(<Table columns={COLUMNS} data={DATA} caption="Active Field Operatives" size={size} />);
+    const caption = screen.getByText('Active Field Operatives');
+    const headerCell = screen.getByRole('columnheader', { name: 'Callsign' });
+    const padding = (el: HTMLElement) => [...el.classList].filter((c) => /^p[xy]-/.test(c));
+    expect(padding(caption)).not.toHaveLength(0);
+    expect(padding(caption)).toEqual(padding(headerCell));
+  });
+
   it('sets aria-label on the table when no caption is given', () => {
     render(<Table columns={COLUMNS} data={DATA} ariaLabel="Operative roster" />);
     expect(screen.getByRole('table')).toHaveAttribute('aria-label', 'Operative roster');

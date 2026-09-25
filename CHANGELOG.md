@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Removed `close`'s unused `{ focusTarget }` option** from `useDialogBehavior` — no component ever passed it; `close()` now takes no arguments.
 - **`Table` is generic over its row type** (pre-release, caught in PR #31's review) — rows were typed as `Record<string, ReactNode>`, which rejected any row declared as an `interface` (the usual shape of API data) and any row with a non-renderable field such as a `Date`, even when a `render` function formatted it. `Table`, `TableProps<T>` and `TableColumn<T>` now take the row type, inferred from `data`, so `render`/`getRowId`/`onRowClick` receive typed rows. A column without `render` only accepts a `key` whose value is directly renderable. `TableRowData` remains the default, so untyped usage is unchanged.
 - **`Table` rows show an accent focus ring when `onRowClick` makes them focusable** (pre-release) — keyboard focus previously fell back to the browser's default outline.
+- **`Table` caption is padded like the cells** (pre-release) — it had no horizontal or top padding, so it sat flush against the container's top-left edge. It now uses the same `size`-based padding as the header and body cells and lines up with the first column.
 
 ## [2.5.0] - 2026-07-23
 
