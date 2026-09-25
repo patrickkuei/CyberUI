@@ -891,6 +891,7 @@
 @media (prefers-reduced-motion: reduce) {
   /* Continuous / decorative loops: off. */
   .animate-scan,
+  .animate-scanline-sweep,
   .animate-spin-slow {
     animation: none;
   }
@@ -916,5 +917,42 @@
 
   .animate-crt-power-off {
     animation: cyberui-reduced-fade-out 150ms ease-in both;
+  }
+}
+
+/* ============================================================
+   Scanline sweep (Image / Carousel stand-in with fallbackStyle="scanline")
+   ------------------------------------------------------------
+   Layered on purpose. The reduced-motion block above is unlayered, and
+   unlayered rules beat layered ones whatever their order, so its
+   `.animate-scanline-sweep { animation: none }` still wins even though
+   this rule comes later in the file. Do not un-layer this rule: unlayered
+   and later, it would override the reduced-motion block.
+
+   The sweeping element is a band one third of the panel tall, so
+   translating it by its own height (percentages) travels the panel. The
+   `scan` keyframe above moves by viewport units and would barely show in
+   a small panel.
+   ============================================================ */
+@layer cyberui {
+  @keyframes scanline-sweep {
+    0% {
+      transform: translateY(-100%);
+      opacity: 0;
+    }
+    10% {
+      opacity: 1;
+    }
+    90% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(300%);
+      opacity: 0;
+    }
+  }
+
+  .animate-scanline-sweep {
+    animation: scanline-sweep 2.5s linear infinite;
   }
 }
