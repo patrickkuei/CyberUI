@@ -97,9 +97,12 @@ export interface DropdownMenuProps {
   menuClassName?: string;
 }
 
+/** What an element trigger must accept: DropdownMenu clones it with handlers, ARIA props and a ref. */
+type TriggerElement = React.ReactElement<React.HTMLAttributes<HTMLElement> & { ref?: React.Ref<HTMLElement> }>;
+
 const isElement = (
   trigger: DropdownMenuProps['trigger']
-): trigger is React.ReactElement => typeof trigger !== 'function';
+): trigger is TriggerElement => typeof trigger !== 'function';
 
 /**
  * A cyberpunk-styled dropdown/context menu anchored to a trigger element,
@@ -285,26 +288,28 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({
     onKeyDown: handleTriggerKeyDown,
   };
 
-  const renderedTrigger = isElement(trigger)
-    ? React.cloneElement(trigger, {
-        ...triggerProps,
-        onClick: (event: React.MouseEvent) => {
-          (trigger.props as { onClick?: React.MouseEventHandler }).onClick?.(event);
-          toggleMenu();
-        },
-        onKeyDown: (event: React.KeyboardEvent) => {
-          (trigger.props as { onKeyDown?: React.KeyboardEventHandler }).onKeyDown?.(event);
-          handleTriggerKeyDown(event);
-        },
-        'aria-disabled': disabled || undefined,
-        ref: (node: HTMLElement | null) => {
-          triggerRef.current = node;
-          const { ref } = trigger as React.ReactElement & { ref?: React.Ref<HTMLElement> };
-          if (typeof ref === 'function') ref(node);
-          else if (ref && typeof ref === 'object') (ref as React.RefObject<HTMLElement | null>).current = node;
-        },
-      })
-    : trigger(triggerProps);
+  const cloneTrigger = (element: TriggerElement) =>
+    React.cloneElement(element, {
+      ...triggerProps,
+      onClick: (event: React.MouseEvent<HTMLElement>) => {
+        element.props.onClick?.(event);
+        toggleMenu();
+      },
+      onKeyDown: (event: React.KeyboardEvent<HTMLElement>) => {
+        element.props.onKeyDown?.(event);
+        handleTriggerKeyDown(event);
+      },
+      'aria-disabled': disabled || undefined,
+      ref: (node: HTMLElement | null) => {
+        triggerRef.current = node;
+        const { ref } = element as TriggerElement & { ref?: React.Ref<HTMLElement> };
+        if (typeof ref === 'function') ref(node);
+        else if (ref && typeof ref === 'object') (ref as React.RefObject<HTMLElement | null>).current = node;
+      },
+    });
+
+  const renderedTrigger =
+    typeof trigger === 'function' ? trigger(triggerProps) : cloneTrigger(trigger as TriggerElement);
 
   return (
     <div ref={containerRef} className={cn('relative inline-block', className)}>
