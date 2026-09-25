@@ -165,6 +165,9 @@ describe('Image reduced motion', () => {
 
   it('pairs the preview movement and pulse classes with motion-reduce overrides', () => {
     openPreview();
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
     expect(dialog.className).toContain('motion-reduce:duration-150');
     dialog.querySelectorAll('.animate-pulse').forEach((el) => {
