@@ -69,3 +69,19 @@ describe('Skeleton', () => {
     expect(el.style.height).toBe('100px');
   });
 });
+
+describe('Skeleton reduced motion', () => {
+  it('stops the pulse under prefers-reduced-motion', () => {
+    const { container } = render(<Skeleton variant="rectangular" />);
+    const block = container.firstElementChild as HTMLElement;
+    expect(block.className).toContain('animate-pulse');
+    expect(block.className).toContain('motion-reduce:animate-none');
+  });
+
+  it('stops the card-level pulse wrapper too', () => {
+    const { container } = render(<Skeleton variant="card" />);
+    container.querySelectorAll('.animate-pulse').forEach((el) => {
+      expect(el.className).toContain('motion-reduce:animate-none');
+    });
+  });
+});

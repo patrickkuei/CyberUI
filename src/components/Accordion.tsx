@@ -214,7 +214,7 @@ const Accordion: React.FC<AccordionProps> = ({
                 <span
                   aria-hidden="true"
                   className={cn(
-                    'shrink-0 text-sm transition-transform duration-300',
+                    'shrink-0 text-sm transition-transform duration-300 motion-reduce:transition-none',
                     isOpen ? 'rotate-180 text-accent' : 'rotate-0 text-muted'
                   )}
                 >
@@ -223,7 +223,7 @@ const Accordion: React.FC<AccordionProps> = ({
               </button>
             </h3>
             <div
-              className="grid transition-[grid-template-rows] duration-300 ease-out"
+              className="grid transition-[grid-template-rows] duration-300 ease-out motion-reduce:transition-none"
               style={{ gridTemplateRows: isOpen ? '1fr' : '0fr' }}
             >
               <div className="overflow-hidden">

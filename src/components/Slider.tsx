@@ -404,7 +404,7 @@ const Slider: React.FC<SliderProps> = ({
         onPointerDown={handleTrackPointerDown}
       >
         <div
-          className={cn('absolute top-0 h-full rounded-full transition-[left,width] duration-100', TRACK_VARIANT_CLASSES[variant])}
+          className={cn('absolute top-0 h-full rounded-full transition-[left,width] duration-100 motion-reduce:transition-none', TRACK_VARIANT_CLASSES[variant])}
           style={{ left: `${fillLeft}%`, width: `${fillWidth}%` }}
         />
 
@@ -422,7 +422,7 @@ const Slider: React.FC<SliderProps> = ({
             aria-label={thumbAriaLabel(index)}
             aria-labelledby={!isRange && !ariaLabel && label ? labelId : undefined}
             className={cn(
-              'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform',
+              'absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full transition-transform motion-reduce:transition-none',
               'focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-base',
               disabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing hover:scale-110',
               thumbSizeClasses,

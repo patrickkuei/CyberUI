@@ -174,3 +174,14 @@ describe('Accordion', () => {
     expect(panel).not.toHaveAttribute('inert');
   });
 });
+
+describe('Accordion reduced motion', () => {
+  it('opens without the height or glyph-rotation transition under prefers-reduced-motion', () => {
+    render(<Accordion items={ITEMS} />);
+    const header = screen.getByRole('button', { name: /Section A/ });
+    const glyph = header.querySelector('[aria-hidden="true"]') as HTMLElement;
+    expect(glyph.className).toContain('motion-reduce:transition-none');
+    const panelWrapper = document.getElementById(header.getAttribute('aria-controls')!)!.parentElement!.parentElement!;
+    expect(panelWrapper.className).toContain('motion-reduce:transition-none');
+  });
+});

@@ -11,6 +11,8 @@ const meta: Meta<typeof Button> = {
       description: {
         component: `A cyberpunk-themed button component with multiple variants, hover effects, and smooth animations.
 
+Under \`prefers-reduced-motion: reduce\`, the primary shimmer sweep and the press scale are off.
+
 **Usage:**
 
 \`\`\`tsx

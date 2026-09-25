@@ -11,6 +11,8 @@ const meta: Meta<typeof Toggle> = {
       description: {
         component: `A cyberpunk-themed toggle switch component with smooth animations and neon styling.
 
+Under \`prefers-reduced-motion: reduce\`, the knob moves without sliding.
+
 **Usage:**
 
 \`\`\`tsx

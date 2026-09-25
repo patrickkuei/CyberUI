@@ -106,7 +106,7 @@ const Toggle: React.FC<ToggleProps> = ({
     'peer-focus:outline-none rounded-full peer',
     'peer-checked:after:translate-x-full peer-checked:after:border-white',
     'after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px]',
-    'after:bg-white after:rounded-full after:transition-all',
+    'after:bg-white after:rounded-full after:transition-all motion-reduce:after:transition-none',
     'transition-colors duration-300'
   );
 
