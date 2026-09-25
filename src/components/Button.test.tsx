@@ -10,7 +10,9 @@ describe('Button', () => {
 
   it('renders with different variants', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(screen.getByRole('button').querySelector('[aria-hidden="true"]')).toHaveClass(
+      'bg-linear-(--gradient-accent)'
+    );
 
     rerender(<Button variant="secondary">Secondary</Button>);
     expect(screen.getByRole('button')).toHaveClass('border-secondary');
@@ -59,8 +61,18 @@ describe('Button', () => {
       rerender(<Button variant={variant} disabled>Jack In</Button>);
       const disabled = borderWidthClasses(screen.getByRole('button'));
 
-      expect(enabled).toEqual(['border-2']);
       expect(disabled).toEqual(enabled);
     }
   );
+
+  it('fades the primary gradient out when disabled instead of removing it', () => {
+    const { rerender } = render(<Button variant="primary">Jack In</Button>);
+    const gradient = screen.getByRole('button').querySelector('[aria-hidden="true"]');
+    expect(gradient).toHaveClass('transition-opacity', 'opacity-100');
+
+    rerender(<Button variant="primary" disabled>Jack In</Button>);
+    // Same element, still mounted: only its opacity changes, so the switch animates.
+    expect(screen.getByRole('button').querySelector('[aria-hidden="true"]')).toBe(gradient);
+    expect(gradient).toHaveClass('opacity-0');
+  });
 });

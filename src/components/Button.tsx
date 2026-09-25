@@ -89,11 +89,11 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantClasses = (variant: string, disabled: boolean): string => {
     const variants = {
       primary: {
-        // Transparent border keeps the box the same size as the disabled state's
-        // border-2 (#35); bg-origin-border stretches the gradient under it
-        // instead of tiling a sliver of it into the border area.
-        enabled: 'bg-linear-(--gradient-accent) bg-origin-border text-inverse shadow-primary border-2 border-transparent hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
-        disabled: 'bg-base border-2 border-accent/20 text-accent/40 shadow-none opacity-50'
+        // The gradient is a separate layer (see below) so it can fade out;
+        // disabled draws its outline as an inset ring rather than a border so
+        // both states keep the same box size (#35).
+        enabled: 'bg-base text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        disabled: 'bg-base border-none inset-ring-2 inset-ring-accent/20 text-accent/40 shadow-none opacity-50'
       },
       secondary: {
         enabled: 'bg-surface border-2 border-secondary text-secondary shadow-secondary/30 hover:bg-secondary hover:text-inverse hover:shadow-secondary focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95',
@@ -123,6 +123,17 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled}
       {...props}
     >
+      {variant === 'primary' && (
+        // background-image can't transition, so the gradient fades via opacity
+        // instead of cutting out when `disabled` flips.
+        <span
+          aria-hidden="true"
+          className={cn(
+            'absolute inset-0 bg-linear-(--gradient-accent) transition-opacity duration-300 ease-in-out',
+            disabled ? 'opacity-0' : 'opacity-100'
+          )}
+        />
+      )}
       <span className="relative z-10">{children}</span>
       {showGradientAnimation && (
         <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
