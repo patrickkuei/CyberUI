@@ -320,3 +320,19 @@ describe('Carousel stand-in (missing src)', () => {
     expect(screen.queryByRole('status')).toBeNull();
   });
 });
+
+describe('Carousel stand-in with an empty alt', () => {
+  it('hides the stand-in for a slide whose alt is empty', () => {
+    render(
+      <Carousel
+        images={[{ alt: '' }, { alt: 'Named slide' }]}
+        currentIndex={0}
+        onChange={vi.fn()}
+        autoPlay={false}
+      />
+    );
+    expect(screen.getAllByRole('img')).toHaveLength(1);
+    expect(screen.getByRole('img', { name: 'Named slide' })).toBeInTheDocument();
+    expect(document.querySelectorAll('[aria-hidden="true"].aspect-video')).toHaveLength(1);
+  });
+});

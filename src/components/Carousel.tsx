@@ -118,8 +118,8 @@ export interface CarouselProps extends CarouselCallbacks {
   disableImagePreview?: boolean;
   /**
    * Style of the built-in stand-in shown for any slide with no image source
-   * (`gradient` is static; `scanline` adds a sweeping line, still under
-   * reduced motion).
+   * (`gradient` is static; `scanline` adds a sweeping line that is
+   * motionless under reduced motion).
    * @default "gradient"
    */
   fallbackStyle?: ImageFallbackStyle;

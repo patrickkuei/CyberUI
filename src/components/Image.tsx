@@ -27,7 +27,7 @@ export type ImageSize = "sm" | "md" | "lg";
  * Built-in stand-in style shown when an image has no source.
  * - `gradient`: a static neon gradient panel
  * - `scanline`: the same panel with a scanline sweeping down it
- *   (still while the user prefers reduced motion)
+ *   (the scanline is motionless while the user prefers reduced motion)
  */
 export type ImageFallbackStyle = "gradient" | "scanline";
 
@@ -148,6 +148,7 @@ interface ImageStandInProps {
 /**
  * Built-in stand-in rendered by Image when there is nothing to load: a static
  * token-based gradient panel, plus a sweeping scanline for `scanline`.
+ * With an empty `alt` the panel is decorative (`aria-hidden`, no role).
  * The sweep is a `.animate-scanline-sweep` element (stopped under reduced
  * motion by the reduced-motion block in `src/index.css`).
  */
@@ -158,8 +159,9 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
   className,
 }) => (
   <div
-    role="img"
-    aria-label={alt}
+    {...(alt
+      ? { role: "img", "aria-label": alt }
+      : { "aria-hidden": true })}
     className={cn(
       "relative w-full aspect-video rounded-lg overflow-hidden border-2 border-accent/30 bg-linear-to-br from-primary/25 via-surface to-secondary/25",
       getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.card),
@@ -331,8 +333,23 @@ const Image: React.FC<ImageProps> = memo(
       [closePreview]
     );
 
+    // The preview is only open while there is an image to show.
+    const previewOpen = isPreviewOpen && hasImage;
+
+    // The image went away (`src` and `fallback` both emptied) with the
+    // preview open: close it now and report it once, unless a close was
+    // already reported.
     useEffect(() => {
-      if (isPreviewOpen) {
+      if (isPreviewOpen && !hasImage) {
+        setIsPreviewOpen(false);
+        setIsOpening(false);
+        setIsClosing(false);
+        if (!isClosing) onPreviewClose?.();
+      }
+    }, [isPreviewOpen, hasImage, isClosing, onPreviewClose]);
+
+    useEffect(() => {
+      if (previewOpen) {
         document.addEventListener("keydown", handleKeyDown);
 
         // Store original values
@@ -358,7 +375,7 @@ const Image: React.FC<ImageProps> = memo(
           document.documentElement.style.scrollbarGutter = originalScrollbarGutter;
         };
       }
-    }, [isPreviewOpen, handleKeyDown]);
+    }, [previewOpen, handleKeyDown]);
 
     // Memoized class calculations
     const imageClasses = useMemo(
@@ -512,7 +529,7 @@ const Image: React.FC<ImageProps> = memo(
         {imageElement}
 
         {/* Preview Overlay */}
-        {isPreviewOpen && createPortal(
+        {previewOpen && createPortal(
           <div
             ref={overlayRef}
             className={`fixed z-50 flex items-center justify-center p-4 transition-all ease-out ${previewClassName} ${

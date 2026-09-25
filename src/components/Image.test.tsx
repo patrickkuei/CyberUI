@@ -326,3 +326,82 @@ describe('Image scanline sweep under reduced motion', () => {
     expect(layer).toMatch(/translateY\(-?\d+%\)/);
   });
 });
+
+describe('Image stand-in: alt and open preview', () => {
+  it('hides a stand-in with an empty alt instead of exposing an unnamed image', () => {
+    const { container } = render(<Image alt="" />);
+    const panel = container.firstElementChild as HTMLElement;
+    expect(panel).toHaveAttribute('aria-hidden', 'true');
+    expect(panel).not.toHaveAttribute('role');
+    expect(panel).not.toHaveAttribute('aria-label');
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+
+  it('keeps role="img" and the alt name for a non-empty alt', () => {
+    const { container } = render(<Image alt="Neon district" />);
+    const panel = container.firstElementChild as HTMLElement;
+    expect(panel).toHaveAttribute('role', 'img');
+    expect(panel).toHaveAttribute('aria-label', 'Neon district');
+    expect(panel).not.toHaveAttribute('aria-hidden');
+  });
+
+  it('calls onPreviewClose exactly once on the normal close path', () => {
+    const onPreviewClose = vi.fn();
+    render(<Image src="test.jpg" alt="Test image" onPreviewClose={onPreviewClose} />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(400);
+    });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(onPreviewClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('closes an open preview when src and fallback are emptied: unlocks scroll, drops Escape, reports close once', () => {
+    document.body.style.overflow = 'scroll';
+    const onPreviewClose = vi.fn();
+    const { rerender } = render(
+      <Image src="test.jpg" alt="Test image" onPreviewClose={onPreviewClose} />
+    );
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+    expect(document.body.style.overflow).toBe('hidden');
+
+    rerender(<Image src="" alt="Test image" onPreviewClose={onPreviewClose} />);
+
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.body.style.overflow).toBe('scroll');
+    expect(onPreviewClose).toHaveBeenCalledTimes(1);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onPreviewClose).toHaveBeenCalledTimes(1);
+    expect(screen.getByRole('img', { name: 'Test image' })).toBeInTheDocument();
+
+    // and a src coming back does not resurrect the preview
+    rerender(<Image src="test.jpg" alt="Test image" onPreviewClose={onPreviewClose} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+    document.body.style.overflow = '';
+  });
+
+  it('does not report a second close when the image goes away mid-close', () => {
+    const onPreviewClose = vi.fn();
+    const { rerender } = render(
+      <Image src="test.jpg" alt="Test image" onPreviewClose={onPreviewClose} />
+    );
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onPreviewClose).toHaveBeenCalledTimes(1);
+    rerender(<Image src="" alt="Test image" onPreviewClose={onPreviewClose} />);
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onPreviewClose).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+});

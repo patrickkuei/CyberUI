@@ -853,7 +853,8 @@
    Unlayered and last in the file on purpose: unlayered rules beat
    every layered rule, so this one block overrides both copies of
    the animation utilities above (the `@layer cyberui` copy and the
-   unlayered copy). Keep it at the end of the file.
+   unlayered copy). Keep it after every unlayered animation rule; layered
+   (`@layer cyberui`) rules may follow it.
 
    To cover a new animation utility, add its selector to the list
    below that matches its treatment:

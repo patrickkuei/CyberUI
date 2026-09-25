@@ -11,7 +11,7 @@ const meta: Meta<typeof Image> = {
       description: {
         component: `A cyberpunk-themed image component with click-to-expand preview functionality, loading states, and smooth animations.
 
-With no image source (\`src\` missing or empty, and no \`fallback\` URL), it renders a built-in stand-in instead of an \`<img>\`: a static neon gradient panel (\`fallbackStyle="gradient"\`, the default) or the same panel with a scanline sweeping down it (\`fallbackStyle="scanline"\`). The stand-in has \`role="img"\` with \`alt\` as its accessible name, is 16:9 by default (pass \`className\` to change the shape), and ignores \`preview\`. If \`src\` is missing or empty but \`fallback\` is set, the \`fallback\` URL is shown as the image.
+With no image source (\`src\` missing or empty, and no \`fallback\` URL), it renders a built-in stand-in instead of an \`<img>\`: a static neon gradient panel (\`fallbackStyle="gradient"\`, the default) or the same panel with a scanline sweeping down it (\`fallbackStyle="scanline"\`). The stand-in has \`role="img"\` with \`alt\` as its accessible name (with an empty \`alt\` it is hidden from assistive technology), is 16:9 by default (pass \`className\` to change the shape), and ignores \`preview\`. If \`src\` is missing or empty but \`fallback\` is set, the \`fallback\` URL is shown as the image.
 
 Under \`prefers-reduced-motion: reduce\`, the preview opens and closes with a 150ms opacity-only fade (\`animation.openDuration\`/\`closeDuration\` are capped at 150ms), the scan line and pulsing effects hold still, the stand-in scanline stops, and the thumbnail does not zoom on hover.
 
