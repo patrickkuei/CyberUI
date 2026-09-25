@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 /**
  * Scrollbar background/border style variants
@@ -15,7 +15,11 @@ export interface UseCyberScrollbarOptions {
   sensitivity?: number;
   /** Disable the scrollbar completely */
   disabled?: boolean;
-  /** Apply to page-level scrolling instead of container scrolling */
+  /**
+   * Apply to page-level scrolling instead of container scrolling. When omitted
+   * (the default), the hook decides on its first post-commit effect: container
+   * mode if the returned ref is attached by then, page-level otherwise.
+   */
   pageLevel?: boolean;
   /** Predefined style variant for the scrollbar background (auto-switches to transparent on mobile) */
   variant?: ScrollbarVariant;
@@ -139,7 +143,18 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  *
  * The scrollbar follows its scroll target: it is added and removed as content
  * grows and shrinks, and re-styled when the viewport crosses the 768px mobile
- * breakpoint.
+ * breakpoint. With `prefers-reduced-motion: reduce` the velocity glow and arrow
+ * sequences are skipped and transitions are disabled.
+ *
+ * **Page-level or container?** Resolved in this order:
+ * 1. `pageLevel: true` — page-level scrolling; the returned ref is unused.
+ * 2. `pageLevel: false` — container mode. The container may attach later (for
+ *    example when it renders conditionally): the scrollbar is created as soon as
+ *    the ref points at an element and removed when it detaches.
+ * 3. `pageLevel` omitted — decided once, in the first post-commit effect:
+ *    container mode if the ref is attached by then, page-level otherwise. The
+ *    decision is not revisited; pass `pageLevel={false}` for a container that
+ *    renders after the first commit.
  *
  * @example
  * ```tsx
@@ -190,24 +205,27 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     typeof window === "undefined" ? false : window.innerWidth >= CONFIG.MOBILE_BREAKPOINT
   );
   const currentArrowCountRef = useRef(0);
-  const [effectivePageLevel, setEffectivePageLevel] = useState(pageLevel ?? false);
+  // The page-level decision when `pageLevel` is omitted; made once, in the
+  // first post-commit effect, then kept.
+  const autoPageLevelRef = useRef<boolean | null>(null);
+  // Lets the every-commit effect below hand a late-attached (or replaced)
+  // container to the live scrollbar without re-running the main effect.
+  const syncContainerRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     if (pageLevel !== undefined) {
-      setEffectivePageLevel(pageLevel);
-    } else {
-      const timeoutId = setTimeout(() => {
-        const isRefAttached = containerRef.current !== null;
-        setEffectivePageLevel(!isRefAttached);
-      }, 0);
-      return () => clearTimeout(timeoutId);
+      autoPageLevelRef.current = null;
+    } else if (autoPageLevelRef.current === null) {
+      autoPageLevelRef.current = containerRef.current === null;
     }
-  }, [pageLevel]);
-
-  useEffect(() => {
     if (disabled) return;
 
-    const isPage = effectivePageLevel;
+    const isPage = pageLevel ?? autoPageLevelRef.current === true;
+    const motionQuery =
+      typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)")
+        : null;
+    let reducedMotion = motionQuery?.matches ?? false;
 
     let container: HTMLDivElement | null = null;
     let element: HTMLDivElement | null = null;
@@ -252,7 +270,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       Object.assign(node.style, {
         color: `var(--color-${glowColor})`,
         opacity: "0",
-        transition: "all 0.2s ease",
+        transition: reducedMotion ? "none" : "all 0.2s ease",
         lineHeight: "1",
         fontWeight: "bold",
       });
@@ -319,7 +337,9 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
       const { isScrolling, direction, velocity, scrollDistance } = scrollStateRef.current;
 
-      if (isScrolling && direction) {
+      // With reduced motion the velocity glow and arrow sequence are skipped;
+      // the idle branch keeps the arrows dark and the pause lines visible.
+      if (isScrolling && direction && !reducedMotion) {
         lines.forEach(line => {
           line.style.opacity = "0";
         });
@@ -394,6 +414,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
         height: `${position.height}px`,
         pointerEvents: "none",
         zIndex: "9999",
+        transition: reducedMotion ? "none" : "",
         display: showScrollbarRef.current ? "flex" : "none",
         flexDirection: "column",
         alignItems: "center",
@@ -542,10 +563,34 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       element.style.height = `${rect.height}px`;
     };
 
+    // ---- Reduced motion ---------------------------------------------------
+
+    const applyMotionPreference = () => {
+      const transition = reducedMotion ? "none" : "all 0.2s ease";
+      arrows.forEach(node => {
+        node.style.transition = transition;
+      });
+      lines.forEach(node => {
+        node.style.transition = transition;
+      });
+      if (element) element.style.transition = reducedMotion ? "none" : "";
+
+      // Drop any in-flight sequence and re-apply the current state.
+      clearAnimationTimeouts();
+      currentArrowCountRef.current = 0;
+      updateScrollbarVisuals();
+    };
+
+    const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
+      reducedMotion = event.matches;
+      applyMotionPreference();
+    };
+
     // ---- Attach / detach --------------------------------------------------
 
     const attachContainer = (el: HTMLDivElement) => {
       container = el;
+      lastScrollTop.current = el.scrollTop;
       el.addEventListener("scroll", handleScroll, { passive: true });
       window.addEventListener("scroll", updatePosition, { passive: true });
       if (typeof MutationObserver !== "undefined") {
@@ -560,26 +605,54 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       evaluate();
     };
 
+    const detachContainer = () => {
+      if (!container) return;
+      container.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", updatePosition);
+      container.classList.remove("cyber-scrollbar-container");
+      mutationObserver?.disconnect();
+      mutationObserver = undefined;
+      resizeObserver?.disconnect();
+      container = null;
+
+      if (stableTimeoutRef.current) clearTimeout(stableTimeoutRef.current);
+      if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
+      scrollStateRef.current = { isScrolling: false, direction: null, velocity: 0, scrollDistance: 0 };
+      removeElement();
+    };
+
+    // Container mode: follow whatever element the ref currently points at.
+    // Runs after every commit, so a container that renders late (or is
+    // replaced or removed) is picked up without waiting on a timer.
+    const syncContainer = () => {
+      if (isPage) return;
+      const next = containerRef.current;
+      if (next === container) return;
+      detachContainer();
+      if (next) attachContainer(next);
+    };
+
     window.addEventListener("resize", scheduleEvaluate);
+    motionQuery?.addEventListener?.("change", onMotionPreferenceChange);
     if (isPage) {
       window.addEventListener("scroll", handleScroll, { passive: true });
       observeTargets();
       evaluate();
-    } else if (containerRef.current) {
-      attachContainer(containerRef.current);
+    } else {
+      syncContainer();
     }
+    syncContainerRef.current = syncContainer;
 
     return () => {
+      syncContainerRef.current = null;
       window.removeEventListener("resize", scheduleEvaluate);
+      motionQuery?.removeEventListener?.("change", onMotionPreferenceChange);
       if (isPage) {
         window.removeEventListener("scroll", handleScroll);
-      } else if (container) {
-        container.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("scroll", updatePosition);
-        container.classList.remove("cyber-scrollbar-container");
+      } else {
+        detachContainer();
       }
       resizeObserver?.disconnect();
-      mutationObserver?.disconnect();
 
       if (stableTimeoutRef.current) clearTimeout(stableTimeoutRef.current);
       if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
@@ -594,7 +667,14 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       }
       removeElement();
     };
-  }, [disabled, effectivePageLevel, glowColor, sensitivity, variant, className]);
+  }, [disabled, pageLevel, glowColor, sensitivity, variant, className]);
+
+  // No dependency array on purpose: a cheap ref check after every commit is
+  // what lets an explicit `pageLevel={false}` (or an auto-detected container)
+  // initialise as soon as the container attaches, and tear down when it goes.
+  useEffect(() => {
+    syncContainerRef.current?.();
+  });
 
   return containerRef;
 };

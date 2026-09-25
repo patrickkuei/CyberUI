@@ -81,17 +81,27 @@ const resizeWindow = (width: number, height = 768) => {
 
 // -- matchMedia stub (jsdom has none) --
 let reducedMotion = false;
+type MotionListener = (event: { matches: boolean }) => void;
+const motionListeners = new Set<MotionListener>();
 const stubMatchMedia = () => {
+  motionListeners.clear();
   vi.stubGlobal('matchMedia', (query: string) => ({
     matches: query.includes('prefers-reduced-motion') ? reducedMotion : false,
     media: query,
     onchange: null,
-    addEventListener: () => {},
-    removeEventListener: () => {},
+    addEventListener: (_type: string, listener: MotionListener) => motionListeners.add(listener),
+    removeEventListener: (_type: string, listener: MotionListener) => motionListeners.delete(listener),
     addListener: () => {},
     removeListener: () => {},
     dispatchEvent: () => false,
   }));
+};
+/** Flip the OS preference while a hook is mounted and notify its listener. */
+const changeReducedMotion = (matches: boolean) => {
+  reducedMotion = matches;
+  act(() => {
+    motionListeners.forEach((listener) => listener({ matches }));
+  });
 };
 
 const geometryTargets: [object, string][] = [
@@ -554,5 +564,179 @@ describe('useCyberScrollbar — resize and content changes', () => {
     bodyScrollHeight = 3000;
     resizeWindow(1024); // the window resize listener still re-evaluates
     expect(getScrollbar()).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Detection: pageLevel auto-detect and late-attached containers (#5)
+// ---------------------------------------------------------------------------
+describe('useCyberScrollbar — pageLevel detection', () => {
+  it('resolves page-level synchronously on mount when no ref is attached (no timer guess)', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar()); // pageLevel omitted, the ref is never attached
+
+    // No timers advanced: the decision is made in the first post-commit effect.
+    const bar = getScrollbar();
+    expect(bar).not.toBeNull();
+    expect(bar!.style.height).toBe(`${window.innerHeight}px`);
+    expect(bar!.style.top).toBe('0px');
+  });
+
+  it('resolves container mode on mount when the ref is attached and pageLevel is omitted', () => {
+    bodyScrollHeight = 3000;
+    const { getByTestId } = render(createElement(Host, { clientHeight: 300 }));
+
+    const bar = getScrollbar();
+    expect(bar).not.toBeNull();
+    expect(bar!.style.height).toBe('300px'); // sized to the container, not the viewport
+    expect(getByTestId('container').classList.contains('cyber-scrollbar-container')).toBe(true);
+  });
+
+  it('keeps the first decision: a container that mounts later does not flip an auto-detected page-level hook', () => {
+    bodyScrollHeight = 3000;
+    const { rerender } = render(createElement(Host, { mounted: false }));
+    expect(getScrollbar()!.style.height).toBe(`${window.innerHeight}px`);
+
+    rerender(createElement(Host, { mounted: true }));
+    flushFrames();
+    expect(getScrollbar()!.style.height).toBe(`${window.innerHeight}px`);
+  });
+
+  it('honours an explicit pageLevel={true} even when a ref is attached', () => {
+    bodyScrollHeight = 3000;
+    render(createElement(Host, { pageLevel: true, clientHeight: 300 }));
+    expect(getScrollbar()!.style.height).toBe(`${window.innerHeight}px`);
+  });
+
+  it('initialises pageLevel={false} as soon as a late container attaches, and tears down when it detaches', () => {
+    const { rerender, getByTestId } = render(createElement(Host, { pageLevel: false, mounted: false }));
+    expect(getScrollbar()).toBeNull();
+
+    rerender(createElement(Host, { pageLevel: false, mounted: true }));
+    expect(getScrollbar()).not.toBeNull(); // no timers: the per-commit check found the ref
+    expect(getByTestId('container').classList.contains('cyber-scrollbar-container')).toBe(true);
+
+    rerender(createElement(Host, { pageLevel: false, mounted: false }));
+    expect(getScrollbar()).toBeNull();
+
+    rerender(createElement(Host, { pageLevel: false, mounted: true }));
+    expect(getScrollbar()).not.toBeNull();
+  });
+
+  it('listens to scroll on a late-attached container', () => {
+    const { rerender, getByTestId } = render(createElement(Host, { pageLevel: false, mounted: false }));
+    rerender(createElement(Host, { pageLevel: false, mounted: true }));
+    const container = getByTestId('container');
+
+    container.scrollTop = 120;
+    container.dispatchEvent(new Event('scroll'));
+    flushFrames();
+
+    const lit = Array.from(getScrollbar()!.querySelectorAll<HTMLElement>('.cyber-arrow-down')).filter(
+      (a) => a.style.opacity !== '0',
+    );
+    expect(lit.length).toBeGreaterThan(0);
+  });
+
+  it('moves to a replacement container element', () => {
+    const { rerender, getByTestId } = render(createElement(Host, { pageLevel: false, key: 'a' }));
+    const first = getByTestId('container');
+    rerender(createElement(Host, { pageLevel: false, key: 'b' }));
+    const second = getByTestId('container');
+
+    expect(second).not.toBe(first);
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+    expect(second.classList.contains('cyber-scrollbar-container')).toBe(true);
+  });
+
+  it('does not add a scrollbar when disabled, then adds it when enabled', () => {
+    bodyScrollHeight = 3000;
+    const { rerender } = render(createElement(Host, { disabled: true }));
+    expect(getScrollbar()).toBeNull();
+    rerender(createElement(Host, { disabled: false }));
+    expect(getScrollbar()).not.toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Reduced motion: the hook's own inline animation honours the OS preference
+// ---------------------------------------------------------------------------
+describe('useCyberScrollbar — prefers-reduced-motion', () => {
+  const litArrows = (bar: HTMLElement) =>
+    Array.from(bar.querySelectorAll<HTMLElement>('.cyber-arrow')).filter((a) => a.style.opacity !== '0');
+
+  it('animates the arrow sequence and eases transitions by default', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar()!;
+    expect(bar.querySelector<HTMLElement>('.cyber-arrow')!.style.transition).toBe('all 0.2s ease');
+
+    scrollWindowTo(300);
+    expect(litArrows(bar).length).toBeGreaterThan(0);
+  });
+
+  it('skips the glow/arrow sequence and disables transitions when reduced motion is preferred', () => {
+    reducedMotion = true;
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar()!;
+    bar.querySelectorAll<HTMLElement>('.cyber-arrow, .cyber-line').forEach((n) => {
+      expect(n.style.transition).toBe('none');
+    });
+    expect(bar.style.transition).toBe('none');
+
+    scrollWindowTo(300);
+    expect(litArrows(bar)).toHaveLength(0);
+    // No animation timers were scheduled: only the scroll-idle timeout is pending.
+    expect(vi.getTimerCount()).toBe(1);
+    act(() => {
+      vi.advanceTimersByTime(600);
+    });
+    expect(litArrows(bar)).toHaveLength(0);
+  });
+
+  it('reacts when the preference changes while mounted', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar()!;
+
+    changeReducedMotion(true);
+    bar.querySelectorAll<HTMLElement>('.cyber-arrow, .cyber-line').forEach((n) => {
+      expect(n.style.transition).toBe('none');
+    });
+    scrollWindowTo(300);
+    expect(litArrows(bar)).toHaveLength(0);
+
+    act(() => {
+      vi.advanceTimersByTime(1200);
+    });
+    changeReducedMotion(false);
+    bar.querySelectorAll<HTMLElement>('.cyber-arrow, .cyber-line').forEach((n) => {
+      expect(n.style.transition).toBe('all 0.2s ease');
+    });
+    scrollWindowTo(600);
+    expect(litArrows(bar).length).toBeGreaterThan(0);
+  });
+
+  it('stops listening for preference changes on unmount', () => {
+    bodyScrollHeight = 3000;
+    const { unmount } = renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    expect(motionListeners.size).toBe(1);
+    unmount();
+    expect(motionListeners.size).toBe(0);
+  });
+
+  it('works when matchMedia is absent', () => {
+    vi.stubGlobal('matchMedia', undefined);
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar()!;
+
+    scrollWindowTo(300);
+    expect(litArrows(bar).length).toBeGreaterThan(0);
   });
 });
