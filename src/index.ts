@@ -43,6 +43,7 @@ import { warnOnce } from "./utils/devWarn";
  * - `useCyberNotifications` → `showNotification(type, title, message, opts?)` — type: 'success'|'warning'|'error'
  * - `useAnimatedProgress({ min?, max?, speed? })` → oscillating number for pulse/loading animations
  * - `useCyberScrollbar<T>()` → ref to attach cyberpunk scrollbar styles
+ * - `usePrefersReducedMotion()` → `true` while the user prefers reduced motion; live-updates
  * - `CyberNotificationProvider` — wrap your app once
  *
  * Docs: https://patrickkuei.github.io/CyberUI/storybook/
