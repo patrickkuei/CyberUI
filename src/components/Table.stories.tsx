@@ -167,20 +167,6 @@ export const Empty: Story = {
   },
 };
 
-export const Disabled: Story = {
-  args: {
-    caption: 'Active Field Operatives (read-only)',
-    variant: 'striped',
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Table has no interactive-by-default state — it only becomes interactive when `onRowClick` is passed. This is the base read-only rendering.',
-      },
-    },
-  },
-};
-
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-10 p-4 bg-base">
