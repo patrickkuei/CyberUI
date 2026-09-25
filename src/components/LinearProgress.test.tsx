@@ -56,4 +56,47 @@ describe('LinearProgress', () => {
     expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
   });
+
+  describe('animate', () => {
+    const innerBar = () => screen.getByRole('progressbar').firstChild as HTMLElement;
+    const TRANSITION_CLASSES = ['transition-all', 'duration-500', 'ease-out', 'motion-reduce:transition-none'];
+
+    it('has the transition classes by default', () => {
+      render(<LinearProgress progress={40} />);
+      const classes = Array.from(innerBar().classList);
+      for (const c of TRANSITION_CLASSES) expect(classes).toContain(c);
+    });
+
+    it('has the transition classes when animate={true}', () => {
+      render(<LinearProgress progress={40} animate />);
+      const classes = Array.from(innerBar().classList);
+      for (const c of TRANSITION_CLASSES) expect(classes).toContain(c);
+    });
+
+    it('has no transition-related classes when animate={false}', () => {
+      render(<LinearProgress progress={40} animate={false} />);
+      const classes = Array.from(innerBar().classList);
+      for (const c of TRANSITION_CLASSES) expect(classes).not.toContain(c);
+      expect(classes.some((c) => c.startsWith('transition'))).toBe(false);
+      expect(classes.some((c) => c.startsWith('duration-'))).toBe(false);
+      expect(classes.some((c) => c.startsWith('ease-'))).toBe(false);
+      expect(classes.some((c) => c.includes('motion-reduce'))).toBe(false);
+    });
+
+    it('keeps the visual classes when animate={false}', () => {
+      render(<LinearProgress progress={40} animate={false} />);
+      const classes = Array.from(innerBar().classList);
+      expect(classes).toContain('bg-gradient-to-r');
+      expect(classes).toContain('rounded-full');
+    });
+
+    it('applies the same width style in both modes', () => {
+      const { rerender } = render(<LinearProgress progress={40} />);
+      expect(innerBar().style.width).toBe('40%');
+      rerender(<LinearProgress progress={40} animate={false} />);
+      expect(innerBar().style.width).toBe('40%');
+      rerender(<LinearProgress progress={85} animate={false} />);
+      expect(innerBar().style.width).toBe('85%');
+    });
+  });
 });

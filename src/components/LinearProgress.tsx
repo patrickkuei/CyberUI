@@ -12,6 +12,10 @@ import { warnOnce } from "../utils/devWarn";
  * <LinearProgress progress={60} />
  *
  * @example
+ * // Bar driven every frame — no width transition
+ * <LinearProgress progress={frameProgress} animate={false} />
+ *
+ * @example
  * // Large progress bar with custom class
  * <LinearProgress
  *   progress={85}
@@ -29,6 +33,12 @@ export interface LinearProgressProps {
    * @default 'md'
    */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
+  /**
+   * Whether the bar animates width changes with a 500 ms ease-out transition.
+   * Set to `false` for values driven every frame (e.g. a `requestAnimationFrame` loop) so the bar tracks `progress` exactly.
+   * @default true
+   */
+  animate?: boolean;
   /** Optional custom class name to override default styles */
   className?: string;
 }
@@ -52,6 +62,7 @@ export interface LinearProgressProps {
 const LinearProgress: React.FC<LinearProgressProps> = ({
   progress,
   size = 'md',
+  animate = true,
   className = "",
 }) => {
   const getWidthClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
@@ -74,7 +85,11 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
 
   const containerClasses = cn('bg-surface rounded-full shadow-inner', heightClasses, className || widthClasses);
 
-  const progressBarClasses = cn('bg-gradient-to-r from-accent to-primary rounded-full shadow-lg-accent transition-all duration-500 ease-out', heightClasses);
+  const progressBarClasses = cn(
+    'bg-gradient-to-r from-accent to-primary rounded-full shadow-lg-accent',
+    animate && 'transition-all duration-500 ease-out motion-reduce:transition-none',
+    heightClasses
+  );
 
   return (
     <div
