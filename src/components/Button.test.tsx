@@ -43,4 +43,24 @@ describe('Button', () => {
     fireEvent.click(button);
     expect(handleClick).not.toHaveBeenCalled();
   });
+
+  // jsdom has no layout, so this pins the cause of #35 (primary went from
+  // border-none to border-2 when disabled) rather than measuring the size —
+  // the DisabledKeepsSize story measures real rendered boxes in Chromium.
+  it.each(['primary', 'secondary', 'danger', 'ghost'] as const)(
+    'uses the same border width enabled and disabled (%s)',
+    (variant) => {
+      const borderWidthClasses = (el: HTMLElement) =>
+        [...el.classList].filter((c) => /^border(-[xytrbl])?(-(\d+|none))?$/.test(c)).sort();
+
+      const { rerender } = render(<Button variant={variant}>Jack In</Button>);
+      const enabled = borderWidthClasses(screen.getByRole('button'));
+
+      rerender(<Button variant={variant} disabled>Jack In</Button>);
+      const disabled = borderWidthClasses(screen.getByRole('button'));
+
+      expect(enabled).toEqual(['border-2']);
+      expect(disabled).toEqual(enabled);
+    }
+  );
 });

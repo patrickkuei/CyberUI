@@ -89,7 +89,10 @@ const Button: React.FC<ButtonProps> = ({
   const getVariantClasses = (variant: string, disabled: boolean): string => {
     const variants = {
       primary: {
-        enabled: 'bg-linear-(--gradient-accent) text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        // Transparent border keeps the box the same size as the disabled state's
+        // border-2 (#35); bg-origin-border stretches the gradient under it
+        // instead of tiling a sliver of it into the border area.
+        enabled: 'bg-linear-(--gradient-accent) bg-origin-border text-inverse shadow-primary border-2 border-transparent hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
         disabled: 'bg-base border-2 border-accent/20 text-accent/40 shadow-none opacity-50'
       },
       secondary: {

@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, within } from 'storybook/test';
 import Button from './Button';
 
 const meta: Meta<typeof Button> = {
@@ -181,4 +182,52 @@ export const AllDisabledVariants: Story = {
       </div>
     </div>
   ),
+};
+
+const SIZE_CHECK_VARIANTS = ['primary', 'secondary', 'danger', 'ghost'] as const;
+const SIZE_CHECK_SIZES = ['sm', 'md', 'lg'] as const;
+
+export const DisabledKeepsSize: Story = {
+  args: {
+    children: 'Button',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Each row pairs an enabled and a disabled button with the same label. Both render at exactly the same size.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-4 p-6 bg-base">
+      {SIZE_CHECK_VARIANTS.flatMap((variant) =>
+        SIZE_CHECK_SIZES.map((size) => (
+          <div key={`${variant}-${size}`} className="flex gap-4 items-start">
+            <Button variant={variant} size={size} data-testid={`${variant}-${size}-enabled`}>
+              Jack In
+            </Button>
+            <Button variant={variant} size={size} disabled data-testid={`${variant}-${size}-disabled`}>
+              Jack In
+            </Button>
+          </div>
+        ))
+      )}
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    for (const variant of SIZE_CHECK_VARIANTS) {
+      for (const size of SIZE_CHECK_SIZES) {
+        const enabled = canvas.getByTestId(`${variant}-${size}-enabled`).getBoundingClientRect();
+        const disabled = canvas.getByTestId(`${variant}-${size}-disabled`).getBoundingClientRect();
+        await expect({ variant, size, width: disabled.width, height: disabled.height }).toEqual({
+          variant,
+          size,
+          width: enabled.width,
+          height: enabled.height,
+        });
+      }
+    }
+  },
 };
