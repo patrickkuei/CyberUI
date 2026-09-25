@@ -24,6 +24,22 @@ const numberAttr = (el: Element, name: string) => Number(el.getAttribute(name) ?
 
 const getScrollbar = () => document.body.querySelector<HTMLElement>('.cyber-scrollbar');
 
+// The hook toggles `display` on the element, so "shown" means anything but none.
+const isShown = (el: HTMLElement | null) => el !== null && el.style.display !== 'none';
+
+/** Let the rAF-throttled scroll handler (and any debounced work) run. */
+const flushFrames = () => {
+  act(() => {
+    vi.advanceTimersByTime(20);
+  });
+};
+
+const scrollWindowTo = (y: number) => {
+  Object.defineProperty(window, 'scrollY', { configurable: true, writable: true, value: y });
+  window.dispatchEvent(new Event('scroll'));
+  flushFrames();
+};
+
 // -- ResizeObserver stub (jsdom has none) --
 type ROCallback = (entries: unknown[], observer: unknown) => void;
 class FakeResizeObserver {
@@ -235,5 +251,123 @@ describe('useCyberScrollbar — baseline behaviour', () => {
       vi.advanceTimersByTime(20);
     });
     expect(getScrollbar()).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Performance: scroll must not drive React renders or DOM churn (#1, #2, #6, #7)
+// ---------------------------------------------------------------------------
+describe('useCyberScrollbar — scroll performance', () => {
+  it('does not re-render the host component on scroll events', () => {
+    bodyScrollHeight = 3000;
+    const onRender = vi.fn();
+    render(createElement(Host, { pageLevel: true, onRender }));
+    flushFrames();
+    const rendersAfterMount = onRender.mock.calls.length;
+
+    for (let y = 100; y <= 1000; y += 100) scrollWindowTo(y);
+    act(() => {
+      vi.advanceTimersByTime(3000); // scrolling settles, mobile hide delay elapses
+    });
+
+    expect(onRender.mock.calls.length).toBe(rendersAfterMount);
+  });
+
+  it('does not re-render a container host on scroll events', () => {
+    const onRender = vi.fn();
+    const { getByTestId } = render(createElement(Host, { pageLevel: false, onRender }));
+    flushFrames();
+    const rendersAfterMount = onRender.mock.calls.length;
+
+    const container = getByTestId('container');
+    for (let y = 50; y <= 400; y += 50) {
+      container.scrollTop = y;
+      container.dispatchEvent(new Event('scroll'));
+      flushFrames();
+    }
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(onRender.mock.calls.length).toBe(rendersAfterMount);
+  });
+
+  it('keeps the same scrollbar node (and listeners) across scroll activity', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar();
+    const children = Array.from(bar!.children);
+
+    scrollWindowTo(300);
+    act(() => {
+      vi.advanceTimersByTime(3000);
+    });
+
+    expect(getScrollbar()).toBe(bar);
+    expect(Array.from(bar!.children)).toEqual(children);
+  });
+
+  it('returns arrows to idle and shows the pause lines once scrolling stops', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const bar = getScrollbar()!;
+
+    scrollWindowTo(200);
+    const downArrows = Array.from(bar.querySelectorAll<HTMLElement>('.cyber-arrow-down'));
+    expect(downArrows.some((a) => a.style.opacity !== '0')).toBe(true);
+    bar.querySelectorAll<HTMLElement>('.cyber-line').forEach((l) => expect(l.style.opacity).toBe('0'));
+
+    act(() => {
+      vi.advanceTimersByTime(1100);
+    });
+    bar.querySelectorAll<HTMLElement>('.cyber-arrow').forEach((a) => expect(a.style.opacity).toBe('0'));
+    bar.querySelectorAll<HTMLElement>('.cyber-line').forEach((l) => expect(l.style.opacity).toBe('0.6'));
+  });
+
+  it('toggles display on the same DOM node through a mobile show -> hide -> show cycle', () => {
+    setViewport(500);
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    const bar = getScrollbar();
+    expect(bar).not.toBeNull();
+    expect(isShown(bar)).toBe(false); // mobile: hidden until the user scrolls
+
+    scrollWindowTo(200);
+    expect(getScrollbar()).toBe(bar);
+    expect(isShown(bar)).toBe(true);
+
+    act(() => {
+      vi.advanceTimersByTime(2200); // stable timeout + hide delay
+    });
+    expect(getScrollbar()).toBe(bar);
+    expect(isShown(bar)).toBe(false);
+
+    scrollWindowTo(400);
+    expect(getScrollbar()).toBe(bar);
+    expect(isShown(bar)).toBe(true);
+  });
+
+  it('does not re-query the arrow/line nodes on every scroll frame', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const spy = vi.spyOn(Element.prototype, 'querySelectorAll');
+
+    for (let y = 100; y <= 500; y += 100) scrollWindowTo(y);
+
+    expect(spy).not.toHaveBeenCalled();
+    spy.mockRestore();
+  });
+
+  it('survives content that exactly fits the viewport without dividing by zero', () => {
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    bodyScrollHeight = window.innerHeight; // scrollHeight - clientHeight === 0
+    expect(() => scrollWindowTo(0)).not.toThrow();
   });
 });

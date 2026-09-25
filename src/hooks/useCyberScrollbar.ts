@@ -30,7 +30,6 @@ interface ScrollState {
   isScrolling: boolean;
   direction: "up" | "down" | null;
   velocity: number;
-  position: number;
   scrollDistance: number;
 }
 
@@ -79,19 +78,23 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
   const stableTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const animationTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const hideTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [scrollState, setScrollState] = useState<ScrollState>({
+  // Scroll state lives in refs: nothing here is rendered, so scrolling must
+  // never cause a React re-render of the host component.
+  const scrollStateRef = useRef<ScrollState>({
     isScrolling: false,
     direction: null,
     velocity: 0,
-    position: 0,
     scrollDistance: 0,
   });
-
-  const [hasEverScrolled, setHasEverScrolled] = useState(false);
-  const [showScrollbar, setShowScrollbar] = useState(() => {
-    if (typeof window === "undefined") return false;
-    return window.innerWidth >= CONFIG.MOBILE_BREAKPOINT;
-  });
+  const hasEverScrolledRef = useRef(false);
+  // Mobile hides the bar between scrolls; visibility is a `display` toggle on
+  // the existing element, never a rebuild.
+  const showScrollbarRef = useRef(
+    typeof window === "undefined" ? false : window.innerWidth >= CONFIG.MOBILE_BREAKPOINT
+  );
+  // Arrow/line nodes cached when the scrollbar DOM is built, reused per frame.
+  const arrowNodesRef = useRef<HTMLElement[]>([]);
+  const lineNodesRef = useRef<HTMLElement[]>([]);
   const currentArrowCountRef = useRef(0);
   const [effectivePageLevel, setEffectivePageLevel] = useState(pageLevel ?? false);
 
@@ -258,25 +261,25 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     const effectiveVariant = isMobile ? "transparent" : variant;
     const variantStyles = getVariantStyles(effectiveVariant);
 
-    scrollbarElement.style.cssText = `
-      position: fixed;
-      top: ${position.top}px;
-      right: ${position.right}px;
-      width: ${sizes.scrollbarWidth}px;
-      height: ${position.height}px;
-      pointer-events: none;
-      z-index: 9999;
-      display: ${showScrollbar ? "flex" : "none"};
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: ${sizes.arrowGap}px;
-      background: ${variantStyles.background};
-      backdrop-filter: ${variantStyles.backdropFilter};
-      border-radius: ${effectivePageLevel ? "4px 0 0 4px" : "4px"};
-      border: ${variantStyles.border};
-      box-shadow: ${variantStyles.boxShadow};
-    `;
+    Object.assign(scrollbarElement.style, {
+      position: "fixed",
+      top: `${position.top}px`,
+      right: `${position.right}px`,
+      width: `${sizes.scrollbarWidth}px`,
+      height: `${position.height}px`,
+      pointerEvents: "none",
+      zIndex: "9999",
+      display: showScrollbarRef.current ? "flex" : "none",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: `${sizes.arrowGap}px`,
+      background: variantStyles.background,
+      backdropFilter: variantStyles.backdropFilter,
+      borderRadius: effectivePageLevel ? "4px 0 0 4px" : "4px",
+      border: variantStyles.border,
+      boxShadow: variantStyles.boxShadow,
+    });
 
     // Add elements in visual order: up arrows → pause lines → down arrows
     for (let i = 0; i < maxArrows; i++) {
@@ -291,6 +294,8 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
     document.body.appendChild(scrollbarElement);
     scrollbarRef.current = scrollbarElement;
+    arrowNodesRef.current = Array.from(scrollbarElement.querySelectorAll<HTMLElement>(".cyber-arrow"));
+    lineNodesRef.current = Array.from(scrollbarElement.querySelectorAll<HTMLElement>(".cyber-line"));
     const updatePosition = effectivePageLevel ? undefined : () => {
       const container = containerRef.current;
       if (container) {
@@ -308,6 +313,11 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
 
     return () => {
       scrollbarElement.remove();
+      if (scrollbarRef.current === scrollbarElement) {
+        scrollbarRef.current = null;
+        arrowNodesRef.current = [];
+        lineNodesRef.current = [];
+      }
       if (!effectivePageLevel && containerRef.current) {
         containerRef.current.classList.remove("cyber-scrollbar-container");
       }
@@ -316,7 +326,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
         window.removeEventListener("scroll", updatePosition);
       }
     };
-  }, [disabled, effectivePageLevel, showScrollbar, hideNativeScrollbars, getScrollbarPosition, createElement, getResponsiveSizes, calculateMaxArrows, getVariantStyles, variant, className]);
+  }, [disabled, effectivePageLevel, hideNativeScrollbars, getScrollbarPosition, createElement, getResponsiveSizes, calculateMaxArrows, getVariantStyles, variant, className]);
 
   const calculateArrowCount = useCallback((velocity: number, scrollDistance: number) => {
     const baseArrowCount = Math.max(1, Math.min(3, Math.ceil(velocity * 0.8)));
@@ -362,9 +372,9 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
   const updateScrollbarVisuals = useCallback(() => {
     if (!scrollbarRef.current) return;
 
-    const { isScrolling, direction, velocity, scrollDistance } = scrollState;
-    const arrows = scrollbarRef.current.querySelectorAll(".cyber-arrow");
-    const lines = scrollbarRef.current.querySelectorAll(".cyber-line");
+    const { isScrolling, direction, velocity, scrollDistance } = scrollStateRef.current;
+    const arrows = arrowNodesRef.current;
+    const lines = lineNodesRef.current;
 
     if (isScrolling && direction) {
       lines.forEach(line => {
@@ -381,7 +391,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
           (arrow as HTMLElement).style.opacity = "0";
         });
 
-        const relevantArrows = selectRelevantArrows(Array.from(arrows), direction, totalArrowCount);
+        const relevantArrows = selectRelevantArrows(arrows, direction, totalArrowCount);
         animateArrows(relevantArrows, velocity, direction);
 
         currentArrowCountRef.current = totalArrowCount;
@@ -396,13 +406,13 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
         (arrow as HTMLElement).style.opacity = "0";
       });
 
-      if (hasEverScrolled) {
+      if (hasEverScrolledRef.current) {
         lines.forEach(line => {
           (line as HTMLElement).style.opacity = "0.6";
         });
       }
     }
-  }, [scrollState, hasEverScrolled, animateArrows, calculateArrowCount, selectRelevantArrows]);
+  }, [animateArrows, calculateArrowCount, selectRelevantArrows]);
 
   const rafIdRef = useRef<number | null>(null);
 
@@ -411,42 +421,31 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     if (!effectivePageLevel && !containerRef.current) return;
 
     const now = Date.now();
-    const scrollInfo = effectivePageLevel
-      ? {
-          currentScrollTop: window.scrollY,
-          scrollHeight: document.body.scrollHeight,
-          clientHeight: window.innerHeight,
-        }
-      : {
-          currentScrollTop: containerRef.current!.scrollTop,
-          scrollHeight: containerRef.current!.scrollHeight,
-          clientHeight: containerRef.current!.clientHeight,
-        };
+    const currentScrollTop = effectivePageLevel ? window.scrollY : containerRef.current!.scrollTop;
 
     const timeDelta = now - lastScrollTime.current;
-    const scrollDelta = scrollInfo.currentScrollTop - lastScrollTop.current;
+    const scrollDelta = currentScrollTop - lastScrollTop.current;
 
     const rawVelocity = Math.abs(scrollDelta) / Math.max(timeDelta, 1);
     const velocity = rawVelocity * CONFIG.VELOCITY_MULTIPLIER;
     const direction = scrollDelta > 0 ? "down" : scrollDelta < 0 ? "up" : null;
-    const position = scrollInfo.currentScrollTop / (scrollInfo.scrollHeight - scrollInfo.clientHeight);
 
-    if (!hasEverScrolled) {
-      setHasEverScrolled(true);
-    }
+    hasEverScrolledRef.current = true;
 
     const isMobile = window.innerWidth < CONFIG.MOBILE_BREAKPOINT;
-    if (isMobile && !showScrollbar) {
-      setShowScrollbar(true);
+    if (isMobile && !showScrollbarRef.current) {
+      showScrollbarRef.current = true;
+      if (scrollbarRef.current) scrollbarRef.current.style.display = "flex";
     }
 
-    setScrollState(prev => ({
+    const prev = scrollStateRef.current;
+    scrollStateRef.current = {
       isScrolling: true,
       direction,
       velocity,
-      position,
       scrollDistance: prev.direction !== direction ? Math.abs(scrollDelta) : prev.scrollDistance + Math.abs(scrollDelta),
-    }));
+    };
+    updateScrollbarVisuals();
 
     if (stableTimeoutRef.current) clearTimeout(stableTimeoutRef.current);
     if (hideTimeoutRef.current) clearTimeout(hideTimeoutRef.current);
@@ -454,23 +453,25 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
       animationTimeoutsRef.current = [];
 
-      setScrollState(prev => ({
-        ...prev,
+      scrollStateRef.current = {
+        ...scrollStateRef.current,
         isScrolling: false,
         velocity: 0,
         scrollDistance: 0,
-      }));
+      };
+      updateScrollbarVisuals();
 
       if (isMobile) {
         hideTimeoutRef.current = setTimeout(() => {
-          setShowScrollbar(false);
+          showScrollbarRef.current = false;
+          if (scrollbarRef.current) scrollbarRef.current.style.display = "none";
         }, CONFIG.MOBILE_HIDE_DELAY);
       }
     }, CONFIG.STABLE_TIMEOUT);
 
     lastScrollTime.current = now;
-    lastScrollTop.current = scrollInfo.currentScrollTop;
-  }, [disabled, effectivePageLevel, hasEverScrolled, showScrollbar]);
+    lastScrollTop.current = currentScrollTop;
+  }, [disabled, effectivePageLevel, updateScrollbarVisuals]);
 
   // Throttle scroll handling to 1 per animation frame
   const handleScroll = useCallback(() => {
@@ -501,9 +502,6 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       cleanup?.();
     };
   }, [createScrollbarUI, handleScroll, disabled, effectivePageLevel]);
-  useEffect(() => {
-    updateScrollbarVisuals();
-  }, [updateScrollbarVisuals]);
 
   return containerRef;
 };
