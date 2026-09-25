@@ -9,10 +9,30 @@ import dts from "vite-plugin-dts";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { storybookTest } from "@storybook/addon-vitest/vitest-plugin";
+import pkg from "./package.json" with { type: "json" };
 const dirname =
   typeof __dirname !== "undefined"
     ? __dirname
     : path.dirname(fileURLToPath(import.meta.url));
+
+// Everything the consumer installs (dependencies + peerDependencies) must stay
+// external, including subpaths like `react/jsx-runtime`. With preserveModules,
+// anything bundled instead gets emitted under dist/node_modules/ or
+// dist/_virtual/ — paths npm never publishes (issue #33).
+const externalPackages = [
+  ...Object.keys(pkg.dependencies ?? {}),
+  ...Object.keys(pkg.peerDependencies ?? {}),
+];
+const isExternal = (id: string) =>
+  externalPackages.some((name) => id === name || id.startsWith(`${name}/`));
+
+const umdGlobals = {
+  react: "React",
+  "react-dom": "ReactDOM",
+  "react/jsx-runtime": "ReactJSXRuntime",
+  clsx: "clsx",
+  "tailwind-merge": "tailwindMerge",
+};
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig(({ mode }) => ({
@@ -50,21 +70,18 @@ export default defineConfig(({ mode }) => ({
             entry: resolve(__dirname, "src/index.ts"),
             name: "CyberUI2045",
             formats: ["es", "umd"],
-            fileName: (format) => `index.${format === "es" ? "es.js" : "js"}`,
+            fileName: (format) => `index.${format === "es" ? "es.js" : "cjs"}`,
           },
           sourcemap: true,
           rollupOptions: {
-            external: ["react", "react-dom"],
+            external: isExternal,
             output: [
               {
                 format: "es",
                 preserveModules: true,
                 preserveModulesRoot: "src",
                 entryFileNames: (chunkInfo) => chunkInfo.name === "index" ? "index.es.js" : "[name].js",
-                globals: {
-                  react: "React",
-                  "react-dom": "ReactDOM",
-                },
+                globals: umdGlobals,
                 assetFileNames: (assetInfo) => {
                   if (assetInfo.name === "style.css") return "cyberui-2045.css";
                   return assetInfo.name as string;
@@ -72,12 +89,9 @@ export default defineConfig(({ mode }) => ({
               },
               {
                 format: "umd",
-                entryFileNames: "index.js",
+                entryFileNames: "index.cjs",
                 name: "CyberUI2045",
-                globals: {
-                  react: "React",
-                  "react-dom": "ReactDOM",
-                },
+                globals: umdGlobals,
                 assetFileNames: (assetInfo) => {
                   if (assetInfo.name === "style.css") return "cyberui-2045.css";
                   return assetInfo.name as string;

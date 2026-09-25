@@ -4,7 +4,7 @@
   "description": "The AI-first cyberpunk React UI library — built-in coding assistant context for Claude, Cursor, Copilot, and AGENTS.md out of the box.",
   "private": false,
   "type": "module",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
   "bin": {
@@ -13,11 +13,12 @@
   "files": [
     "dist/assets",
     "dist/components",
+    "dist/constants",
     "dist/hooks",
     "dist/contexts",
     "dist/utils",
     "dist/index.d.ts",
-    "dist/index.js",
+    "dist/index.cjs",
     "dist/index.es.js",
     "dist/cyberui-2045.css",
     "dist/component-manifest.json",
@@ -33,7 +34,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.js"
+      "require": "./dist/index.cjs"
     },
     "./styles.css": "./dist/cyberui-2045.css"
   },
@@ -81,6 +82,7 @@
     "build-storybook": "storybook build",
     "docs:generate": "node scripts/generate-manifest.js",
     "size": "size-limit",
+    "check:package": "node scripts/check-package.js",
     "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist",
     "prepublishOnly": "npm run build"

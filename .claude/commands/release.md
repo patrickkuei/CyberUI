@@ -61,7 +61,7 @@ Confirm the build succeeds and `dist/` is populated. Report the output file size
 Run: `npm pack --dry-run`
 
 Show the list of files that would be included in the npm package. Verify that:
-- `dist/index.es.js`, `dist/index.js`, `dist/index.d.ts`, `dist/cyberui-2045.css` are included
+- `dist/index.es.js`, `dist/index.cjs`, `dist/index.d.ts`, `dist/cyberui-2045.css` are included
 - No `src/`, `node_modules/`, `.storybook/`, or test files are included
 
 ---
