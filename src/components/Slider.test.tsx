@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, expectTypeOf, vi } from 'vitest';
 import Slider from './Slider';
+import type { SliderProps, SliderValue } from './Slider';
 
 describe('Slider', () => {
   it('renders a single thumb without crashing', () => {
@@ -264,5 +265,82 @@ describe('Slider', () => {
     const [lower, upper] = screen.getAllByRole('slider') as HTMLElement[];
     fireEvent.pointerDown(upper, { pointerId: 1 });
     expect(Number(upper.style.zIndex)).toBeGreaterThan(Number(lower.style.zIndex));
+  });
+});
+
+// Type-level tests: `npm run type-check` is what enforces these. Elements are
+// created but never rendered; each `@ts-expect-error` fails the type-check if
+// the usage it names ever starts compiling.
+describe('Slider onValueChange typing', () => {
+  const setVolume: React.Dispatch<React.SetStateAction<number>> = () => {};
+  const setRange: React.Dispatch<React.SetStateAction<[number, number]>> = () => {};
+  const legacyHandler: (value: SliderValue) => void = () => {};
+  const numberHandler: (value: number) => void = () => {};
+  const rangeHandler: (value: [number, number]) => void = () => {};
+
+  it('gives single-value handlers a number', () => {
+    const elements = [
+      <Slider key="setter" value={55} onValueChange={setVolume} />,
+      <Slider key="value" value={55} onValueChange={(v) => expectTypeOf(v).toEqualTypeOf<number>()} />,
+      <Slider key="default" defaultValue={55} onValueChange={(v) => expectTypeOf(v).toEqualTypeOf<number>()} />,
+      // No value/defaultValue: single mode, the thumb starts at `min`.
+      <Slider key="none" onValueChange={(v) => expectTypeOf(v).toEqualTypeOf<number>()} />,
+      <Slider key="named" value={55} onValueChange={numberHandler} />,
+    ];
+    expect(elements).toHaveLength(5);
+  });
+
+  it('gives range handlers a [number, number] tuple', () => {
+    const elements = [
+      <Slider key="setter" value={[10, 90]} onValueChange={setRange} />,
+      <Slider key="value" value={[10, 90]} onValueChange={(v) => expectTypeOf(v).toEqualTypeOf<[number, number]>()} />,
+      <Slider key="default" defaultValue={[10, 90]} onValueChange={(v) => expectTypeOf(v).toEqualTypeOf<[number, number]>()} />,
+      <Slider key="named" value={[10, 90]} onValueChange={rangeHandler} />,
+    ];
+    expect(elements).toHaveLength(4);
+  });
+
+  it('keeps accepting a handler typed with the SliderValue union in both modes', () => {
+    const elements = [
+      <Slider key="single" value={55} onValueChange={legacyHandler} />,
+      <Slider key="range" value={[10, 90]} onValueChange={legacyHandler} />,
+      <Slider key="none" onValueChange={legacyHandler} />,
+    ];
+    expect(elements).toHaveLength(3);
+  });
+
+  it('does not narrow a literal value to a literal type', () => {
+    // `value={55}` must be a `number` slider, not one that only accepts `55`.
+    const literal = <Slider value={55} onValueChange={(v) => expectTypeOf(v).not.toEqualTypeOf<55>()} />;
+    expect(literal).toBeTruthy();
+  });
+
+  it('keeps SliderProps a non-generic-by-default interface that consumers can extend', () => {
+    interface OperativeSliderProps extends SliderProps {
+      operative: string;
+    }
+    const props: OperativeSliderProps = { operative: 'Ghost', value: 40, onValueChange: legacyHandler };
+    expectTypeOf<SliderProps['onValueChange']>().toEqualTypeOf<((value: SliderValue) => void) | undefined>();
+    expect(props.operative).toBe('Ghost');
+  });
+
+  it('rejects handlers and values that disagree with the slider mode', () => {
+    const invalid = [
+      // @ts-expect-error — a range handler on a single-value slider
+      <Slider key="a" value={55} onValueChange={rangeHandler} />,
+      // @ts-expect-error — a single-value handler on a range slider
+      <Slider key="b" value={[10, 90]} onValueChange={numberHandler} />,
+      // @ts-expect-error — a number state setter on a range slider
+      <Slider key="c" value={[10, 90]} onValueChange={setVolume} />,
+      // @ts-expect-error — a range state setter on a single-value slider
+      <Slider key="d" value={55} onValueChange={setRange} />,
+      // @ts-expect-error — a range handler with no value: the slider defaults to single mode
+      <Slider key="e" onValueChange={rangeHandler} />,
+      // @ts-expect-error — `value` and `defaultValue` in different modes (number vs range)
+      <Slider key="f" value={55} defaultValue={[10, 90]} />,
+      // @ts-expect-error — a handler parameter that is neither a number nor a range
+      <Slider key="g" value={55} onValueChange={(v: string) => v.length} />,
+    ];
+    expect(invalid).toHaveLength(7);
   });
 });
