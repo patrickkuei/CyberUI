@@ -17,7 +17,7 @@ const meta: Meta<typeof Modal> = {
 - **Portal Rendering:** Uses React Portal for proper z-index layering
 - **Backdrop Controls:** Configurable overlay click and escape key handling
 - **Multiple Sizes:** From small dialogs to fullscreen modals
-- **Accessibility:** Full ARIA support with focus management and screen reader compatibility
+- **Accessibility:** Full ARIA support with focus management and screen reader compatibility. Escape restores focus to the trigger; overlay click does not.
 - **Cyberpunk Aesthetics:** Grid background, scanline effects, corner accents, and neon styling
 
 **Usage:**

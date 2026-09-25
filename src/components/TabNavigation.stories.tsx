@@ -237,6 +237,11 @@ export const DropdownMode: Story = {
   },
   parameters: {
     layout: "padded",
+    docs: {
+      description: {
+        story: 'Click the anchor to open the tab list. Escape closes it and restores focus to the anchor. Outside click and click-to-select close it without restoring focus.',
+      },
+    },
   },
   render: (args) => (
     <div

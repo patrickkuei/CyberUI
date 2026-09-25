@@ -27,6 +27,8 @@ const meta: Meta<typeof DatePicker> = {
       description: {
         component: `A cyberpunk-styled single-date picker — a text-input trigger (matching Input's styling) that opens a keyboard-navigable calendar grid popover (matching Modal/Select's overlay treatment). Range selection is a natural follow-up once single-date selection is proven out.
 
+Escape or outside click closes the calendar. Escape restores focus to the trigger. Outside click does not.
+
 **Usage:**
 
 \`\`\`tsx

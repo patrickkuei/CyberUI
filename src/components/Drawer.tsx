@@ -3,13 +3,13 @@ import React, {
   useEffect,
   useLayoutEffect,
   useRef,
-  useCallback,
   useId,
   memo,
   useMemo,
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../utils/cn";
+import { useDialogBehavior } from "../hooks/useDialogBehavior";
 
 /** Edge of the viewport the drawer slides in from. */
 export type DrawerSide = "left" | "right" | "top" | "bottom";
@@ -151,8 +151,6 @@ const Drawer: React.FC<DrawerProps> = memo(
     className = "",
     overlayClassName = "",
   }) => {
-    const [isClosing, setIsClosing] = useState(false);
-    const [isOpening, setIsOpening] = useState(true);
     // Tracks whether the entrance transition has been kicked off yet. Starts
     // `false` so the very first paint commits the panel/overlay in their
     // hidden position; a follow-up effect then flips this to `true` on the
@@ -160,27 +158,24 @@ const Drawer: React.FC<DrawerProps> = memo(
     // from instead of snapping into place once OPEN_DURATION elapses.
     const [hasEntered, setHasEntered] = useState(false);
 
-    const overlayRef = useRef<HTMLDivElement>(null);
     const panelRef = useRef<HTMLDivElement>(null);
-    const previouslyFocusedRef = useRef<HTMLElement | null>(null);
-    const closeTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-    const openTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const wasOpenRef = useRef(false);
     const titleId = useId();
 
-    const closeDrawer = useCallback(() => {
-      setIsClosing(true);
-      // Cancel any pending open-settle timer — without this, closing while
-      // the initial open animation is still in flight let the stale open
-      // timer fire later, flipping isOpening back and yanking focus into a
-      // panel that's now closing (or already gone).
-      if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-      if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-      closeTimeoutRef.current = setTimeout(() => {
-        setIsClosing(false);
-        setIsOpening(true);
-        onClose();
-      }, CLOSE_DURATION);
-    }, [onClose]);
+    const {
+      isOpening,
+      isClosing,
+      close: closeDrawer,
+      handleOverlayClick,
+    } = useDialogBehavior(isOpen, {
+      closeDuration: CLOSE_DURATION,
+      openDuration: OPEN_DURATION,
+      closeOnEscape,
+      closeOnOutsideClick: closeOnOverlayClick,
+      lockScroll: true,
+      onOpenSettle: () => panelRef.current?.focus(),
+      onClose,
+    });
 
     // Runs synchronously before the browser paints. The panel/overlay `<div>`
     // is conditionally mounted ({(isOpen || isClosing) && ...}), so reopening
@@ -191,22 +186,11 @@ const Drawer: React.FC<DrawerProps> = memo(
     // here would run too late, after that stale-visible frame already
     // painted; `useLayoutEffect` corrects it before the user ever sees it.
     useLayoutEffect(() => {
-      if (isOpen && !isClosing) {
-        previouslyFocusedRef.current = (document.activeElement as HTMLElement) || null;
-        setIsOpening(true);
+      if (isOpen && !wasOpenRef.current) {
         setHasEntered(false);
       }
-    }, [isOpen, isClosing]);
-
-    useEffect(() => {
-      if (isOpen && !isClosing) {
-        if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-        openTimeoutRef.current = setTimeout(() => {
-          setIsOpening(false);
-          panelRef.current?.focus();
-        }, OPEN_DURATION);
-      }
-    }, [isOpen, isClosing]);
+      wasOpenRef.current = isOpen;
+    }, [isOpen]);
 
     // Kicks the entrance transition on the next animation frame after the
     // hidden frame from the layout effect above has actually been painted,
@@ -222,64 +206,6 @@ const Drawer: React.FC<DrawerProps> = memo(
         return () => cancelAnimationFrame(raf);
       }
     }, [isOpen, isClosing, isOpening, hasEntered]);
-
-    useEffect(() => {
-      return () => {
-        if (closeTimeoutRef.current) clearTimeout(closeTimeoutRef.current);
-        if (openTimeoutRef.current) clearTimeout(openTimeoutRef.current);
-      };
-    }, []);
-
-    const handleOverlayClick = useCallback(
-      (e: React.MouseEvent) => {
-        if (
-          closeOnOverlayClick &&
-          (e.target === overlayRef.current || e.target === e.currentTarget)
-        ) {
-          closeDrawer();
-        }
-      },
-      [closeDrawer, closeOnOverlayClick]
-    );
-
-    // Latest-value refs for closeOnEscape/closeDrawer so handleKeyDown below
-    // can stay referentially stable across renders. Without this, a fresh
-    // inline `onClose` from the consumer (the exact pattern shown in this
-    // component's own JSDoc usage example) recreates `closeDrawer` and thus
-    // `handleKeyDown` on every render, which re-runs the scroll-lock/
-    // focus-restore effect below on every unrelated parent re-render — and
-    // that effect's cleanup unconditionally restores focus, so it yanked
-    // focus back to the trigger mid-interaction even though the drawer never
-    // actually closed.
-    const closeOnEscapeRef = useRef(closeOnEscape);
-    closeOnEscapeRef.current = closeOnEscape;
-    const closeDrawerRef = useRef(closeDrawer);
-    closeDrawerRef.current = closeDrawer;
-
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-      if (closeOnEscapeRef.current && e.key === "Escape") {
-        closeDrawerRef.current();
-      }
-    }, []);
-
-    useEffect(() => {
-      if (isOpen) {
-        document.addEventListener("keydown", handleKeyDown);
-        const originalOverflow = document.body.style.overflow;
-        const scrollbarWidth =
-          window.innerWidth - document.documentElement.clientWidth;
-
-        document.body.style.overflow = "hidden";
-        document.body.style.paddingRight = `${scrollbarWidth}px`;
-
-        return () => {
-          document.removeEventListener("keydown", handleKeyDown);
-          document.body.style.overflow = originalOverflow;
-          document.body.style.paddingRight = "";
-          previouslyFocusedRef.current?.focus?.();
-        };
-      }
-    }, [isOpen, handleKeyDown]);
 
     const panelClasses = useMemo(() => {
       const danger = variant === "danger";
@@ -309,7 +235,6 @@ const Drawer: React.FC<DrawerProps> = memo(
 
     return createPortal(
       <div
-        ref={overlayRef}
         className={cn(
           "fixed inset-0 z-50 transition-all ease-out",
           isClosing

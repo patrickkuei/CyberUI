@@ -17,4 +17,6 @@ Format:
 
 Use bold for the component or feature name. Keep the description concise and factual.
 
+Always add a new bullet, even for a change related to an existing one. Never append another sentence onto an existing bullet for a distinct change — that's how a single entry grows into one unreadable paragraph covering several unrelated things, which is exactly what happened to the `useDialogBehavior` entry across several follow-up fixes before it got split back apart. A follow-up fix to something already logged gets its own bullet, not a tacked-on clause.
+
 If $ARGUMENTS is empty or malformed, ask the user for the type and description before editing the file.

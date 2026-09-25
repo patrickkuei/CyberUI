@@ -63,6 +63,7 @@ Follow Button.stories.tsx as the canonical template. Include:
 - `meta` with `title: 'Components/$ARGUMENTS'`, `tags: ['autodocs']`, full `docs.description.component` (markdown with usage code + props table), and `argTypes`
 - Stories: `Default`, one per variant/state, `AllVariants` render story showing the full matrix
 - Use cyberpunk-flavored copy for labels (e.g. "Execute Protocol", "Neural Link", "System Override")
+- `docs.description.component` and `docs.description.story` text: state what the component/story does and how it behaves — don't tack an explanatory "why"/rationale clause onto a behavior statement (e.g. not "X doesn't happen, since Y already handles it" — just "X doesn't happen"). Storybook is published (GitHub Pages) and read by humans, so keep behavior descriptions short and plain. This does **not** ban the library's own descriptive vocabulary (`cyberpunk-themed`, `neon-bordered`, etc. — see the cyberpunk-flavored copy rule above) or prescriptive "when to use X vs Y" usage guidance (see `FormField.stories.tsx` for the pattern) — only rationale clauses justifying an internal behavior.
 
 ---
 
