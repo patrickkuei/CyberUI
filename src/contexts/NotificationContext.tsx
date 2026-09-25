@@ -1,5 +1,9 @@
-import React, { useState, useCallback, type ReactNode } from "react";
+import React, { useState, useCallback, useRef, type ReactNode } from "react";
 import Notification from "../components/Notification";
+import {
+  REDUCED_MOTION_DURATION,
+  usePrefersReducedMotion,
+} from "../hooks/usePrefersReducedMotion";
 import {
   NotificationContext,
   type CyberNotification,
@@ -14,8 +18,18 @@ export interface CyberNotificationProviderProps {
 }
 
 /**
+ * How long a closing toast stays mounted: its slide-out (`duration-500`), or
+ * the 150ms fade (`motion-reduce:duration-150`) under reduced motion.
+ */
+const closeDelay = (reduceMotion: boolean) =>
+  reduceMotion ? REDUCED_MOTION_DURATION : 500;
+
+/**
  * Context provider for the Cyberpunk notification system.
  * Wrap your application root with this provider to enable toasts.
+ *
+ * While the user prefers reduced motion (`prefers-reduced-motion: reduce`),
+ * toasts fade in and out in 150ms instead of sliding.
  * 
  * @example
  * <CyberNotificationProvider position="top-right">
@@ -26,6 +40,11 @@ export const CyberNotificationProvider: React.FC<
   CyberNotificationProviderProps
 > = ({ children, position = "top-right", defaultDuration = 2500 }) => {
   const [notifications, setNotifications] = useState<CyberNotification[]>([]);
+  const reduceMotion = usePrefersReducedMotion();
+  // Read when a close is scheduled, so a toast already on screen uses the
+  // preference in effect at dismissal time.
+  const reduceMotionRef = useRef(reduceMotion);
+  reduceMotionRef.current = reduceMotion;
 
   const showNotification = useCallback(
     (
@@ -48,7 +67,7 @@ export const CyberNotificationProvider: React.FC<
           // Remove after animation completes
           setTimeout(() => {
             setNotifications((prev) => prev.filter((n) => n.id !== id));
-          }, 500); // Animation duration
+          }, closeDelay(reduceMotionRef.current));
         }, duration);
       }
 
@@ -65,7 +84,7 @@ export const CyberNotificationProvider: React.FC<
     // Remove after animation completes
     setTimeout(() => {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
-    }, 500); // Animation duration
+    }, closeDelay(reduceMotionRef.current));
   }, []);
 
   const clearAllNotifications = useCallback(() => {
@@ -108,7 +127,7 @@ export const CyberNotificationProvider: React.FC<
               }}
             >
               <div
-                className={`transform transition-all duration-500 ease-out scale-75 opacity-90 w-full ${
+                className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out scale-75 opacity-90 w-full ${
                   position.includes("right")
                     ? "flex justify-end"
                     : "flex justify-start"
@@ -126,7 +145,11 @@ export const CyberNotificationProvider: React.FC<
                   transformOrigin: position.includes("right")
                     ? "right center"
                     : "left center",
-                  transform: notification.isClosing
+                  // Reduced motion: no slide — the toast stays in place and
+                  // fades in once measured, and out on close.
+                  transform: reduceMotion
+                    ? "scale(0.75)"
+                    : notification.isClosing
                     ? `translateX(${
                         position.includes("right") ? "100%" : "-100%"
                       }) scale(0.75)`
@@ -137,6 +160,7 @@ export const CyberNotificationProvider: React.FC<
                           ? "100%"
                           : "-100%"
                       }) scale(0.75)`,
+                  ...(reduceMotion && !notification.width ? { opacity: 0 } : {}),
                 }}
                 ref={(el) => {
                   if (el && !notification.width) {

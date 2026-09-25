@@ -67,6 +67,8 @@ import { Notification } from 'cyberui-2045';
 
 ### CyberNotificationProvider Props
 
+Under \`prefers-reduced-motion: reduce\`, toasts fade in and out in 150ms instead of sliding.
+
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`children\` | \`ReactNode\` | ✅ | - | The app content to wrap with notification context |
