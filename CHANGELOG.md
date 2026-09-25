@@ -45,6 +45,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Table` rows show an accent focus ring when `onRowClick` makes them focusable** (pre-release) — keyboard focus previously fell back to the browser's default outline.
 - **`Table` caption is padded like the cells** (pre-release) — it had no horizontal or top padding, so it sat flush against the container's top-left edge. It now uses the same `size`-based padding as the header and body cells and lines up with the first column.
 - **`Table` empty state keeps the table's shape** (pre-release) — with no rows it used to collapse to a single strip. The empty body is now about three rows tall at each `size` (new `RESPONSIVE_SIZE_MAPS.tableEmpty` entry), filled with a faint static diagonal hatch (new `bg-no-signal` class) behind the centered `emptyMessage`.
+- **`Table` clickable rows no longer swallow Enter/Space from controls inside cells** (pre-release) — with `onRowClick` set, the row's key handler reacted to keys bubbling up from any descendant and called `preventDefault()`, so a button rendered in a cell ran the row action instead of its own, and an input in a cell couldn't type a space. The row now only responds when it has focus itself.
 
 ## [2.5.0] - 2026-07-23
 

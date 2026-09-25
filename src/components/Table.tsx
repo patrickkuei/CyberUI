@@ -138,7 +138,9 @@ function Table<T = TableRowData>({
     row: T,
     rowIndex: number
   ) => {
-    if (!onRowClick) return;
+    // Only when the row itself has focus — a button, link or input rendered
+    // inside a cell must keep its own Enter/Space behaviour.
+    if (!onRowClick || event.target !== event.currentTarget) return;
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       onRowClick(row, rowIndex);

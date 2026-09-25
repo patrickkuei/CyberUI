@@ -125,6 +125,47 @@ describe('Table', () => {
     expect(handleClick).not.toHaveBeenCalled();
   });
 
+  it('leaves Enter/Space alone for controls rendered inside a cell', () => {
+    const handleRowClick = vi.fn();
+    const columns: TableColumn[] = [
+      ...COLUMNS,
+      { key: 'actions', header: 'Actions', render: () => <button type="button">Purge</button> },
+      { key: 'note', header: 'Note', render: () => <input aria-label="Field note" /> },
+    ];
+    render(<Table columns={columns} data={DATA} onRowClick={handleRowClick} />);
+
+    const [button] = screen.getAllByRole('button', { name: 'Purge' });
+    const [input] = screen.getAllByRole('textbox', { name: 'Field note' });
+    // fireEvent returns false when the event was preventDefault()-ed
+    expect(fireEvent.keyDown(button, { key: 'Enter' })).toBe(true);
+    expect(fireEvent.keyDown(button, { key: ' ' })).toBe(true);
+    expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+    expect(handleRowClick).not.toHaveBeenCalled();
+  });
+
+  it('tints only odd rows when variant is striped', () => {
+    const { rerender } = render(<Table columns={COLUMNS} data={DATA} variant="striped" />);
+    const dataRows = () => screen.getAllByRole('row').slice(1);
+    expect(dataRows().map((row) => row.classList.contains('bg-surface/40'))).toEqual([false, true, false]);
+
+    rerender(<Table columns={COLUMNS} data={DATA} />);
+    expect(dataRows().some((row) => row.classList.contains('bg-surface/40'))).toBe(false);
+  });
+
+  it('applies column align to header and body cells, and width to the header', () => {
+    const columns: TableColumn[] = [
+      { key: 'callsign', header: 'Callsign', width: '40%' },
+      { key: 'status', header: 'Status', align: 'right' },
+    ];
+    render(<Table columns={columns} data={DATA} />);
+
+    const callsignHeader = screen.getByRole('columnheader', { name: 'Callsign' });
+    expect(callsignHeader).toHaveClass('text-left');
+    expect(callsignHeader).toHaveStyle({ width: '40%' });
+    expect(screen.getByRole('columnheader', { name: 'Status' })).toHaveClass('text-right');
+    expect(screen.getAllByText('Online')[0].closest('td')).toHaveClass('text-right');
+  });
+
   it('uses getRowId for row keys instead of index when provided', () => {
     const getRowId = vi.fn((row: TableRowData) => row.callsign as string);
     render(<Table columns={COLUMNS} data={DATA} getRowId={getRowId} />);
