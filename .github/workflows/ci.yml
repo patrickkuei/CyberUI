@@ -55,5 +55,8 @@ jobs:
       - name: Build library
         run: npm run build
 
+      - name: Check package integrity
+        run: npm run check:package
+
       - name: Check bundle size
         run: npm run size
