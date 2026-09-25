@@ -6,6 +6,7 @@ import {
   RESPONSIVE_SIZE_MAPS,
 } from "../utils/responsive";
 import { cn } from "../utils/cn";
+import { usePrefersReducedMotion } from "../hooks/usePrefersReducedMotion";
 
 /**
  * Size options for the Carousel component
@@ -47,6 +48,10 @@ export interface CarouselCallbacks {
 }
 
 
+/** Inline animation of the active indicator's inner glow and cross lines. */
+const INDICATOR_PULSE =
+  "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite";
+
 /**
  * Props for the CyberUI Carousel component
  *
@@ -82,13 +87,20 @@ export interface CarouselProps extends CarouselCallbacks {
   onChange: (index: number) => void;
   /** Size variant with responsive support */
   size?: ResponsiveValue<CarouselSize>;
-  /** Enable auto-play functionality */
+  /**
+   * Enable auto-play functionality. Does not auto-advance while the user
+   * prefers reduced motion (`prefers-reduced-motion: reduce`).
+   */
   autoPlay?: boolean;
   /** Auto-play interval in milliseconds */
   interval?: number;
   /** Enable infinite loop */
   infinite?: boolean;
-  /** Transition effect */
+  /**
+   * Transition effect. While the user prefers reduced motion, `matrix` and
+   * `signal-glitch` render as `fade`, and `slide` changes slides without
+   * sliding.
+   */
   transition?: CarouselTransition;
   /** Image object fit behavior */
   objectFit?: CarouselObjectFit;
@@ -139,6 +151,21 @@ const Carousel: React.FC<CarouselProps> = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [autoPlayActive, setAutoPlayActive] = useState(autoPlay);
   const [shouldGlitch, setShouldGlitch] = useState(true);
+  const reduceMotion = usePrefersReducedMotion();
+
+  // Under reduced motion the flashing/3D transitions become a plain fade.
+  // Everything below reads this instead of the raw `transition` prop.
+  const activeTransition: CarouselTransition =
+    reduceMotion && (transition === "signal-glitch" || transition === "matrix")
+      ? "fade"
+      : transition;
+
+  // Closing an image preview restores autoplay from the prop — but never
+  // under reduced motion.
+  const resumeAutoPlay = useCallback(
+    () => setAutoPlayActive(autoPlay && !reduceMotion),
+    [autoPlay, reduceMotion]
+  );
 
   // Memoized classes
   const sizeClasses = useMemo(
@@ -156,7 +183,7 @@ const Carousel: React.FC<CarouselProps> = ({
 
       // Determine if this transition should use glitch effects (for signal-glitch transition)
       const shouldUseGlitch =
-        transition === "signal-glitch" &&
+        activeTransition === "signal-glitch" &&
         (() => {
           if (typeof glitchRate === "boolean") {
             return glitchRate;
@@ -173,9 +200,9 @@ const Carousel: React.FC<CarouselProps> = ({
       // For fade/matrix transitions, wait for transition to complete
       // For signal-glitch, use glitch timing only if effects are active, otherwise use fade timing
       const delay =
-        transition === "slide"
+        activeTransition === "slide"
           ? 0
-          : transition === "signal-glitch" && shouldUseGlitch
+          : activeTransition === "signal-glitch" && shouldUseGlitch
           ? 600
           : 250;
 
@@ -191,14 +218,14 @@ const Carousel: React.FC<CarouselProps> = ({
       onChange,
       onBeforeChange,
       onAfterChange,
-      transition,
+      activeTransition,
       glitchRate,
     ]
   );
 
   // Auto-play logic
   useEffect(() => {
-    if (!autoPlayActive || images.length <= 1) return;
+    if (!autoPlayActive || reduceMotion || images.length <= 1) return;
 
     const timer = setInterval(() => {
       const nextIndex = infinite
@@ -216,6 +243,7 @@ const Carousel: React.FC<CarouselProps> = ({
     return () => clearInterval(timer);
   }, [
     autoPlayActive,
+    reduceMotion,
     currentIndex,
     images.length,
     infinite,
@@ -274,7 +302,7 @@ const Carousel: React.FC<CarouselProps> = ({
    */
   const renderSlideTransition = () => (
     <div
-      className="flex h-full transition-transform duration-500 ease-in-out"
+      className="flex h-full transition-transform duration-500 ease-in-out motion-reduce:transition-none"
       style={{
         transform: `translateX(-${currentIndex * 100}%)`,
         willChange: "transform",
@@ -291,7 +319,7 @@ const Carousel: React.FC<CarouselProps> = ({
             preview={!disableImagePreview}
             loading={index <= 1 ? "eager" : "lazy"}
             onPreviewOpen={() => setAutoPlayActive(false)}
-            onPreviewClose={() => setAutoPlayActive(autoPlay)}
+            onPreviewClose={resumeAutoPlay}
           />
         </div>
       ))}
@@ -306,13 +334,13 @@ const Carousel: React.FC<CarouselProps> = ({
       {images.map((image, index) => {
         const isActive = index === currentIndex;
         const transitionStyle =
-          transition === "fade"
+          activeTransition === "fade"
             ? {
                 opacity: isActive ? 1 : 0,
                 transition: "opacity 500ms ease-in-out",
                 willChange: "opacity",
               }
-            : transition === "matrix"
+            : activeTransition === "matrix"
             ? {
                 opacity: isActive ? 1 : 0,
                 transform: isActive
@@ -356,11 +384,11 @@ const Carousel: React.FC<CarouselProps> = ({
               preview={!disableImagePreview}
               loading={index <= 1 ? "eager" : "lazy"}
               onPreviewOpen={() => setAutoPlayActive(false)}
-              onPreviewClose={() => setAutoPlayActive(autoPlay)}
+              onPreviewClose={resumeAutoPlay}
             />
 
             {/* Matrix-specific glitch effects */}
-            {transition === "matrix" &&
+            {activeTransition === "matrix" &&
               renderMatrixEffects(isActive, isTransitioning)}
           </div>
         );
@@ -380,7 +408,7 @@ const Carousel: React.FC<CarouselProps> = ({
 
         // During signal glitch transition, use effects only if shouldGlitch is true
         const imageStyle =
-          isTransitioning && transition === "signal-glitch" && shouldGlitch
+          isTransitioning && activeTransition === "signal-glitch" && shouldGlitch
             ? {
                 opacity: isActive ? 1 : isPrevious ? 0.8 : 0,
                 animation: isActive
@@ -419,17 +447,17 @@ const Carousel: React.FC<CarouselProps> = ({
                 !disableImagePreview &&
                 !(
                   isTransitioning &&
-                  transition === "signal-glitch" &&
+                  activeTransition === "signal-glitch" &&
                   shouldGlitch
                 )
               }
               loading={index <= 1 ? "eager" : "lazy"}
               onPreviewOpen={() => setAutoPlayActive(false)}
-              onPreviewClose={() => setAutoPlayActive(autoPlay)}
+              onPreviewClose={resumeAutoPlay}
             />
 
             {/* Signal-Glitch specific effects */}
-            {transition === "signal-glitch" &&
+            {activeTransition === "signal-glitch" &&
               isTransitioning &&
               shouldGlitch &&
               renderSignalGlitchEffects(isActive)}
@@ -617,16 +645,16 @@ const Carousel: React.FC<CarouselProps> = ({
           onClick={goToPrevious}
           disabled={
             (!infinite && currentIndex === 0) ||
-            (isTransitioning && transition === "signal-glitch" && shouldGlitch)
+            (isTransitioning && activeTransition === "signal-glitch" && shouldGlitch)
           }
-          className="group absolute left-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
+          className="group absolute left-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110 motion-reduce:hover:scale-100"
           aria-label="Previous image"
         >
           <svg
             width="48"
             height="48"
             viewBox="0 0 100 100"
-            className="transition-all duration-300 group-hover:scale-110 overflow-visible"
+            className="transition-all duration-300 group-hover:scale-110 motion-reduce:group-hover:scale-100 overflow-visible"
             style={{ overflow: "visible" } as React.CSSProperties}
           >
             <defs>
@@ -670,7 +698,7 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] group-active:opacity-0"
+              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] motion-reduce:group-hover:animate-none group-active:opacity-0"
               style={
                 {
                   filter:
@@ -684,7 +712,7 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite]"
+              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite] motion-reduce:group-active:animate-none"
             />
           </svg>
         </button>
@@ -694,16 +722,16 @@ const Carousel: React.FC<CarouselProps> = ({
           onClick={goToNext}
           disabled={
             (!infinite && currentIndex === images.length - 1) ||
-            (isTransitioning && transition === "signal-glitch" && shouldGlitch)
+            (isTransitioning && activeTransition === "signal-glitch" && shouldGlitch)
           }
-          className="group absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110"
+          className="group absolute right-2 top-1/2 -translate-y-1/2 w-16 h-16 text-primary hover:text-accent cursor-pointer disabled:cursor-not-allowed disabled:opacity-30 focus:outline-none transition-all duration-300 flex items-center justify-center hover:scale-110 motion-reduce:hover:scale-100"
           aria-label="Next image"
         >
           <svg
             width="48"
             height="48"
             viewBox="0 0 100 100"
-            className="transition-all duration-300 group-hover:scale-110 overflow-visible"
+            className="transition-all duration-300 group-hover:scale-110 motion-reduce:group-hover:scale-100 overflow-visible"
             style={{ overflow: "visible" } as React.CSSProperties}
           >
             <path
@@ -719,7 +747,7 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] group-active:opacity-0"
+              className="opacity-0 group-hover:opacity-100 group-hover:animate-[rgbStroke_1.5s_linear_infinite] motion-reduce:group-hover:animate-none group-active:opacity-0"
               style={
                 {
                   filter:
@@ -733,7 +761,7 @@ const Carousel: React.FC<CarouselProps> = ({
               stroke="rgb(255, 0, 93)"
               strokeWidth="4"
               fill="none"
-              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite]"
+              className="opacity-0 group-active:opacity-100 group-active:animate-[rgbStroke_1.5s_linear_infinite] motion-reduce:group-active:animate-none"
             />
           </svg>
         </button>
@@ -752,9 +780,9 @@ const Carousel: React.FC<CarouselProps> = ({
             key={index}
             onClick={() => goToSlide(index)}
             disabled={
-              isTransitioning && transition === "signal-glitch" && shouldGlitch
+              isTransitioning && activeTransition === "signal-glitch" && shouldGlitch
             }
-            className="group relative transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
+            className="group relative transition-all duration-300 hover:scale-110 motion-reduce:hover:scale-100 focus:outline-none cursor-pointer disabled:cursor-not-allowed disabled:opacity-30"
             style={{
               width: "24px",
               height: "24px",
@@ -768,8 +796,13 @@ const Carousel: React.FC<CarouselProps> = ({
                 style={
                   {
                     borderColor: "rgb(255, 0, 93)",
-                    animation:
-                      "rotateFocusRing 0.8s ease-out forwards, rgbBorder 1.5s linear infinite 0.8s",
+                    // Reduced motion: static at the ring's final (rotated) frame.
+                    ...(reduceMotion
+                      ? { transform: "rotate(135deg)" }
+                      : {
+                          animation:
+                            "rotateFocusRing 0.8s ease-out forwards, rgbBorder 1.5s linear infinite 0.8s",
+                        }),
                   } as React.CSSProperties
                 }
               />
@@ -778,8 +811,8 @@ const Carousel: React.FC<CarouselProps> = ({
             <div
               className={`absolute inset-0 border-2 transition-all duration-300 ${
                 index === currentIndex
-                  ? "border-primary bg-primary/30 shadow-lg-primary animate-[rgbBorder_1.5s_linear_infinite]"
-                  : "border-accent bg-surface/50 group-hover:border-primary group-hover:bg-primary/20 group-hover:shadow-primary group-hover:animate-[rgbBorder_1.5s_linear_infinite]"
+                  ? "border-primary bg-primary/30 shadow-lg-primary animate-[rgbBorder_1.5s_linear_infinite] motion-reduce:animate-none"
+                  : "border-accent bg-surface/50 group-hover:border-primary group-hover:bg-primary/20 group-hover:shadow-primary group-hover:animate-[rgbBorder_1.5s_linear_infinite] motion-reduce:group-hover:animate-none"
               }`}
               style={{
                 clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
@@ -788,12 +821,11 @@ const Carousel: React.FC<CarouselProps> = ({
             {/* Inner RGB glow effect with pulse */}
             {index === currentIndex && (
               <div
-                className="absolute inset-2 bg-primary/60 animate-pulse"
+                className="absolute inset-2 bg-primary/60 animate-pulse motion-reduce:animate-none"
                 style={
                   {
                     clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                    animation:
-                      "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                    animation: reduceMotion ? undefined : INDICATOR_PULSE,
                   } as React.CSSProperties
                 }
               />
@@ -802,22 +834,20 @@ const Carousel: React.FC<CarouselProps> = ({
             {index === currentIndex && (
               <div className="absolute inset-0 opacity-80">
                 <div
-                  className="absolute top-1/2 left-2 right-2 h-0.5 bg-primary/80 animate-pulse"
+                  className="absolute top-1/2 left-2 right-2 h-0.5 bg-primary/80 animate-pulse motion-reduce:animate-none"
                   style={
                     {
                       transform: "translateY(-50%)",
-                      animation:
-                        "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                      animation: reduceMotion ? undefined : INDICATOR_PULSE,
                     } as React.CSSProperties
                   }
                 />
                 <div
-                  className="absolute left-1/2 top-2 bottom-2 w-0.5 bg-primary/80 animate-pulse"
+                  className="absolute left-1/2 top-2 bottom-2 w-0.5 bg-primary/80 animate-pulse motion-reduce:animate-none"
                   style={
                     {
                       transform: "translateX(-50%)",
-                      animation:
-                        "rgbBackground 1.5s linear infinite, pulse 2s ease-in-out infinite",
+                      animation: reduceMotion ? undefined : INDICATOR_PULSE,
                     } as React.CSSProperties
                   }
                 />
@@ -859,17 +889,18 @@ const Carousel: React.FC<CarouselProps> = ({
           <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary opacity-60"></div>
 
           {/* Scanning line animation */}
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent h-1 animate-pulse"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-primary/10 to-transparent h-1 animate-pulse motion-reduce:animate-none"></div>
         </div>
 
         {/* Images Container */}
         <div
           className={`relative w-full h-full overflow-hidden carousel-${objectFit}`}
         >
-          {transition === "slide" && renderSlideTransition()}
-          {(transition === "fade" || transition === "matrix") &&
+          {activeTransition === "slide" && renderSlideTransition()}
+          {(activeTransition === "fade" || activeTransition === "matrix") &&
             renderFadeMatrixTransition()}
-          {transition === "signal-glitch" && renderSignalGlitchTransition()}
+          {activeTransition === "signal-glitch" &&
+            renderSignalGlitchTransition()}
         </div>
 
         {/* Caption overlay */}

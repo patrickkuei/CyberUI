@@ -11,6 +11,8 @@ const meta: Meta<typeof Carousel> = {
       description: {
         component: `A cyberpunk-themed image carousel with auto-play, navigation controls, and smooth transitions.
 
+Under \`prefers-reduced-motion: reduce\`, \`autoPlay\` does not advance (also after an image preview closes), \`matrix\` and \`signal-glitch\` render as a plain \`fade\` with no glitch overlays, \`slide\` changes slides without sliding, and the indicators hold still.
+
 **Usage:**
 
 \`\`\`tsx
@@ -90,10 +92,10 @@ const images = [
 | \`currentIndex\` | \`number\` | ✅ | - | Current slide index (controlled) |
 | \`onChange\` | \`(index: number) => void\` | ✅ | - | Callback when slide changes |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Carousel size (supports responsive values) |
-| \`autoPlay\` | \`boolean\` | ❌ | \`true\` | Enable auto-play functionality |
+| \`autoPlay\` | \`boolean\` | ❌ | \`true\` | Enable auto-play functionality. Does not advance under reduced motion |
 | \`interval\` | \`number\` | ❌ | \`3000\` | Auto-play interval in milliseconds |
 | \`infinite\` | \`boolean\` | ❌ | \`true\` | Enable infinite loop |
-| \`transition\` | \`'slide' \\| 'fade' \\| 'matrix' \\| 'signal-glitch'\` | ❌ | \`'slide'\` | Transition effect |
+| \`transition\` | \`'slide' \\| 'fade' \\| 'matrix' \\| 'signal-glitch'\` | ❌ | \`'slide'\` | Transition effect. \`matrix\`/\`signal-glitch\` render as \`fade\` under reduced motion |
 | \`objectFit\` | \`'cover' \\| 'contain'\` | ❌ | \`'cover'\` | Image display behavior |
 | \`showArrows\` | \`boolean\` | ❌ | \`true\` | Show navigation arrows |
 | \`showIndicators\` | \`boolean\` | ❌ | \`true\` | Show slide indicators |
