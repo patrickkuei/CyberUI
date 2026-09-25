@@ -318,7 +318,7 @@ const Modal: React.FC<ModalProps> = memo(
           {title && (
             <div
               className={cn(
-                "px-6 py-4 border-b flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0",
+                "px-6 py-4 border-b flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100",
                 variant === "danger" ? "border-error/20" : "border-accent/20",
                 !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               )}
@@ -333,7 +333,7 @@ const Modal: React.FC<ModalProps> = memo(
           )}
 
           <div
-            className={`flex-1 overflow-auto p-6 transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-y-0 ${
+            className={`flex-1 overflow-auto p-6 transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100 ${
               !isOpening
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -345,7 +345,7 @@ const Modal: React.FC<ModalProps> = memo(
           {(footer || onCancel || onConfirm) && (
             <div
               className={cn(
-                "px-6 py-4 border-t flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0",
+                "px-6 py-4 border-t flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100",
                 variant === "danger" ? "border-error/20" : "border-accent/20",
                 !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               )}

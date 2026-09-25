@@ -160,11 +160,12 @@ const Carousel: React.FC<CarouselProps> = ({
       ? "fade"
       : transition;
 
-  // Closing an image preview restores autoplay from the prop — but never
-  // under reduced motion.
+  // Closing an image preview restores autoplay from the prop. The autoplay
+  // effect's own reduceMotion gate keeps it from advancing under reduced
+  // motion, and it resumes if the preference later turns off.
   const resumeAutoPlay = useCallback(
-    () => setAutoPlayActive(autoPlay && !reduceMotion),
-    [autoPlay, reduceMotion]
+    () => setAutoPlayActive(autoPlay),
+    [autoPlay]
   );
 
   // Memoized classes

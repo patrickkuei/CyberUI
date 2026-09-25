@@ -240,6 +240,22 @@ describe('Modal Component', () => {
     expect(screen.getByText('Uplink').parentElement!.className).toContain('motion-reduce:translate-y-0');
     expect(screen.getByText('Content').parentElement!.className).toContain('motion-reduce:translate-y-0');
   });
+
+  it('shows title, body and footer at full opacity from the start under reduced motion (one 150ms dialog fade)', () => {
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} title="Uplink" onConfirm={vi.fn()}>
+        <div>Content</div>
+      </Modal>
+    );
+    const title = screen.getByText('Uplink').parentElement!;
+    const body = screen.getByText('Content').parentElement!;
+    const footer = screen.getByText('Confirm').closest('.border-t') as HTMLElement;
+    // Still opening: default motion hides the sections (opacity-0); reduced motion overrides that.
+    for (const section of [title, body, footer]) {
+      expect(section.className).toContain('opacity-0');
+      expect(section.className).toContain('motion-reduce:opacity-100');
+    }
+  });
 });
 
 describe('Modal under prefers-reduced-motion', () => {

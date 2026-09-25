@@ -130,13 +130,31 @@ describe('Carousel reduced motion', () => {
       vi.advanceTimersByTime(5000);
     });
     expect(handleChange).not.toHaveBeenCalled();
+  });
 
-    // Preview close left autoplay off, so it stays off even once motion is allowed again.
-    act(() => motion.set(false));
+  it('resumes auto-play once the preference flips back after a reduced-motion preview close', () => {
+    const handleChange = vi.fn();
+    render(<Carousel images={images} currentIndex={0} onChange={handleChange} autoPlay interval={1000} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Image 1. Click to enlarge' }));
+    fireEvent.keyDown(document, { key: 'Escape' });
     act(() => {
-      vi.advanceTimersByTime(5000);
+      vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('dialog', { name: 'Preview: Image 1' })).toBeNull();
+    act(() => {
+      vi.advanceTimersByTime(3000);
     });
     expect(handleChange).not.toHaveBeenCalled();
+
+    act(() => motion.set(false));
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    act(() => {
+      vi.runOnlyPendingTimers();
+    });
+    expect(handleChange).toHaveBeenCalledWith(1);
   });
 
   it('stops and resumes auto-play when the OS preference changes', () => {
