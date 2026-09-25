@@ -11,9 +11,11 @@ import { warnOnce } from '../utils/devWarn';
 export type SliderValue = number | [number, number];
 
 /**
- * Widens a literal number type (`55`) to `number`, so `value={55}` selects
- * single-value mode rather than a slider that only ever holds `55`. Tuples
- * pass through unchanged.
+ * Widens a literal number type (`55`) to `number`, so the `onValueChange`
+ * handler for `value={55}` receives a `number` rather than `55`. Tuples pass
+ * through unchanged. Applied only to the callback parameter — `value` and
+ * `defaultValue` keep `V` itself, so a `SliderValue`-typed variable is still
+ * accepted.
  */
 type WidenSliderValue<V extends SliderValue> = V extends number ? number : V;
 
@@ -67,7 +69,7 @@ export interface SliderProps<V extends SliderValue = SliderValue> {
    * Receives a `number` for a single-thumb slider and a `[number, number]`
    * for a range slider, matching the shape of `value` / `defaultValue`.
    */
-  onValueChange?: (value: NoInferValue<V>) => void;
+  onValueChange?: (value: NoInferValue<WidenSliderValue<V>>) => void;
   /**
    * Visual style, reusing the neon palette from Button/Badge/Tooltip.
    * `accent` matches LinearProgress's default accent-to-primary gradient
@@ -182,7 +184,7 @@ function Slider<V extends SliderValue = number>({
   ariaLabelMax,
   className = '',
   id,
-}: SliderProps<WidenSliderValue<V>>) {
+}: SliderProps<V>) {
   // `SliderProps<V>` types the callback per mode, but the component emits
   // whichever shape `value` / `defaultValue` selected at runtime, which is
   // exactly what `V` was inferred from — so widening here is sound.

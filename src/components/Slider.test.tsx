@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { describe, it, expect, expectTypeOf, vi } from 'vitest';
 import Slider from './Slider';
@@ -307,6 +308,25 @@ describe('Slider onValueChange typing', () => {
       <Slider key="none" onValueChange={legacyHandler} />,
     ];
     expect(elements).toHaveLength(3);
+  });
+
+  it('accepts a value or defaultValue typed as the SliderValue union (backward compatibility)', () => {
+    // Regression: typing `value`/`defaultValue` as `SliderValue` once failed with
+    // "Type 'SliderValue' is not assignable to type 'number | undefined'".
+    const asUnion = (v: SliderValue): SliderValue => v;
+    const union = asUnion(55); // typed `SliderValue`, not narrowed to `number`
+    const Stateful = () => {
+      const [state, setState] = useState<SliderValue>(5);
+      return <Slider value={state} onValueChange={setState} />;
+    };
+    const elements = [
+      <Slider key="value" value={union} />,
+      <Slider key="value-handler" value={union} onValueChange={legacyHandler} />,
+      <Slider key="default" defaultValue={union} />,
+      <Slider key="default-handler" defaultValue={union} onValueChange={legacyHandler} />,
+      <Stateful key="state" />,
+    ];
+    expect(elements).toHaveLength(5);
   });
 
   it('does not narrow a literal value to a literal type', () => {
