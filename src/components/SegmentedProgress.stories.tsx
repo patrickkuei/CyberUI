@@ -1,7 +1,10 @@
-import type { Meta, StoryObj } from '@storybook/react-vite';
+import type { Decorator, Meta, StoryObj } from '@storybook/react-vite';
 import SegmentedProgress from './SegmentedProgress';
+import type { SegmentedProgressProps } from './SegmentedProgress';
 
-const meta: Meta<typeof SegmentedProgress> = {
+// Typed against the props union directly: StoryObj<typeof meta> collapses a
+// union of prop types (radial | block) to `never`.
+const meta: Meta<SegmentedProgressProps> = {
   title: 'Components/SegmentedProgress',
   component: SegmentedProgress,
   parameters: {
@@ -55,7 +58,7 @@ import 'cyberui-2045/styles.css';
 };
 
 export default meta;
-type Story = StoryObj<typeof meta>;
+type Story = StoryObj<SegmentedProgressProps>;
 
 // ── Radial stories ────────────────────────────────────────────────────────────
 
@@ -106,6 +109,12 @@ export const RadialSizes: Story = {
 
 // ── Block stories ─────────────────────────────────────────────────────────────
 
+const blockWidth: Decorator = (Story) => (
+  <div className="w-64">
+    <Story />
+  </div>
+);
+
 export const Block: Story = {
   name: 'Block — default',
   args: {
@@ -114,19 +123,19 @@ export const Block: Story = {
     segments: 10,
     size: 'md',
   },
-  decorators: [(Story) => <div className="w-64"><Story /></div>],
+  decorators: [blockWidth],
 };
 
 export const BlockEmpty: Story = {
   name: 'Block — empty',
   args: { variant: 'block', progress: 0, segments: 10, size: 'md' },
-  decorators: [(Story) => <div className="w-64"><Story /></div>],
+  decorators: [blockWidth],
 };
 
 export const BlockFull: Story = {
   name: 'Block — full',
   args: { variant: 'block', progress: 100, segments: 10, size: 'md' },
-  decorators: [(Story) => <div className="w-64"><Story /></div>],
+  decorators: [blockWidth],
 };
 
 export const BlockSegments: Story = {

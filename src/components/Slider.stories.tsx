@@ -152,7 +152,12 @@ export const Controlled: Story = {
       const [volume, setVolume] = useState(55);
       return (
         <div className="flex flex-col gap-3 w-80">
-          <Slider label="Audio Uplink Volume" value={volume} onValueChange={setVolume} showValue />
+          <Slider
+            label="Audio Uplink Volume"
+            value={volume}
+            onValueChange={(next) => typeof next === 'number' && setVolume(next)}
+            showValue
+          />
           <p className="text-xs text-muted">Current: {volume}</p>
         </div>
       );
