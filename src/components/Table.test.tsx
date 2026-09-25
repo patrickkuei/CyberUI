@@ -54,6 +54,21 @@ describe('Table', () => {
     expect(screen.getByText('Active Field Operatives')).toBeInTheDocument();
   });
 
+  it.each([
+    ['sm', 'h-28'],
+    ['md', 'h-40'],
+    ['lg', 'h-48'],
+  ] as const)('gives the empty state a %s-sized height and the no-signal hatch', (size, heightClass) => {
+    render(<Table columns={COLUMNS} data={[]} size={size} />);
+    const emptyCell = screen.getByText('No data available.').closest('td');
+    expect(emptyCell).toHaveClass(heightClass, 'bg-no-signal');
+  });
+
+  it('renders a React node as emptyMessage', () => {
+    render(<Table columns={COLUMNS} data={[]} emptyMessage={<button type="button">Deploy operative</button>} />);
+    expect(screen.getByRole('button', { name: 'Deploy operative' })).toBeInTheDocument();
+  });
+
   it.each(['sm', 'md', 'lg'] as const)('pads the caption like the cells at size %s', (size) => {
     render(<Table columns={COLUMNS} data={DATA} caption="Active Field Operatives" size={size} />);
     const caption = screen.getByText('Active Field Operatives');

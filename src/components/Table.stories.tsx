@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import Table from './Table';
 import type { TableColumn } from './Table';
 import Badge from './Badge';
+import Button from './Button';
 
 interface Operative {
   callsign: string;
@@ -164,6 +165,28 @@ export const Empty: Story = {
     data: [],
     caption: 'Active Field Operatives',
     emptyMessage: 'No operatives currently deployed.',
+  },
+};
+
+export const EmptyWithAction: Story = {
+  args: {
+    data: [],
+    caption: 'Active Field Operatives',
+    emptyMessage: (
+      <div className="flex flex-col items-center gap-3">
+        <span>No operatives deployed to this sector yet.</span>
+        <Button variant="secondary" size="sm">
+          Deploy operative
+        </Button>
+      </div>
+    ),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '`emptyMessage` accepts any React node, so the empty state can offer the next step.',
+      },
+    },
   },
 };
 

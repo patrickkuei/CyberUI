@@ -189,6 +189,13 @@ export const RESPONSIVE_SIZE_MAPS = {
     md: "px-4 py-3 text-(length:--text-base)",
     lg: "px-5 py-4 text-lg",
   },
+  // Table's empty-state body: roughly three rows tall at each size, so an
+  // empty table keeps its shape instead of collapsing to a single strip.
+  tableEmpty: {
+    sm: "h-28",
+    md: "h-40",
+    lg: "h-48",
+  },
 } as const;
 
 // Breakpoint pixel map aligned with Tailwind defaults

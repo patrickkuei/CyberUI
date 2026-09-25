@@ -367,6 +367,16 @@
     object-fit: contain;
     height: 100%;
   }
+
+  /* Static diagonal hatch marking a region with no data (Table's empty
+     state) — a dead-feed texture, deliberately not animated. */
+  .bg-no-signal {
+    background-image: repeating-linear-gradient(
+      135deg,
+      color-mix(in oklab, var(--color-border-default) 55%, transparent) 0 1px,
+      transparent 1px 11px
+    );
+  }
 }
 
 

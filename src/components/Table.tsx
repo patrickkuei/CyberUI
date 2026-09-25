@@ -174,7 +174,14 @@ function Table<T = TableRowData>({
         <tbody>
           {data.length === 0 ? (
             <tr>
-              <td colSpan={columns.length} className={cn('text-center text-muted', sizeClasses)}>
+              <td
+                colSpan={columns.length}
+                className={cn(
+                  'bg-no-signal text-center align-middle text-muted',
+                  sizeClasses,
+                  getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.tableEmpty)
+                )}
+              >
                 {emptyMessage}
               </td>
             </tr>
