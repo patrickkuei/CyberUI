@@ -250,21 +250,25 @@ export const AllSizes: Story = {
   render: () => (
     <div className="flex flex-col gap-4 p-4 bg-base min-h-screen">
       <h4 className="text-secondary font-semibold">Size Comparison</h4>
-      <div className="flex gap-8 items-end justify-center">
+      <p className="text-muted text-sm">
+        <code className="text-accent">size</code> scales the frame (padding) around the image. Every image below
+        is given the same width so the difference shows.
+      </p>
+      <div className="flex flex-wrap gap-8 items-end justify-center">
         <div className="text-center">
-          <Image src="image_demo_1.jpg" alt="Small size demo" size="sm" />
+          <Image src="image_demo_1.jpg" alt="Small size demo" size="sm" className="w-64 max-w-full" />
           <p className="text-muted text-xs mt-2">Small (sm)</p>
-          <p className="text-accent text-xs font-mono">128×96px</p>
+          <p className="text-accent text-xs font-mono">12px frame</p>
         </div>
         <div className="text-center">
-          <Image src="image_demo_2.jpg" alt="Medium size demo" size="md" />
+          <Image src="image_demo_2.jpg" alt="Medium size demo" size="md" className="w-64 max-w-full" />
           <p className="text-muted text-xs mt-2">Medium (md)</p>
-          <p className="text-accent text-xs font-mono">256×192px</p>
+          <p className="text-accent text-xs font-mono">24px frame</p>
         </div>
         <div className="text-center">
-          <Image src="image_demo_3.jpg" alt="Large size demo" size="lg" />
+          <Image src="image_demo_3.jpg" alt="Large size demo" size="lg" className="w-64 max-w-full" />
           <p className="text-muted text-xs mt-2">Large (lg)</p>
-          <p className="text-accent text-xs font-mono">384×288px</p>
+          <p className="text-accent text-xs font-mono">32px frame</p>
         </div>
       </div>
     </div>
