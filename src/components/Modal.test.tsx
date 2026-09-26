@@ -1,6 +1,7 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Modal from './Modal';
+import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 // Mock the portal to render into the container for testing
 vi.mock('react-dom', async (importOriginal) => {
@@ -223,5 +224,127 @@ describe('Modal Component', () => {
     } finally {
       errorSpy.mockRestore();
     }
+  });
+
+  it('pairs every movement class with a motion-reduce override and a 150ms duration', () => {
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} title="Uplink" onConfirm={vi.fn()}>
+        <div>Content</div>
+      </Modal>
+    );
+    const panel = screen.getByRole('dialog', { hidden: true });
+    expect(panel.className).toContain('motion-reduce:duration-150');
+    expect(panel.className).toContain('motion-reduce:scale-100');
+    expect(panel.parentElement!.className).toContain('motion-reduce:duration-150');
+    expect(screen.getByLabelText('Close modal').className).toContain('motion-reduce:rotate-0');
+    expect(screen.getByText('Uplink').parentElement!.className).toContain('motion-reduce:translate-y-0');
+    expect(screen.getByText('Content').parentElement!.className).toContain('motion-reduce:translate-y-0');
+  });
+
+  it('shows title, body and footer at full opacity from the start under reduced motion (one 150ms dialog fade)', () => {
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} title="Uplink" onConfirm={vi.fn()}>
+        <div>Content</div>
+      </Modal>
+    );
+    const title = screen.getByText('Uplink').parentElement!;
+    const body = screen.getByText('Content').parentElement!;
+    const footer = screen.getByText('Confirm').closest('.border-t') as HTMLElement;
+    // Still opening: default motion hides the sections (opacity-0); reduced motion overrides that.
+    for (const section of [title, body, footer]) {
+      expect(section.className).toContain('opacity-0');
+      expect(section.className).toContain('motion-reduce:opacity-100');
+    }
+  });
+});
+
+describe('Modal under prefers-reduced-motion', () => {
+  let motion: ReducedMotionStub;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    motion = stubReducedMotion(true);
+  });
+
+  afterEach(() => {
+    motion.restore();
+    vi.useRealTimers();
+  });
+
+  it('boots in 150ms and fires onCRTBootComplete exactly once', () => {
+    const onCRTBootComplete = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} onCRTBootComplete={onCRTBootComplete}>
+        <div>Content</div>
+      </Modal>
+    );
+    const panel = screen.getByRole('dialog', { hidden: true });
+    expect(panel.className).toContain('animate-crt-power-on');
+
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(onCRTBootComplete).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(onCRTBootComplete).toHaveBeenCalledTimes(1);
+    expect(panel).toHaveFocus();
+    expect(panel.className).toContain('animate-rgb-glow');
+
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+    expect(onCRTBootComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('completes the close at 150ms instead of the default 400ms', () => {
+    const handleClose = vi.fn();
+    render(
+      <Modal isOpen={true} onClose={handleClose}>
+        <div>Content</div>
+      </Modal>
+    );
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+
+    fireEvent.click(screen.getByLabelText('Close modal'));
+    expect(screen.getByRole('dialog', { hidden: true }).className).toContain('animate-crt-power-off');
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(handleClose).not.toHaveBeenCalled();
+
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('caps consumer-supplied animation durations at 150ms', () => {
+    const handleClose = vi.fn();
+    const onCRTBootComplete = vi.fn();
+    render(
+      <Modal
+        isOpen={true}
+        onClose={handleClose}
+        onCRTBootComplete={onCRTBootComplete}
+        animation={{ openDuration: 2000, closeDuration: 1000 }}
+      >
+        <div>Content</div>
+      </Modal>
+    );
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(onCRTBootComplete).toHaveBeenCalledTimes(1);
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(handleClose).toHaveBeenCalledTimes(1);
   });
 });

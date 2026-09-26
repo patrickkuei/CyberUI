@@ -103,11 +103,18 @@ const HIDDEN_TRANSFORM: Record<DrawerSide, string> = {
   bottom: "translate-y-full",
 };
 
-// Matches the panel/overlay's `duration-300` transition class below — keep
-// these in sync so the JS settle timer fires exactly when the CSS
-// transition finishes.
+// Matches the panel/overlay's `duration-300` / `duration-[250ms]` transition
+// classes below — keep these in sync so the JS settle timer fires exactly
+// when the CSS transition finishes. Under reduced motion useDialogBehavior
+// caps both timers at REDUCED_MOTION_DURATION (150ms), matching the
+// `motion-reduce:duration-150` classes next to them.
 const OPEN_DURATION = 300;
 const CLOSE_DURATION = 250;
+
+// Under reduced motion the panel fades instead of sliding: the hidden
+// position is an untranslated, transparent panel.
+const REDUCED_MOTION_HIDDEN =
+  "motion-reduce:translate-x-0 motion-reduce:translate-y-0 motion-reduce:opacity-0";
 
 /**
  * A cyberpunk-styled slide-in side panel, for mobile nav, filters, or detail
@@ -215,18 +222,18 @@ const Drawer: React.FC<DrawerProps> = memo(
       const isHorizontal = side === "left" || side === "right";
 
       return cn(
-        "fixed z-50 bg-surface flex flex-col transition-transform ease-out",
+        "fixed z-50 bg-surface flex flex-col transition-transform motion-reduce:transition-opacity ease-out",
         POSITION_CLASSES[side],
         isHorizontal ? WIDTH_CLASSES[size] : HEIGHT_CLASSES[size],
         isHorizontal ? "max-w-full" : "max-h-full",
         border,
         isClosing
-          ? `${HIDDEN_TRANSFORM[side]} duration-[250ms]`
+          ? `${HIDDEN_TRANSFORM[side]} ${REDUCED_MOTION_HIDDEN} duration-[250ms] motion-reduce:duration-150`
           : isOpening && !hasEntered
-          ? `${HIDDEN_TRANSFORM[side]} duration-0`
+          ? `${HIDDEN_TRANSFORM[side]} ${REDUCED_MOTION_HIDDEN} duration-0`
           : isOpening
-          ? "translate-x-0 translate-y-0 duration-300"
-          : `translate-x-0 translate-y-0 duration-300 ${glow} ${idleAnim}`,
+          ? "translate-x-0 translate-y-0 duration-300 motion-reduce:duration-150"
+          : `translate-x-0 translate-y-0 duration-300 motion-reduce:duration-150 ${glow} ${idleAnim}`,
         className
       );
     }, [side, size, variant, isClosing, isOpening, hasEntered, className]);
@@ -238,10 +245,10 @@ const Drawer: React.FC<DrawerProps> = memo(
         className={cn(
           "fixed inset-0 z-50 transition-all ease-out",
           isClosing
-            ? "bg-black/0 backdrop-blur-none opacity-0 duration-[250ms]"
+            ? "bg-black/0 backdrop-blur-none opacity-0 duration-[250ms] motion-reduce:duration-150"
             : isOpening && !hasEntered
             ? "bg-black/0 backdrop-blur-none opacity-0 duration-0"
-            : "bg-black/30 backdrop-blur-sm opacity-100 duration-300",
+            : "bg-black/30 backdrop-blur-sm opacity-100 duration-300 motion-reduce:duration-150",
           overlayClassName
         )}
         onClick={handleOverlayClick}

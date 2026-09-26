@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { REDUCED_MOTION_DURATION, usePrefersReducedMotion } from './usePrefersReducedMotion';
 
 /**
  * Options for {@link useDialogBehavior}.
  */
 export interface UseDialogBehaviorOptions {
-  /** Duration of the staged-close animation in ms, before `onClose` fires. */
+  /**
+   * Duration of the staged-close animation in ms, before `onClose` fires.
+   * Capped at 150ms while the user prefers reduced motion.
+   */
   closeDuration: number;
   /**
    * Duration of the staged-open animation in ms, before `onOpenSettle` fires
@@ -15,6 +19,8 @@ export interface UseDialogBehaviorOptions {
    * isOpening timer/state machinery altogether (`isOpening` stays `false`,
    * `onOpenSettle` fires synchronously from `open()` if provided), instead
    * of scheduling a timer purely to flip state nothing reads.
+   *
+   * Capped at 150ms while the user prefers reduced motion.
    */
   openDuration?: number;
   /** Whether pressing Escape triggers a close. @default true */
@@ -159,8 +165,8 @@ export function useDialogBehavior(
   options: UseDialogBehaviorOptions
 ): UseDialogBehaviorResult {
   const {
-    closeDuration,
-    openDuration,
+    closeDuration: requestedCloseDuration,
+    openDuration: requestedOpenDuration,
     closeOnEscape = true,
     closeOnOutsideClick = true,
     lockScroll = false,
@@ -169,6 +175,19 @@ export function useDialogBehavior(
     restoreFocus = 'if-unclaimed',
     getRestoreFocusTarget,
   } = options;
+
+  // Under reduced motion every caller's open/close is a short opacity fade
+  // (its CSS pairs `motion-reduce:duration-150` with these timers), so the
+  // timers are capped to the same length rather than zeroed — a 0ms timer
+  // would unmount the dialog before any fade shows.
+  const prefersReducedMotion = usePrefersReducedMotion();
+  const closeDuration = prefersReducedMotion
+    ? Math.min(requestedCloseDuration, REDUCED_MOTION_DURATION)
+    : requestedCloseDuration;
+  const openDuration =
+    prefersReducedMotion && requestedOpenDuration !== undefined
+      ? Math.min(requestedOpenDuration, REDUCED_MOTION_DURATION)
+      : requestedOpenDuration;
 
   const [isOpening, setIsOpening] = useState(false);
   const [isClosing, setIsClosing] = useState(false);

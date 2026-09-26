@@ -42,6 +42,8 @@ const meta: Meta<typeof Accordion> = {
       description: {
         component: `A cyberpunk-styled collapsible section list for FAQs, settings panels, and grouped content.
 
+Under \`prefers-reduced-motion: reduce\`, sections open and close without the height animation, and the glyph flips without rotating.
+
 **Usage:**
 
 \`\`\`tsx

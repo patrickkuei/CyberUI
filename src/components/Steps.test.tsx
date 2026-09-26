@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import Steps from './Steps';
+import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 const basicSteps = [
   { title: 'Login' },
@@ -104,5 +105,44 @@ describe('Steps', () => {
     render(<Steps items={basicSteps} current={1} />);
     expect(warnSpy).not.toHaveBeenCalled();
     warnSpy.mockRestore();
+  });
+});
+
+describe('Steps reduced motion', () => {
+  let motion: ReducedMotionStub;
+
+  beforeEach(() => {
+    motion = stubReducedMotion(true);
+  });
+
+  afterEach(() => {
+    motion.restore();
+  });
+
+  const flowChevrons = () =>
+    screen.getAllByText('›').filter((el) => (el.getAttribute('style') ?? '').includes('opacity: 0.8'));
+
+  it('holds the chevrons before the current step at a steady glow instead of pulsing', () => {
+    render(<Steps items={basicSteps} current={1} />);
+    const chevrons = screen.getAllByText('›');
+    for (const chevron of chevrons) {
+      expect(chevron.getAttribute('style') ?? '').not.toContain('chevronFlow');
+    }
+    // The three chevrons between the completed and the current step are lit.
+    expect(flowChevrons()).toHaveLength(3);
+  });
+
+  it('pulses those chevrons when motion is allowed', () => {
+    motion.set(false);
+    render(<Steps items={basicSteps} current={1} />);
+    const pulsing = screen
+      .getAllByText('›')
+      .filter((el) => (el.getAttribute('style') ?? '').includes('chevronFlow'));
+    expect(pulsing).toHaveLength(3);
+  });
+
+  it('shows underlines without growing them', () => {
+    render(<Steps items={basicSteps} current={1} orientation="horizontal" />);
+    expect(screen.getByText('Login').className).toContain('motion-reduce:after:transition-none');
   });
 });

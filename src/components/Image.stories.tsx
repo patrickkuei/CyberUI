@@ -10,6 +10,8 @@ const meta: Meta<typeof Image> = {
       description: {
         component: `A cyberpunk-themed image component with click-to-expand preview functionality, loading states, and smooth animations.
 
+Under \`prefers-reduced-motion: reduce\`, the preview opens and closes with a 150ms opacity-only fade (\`animation.openDuration\`/\`closeDuration\` are capped at 150ms), the scan line and pulsing effects hold still, and the thumbnail does not zoom on hover.
+
 **Usage:**
 
 \`\`\`tsx
@@ -82,7 +84,7 @@ import 'cyberui-2045/styles.css';
 | \`fallback\` | \`string\` | ❌ | - | Fallback image URL on error |
 | \`placeholder\` | \`React.ReactNode\` | ❌ | - | Custom loading placeholder |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
-| \`animation\` | \`ImageAnimationConfig\` | ❌ | - | Animation configuration |
+| \`animation\` | \`ImageAnimationConfig\` | ❌ | - | Animation configuration. Durations are capped at 150ms under reduced motion |
 | \`eager\` | \`boolean\` | ❌ | \`false\` | Disable lazy loading |
 | \`onPreviewOpen\` | \`() => void\` | ❌ | - | Preview open callback |
 | \`onPreviewClose\` | \`() => void\` | ❌ | - | Preview close callback |

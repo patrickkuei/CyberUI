@@ -10,6 +10,8 @@ const meta: Meta<typeof Steps> = {
       description: {
         component: `A multi-step progress indicator with cyberpunk styling.
 
+Under \`prefers-reduced-motion: reduce\`, the chevrons leading into the current step glow steadily instead of pulsing, and underlines appear without growing.
+
 **Usage:**
 
 \`\`\`tsx

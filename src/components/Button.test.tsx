@@ -89,3 +89,13 @@ describe('Button', () => {
     expect(button).not.toHaveClass('bg-linear-(--gradient-accent)');
   });
 });
+
+describe('Button reduced motion', () => {
+  it('drops the shimmer sweep and press scale under prefers-reduced-motion', () => {
+    render(<Button>Jack In</Button>);
+    const button = screen.getByRole('button', { name: 'Jack In' });
+    expect(button.className).toContain('motion-reduce:active:scale-100');
+    const shimmer = button.querySelector('.group-hover\\:translate-x-full') as HTMLElement;
+    expect(shimmer.className).toContain('motion-reduce:hidden');
+  });
+});

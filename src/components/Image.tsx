@@ -8,6 +8,10 @@ import React, {
 } from "react";
 import { createPortal } from "react-dom";
 import { cn } from "../utils/cn";
+import {
+  REDUCED_MOTION_DURATION,
+  usePrefersReducedMotion,
+} from "../hooks/usePrefersReducedMotion";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -20,12 +24,17 @@ import {
 export type ImageSize = "sm" | "md" | "lg";
 
 /**
- * Animation configuration for preview transitions
+ * Animation configuration for preview transitions.
+ *
+ * While the user prefers reduced motion (`prefers-reduced-motion: reduce`),
+ * the preview opens and closes with an opacity-only fade: `openDuration` and
+ * `closeDuration` are capped at 150ms, and the scan line and pulsing effects
+ * are still.
  */
 export interface ImageAnimationConfig {
-  /** Duration of opening animation in milliseconds */
+  /** Duration of opening animation in milliseconds. Capped at 150ms under reduced motion. */
   openDuration?: number;
-  /** Duration of closing animation in milliseconds */
+  /** Duration of closing animation in milliseconds. Capped at 150ms under reduced motion. */
   closeDuration?: number;
   /** Enable/disable cyberpunk effects */
   cyberpunkEffects?: boolean;
@@ -143,6 +152,13 @@ const Image: React.FC<ImageProps> = memo(
   }) => {
     // Animation configuration with defaults
     const animationConfig = { ...DEFAULT_ANIMATION, ...animation };
+    const reduceMotion = usePrefersReducedMotion();
+    const openDuration = reduceMotion
+      ? Math.min(animationConfig.openDuration, REDUCED_MOTION_DURATION)
+      : animationConfig.openDuration;
+    const closeDuration = reduceMotion
+      ? Math.min(animationConfig.closeDuration, REDUCED_MOTION_DURATION)
+      : animationConfig.closeDuration;
 
     // Component state
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -199,9 +215,9 @@ const Image: React.FC<ImageProps> = memo(
 
         setTimeout(() => {
           setIsOpening(false);
-        }, animationConfig.openDuration);
+        }, openDuration);
       }
-    }, [preview, hasError, onPreviewOpen, animationConfig.openDuration]);
+    }, [preview, hasError, onPreviewOpen, openDuration]);
 
     const closePreview = useCallback(() => {
       setIsClosing(true);
@@ -210,8 +226,8 @@ const Image: React.FC<ImageProps> = memo(
       setTimeout(() => {
         setIsPreviewOpen(false);
         setIsClosing(false);
-      }, animationConfig.closeDuration);
-    }, [onPreviewClose, animationConfig.closeDuration]);
+      }, closeDuration);
+    }, [onPreviewClose, closeDuration]);
 
     // Event handlers for preview overlay
     const handleOverlayClick = useCallback(
@@ -267,7 +283,7 @@ const Image: React.FC<ImageProps> = memo(
         cn(
           "relative rounded-lg overflow-hidden border-2 border-accent/30 transition-all duration-300 ease-in-out transform flex justify-center content-center",
           preview && !hasError
-            ? "cursor-pointer hover:scale-105 hover:border-accent hover:shadow-lg-accent focus:outline-none focus:ring-4 focus:ring-accent/50"
+            ? "cursor-pointer hover:scale-105 motion-reduce:hover:scale-100 hover:border-accent hover:shadow-lg-accent focus:outline-none focus:ring-4 focus:ring-accent/50"
             : "",
           getSizeClasses(size),
           className
@@ -311,7 +327,7 @@ const Image: React.FC<ImageProps> = memo(
               aria-label="Loading image"
             >
               {placeholder || (
-                <div className="animate-pulse bg-gradient-to-r from-accent/20 to-secondary/20 w-full h-full flex items-center justify-center">
+                <div className="animate-pulse motion-reduce:animate-none bg-gradient-to-r from-accent/20 to-secondary/20 w-full h-full flex items-center justify-center">
                   <div className="text-muted text-sm">Loading...</div>
                 </div>
               )}
@@ -409,7 +425,7 @@ const Image: React.FC<ImageProps> = memo(
                 : isOpening
                 ? "bg-black/80 backdrop-blur-sm opacity-100 duration-500"
                 : "bg-black/80 backdrop-blur-sm opacity-100 duration-300"
-            }`}
+            } motion-reduce:duration-150`}
             style={{
               top: 0,
               left: 0,
@@ -425,7 +441,7 @@ const Image: React.FC<ImageProps> = memo(
             {/* Cyberpunk Grid Background */}
             {animationConfig.cyberpunkEffects && (
               <div
-                className={`absolute transition-opacity duration-300 ${
+                className={`absolute transition-opacity duration-300 motion-reduce:duration-150 ${
                   isClosing ? "opacity-0" : "opacity-20"
                 }`}
                 style={{
@@ -460,7 +476,7 @@ const Image: React.FC<ImageProps> = memo(
               {/* Animated Close Button */}
               <button
                 onClick={closePreview}
-                className={`absolute top-4 right-4 text-white hover:text-accent/80 transition-all duration-300 font-bold z-20 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transform ${
+                className={`absolute top-4 right-4 text-white hover:text-accent/80 transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 motion-reduce:rotate-0 motion-reduce:hover:scale-100 font-bold z-20 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transform ${
                   isClosing
                     ? "bg-black/0 scale-50 rotate-180 opacity-0"
                     : isOpening
@@ -489,29 +505,29 @@ const Image: React.FC<ImageProps> = memo(
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="absolute inset-0 text-accent opacity-0 hover:opacity-100 transition-opacity duration-200 animate-pulse"
+                    className="absolute inset-0 text-accent opacity-0 hover:opacity-100 transition-opacity duration-200 animate-pulse motion-reduce:animate-none"
                   />
                 </svg>
               </button>
 
               {/* Main Image Container */}
               <div
-                className={`relative max-w-full max-h-full flex items-center justify-center transition-all ease-out ${
+                className={`relative max-w-full max-h-full flex items-center justify-center transition-all ease-out motion-reduce:scale-100 motion-reduce:rotate-0 ${
                   isClosing
                     ? "scale-75 opacity-0 rotate-1 duration-300"
                     : isOpening
                     ? "scale-95 opacity-0 rotate-0 duration-500"
                     : "scale-100 opacity-100 rotate-0 duration-300"
-                }`}
+                } motion-reduce:duration-150`}
                 onClick={(e) => e.stopPropagation()}
               >
                 {/* Glitch Effect Border */}
                 {animationConfig.cyberpunkEffects && (
                   <div
-                    className={`absolute inset-0 rounded-lg border-2 transition-all duration-300 ${
+                    className={`absolute inset-0 rounded-lg border-2 transition-all duration-300 motion-reduce:duration-150 ${
                       isClosing
                         ? "border-transparent shadow-none"
-                        : "border-accent shadow-lg-accent animate-pulse"
+                        : "border-accent shadow-lg-accent animate-pulse motion-reduce:animate-none"
                     }`}
                     aria-hidden="true"
                   />
@@ -520,7 +536,7 @@ const Image: React.FC<ImageProps> = memo(
                 {/* Scanning Line Effect */}
                 {animationConfig.cyberpunkEffects && (
                   <div
-                    className={`absolute inset-0 overflow-hidden rounded-lg transition-opacity duration-300 z-10 ${
+                    className={`absolute inset-0 overflow-hidden rounded-lg transition-opacity duration-300 motion-reduce:duration-150 z-10 ${
                       isClosing ? "opacity-0" : "opacity-100"
                     }`}
                     aria-hidden="true"
@@ -535,7 +551,7 @@ const Image: React.FC<ImageProps> = memo(
                 <img
                   src={showFallback ? fallback : src}
                   alt={showFallback ? `${alt} (fallback)` : alt}
-                  className={`max-w-[95vw] max-h-[95vh] w-auto h-auto object-contain rounded-lg transition-all duration-300 ease-out ${
+                  className={`max-w-[95vw] max-h-[95vh] w-auto h-auto object-contain rounded-lg transition-all duration-300 motion-reduce:duration-150 ease-out ${
                     isClosing
                       ? "filter blur-sm brightness-50"
                       : "filter blur-0 brightness-100"
@@ -550,7 +566,7 @@ const Image: React.FC<ImageProps> = memo(
 
                 {/* Caption with Cyber Effect */}
                 <div
-                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 rounded-b-lg transition-all duration-300 ${
+                  className={`absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 rounded-b-lg transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0 ${
                     isClosing
                       ? "translate-y-4 opacity-0"
                       : "translate-y-0 opacity-100"
@@ -559,7 +575,7 @@ const Image: React.FC<ImageProps> = memo(
                   <p className="text-white text-sm font-medium truncate relative">
                     {showFallback ? `${alt} (fallback)` : alt}
                     {animationConfig.cyberpunkEffects && (
-                      <span className="absolute inset-0 text-accent opacity-20 animate-pulse">
+                      <span className="absolute inset-0 text-accent opacity-20 animate-pulse motion-reduce:animate-none">
                         {showFallback ? `${alt} (fallback)` : alt}
                       </span>
                     )}
@@ -570,25 +586,25 @@ const Image: React.FC<ImageProps> = memo(
                 {animationConfig.cyberpunkEffects && (
                   <>
                     <div
-                      className={`absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-accent transition-all duration-300 ${
+                      className={`absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-accent transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 ${
                         isClosing ? "opacity-0 scale-0" : "opacity-60 scale-100"
                       }`}
                       aria-hidden="true"
                     />
                     <div
-                      className={`absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-accent transition-all duration-300 ${
+                      className={`absolute top-2 right-2 w-4 h-4 border-r-2 border-t-2 border-accent transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 ${
                         isClosing ? "opacity-0 scale-0" : "opacity-60 scale-100"
                       }`}
                       aria-hidden="true"
                     />
                     <div
-                      className={`absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-accent transition-all duration-300 ${
+                      className={`absolute bottom-2 left-2 w-4 h-4 border-l-2 border-b-2 border-accent transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 ${
                         isClosing ? "opacity-0 scale-0" : "opacity-60 scale-100"
                       }`}
                       aria-hidden="true"
                     />
                     <div
-                      className={`absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-accent transition-all duration-300 ${
+                      className={`absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-accent transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 ${
                         isClosing ? "opacity-0 scale-0" : "opacity-60 scale-100"
                       }`}
                       aria-hidden="true"

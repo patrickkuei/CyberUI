@@ -1,6 +1,7 @@
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import Image from './Image';
+import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -104,5 +105,84 @@ describe('Image', () => {
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+  });
+});
+
+describe('Image reduced motion', () => {
+  let motion: ReducedMotionStub;
+
+  beforeEach(() => {
+    motion = stubReducedMotion(true);
+  });
+
+  afterEach(() => {
+    motion.restore();
+  });
+
+  const openPreview = (props: Partial<React.ComponentProps<typeof Image>> = {}) => {
+    const onPreviewClose = vi.fn();
+    render(<Image src="test.jpg" alt="Test image" preview onPreviewClose={onPreviewClose} {...props} />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button', { name: 'Test image. Click to enlarge' }));
+    return onPreviewClose;
+  };
+
+  it('closes the preview after 150ms instead of the default 350ms', () => {
+    openPreview();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(149);
+    });
+    expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.queryByRole('dialog', { name: 'Preview: Test image' })).toBeNull();
+  });
+
+  it('caps a consumer-supplied closeDuration at 150ms', () => {
+    openPreview({ animation: { closeDuration: 1200 } });
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(150);
+    });
+    expect(screen.queryByRole('dialog', { name: 'Preview: Test image' })).toBeNull();
+  });
+
+  it('keeps the 350ms close when motion is allowed', () => {
+    motion.set(false);
+    openPreview();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    act(() => {
+      vi.advanceTimersByTime(349);
+    });
+    expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+    act(() => {
+      vi.advanceTimersByTime(1);
+    });
+    expect(screen.queryByRole('dialog', { name: 'Preview: Test image' })).toBeNull();
+  });
+
+  it('pairs the preview movement and pulse classes with motion-reduce overrides', () => {
+    openPreview();
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
+    expect(dialog.className).toContain('motion-reduce:duration-150');
+    dialog.querySelectorAll('.animate-pulse').forEach((el) => {
+      expect(el.getAttribute('class')).toContain('motion-reduce:animate-none');
+    });
+    const frame = dialog.querySelector('.max-w-full.max-h-full') as HTMLElement;
+    expect(frame.className).toContain('motion-reduce:scale-100');
+    expect(frame.className).toContain('motion-reduce:rotate-0');
+    expect(screen.getByRole('button', { name: 'Test image. Click to enlarge' }).className).toContain(
+      'motion-reduce:hover:scale-100'
+    );
+  });
+
+  it('stops the loading pulse', () => {
+    render(<Image src="test.jpg" alt="Test image" />);
+    expect(screen.getByText('Loading...').parentElement!.className).toContain('motion-reduce:animate-none');
   });
 });

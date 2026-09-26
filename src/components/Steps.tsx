@@ -3,6 +3,7 @@ import type { ResponsiveValue } from "../utils/responsive";
 import { useResponsiveValue } from "../utils/responsive";
 import { cn } from '../utils/cn';
 import { warnOnce } from '../utils/devWarn';
+import { usePrefersReducedMotion } from '../hooks/usePrefersReducedMotion';
 
 /**
  * Individual step item data.
@@ -26,7 +27,8 @@ export interface StepItem {
  * A horizontal stepper component for multi-step processes.
  *
  * Styled with half-diamond indicators for current step, gradient underlines for completed steps,
- * and animated chevron separators.
+ * and animated chevron separators. While the user prefers reduced motion, the chevrons leading
+ * into the current step glow statically instead of pulsing, and underlines appear without growing.
  *
  * @example
  * // Basic steps with current index
@@ -86,6 +88,7 @@ const Steps: React.FC<StepsProps> = ({
 }) => {
   const currentOrientation = useResponsiveValue(orientation, 'vertical');
   const isVertical = currentOrientation === 'vertical';
+  const reduceMotion = usePrefersReducedMotion();
 
   if (items.length > 0 && (current < 0 || current >= items.length)) {
     const hint = current === items.length
@@ -107,7 +110,7 @@ const Steps: React.FC<StepsProps> = ({
   const getTitleClasses = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
     const baseClasses = cn(
       'relative px-2 py-1 pb-2 font-bold text-sm transition-colors duration-200 whitespace-nowrap overflow-hidden',
-      "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-center after:transition-transform after:duration-300 after:ease-out",
+      "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-center after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none",
       "before:content-[''] before:absolute before:left-1/2 before:-translate-x-1/2 before:-bottom-[3px] before:w-1.5 before:h-1.5 before:bg-accent before:rotate-45 before:rounded-[2px] before:opacity-0 before:transition-opacity before:duration-200",
     );
 
@@ -129,13 +132,16 @@ const Steps: React.FC<StepsProps> = ({
     nextStepCompleted: boolean,
     chevronIndex: number
   ): React.CSSProperties => {
+    const flowing = nextStepCurrent && isCompleted;
+    // Reduced motion: flowing chevrons hold the completed-chevron glow instead of pulsing.
+    const lit = nextStepCompleted || (flowing && reduceMotion);
     return {
       color: 'var(--color-primary)',
-      opacity: nextStepCompleted ? 0.8 : 0.3,
-      filter: nextStepCompleted
+      opacity: lit ? 0.8 : 0.3,
+      filter: lit
         ? 'drop-shadow(0 0 4px color-mix(in srgb, var(--color-primary), transparent 40%))'
         : 'none',
-      animation: nextStepCurrent && isCompleted
+      animation: flowing && !reduceMotion
         ? `chevronFlow 1.5s ease-in-out infinite ${chevronIndex * 0.2}s`
         : 'none',
     };
@@ -157,7 +163,7 @@ const Steps: React.FC<StepsProps> = ({
   const getVerticalTitleClasses = (isCompleted: boolean, isCurrent: boolean, isError: boolean): string => {
     const baseClasses = cn(
       'relative font-bold text-sm transition-colors duration-200 pb-1 w-fit',
-      "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:transition-transform after:duration-300 after:ease-out",
+      "after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:w-full after:scale-x-0 after:origin-left after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none",
     );
 
     if (isCompleted) {

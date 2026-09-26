@@ -16,11 +16,16 @@ import { useDialogBehavior } from "../hooks/useDialogBehavior";
  * ```tsx
  * <Modal animation={{ openDuration: 300, crtEffects: false }} ... />
  * ```
+ *
+ * While the user prefers reduced motion (`prefers-reduced-motion: reduce`),
+ * open and close are a 150ms opacity-only fade: `openDuration` and
+ * `closeDuration` are capped at 150ms, and the CRT effects and idle glow
+ * pulse are replaced by the fade and a static glow.
  */
 export interface ModalAnimationConfig {
-  /** Duration of the open (CRT boot) animation in ms. @default 600 */
+  /** Duration of the open (CRT boot) animation in ms. Capped at 150ms under reduced motion. @default 600 */
   openDuration?: number;
-  /** Duration of the close (CRT off) animation in ms. @default 400 */
+  /** Duration of the close (CRT off) animation in ms. Capped at 150ms under reduced motion. @default 400 */
   closeDuration?: number;
   /** Enable CRT scanline power-on/off effects. @default true */
   crtEffects?: boolean;
@@ -235,7 +240,7 @@ const Modal: React.FC<ModalProps> = memo(
       const idleAnim = danger ? "animate-danger-glow" : "animate-rgb-glow";
 
       return cn(
-        "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300",
+        "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100",
         SIZE_CLASSES[size],
         animationConfig.crtEffects && isOpening
           ? `animate-crt-power-on ${border} ${glow}`
@@ -261,7 +266,7 @@ const Modal: React.FC<ModalProps> = memo(
             : isOpening
             ? "bg-black/30 backdrop-blur-md opacity-100 duration-500"
             : "bg-black/30 backdrop-blur-sm opacity-100 duration-300"
-        }`}
+        } motion-reduce:duration-150`}
         style={{
           top: 0,
           left: 0,
@@ -283,7 +288,7 @@ const Modal: React.FC<ModalProps> = memo(
           {showCloseButton && (
             <button
               onClick={closeModal}
-              className={`absolute top-4 right-4 text-muted hover:text-accent transition-all duration-300 z-20 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transform ${
+              className={`absolute top-4 right-4 text-muted hover:text-accent transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 motion-reduce:rotate-0 motion-reduce:hover:scale-100 z-20 rounded-full w-8 h-8 flex items-center justify-center cursor-pointer transform ${
                 isClosing
                   ? "scale-0 rotate-180 opacity-0"
                   : isOpening
@@ -313,7 +318,7 @@ const Modal: React.FC<ModalProps> = memo(
           {title && (
             <div
               className={cn(
-                "px-6 py-4 border-b flex-shrink-0 transition-all duration-300",
+                "px-6 py-4 border-b flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100",
                 variant === "danger" ? "border-error/20" : "border-accent/20",
                 !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               )}
@@ -328,7 +333,7 @@ const Modal: React.FC<ModalProps> = memo(
           )}
 
           <div
-            className={`flex-1 overflow-auto p-6 transition-all duration-500 ${
+            className={`flex-1 overflow-auto p-6 transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100 ${
               !isOpening
                 ? "opacity-100 translate-y-0"
                 : "opacity-0 translate-y-4"
@@ -340,7 +345,7 @@ const Modal: React.FC<ModalProps> = memo(
           {(footer || onCancel || onConfirm) && (
             <div
               className={cn(
-                "px-6 py-4 border-t flex-shrink-0 transition-all duration-300",
+                "px-6 py-4 border-t flex-shrink-0 transition-all duration-300 motion-reduce:duration-150 motion-reduce:translate-y-0 motion-reduce:opacity-100",
                 variant === "danger" ? "border-error/20" : "border-accent/20",
                 !isOpening ? "opacity-100 translate-y-0" : "opacity-0 translate-y-2"
               )}

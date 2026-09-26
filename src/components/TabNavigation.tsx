@@ -109,7 +109,7 @@ const TabDropdown: React.FC<TabDropdownProps> = ({
             className={`absolute ${
               alignRight ? "right-0" : "left-0"
             } mt-2 min-w-40 z-50 bg-surface border-2 border-border-default rounded-lg shadow-secondary overflow-hidden ${menuClassName}
-              transition-transform transition-opacity duration-200 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity ${
+              transition-transform transition-opacity duration-200 motion-reduce:duration-150 motion-reduce:scale-y-100 ease-[cubic-bezier(.2,0,0,1)] transform-gpu origin-top will-change-transform will-change-opacity ${
                 isOpening || isClosing
                   ? "opacity-0 scale-y-0 pointer-events-none"
                   : "opacity-100 scale-y-100 pointer-events-auto"
@@ -270,7 +270,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
           onClick={() => onTabChange(tab)}
           className={`
             ${sizeClasses} font-bold transition-colors duration-200 rounded-t-lg cursor-pointer whitespace-nowrap flex-shrink-0 relative
-            after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-[2px] after:h-[2px] after:w-full after:scale-x-0 after:origin-center after:transition-transform after:duration-300 after:ease-out
+            after:content-[''] after:absolute after:left-0 after:right-0 after:-bottom-[2px] after:h-[2px] after:w-full after:scale-x-0 after:origin-center after:transition-transform after:duration-300 after:ease-out motion-reduce:after:transition-none
             before:content-[''] before:absolute before:left-1/2 before:-translate-x-1/2 before:-bottom-[6px] before:w-1.5 before:h-1.5 before:bg-accent before:rotate-45 before:rounded-[2px] before:opacity-0 before:transition-opacity before:duration-200
             ${
               activeTab === tab

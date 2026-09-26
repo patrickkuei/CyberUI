@@ -11,6 +11,8 @@ const meta: Meta<typeof TabNavigation> = {
       description: {
         component: `A cyberpunk-themed tab navigation component with neon styling and smooth animations.
 
+Under \`prefers-reduced-motion: reduce\`, the dropdown menu fades in and out in 150ms without scaling, and the active-tab underline appears without growing.
+
 **Usage:**
 
 \`\`\`tsx

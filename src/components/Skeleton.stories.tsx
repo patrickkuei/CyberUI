@@ -10,6 +10,8 @@ const meta: Meta<typeof Skeleton> = {
       description: {
         component: `A cyberpunk-themed skeleton loader component for displaying loading placeholders with smooth animations.
 
+Under \`prefers-reduced-motion: reduce\`, the pulse is off.
+
 **Usage:**
 
 \`\`\`tsx
@@ -40,7 +42,7 @@ import 'cyberui-2045/styles.css';
 | \`lines\` | \`number\` | ❌ | \`3\` | Number of lines for text variant |
 | \`width\` | \`string \\| number\` | ❌ | - | Custom width override |
 | \`height\` | \`string \\| number\` | ❌ | - | Custom height override |
-| \`animate\` | \`boolean\` | ❌ | \`true\` | Whether to show pulse animation |
+| \`animate\` | \`boolean\` | ❌ | \`true\` | Whether to show pulse animation. Off under reduced motion |
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes |
 `,
       },

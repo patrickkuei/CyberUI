@@ -846,3 +846,75 @@
     filter: drop-shadow(0 0 8px rgba(255, 0, 93, 0.9));
   }
 }
+
+/* ============================================================
+   Reduced motion (prefers-reduced-motion: reduce)
+   ------------------------------------------------------------
+   Unlayered and last in the file on purpose: unlayered rules beat
+   every layered rule, so this one block overrides both copies of
+   the animation utilities above (the `@layer cyberui` copy and the
+   unlayered copy). Keep it at the end of the file.
+
+   To cover a new animation utility, add its selector to the list
+   below that matches its treatment:
+   - continuous/decorative loops → `animation: none`
+   - open/close entrances/exits → a 150ms opacity-only fade
+     (`cyberui-reduced-fade-in` / `-out`; 150ms matches
+     REDUCED_MOTION_DURATION in usePrefersReducedMotion.ts and the
+     `motion-reduce:duration-150` classes).
+
+   Tailwind's own `animate-pulse`/`animate-spin` are NOT overridden
+   here — this stylesheet is global, and that would also freeze the
+   consumer's own uses. Library components add
+   `motion-reduce:animate-none` to their own uses instead. Inline
+   `style={{ animation }}` values can't be reached from CSS; those
+   components read `usePrefersReducedMotion()` instead.
+   ============================================================ */
+@keyframes cyberui-reduced-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes cyberui-reduced-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* Continuous / decorative loops: off. */
+  .animate-scan,
+  .animate-spin-slow {
+    animation: none;
+  }
+
+  /* Idle glow loops: off, replaced by a static glow in the same
+     colours the component uses while opening/closing. */
+  .animate-rgb-glow {
+    animation: none;
+    border-color: var(--color-accent);
+    box-shadow: var(--shadow-lg-accent);
+  }
+
+  .animate-danger-glow {
+    animation: none;
+    border-color: var(--color-error);
+    box-shadow: var(--shadow-error);
+  }
+
+  /* CRT power-on/off: opacity-only fade. */
+  .animate-crt-power-on {
+    animation: cyberui-reduced-fade-in 150ms ease-out both;
+  }
+
+  .animate-crt-power-off {
+    animation: cyberui-reduced-fade-out 150ms ease-in both;
+  }
+}

@@ -78,6 +78,7 @@ const Button: React.FC<ButtonProps> = ({
     'transition-all',
     'duration-300',
     'ease-in-out',
+    'motion-reduce:active:scale-100',
     'focus:outline-none',
     disabled ? 'cursor-not-allowed' : 'cursor-pointer'
   ].join(' ');
@@ -138,7 +139,7 @@ const Button: React.FC<ButtonProps> = ({
       )}
       <span className="relative z-10">{children}</span>
       {showGradientAnimation && (
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 motion-reduce:hidden" />
       )}
       {disabled && (
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-base/10 to-transparent pointer-events-none" />

@@ -55,7 +55,7 @@ export interface SkeletonProps {
    */
   lines?: number; // For text variant
   /**
-   * Whether to show the pulse animation.
+   * Whether to show the pulse animation. The pulse stays off while the user prefers reduced motion.
    * @default true
    */
   animate?: boolean;
@@ -85,7 +85,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
     return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.skeleton);
   };
 
-  const baseClasses = cn('bg-gray-600', animate && 'animate-pulse', getSizeClasses(size), className);
+  const baseClasses = cn('bg-gray-600', animate && 'animate-pulse motion-reduce:animate-none', getSizeClasses(size), className);
 
   const getCustomStyles = () => {
     const styles: React.CSSProperties = {};
@@ -183,7 +183,7 @@ const Skeleton: React.FC<SkeletonProps> = ({
         className={`border border-border-default rounded-lg bg-surface ${paddingClass} space-y-4 ${className}`}
       >
         {animate && (
-          <div className="animate-pulse space-y-4">
+          <div className="animate-pulse motion-reduce:animate-none space-y-4">
             {/* Header with avatar */}
             <div className="flex items-center space-x-4">
               <div className={`rounded-full ${baseClasses} h-16 w-16`} />

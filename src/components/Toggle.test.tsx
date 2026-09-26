@@ -40,3 +40,11 @@ describe('Toggle Component', () => {
     expect(container.firstChild).toHaveClass('custom-glitch');
   });
 });
+
+describe('Toggle reduced motion', () => {
+  it('moves the knob without sliding under prefers-reduced-motion', () => {
+    const { container } = render(<Toggle label="Stealth Mode" />);
+    const track = container.querySelector('input.peer')!.nextElementSibling as HTMLElement;
+    expect(track.className).toContain('motion-reduce:after:transition-none');
+  });
+});

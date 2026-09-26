@@ -106,3 +106,20 @@ describe('TabNavigation Component', () => {
     }
   });
 });
+
+describe('TabNavigation reduced motion', () => {
+  it('fades the dropdown without scaling in 150ms under prefers-reduced-motion', async () => {
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="dropdown" />);
+    fireEvent.click(screen.getByRole('button', { expanded: false }));
+    const option = await screen.findByText('SIGNAL', { selector: 'button span' });
+    const menu = option.closest('[aria-hidden]') as HTMLElement;
+    expect(menu.className).toContain('motion-reduce:scale-y-100');
+    expect(menu.className).toContain('motion-reduce:duration-150');
+  });
+
+  it('shows the active-tab underline without growing it under prefers-reduced-motion', () => {
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} />);
+    const tab = screen.getByRole('tab', { name: 'NEURAL' });
+    expect(tab.className).toContain('motion-reduce:after:transition-none');
+  });
+});
