@@ -186,8 +186,9 @@ const Carousel: React.FC<CarouselProps> = ({
     [size]
   );
 
-  // Image classes (objectFit handled by CSS selectors)
-  const getImageClasses = "w-full h-full";
+  // Image classes (objectFit handled by CSS selectors). The Carousel frame
+  // draws its own corner brackets, so the Image stand-in's are hidden.
+  const getImageClasses = "w-full h-full [&_[data-standin-corners]]:hidden";
 
   // Handle slide change with lifecycle callbacks
   const handleSlideChange = useCallback(

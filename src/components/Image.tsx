@@ -173,8 +173,11 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
         child and would push the bottom-right bracket up (it only showed
         with the scanline layer, which made the bracket a non-last child). */}
     <div className="absolute inset-0" aria-hidden="true">
-      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-secondary/60" />
-      <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary/60" />
+      {/* Hidden by Carousel, which draws its own corner brackets. */}
+      <div data-standin-corners="" className="absolute inset-0">
+        <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-secondary/60" />
+        <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary/60" />
+      </div>
       {fallbackStyle === "scanline" && (
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-x-0 top-0 h-1/3 border-b-2 border-accent bg-linear-to-b from-transparent to-accent/25 shadow-md-accent animate-scanline-sweep" />

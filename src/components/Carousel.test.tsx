@@ -269,6 +269,13 @@ describe('Carousel stand-in (missing src)', () => {
     expect(container.querySelector('.animate-scanline-sweep')).toBeNull();
   });
 
+  it('hides the stand-in corner brackets, because the Carousel frame draws its own', () => {
+    render(<Carousel images={mixed} currentIndex={1} onChange={vi.fn()} autoPlay={false} />);
+    const panel = screen.getByRole('img', { name: 'Stand-in slide' });
+    expect(panel.querySelector('[data-standin-corners]')).not.toBeNull();
+    expect(panel.className).toContain('[&_[data-standin-corners]]:hidden');
+  });
+
   it('applies fallbackStyle to every slide without a source, and only those', () => {
     const { container } = render(
       <Carousel images={mixed} currentIndex={1} onChange={vi.fn()} autoPlay={false} fallbackStyle="scanline" />
