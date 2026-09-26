@@ -11,7 +11,9 @@ const meta: Meta<typeof Carousel> = {
       description: {
         component: `A cyberpunk-themed image carousel with auto-play, navigation controls, and smooth transitions.
 
-Under \`prefers-reduced-motion: reduce\`, \`autoPlay\` does not advance (also after an image preview closes), \`matrix\` and \`signal-glitch\` render as a plain \`fade\` with no glitch overlays, \`slide\` changes slides without sliding, and the indicators hold still.
+A slide with no \`src\` (and no \`fallbackSrc\`) shows a built-in stand-in chosen by the Carousel's \`fallbackStyle\`: a static neon gradient panel (\`gradient\`, the default) or the same panel with a scanline sweeping down it (\`scanline\`). Captions, navigation and keyboard behavior are the same as for slides with images. A slide with no \`src\` but a \`fallbackSrc\` shows the \`fallbackSrc\` image.
+
+Under \`prefers-reduced-motion: reduce\`, \`autoPlay\` does not advance (also after an image preview closes), \`matrix\` and \`signal-glitch\` render as a plain \`fade\` with no glitch overlays, \`slide\` changes slides without sliding, the stand-in scanline stops, and the indicators hold still.
 
 **Usage:**
 
@@ -77,6 +79,18 @@ const images = [
   autoPlay={false}            // User controlled
 />
 
+// No assets yet: slides without a src render a built-in stand-in
+const placeholders = [
+  { alt: 'Neon district', caption: 'Sector 7' },
+  { alt: 'Corporate tower', caption: 'Megacorp HQ' },
+];
+<Carousel
+  images={placeholders}
+  currentIndex={currentSlide}
+  onChange={setCurrentSlide}
+  fallbackStyle="scanline"   // or 'gradient' (default)
+/>
+
 // Different transitions
 <Carousel images={images} currentIndex={slide1} onChange={setSlide1} transition="slide" />
 <Carousel images={images} currentIndex={slide2} onChange={setSlide2} transition="fade" />
@@ -100,6 +114,7 @@ const images = [
 | \`showArrows\` | \`boolean\` | ❌ | \`true\` | Show navigation arrows |
 | \`showIndicators\` | \`boolean\` | ❌ | \`true\` | Show slide indicators |
 | \`disableImagePreview\` | \`boolean\` | ❌ | \`false\` | Disable click-to-expand on images |
+| \`fallbackStyle\` | \`'gradient' \\| 'scanline'\` | ❌ | \`'gradient'\` | Built-in stand-in style for any slide with no image source |
 | \`onBeforeChange\` | \`(from: number, to: number) => void\` | ❌ | - | Callback before slide change |
 | \`onAfterChange\` | \`(index: number) => void\` | ❌ | - | Callback after slide change |
 
@@ -107,9 +122,9 @@ const images = [
 
 \`\`\`tsx
 interface CarouselImageData {
-  src: string;        // Image source URL
+  src?: string;       // Image source URL; omit for the built-in stand-in
   alt: string;        // Alternative text for accessibility
-  fallbackSrc?: string; // Optional fallback image URL on error
+  fallbackSrc?: string; // Optional fallback image URL on error; also shown when src is missing
   caption?: string;     // Optional caption text overlay
 }
 \`\`\`
@@ -169,6 +184,12 @@ interface CarouselImageData {
     disableImagePreview: {
       control: "boolean",
       description: "Disable click-to-expand on images",
+    },
+    fallbackStyle: {
+      control: { type: "inline-radio" },
+      options: ["gradient", "scanline"],
+      description:
+        "Built-in stand-in style for any slide with no image source",
     },
     glitchRate: {
       control: { type: "range", min: 0, max: 1, step: 0.1 },
@@ -434,6 +455,147 @@ export const AllSizes: Story = {
                 autoPlay={false}
               />
             </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
+
+// Slides with no assets at all
+const placeholderSlides = [
+  { alt: "Neon district (asset pending)", caption: "Sector 7 Uplink" },
+  { alt: "Corporate tower (asset pending)", caption: "Megacorp Atrium" },
+  { alt: "Back-alley market (asset pending)", caption: "Black Market Feed" },
+];
+
+export const FallbackGradient: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Slides with no `src` render the static gradient stand-in. `fallbackStyle` defaults to `gradient`.",
+      },
+      story: {
+        inline: false,
+        iframeHeight: 400,
+      },
+    },
+  },
+  args: {
+    images: placeholderSlides,
+    autoPlay: false,
+  },
+  render: (args) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-base p-8">
+        <div className="w-full max-w-2xl">
+          <Carousel
+            {...args}
+            currentIndex={currentIndex}
+            onChange={setCurrentIndex}
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+export const FallbackScanline: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`fallbackStyle=\"scanline\"` adds a scanline that sweeps down each stand-in. The sweep stops under `prefers-reduced-motion: reduce`.",
+      },
+      story: {
+        inline: false,
+        iframeHeight: 400,
+      },
+    },
+  },
+  args: {
+    images: placeholderSlides,
+    autoPlay: false,
+    fallbackStyle: "scanline",
+  },
+  render: (args) => {
+    const [currentIndex, setCurrentIndex] = useState(0);
+
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-base p-8">
+        <div className="w-full max-w-2xl">
+          <Carousel
+            {...args}
+            currentIndex={currentIndex}
+            onChange={setCurrentIndex}
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+export const AllFallbackStyles: Story = {
+  parameters: {
+    docs: {
+      story: {
+        inline: false,
+        iframeHeight: 900,
+      },
+    },
+  },
+  render: () => {
+    const [gradientIndex, setGradientIndex] = useState(0);
+    const [scanlineIndex, setScanlineIndex] = useState(0);
+    const [mixedIndex, setMixedIndex] = useState(1);
+
+    return (
+      <div className="flex flex-col gap-8 p-6 bg-base min-h-screen">
+        <div className="space-y-3">
+          <h5 className="text-accent font-semibold">gradient (default)</h5>
+          <div className="max-w-md">
+            <Carousel
+              images={placeholderSlides}
+              currentIndex={gradientIndex}
+              onChange={setGradientIndex}
+              autoPlay={false}
+              fallbackStyle="gradient"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h5 className="text-accent font-semibold">scanline</h5>
+          <div className="max-w-md">
+            <Carousel
+              images={placeholderSlides}
+              currentIndex={scanlineIndex}
+              onChange={setScanlineIndex}
+              autoPlay={false}
+              fallbackStyle="scanline"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <h5 className="text-accent font-semibold">
+            Mixed: real images and slides with no src
+          </h5>
+          <div className="max-w-md">
+            <Carousel
+              images={[
+                demoImages[0],
+                { alt: "Signal lost (asset pending)", caption: "Signal Lost" },
+                demoImages[1],
+              ]}
+              currentIndex={mixedIndex}
+              onChange={setMixedIndex}
+              autoPlay={false}
+              fallbackStyle="scanline"
+            />
           </div>
         </div>
       </div>

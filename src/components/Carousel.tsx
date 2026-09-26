@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from "react";
 import Image from "./Image";
+import type { ImageFallbackStyle } from "./Image";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -27,11 +28,14 @@ export type CarouselObjectFit = "cover" | "contain";
  * Image data structure for Carousel
  */
 export interface CarouselImageData {
-  /** Image source URL */
-  src: string;
+  /**
+   * Image source URL. A slide with no `src` (and no `fallbackSrc`) shows the
+   * built-in stand-in chosen by the Carousel's `fallbackStyle`.
+   */
+  src?: string;
   /** Alt text for accessibility */
   alt: string;
-  /** Optional fallback image URL */
+  /** Optional fallback image URL. Shown as the image when `src` is missing or empty. */
   fallbackSrc?: string;
   /** Optional caption */
   caption?: string;
@@ -56,7 +60,7 @@ const INDICATOR_PULSE =
  * Props for the CyberUI Carousel component
  *
  * @example
- * // Basic carousel — images is CarouselImageData[]: { src, alt, fallbackSrc?, caption? }
+ * // Basic carousel — images is CarouselImageData[]: { src?, alt, fallbackSrc?, caption? }
  * <Carousel
  *   images={[
  *     { src: 'img1.jpg', alt: 'Cyber City', caption: 'Night District' },
@@ -112,6 +116,13 @@ export interface CarouselProps extends CarouselCallbacks {
   className?: string;
   /** Disable click-to-expand on images */
   disableImagePreview?: boolean;
+  /**
+   * Style of the built-in stand-in shown for any slide with no image source
+   * (`gradient` is static; `scanline` adds a sweeping line that is
+   * motionless under reduced motion).
+   * @default "gradient"
+   */
+  fallbackStyle?: ImageFallbackStyle;
   /** Control signal-glitch effect frequency. Float (0.0-1.0) for probability, boolean for on/off */
   glitchRate?: number | boolean;
 }
@@ -144,6 +155,7 @@ const Carousel: React.FC<CarouselProps> = ({
   showIndicators = true,
   className = "",
   disableImagePreview = false,
+  fallbackStyle = "gradient",
   glitchRate = 1.0,
   onBeforeChange,
   onAfterChange,
@@ -174,8 +186,9 @@ const Carousel: React.FC<CarouselProps> = ({
     [size]
   );
 
-  // Image classes (objectFit handled by CSS selectors)
-  const getImageClasses = "w-full h-full";
+  // Image classes (objectFit handled by CSS selectors). The Carousel frame
+  // draws its own corner brackets, so the Image stand-in's are hidden.
+  const getImageClasses = "w-full h-full [&_[data-standin-corners]]:hidden";
 
   // Handle slide change with lifecycle callbacks
   const handleSlideChange = useCallback(
@@ -315,6 +328,7 @@ const Carousel: React.FC<CarouselProps> = ({
             src={image.src}
             alt={image.alt}
             fallback={image.fallbackSrc}
+            fallbackStyle={fallbackStyle}
             className={getImageClasses}
             size="lg"
             preview={!disableImagePreview}
@@ -380,6 +394,7 @@ const Carousel: React.FC<CarouselProps> = ({
               src={image.src}
               alt={image.alt}
               fallback={image.fallbackSrc}
+              fallbackStyle={fallbackStyle}
               className={getImageClasses}
               size="lg"
               preview={!disableImagePreview}
@@ -442,6 +457,7 @@ const Carousel: React.FC<CarouselProps> = ({
               src={image.src}
               alt={image.alt}
               fallback={image.fallbackSrc}
+              fallbackStyle={fallbackStyle}
               className={getImageClasses}
               size="lg"
               preview={
