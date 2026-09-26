@@ -97,7 +97,7 @@ export interface ImageProps
   src?: string;
   /** Alternative text for accessibility (required) */
   alt: string;
-  /** Size of the image container */
+  /** Scale of the frame (padding) around the image; it does not set the image's width or height */
   size?: ResponsiveValue<ImageSize>;
   /**
    * Enable click-to-expand fullscreen preview on click. Ignored by the

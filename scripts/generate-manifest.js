@@ -42,15 +42,15 @@ const DOC_SUMMARIES = {
   Modal: 'CRT-style modal dialog.',
   Notification: 'Toast notifications. Use `useCyberNotifications` hook.',
   CircularProgress: 'Dual-ring circular progress indicator.',
-  LinearProgress: 'Smooth horizontal progress bar.',
+  LinearProgress: 'Smooth horizontal progress bar. `animate={false}` drops the width transition for values driven every frame.',
   SegmentedProgress: 'Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯).',
   TabNavigation: 'Animated tab bar.',
   Badge: 'Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`.',
   Toggle: 'Cyberpunk switch.',
   Select: 'Styled dropdown.',
   Skeleton: 'Loading placeholder.',
-  Image: 'Image with cyberpunk frame/effects.',
-  Carousel: 'Image carousel.',
+  Image: 'Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).',
+  Carousel: 'Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`).',
   Checkbox: 'Neon-styled checkbox with SVG icons.',
   Divider: 'Gradient/solid/dashed content separator.',
   GradientText: 'Text with cyberpunk gradient effects.',
@@ -116,14 +116,14 @@ const SEGMENTED_PROGRESS_OVERRIDE = {
 };
 
 // Hooks aren't components with a props interface — react-docgen-typescript gives
-// no structured parameter/return shape for them. Small enough (3) to hand-author.
+// no structured parameter/return shape for them. Small enough (4) to hand-author.
 const HOOKS_MANIFEST = [
   {
     name: 'useCyberScrollbar',
     kind: 'hook',
     description: 'Custom hook that creates a cyberpunk-themed scrollbar with animated arrows that respond to scroll velocity and direction.',
     docSummary: 'applies cyberpunk scrollbar styling to a scrollable ref.',
-    signature: 'useCyberScrollbar<T extends HTMLElement>(options?: UseCyberScrollbarOptions): React.RefObject<T>',
+    signature: 'useCyberScrollbar(options?: UseCyberScrollbarOptions): React.RefObject<HTMLDivElement>',
     requiresProvider: null,
   },
   {
@@ -142,10 +142,29 @@ const HOOKS_MANIFEST = [
     signature: 'useAnimatedProgress(options?: { min?: number; max?: number; speed?: number }): number',
     requiresProvider: null,
   },
+  {
+    name: 'usePrefersReducedMotion',
+    kind: 'hook',
+    description: 'Returns true while the user asks for reduced motion (prefers-reduced-motion: reduce) and re-renders when that changes. Safe for server rendering: it returns false there.',
+    docSummary: '`true` while the user prefers reduced motion; use it to gate inline-style animations that CSS cannot reach.',
+    signature: 'usePrefersReducedMotion(): boolean',
+    requiresProvider: null,
+  },
 ];
 
 const CONTEXT_DOC_SUMMARY = {
   CyberNotificationProvider: 'wraps the app once to enable `useCyberNotifications`.',
+};
+
+// Slider is generic (`Slider<V extends SliderValue>`), and its `onValueChange`
+// parameter is typed `NoInferValue<WidenSliderValue<V>>`: two internal helper
+// types that mean nothing to a reader of the docs. The type string below is what
+// the callback receives, as a plain union; the prop's JSDoc explains that it
+// follows the shape of `value` / `defaultValue`.
+const PROP_TYPE_OVERRIDES = {
+  Slider: {
+    onValueChange: '((value: number | [number, number]) => void) | undefined',
+  },
 };
 
 // ─── Extraction ────────────────────────────────────────────────────────────────
@@ -196,7 +215,10 @@ function extractComponent(parser, name, category) {
     docSummary,
     storybookPath: `components-${name.toLowerCase()}--docs`,
     manifestOverride: false,
-    props: mapProps(doc.props),
+    props: mapProps(doc.props).map((p) => {
+      const type = PROP_TYPE_OVERRIDES[name]?.[p.name];
+      return type ? { ...p, type } : p;
+    }),
   };
 }
 

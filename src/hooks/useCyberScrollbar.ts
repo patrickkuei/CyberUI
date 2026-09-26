@@ -156,6 +156,10 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  *    decision is not revisited; pass `pageLevel={false}` for a container that
  *    renders after the first commit.
  *
+ * Page-level mode notices content changes through the size of `html` and
+ * `body`. If both have a fixed height (for example `html, body { height: 100% }`),
+ * content growing inside them is only noticed on the next window resize.
+ *
  * @example
  * ```tsx
  * const scrollRef = useCyberScrollbar({

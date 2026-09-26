@@ -30,6 +30,7 @@ npm install cyberui-2045
 - `useCyberScrollbar`: applies cyberpunk scrollbar styling to a scrollable ref.
 - `useCyberNotifications`: `showNotification(type, title, message, options?)` toast trigger; requires `CyberNotificationProvider`.
 - `useAnimatedProgress`: oscillating value generator for pulse/loading animations.
+- `usePrefersReducedMotion`: `true` while the user prefers reduced motion; use it to gate inline-style animations that CSS cannot reach.
 - `CyberNotificationProvider`: wraps the app once to enable `useCyberNotifications`.
 <!-- cyberui-2045:manifest:end -->
 
