@@ -930,11 +930,10 @@
    this rule comes later in the file. Do not un-layer this rule: unlayered
    and later, it would override the reduced-motion block.
 
-   The sweeping element is a fading tail one quarter of the panel tall
-   with the bright line on its bottom edge, so translating it by its own
-   height (percentages) travels the panel: the line moves from the top edge
-   to the bottom edge while the tail trails above it. The `scan` keyframe
-   above moves by viewport units and would barely show in a small panel.
+   The sweeping element is a band one third of the panel tall, so
+   translating it by its own height (percentages) travels the panel. The
+   `scan` keyframe above moves by viewport units and would barely show in
+   a small panel.
    ============================================================ */
 @layer cyberui {
   @keyframes scanline-sweep {
