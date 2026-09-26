@@ -20,6 +20,10 @@ import 'cyberui-2045/styles.css';
 // Single value (uncontrolled)
 <Slider label="Brightness" defaultValue={40} showValue />
 
+// Controlled single value — the state setter works as the handler
+const [volume, setVolume] = useState(55);
+<Slider label="Volume" value={volume} onValueChange={setVolume} showValue />
+
 // Controlled range (two thumbs)
 const [priceRange, setPriceRange] = useState<[number, number]>([50, 250]);
 <Slider
@@ -43,7 +47,7 @@ const [priceRange, setPriceRange] = useState<[number, number]>([50, 250]);
 | \`step\` | \`number\` | ❌ | \`1\` | Increment between values; also the Arrow key step |
 | \`value\` | \`number \\| [number, number]\` | ❌ | - | Controlled value — a tuple renders a range slider |
 | \`defaultValue\` | \`number \\| [number, number]\` | ❌ | \`min\` | Initial value, uncontrolled; determines single vs. range mode |
-| \`onValueChange\` | \`(value: number \\| [number, number]) => void\` | ❌ | - | Fired on every drag move / keyboard adjustment |
+| \`onValueChange\` | \`(value: number) => void\` (single) or \`(value: [number, number]) => void\` (range) | ❌ | - | Fired on every drag move / keyboard adjustment. The parameter type follows \`value\` / \`defaultValue\`: \`number\` for a single thumb (also when neither is set), \`[number, number]\` for a range |
 | \`variant\` | \`'primary' \\| 'secondary' \\| 'accent'\` | ❌ | \`'accent'\` | Track fill / thumb color |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Track thickness and thumb diameter |
 | \`disabled\` | \`boolean\` | ❌ | \`false\` | Disables dragging and keyboard interaction |
@@ -155,7 +159,7 @@ export const Controlled: Story = {
           <Slider
             label="Audio Uplink Volume"
             value={volume}
-            onValueChange={(next) => typeof next === 'number' && setVolume(next)}
+            onValueChange={setVolume}
             showValue
           />
           <p className="text-xs text-muted">Current: {volume}</p>

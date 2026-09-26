@@ -11,9 +11,29 @@ import { warnOnce } from '../utils/devWarn';
 export type SliderValue = number | [number, number];
 
 /**
- * Props for the Slider component.
+ * Widens a literal number type (`55`) to `number`, so the `onValueChange`
+ * handler for `value={55}` receives a `number` rather than `55`. Tuples pass
+ * through unchanged. Applied only to the callback parameter — `value` and
+ * `defaultValue` keep `V` itself, so a `SliderValue`-typed variable is still
+ * accepted.
  */
-export interface SliderProps {
+type WidenSliderValue<V extends SliderValue> = V extends number ? number : V;
+
+/**
+ * `V`, hidden from type inference — so the value shape is inferred only from
+ * `value` / `defaultValue`, never from the `onValueChange` handler.
+ * (`NoInfer` itself needs TypeScript 5.4; this works on older consumers.)
+ */
+type NoInferValue<V> = [V][V extends unknown ? 0 : never];
+
+/**
+ * Props for the Slider component. `V` is the value shape — `number` for a
+ * single-thumb slider, `[number, number]` for a range slider — and `Slider`
+ * infers it from `value` / `defaultValue` (or `number` if neither is given),
+ * so `value`, `defaultValue` and `onValueChange` always agree. Left at its
+ * default (`SliderValue`) the props accept either shape.
+ */
+export interface SliderProps<V extends SliderValue = SliderValue> {
   /**
    * Minimum allowed value.
    * @default 0
@@ -37,15 +57,19 @@ export interface SliderProps {
    * component's lifetime — switching between number and tuple afterwards is
    * not supported.
    */
-  value?: SliderValue;
+  value?: V;
   /**
    * Initial value for uncontrolled usage, and what determines single- vs
    * range-mode when `value` is never passed. Ignored once `value` is set.
    * @default min
    */
-  defaultValue?: SliderValue;
-  /** Fired with the next value on every drag move and keyboard adjustment. */
-  onValueChange?: (value: SliderValue) => void;
+  defaultValue?: V;
+  /**
+   * Fired with the next value on every drag move and keyboard adjustment.
+   * Receives a `number` for a single-thumb slider and a `[number, number]`
+   * for a range slider, matching the shape of `value` / `defaultValue`.
+   */
+  onValueChange?: (value: NoInferValue<WidenSliderValue<V>>) => void;
   /**
    * Visual style, reusing the neon palette from Button/Badge/Tooltip.
    * `accent` matches LinearProgress's default accent-to-primary gradient
@@ -142,13 +166,13 @@ function capturePointer(el: Element, pointerId: number) {
  *   showValue
  * />
  */
-const Slider: React.FC<SliderProps> = ({
+function Slider<V extends SliderValue = number>({
   min = 0,
   max = 100,
   step = 1,
   value,
   defaultValue,
-  onValueChange,
+  onValueChange: onValueChangeTyped,
   variant = 'accent',
   size = 'md',
   disabled = false,
@@ -160,7 +184,11 @@ const Slider: React.FC<SliderProps> = ({
   ariaLabelMax,
   className = '',
   id,
-}) => {
+}: SliderProps<V>) {
+  // `SliderProps<V>` types the callback per mode, but the component emits
+  // whichever shape `value` / `defaultValue` selected at runtime, which is
+  // exactly what `V` was inferred from — so widening here is sound.
+  const onValueChange = onValueChangeTyped as ((value: SliderValue) => void) | undefined;
   const generatedId = useId();
   const rootId = id || generatedId;
   const labelId = `${rootId}-label`;
@@ -436,7 +464,7 @@ const Slider: React.FC<SliderProps> = ({
       </div>
     </div>
   );
-};
+}
 
 Slider.displayName = 'CyberUI.Slider';
 

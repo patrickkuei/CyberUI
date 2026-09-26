@@ -11,9 +11,57 @@ import Tooltip from "../components/Tooltip";
 import Pagination from "../components/Pagination";
 import TabNavigation from "../components/TabNavigation";
 import Button from "../components/Button";
+import Badge from "../components/Badge";
+import Table from "../components/Table";
+import type { TableColumn } from "../components/Table";
 import { useCyberNotifications } from "../hooks/useCyberNotifications";
 
 const ARCHIVE_FILTERS = ["All", "Flagged", "Classified"] as const;
+
+type ArchiveStatus = "Open" | "Flagged" | "Classified";
+
+interface ArchiveRecord {
+  id: string;
+  subject: string;
+  status: ArchiveStatus;
+}
+
+const ARCHIVE_STATUS_VARIANT = {
+  Open: "success",
+  Flagged: "warning",
+  Classified: "error",
+} as const;
+
+const RECORD_TEMPLATES: ReadonlyArray<Pick<ArchiveRecord, "subject" | "status">> = [
+  { subject: "Arasaka mainframe intrusion", status: "Flagged" },
+  { subject: "Militech implant shipment", status: "Open" },
+  { subject: "Blackwall breach — sector 7", status: "Classified" },
+  { subject: "Netwatch ICE anomaly", status: "Open" },
+  { subject: "Kabuki black-market ripperdoc", status: "Flagged" },
+  { subject: "Maelstrom safehouse raid", status: "Classified" },
+];
+
+const ARCHIVE_RECORDS: ArchiveRecord[] = Array.from({ length: 36 }, (_, i) => ({
+  id: `#${4400 + i}`,
+  ...RECORD_TEMPLATES[i % RECORD_TEMPLATES.length],
+}));
+
+const RECORDS_PER_PAGE = 3;
+
+const RECORD_COLUMNS: TableColumn<ArchiveRecord>[] = [
+  { key: "id", header: "Case", width: "90px" },
+  { key: "subject", header: "Subject" },
+  {
+    key: "status",
+    header: "Status",
+    align: "center",
+    render: (row) => (
+      <Badge variant={ARCHIVE_STATUS_VARIANT[row.status]} size="sm">
+        {row.status}
+      </Badge>
+    ),
+  },
+];
 
 const fieldClasses =
   "w-full resize-none rounded-lg bg-surface text-default placeholder-muted border-2 border-accent px-4 py-3 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-accent";
@@ -25,8 +73,29 @@ const ConsoleTab: React.FC = () => {
     ARCHIVE_FILTERS[0]
   );
   const [archivePage, setArchivePage] = useState(1);
+  const [selectedRecord, setSelectedRecord] = useState<ArchiveRecord | null>(
+    null
+  );
 
   const { showNotification } = useCyberNotifications();
+
+  const filteredRecords =
+    archiveFilter === "All"
+      ? ARCHIVE_RECORDS
+      : ARCHIVE_RECORDS.filter((record) => record.status === archiveFilter);
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredRecords.length / RECORDS_PER_PAGE)
+  );
+  const pageRecords = filteredRecords.slice(
+    (archivePage - 1) * RECORDS_PER_PAGE,
+    archivePage * RECORDS_PER_PAGE
+  );
+
+  const handleFilterChange = (filter: string) => {
+    setArchiveFilter(filter);
+    setArchivePage(1);
+  };
 
   const recordActions = [
     {
@@ -197,7 +266,7 @@ const ConsoleTab: React.FC = () => {
             <TabNavigation
               tabs={ARCHIVE_FILTERS}
               activeTab={archiveFilter}
-              onTabChange={setArchiveFilter}
+              onTabChange={handleFilterChange}
               mode="dropdown"
               size="sm"
             />
@@ -206,15 +275,36 @@ const ConsoleTab: React.FC = () => {
           <div className="flex flex-col items-center gap-2 pt-2">
             <Pagination
               currentPage={archivePage}
-              totalPages={12}
+              totalPages={totalPages}
               onPageChange={setArchivePage}
               size="sm"
             />
             <span className="text-xs text-muted">
               Showing {archiveFilter.toLowerCase()} results — page{" "}
-              {archivePage} of 12
+              {archivePage} of {totalPages}
             </span>
           </div>
+        </div>
+      </Card>
+
+      <SectionTitle>Operative Records</SectionTitle>
+      <Card>
+        <div className="space-y-4">
+          <Table
+            columns={RECORD_COLUMNS}
+            data={pageRecords}
+            getRowId={(row) => row.id}
+            variant="striped"
+            size="sm"
+            caption="Archive records — driven by the filter and pager above"
+            emptyMessage="No records match this clearance filter."
+            onRowClick={setSelectedRecord}
+          />
+          <p className="text-xs text-muted" role="status">
+            {selectedRecord
+              ? `Decrypting ${selectedRecord.id} — ${selectedRecord.subject} [${selectedRecord.status.toUpperCase()}]`
+              : "Select a record to decrypt its file."}
+          </p>
         </div>
       </Card>
     </div>
