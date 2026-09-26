@@ -228,7 +228,7 @@ export const AllFeatures: Story = {
           💡 Click images to test preview mode (simulates fullscreen within
           story)
         </p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <Image src="image_demo_1.jpg" alt="Cyberpunk cityscape" size="md" />
           <Image src="image_demo_2.jpg" alt="Neural network" size="md" />
           <Image src="image_demo_3.jpg" alt="Holographic display" size="md" />
@@ -343,7 +343,7 @@ export const AllFallbackStyles: Story = {
           <Image
             alt="Small scanline stand-in"
             fallbackStyle="scanline"
-            className="w-32 h-24"
+            className="w-32 h-24 mx-auto"
           />
           <p className="text-muted text-sm mt-2">scanline, custom size (w-32 h-24)</p>
         </div>
@@ -352,7 +352,7 @@ export const AllFallbackStyles: Story = {
             alt="Backup feed"
             fallback="image_demo_2.jpg"
             fallbackStyle="scanline"
-            className="w-64"
+            className="w-64 mx-auto"
           />
           <p className="text-muted text-sm mt-2">fallback URL shown instead of the stand-in</p>
         </div>
