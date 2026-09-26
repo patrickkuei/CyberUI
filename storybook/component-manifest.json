@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.6.0",
-  "generatedAt": "2026-09-25T03:35:49.900Z",
+  "generatedAt": "2026-09-26T13:27:12.916Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -508,10 +508,10 @@
         },
         {
           "name": "onValueChange",
-          "type": "((value: SliderValue) => void) | undefined",
+          "type": "((value: number | [number, number]) => void) | undefined",
           "required": false,
           "default": null,
-          "description": "Fired with the next value on every drag move and keyboard adjustment."
+          "description": "Fired with the next value on every drag move and keyboard adjustment.\nReceives a `number` for a single-thumb slider and a `[number, number]`\nfor a range slider, matching the shape of `value` / `defaultValue`."
         },
         {
           "name": "variant",
@@ -1429,7 +1429,7 @@
           "type": "boolean | undefined",
           "required": false,
           "default": true,
-          "description": "Whether to show the pulse animation."
+          "description": "Whether to show the pulse animation. The pulse stays off while the user prefers reduced motion."
         }
       ]
     },
@@ -1685,7 +1685,7 @@
       "sourceFile": "src/components/LinearProgress.tsx",
       "displayName": "CyberUI.LinearProgress",
       "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nThe bar is `w-full` by default — it fills its container width.\nWrap it in a constrained element to control its width.",
-      "docSummary": "Smooth horizontal progress bar.",
+      "docSummary": "Smooth horizontal progress bar. `animate={false}` drops the width transition for values driven every frame.",
       "storybookPath": "components-linearprogress--docs",
       "manifestOverride": false,
       "props": [
@@ -1702,6 +1702,13 @@
           "required": false,
           "default": "md",
           "description": "Height of the progress bar."
+        },
+        {
+          "name": "animate",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether the bar animates width changes with a 500 ms ease-out transition.\nSet to `false` for values driven every frame (e.g. a `requestAnimationFrame` loop) so the bar tracks `progress` exactly.\nThe transition is also off while the user prefers reduced motion."
         },
         {
           "name": "className",
@@ -1833,9 +1840,9 @@
       "name": "Carousel",
       "category": "Navigation",
       "sourceFile": "src/components/Carousel.tsx",
-      "displayName": "CyberUI.Carousel",
+      "displayName": "Carousel",
       "description": "",
-      "docSummary": "Image carousel.",
+      "docSummary": "Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`).",
       "storybookPath": "components-carousel--docs",
       "manifestOverride": false,
       "props": [
@@ -1872,7 +1879,7 @@
           "type": "boolean | undefined",
           "required": false,
           "default": true,
-          "description": "Enable auto-play functionality"
+          "description": "Enable auto-play functionality. Does not auto-advance while the user\nprefers reduced motion (`prefers-reduced-motion: reduce`)."
         },
         {
           "name": "interval",
@@ -1893,7 +1900,7 @@
           "type": "CarouselTransition | undefined",
           "required": false,
           "default": "slide",
-          "description": "Transition effect"
+          "description": "Transition effect. While the user prefers reduced motion, `matrix` and\n`signal-glitch` render as `fade`, and `slide` changes slides without\nsliding."
         },
         {
           "name": "objectFit",
@@ -1929,6 +1936,13 @@
           "required": false,
           "default": false,
           "description": "Disable click-to-expand on images"
+        },
+        {
+          "name": "fallbackStyle",
+          "type": "ImageFallbackStyle | undefined",
+          "required": false,
+          "default": "gradient",
+          "description": "Style of the built-in stand-in shown for any slide with no image source\n(`gradient` is static; `scanline` adds a sweeping line that is\nmotionless under reduced motion)."
         },
         {
           "name": "glitchRate",
@@ -2378,17 +2392,17 @@
       "category": "Media",
       "sourceFile": "src/components/Image.tsx",
       "displayName": "Image",
-      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations.",
-      "docSummary": "Image with cyberpunk frame/effects.",
+      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations. With no image source\nit renders a built-in gradient or scanline stand-in instead.",
+      "docSummary": "Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).",
       "storybookPath": "components-image--docs",
       "manifestOverride": false,
       "props": [
         {
           "name": "src",
-          "type": "string",
-          "required": true,
+          "type": "string | undefined",
+          "required": false,
           "default": null,
-          "description": "Image source URL (required)"
+          "description": "Image source URL. When it is missing or empty and no `fallback` URL is\ngiven, a built-in stand-in panel (see `fallbackStyle`) renders instead\nof an `<img>`."
         },
         {
           "name": "alt",
@@ -2402,21 +2416,28 @@
           "type": "ResponsiveValue<ImageSize> | undefined",
           "required": false,
           "default": null,
-          "description": "Size of the image container"
+          "description": "Scale of the frame (padding) around the image; it does not set the image's width or height"
         },
         {
           "name": "preview",
           "type": "boolean | undefined",
           "required": false,
-          "default": "false",
-          "description": "Enable click-to-expand fullscreen preview on click.\nMust be explicitly set to `true` — disabled by default."
+          "default": "true",
+          "description": "Enable click-to-expand fullscreen preview on click. Ignored by the\nbuilt-in stand-in, which has nothing to enlarge."
         },
         {
           "name": "fallback",
           "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Fallback image URL when main image fails to load"
+          "description": "Fallback image URL when main image fails to load. It is also shown as the\nimage when `src` is missing or empty."
+        },
+        {
+          "name": "fallbackStyle",
+          "type": "ImageFallbackStyle | undefined",
+          "required": false,
+          "default": "\"gradient\"",
+          "description": "Style of the built-in stand-in rendered when there is no image source\n(no `src` and no `fallback`). It has `role=\"img\"` and `alt` as its\naccessible name."
         },
         {
           "name": "placeholder",
@@ -2551,7 +2572,7 @@
       "kind": "hook",
       "description": "Custom hook that creates a cyberpunk-themed scrollbar with animated arrows that respond to scroll velocity and direction.",
       "docSummary": "applies cyberpunk scrollbar styling to a scrollable ref.",
-      "signature": "useCyberScrollbar<T extends HTMLElement>(options?: UseCyberScrollbarOptions): React.RefObject<T>",
+      "signature": "useCyberScrollbar(options?: UseCyberScrollbarOptions): React.RefObject<HTMLDivElement>",
       "requiresProvider": null
     },
     {
@@ -2569,6 +2590,14 @@
       "docSummary": "oscillating value generator for pulse/loading animations.",
       "signature": "useAnimatedProgress(options?: { min?: number; max?: number; speed?: number }): number",
       "requiresProvider": null
+    },
+    {
+      "name": "usePrefersReducedMotion",
+      "kind": "hook",
+      "description": "Returns true while the user asks for reduced motion (prefers-reduced-motion: reduce) and re-renders when that changes. Safe for server rendering: it returns false there.",
+      "docSummary": "`true` while the user prefers reduced motion; use it to gate inline-style animations that CSS cannot reach.",
+      "signature": "usePrefersReducedMotion(): boolean",
+      "requiresProvider": null
     }
   ],
   "context": [
@@ -2576,7 +2605,7 @@
       "name": "CyberNotificationProvider",
       "kind": "context-provider",
       "sourceFile": "src/contexts/NotificationContext.tsx",
-      "description": "Context provider for the Cyberpunk notification system.\nWrap your application root with this provider to enable toasts.",
+      "description": "Context provider for the Cyberpunk notification system.\nWrap your application root with this provider to enable toasts.\n\nWhile the user prefers reduced motion (`prefers-reduced-motion: reduce`),\ntoasts fade in and out in 150ms instead of sliding.",
       "docSummary": "wraps the app once to enable `useCyberNotifications`.",
       "props": [
         {
