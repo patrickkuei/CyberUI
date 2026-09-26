@@ -209,6 +209,16 @@ describe('Image stand-in (no src)', () => {
     expect(sweep!.closest('[aria-hidden="true"]')).not.toBeNull();
   });
 
+  it.each(['gradient', 'scanline'] as const)(
+    'keeps every decoration inside one overlay child (%s), so space-y-* cannot offset the corner brackets',
+    (fallbackStyle) => {
+      render(<Image alt="Neon district" fallbackStyle={fallbackStyle} />);
+      const panel = screen.getByRole('img', { name: 'Neon district' });
+      expect(panel.children).toHaveLength(1);
+      expect(panel.children[0]).toHaveClass('absolute', 'inset-0');
+    }
+  );
+
   it('treats an empty src like a missing one', () => {
     const { container } = render(<Image src="" alt="Neon district" fallbackStyle="scanline" />);
     expect(container.querySelector('img')).toBeNull();

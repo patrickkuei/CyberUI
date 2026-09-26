@@ -168,19 +168,19 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
       className
     )}
   >
-    <div
-      className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-secondary/60"
-      aria-hidden="true"
-    />
-    <div
-      className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary/60"
-      aria-hidden="true"
-    />
-    {fallbackStyle === "scanline" && (
-      <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute inset-x-0 top-0 h-1/3 border-b-2 border-accent bg-linear-to-b from-transparent to-accent/25 shadow-md-accent animate-scanline-sweep" />
-      </div>
-    )}
+    {/* One overlay child on purpose: the card size classes above include
+        `space-y-*`, which adds a bottom margin to every non-last direct
+        child and would push the bottom-right bracket up (it only showed
+        with the scanline layer, which made the bracket a non-last child). */}
+    <div className="absolute inset-0" aria-hidden="true">
+      <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-secondary/60" />
+      <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary/60" />
+      {fallbackStyle === "scanline" && (
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-1/3 border-b-2 border-accent bg-linear-to-b from-transparent to-accent/25 shadow-md-accent animate-scanline-sweep" />
+        </div>
+      )}
+    </div>
   </div>
 );
 
