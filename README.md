@@ -77,7 +77,7 @@ function App() {
 | Image | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-image--docs) |
 | Avatar | Media | [→](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/components-avatar--docs) |
 
-Also includes hooks (`useCyberScrollbar`, `useCyberNotifications`, `useAnimatedProgress`) and `CyberNotificationProvider` context.
+Also includes hooks (`useCyberScrollbar`, `useCyberNotifications`, `useAnimatedProgress`, `usePrefersReducedMotion`) and `CyberNotificationProvider` context.
 <!-- cyberui-2045:manifest:end -->
 
 ## AI Coding Setup

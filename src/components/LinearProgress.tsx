@@ -36,6 +36,7 @@ export interface LinearProgressProps {
   /**
    * Whether the bar animates width changes with a 500 ms ease-out transition.
    * Set to `false` for values driven every frame (e.g. a `requestAnimationFrame` loop) so the bar tracks `progress` exactly.
+   * The transition is also off while the user prefers reduced motion.
    * @default true
    */
   animate?: boolean;

@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`LinearProgress`** — `animate` prop (default `true`). `animate={false}` drops the width transition, so a bar driven every frame (for example from a `requestAnimationFrame` loop) tracks `progress` exactly instead of lagging behind it (#34).
+- **`usePrefersReducedMotion`** hook — returns `true` while the user's OS or browser asks for reduced motion (`prefers-reduced-motion: reduce`) and re-renders when that changes. It returns `false` on the server and during hydration, then updates, so it never causes a hydration mismatch. Use it to gate inline-style animations that CSS can't reach (#4).
+- **`Image`** — built-in stand-in for an image with nothing to show. With no `src` (missing or empty) and no `fallback`, `Image` renders a neon panel instead of an `<img>`; `fallbackStyle` picks `gradient` (default, static) or `scanline` (a line sweeping down the panel). The panel has `role="img"` with `alt` as its name (with an empty `alt` it is hidden from assistive technology), takes `size` and `className`, and ignores `preview`. It uses a new `.animate-scanline-sweep` utility and `scanline-sweep` keyframe (#3).
+- **`Image`** — the `fallback` URL is now also shown when `src` is missing or empty, not only when `src` fails to load (#3).
+- **`Carousel`** — slides without a `src` render the `Image` stand-in, styled by a new Carousel-level `fallbackStyle` prop. The stand-in's own corner brackets are hidden inside a Carousel, which draws its own (#3).
+- **Demo Application** — `Table` now appears in the `Console` tab, driven by the archive filter and the `Pagination` control above it, with an empty state for filters that match nothing.
+
+### Changed
+
+- **`ImageProps.src` and `CarouselImageData.src` are now optional** — a type-level change, needed for the stand-in above. Code that reads `.src` from either type now gets `string | undefined`; existing `<Image src=… />` and `<Carousel images=… />` usage is unchanged (#3).
+- **`Slider` is now a generic function component** — `Slider<V extends SliderValue>` with a matching `SliderProps<V>`, so `onValueChange` receives a `number` for a single-thumb slider and a `[number, number]` for a range slider instead of the `number | [number, number]` union. Values typed as `SliderValue` are still accepted. `typeof Slider` is no longer `React.FC<SliderProps>`, which only matters for code that used it as a type.
+- **Reduced motion: open/close animations fade** — with `prefers-reduced-motion: reduce`, `Modal`, `Drawer`, `DropdownMenu`, `DatePicker`, the `TabNavigation` dropdown and the `Image` preview open and close with a 150ms opacity fade instead of scaling, sliding or the CRT power-on/off. Consumer-supplied `animation.openDuration`/`closeDuration` are capped at 150ms in that mode, and the close timers of `DropdownMenu`, `DatePicker` and `TabNavigation` went from 180ms to 150ms (#4).
+- **Reduced motion: toasts fade** — `CyberNotificationProvider` toasts fade in and out in 150ms instead of sliding (#4).
+- **Reduced motion: decorative loops stop** — the scan line and spin animations, the idle `Modal`/`Drawer` glow loops (which hold a static glow instead), `Skeleton` and loading pulses, `Steps` chevron pulses, and hover zoom on `Image` thumbnails are off. `Button`'s press scale, `Toggle`'s knob slide and `Accordion`'s chevron and panel transitions also stop. The new `usePrefersReducedMotion` hook handles the ones set through inline styles (#4).
+- **`Carousel` under reduced motion** — autoplay does not advance, and resumes after an image preview closes only when motion is allowed. `matrix` and `signal-glitch` transitions render as `fade`, and `slide` changes slides without sliding (#4).
+- **`useCyberScrollbar` under reduced motion** — the velocity glow and arrow animation are skipped and transitions are off (#32).
+
+### Fixed
+
+- **`useCyberScrollbar`** — scrolling no longer re-renders the component that calls the hook; scroll state lives in refs and the visuals are updated directly (#32).
+- **`useCyberScrollbar`** — on mobile the scrollbar is shown and hidden by toggling `display` on the existing element instead of being rebuilt, which also fixes it never returning to idle after the first scroll (#32).
+- **`useCyberScrollbar`** — updates on window resize and content changes, in container and page-level mode, and restyles when the viewport crosses the 768px breakpoint (#32).
+- **`useCyberScrollbar`** — `pageLevel` auto-detection no longer relies on a 0ms timeout: with `pageLevel` omitted the mode is decided in the first post-commit effect, and `pageLevel={false}` starts up when a container attaches after mount. In page-level mode with a fixed-height `html`/`body`, content changes are only noticed on the next window resize (#32).
+- **`package.json` is now exposed in the `exports` map** — `require('cyberui-2045/package.json')` now resolves instead of throwing `ERR_PACKAGE_PATH_NOT_EXPORTED`, so tools that read the installed version can find it.
+- **`Image` preview overflowed its frame on small screens** — the enlarged image was capped at `95vw`/`95vh`, but the overlay has 1rem of padding on every side, so on short or narrow viewports the image stuck out past the frame that carries the border, glow, corner accents and caption. It is now capped at `calc(100vw - 2rem)` by `calc(100vh - 2rem)`.
+- **`Image` `preview` default documented correctly** — the JSDoc and Storybook table said `false`, but the default has always been `true`. Behaviour is unchanged.
+- **`Image` stories** — `Gallery Layout` and `All Sizes` no longer shrink their images on narrow screens (and `All Sizes` no longer claims pixel sizes `size` never set), and the stand-in stories centre their custom-size examples.
+
 ## [2.6.0] - 2026-09-25
 
 ### Added

@@ -38,7 +38,7 @@ npm test              # All tests (unit + Storybook/Playwright)
 | Typography | GradientText, SectionTitle |
 | Display | Timeline, Table |
 | Media | Image, Avatar |
-| Hooks | useCyberScrollbar, useCyberNotifications, useAnimatedProgress |
+| Hooks | useCyberScrollbar, useCyberNotifications, useAnimatedProgress, usePrefersReducedMotion |
 | Context | CyberNotificationProvider |
 <!-- cyberui-2045:manifest:end -->
 

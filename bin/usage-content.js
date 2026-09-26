@@ -79,7 +79,7 @@ Only cross-cutting facts that don't belong to any single component's own types a
 ### Hooks
 
 \`\`\`tsx
-import { useCyberNotifications, useAnimatedProgress, useCyberScrollbar } from 'cyberui-2045';
+import { useCyberNotifications, useAnimatedProgress, useCyberScrollbar, usePrefersReducedMotion } from 'cyberui-2045';
 
 // Toast notifications — showNotification(type, title, message, options?)
 // type: 'success' | 'warning' | 'error'
@@ -91,7 +91,11 @@ showNotification('error', 'Breach Detected', 'Sector 7 compromised.', { duration
 const value = useAnimatedProgress({ min: 5, max: 95, speed: 30 });
 
 // Apply cyberpunk scrollbar styles to a scrollable element
-const ref = useCyberScrollbar<HTMLDivElement>();
+const ref = useCyberScrollbar();
+
+// true while the user prefers reduced motion; re-renders when the setting changes.
+// Use it to switch off inline-style animations that CSS can't reach.
+const reduceMotion = usePrefersReducedMotion();
 \`\`\`
 
 ### Notifications (requires provider)
