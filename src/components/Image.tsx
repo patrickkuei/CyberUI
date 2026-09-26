@@ -178,7 +178,9 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
     />
     {fallbackStyle === "scanline" && (
       <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute inset-x-0 top-0 h-1/3 border-b-2 border-accent bg-linear-to-b from-transparent to-accent/25 shadow-md-accent animate-scanline-sweep" />
+        <div className="absolute inset-x-0 top-0 h-1/4 bg-linear-to-b from-transparent to-accent/20 animate-scanline-sweep">
+          <div className="absolute inset-x-0 bottom-0 h-0.5 bg-accent shadow-md-accent" />
+        </div>
       </div>
     )}
   </div>
