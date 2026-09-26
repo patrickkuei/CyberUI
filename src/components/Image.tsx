@@ -664,14 +664,17 @@ const Image: React.FC<ImageProps> = memo(
                 <img
                   src={showFallback ? fallback : src}
                   alt={showFallback ? `${alt} (fallback)` : alt}
-                  className={`max-w-[95vw] max-h-[95vh] w-auto h-auto object-contain rounded-lg transition-all duration-300 motion-reduce:duration-150 ease-out ${
+                  className={`max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] w-auto h-auto object-contain rounded-lg transition-all duration-300 motion-reduce:duration-150 ease-out ${
                     isClosing
                       ? "filter blur-sm brightness-50"
                       : "filter blur-0 brightness-100"
                   }`}
                   style={{
-                    maxWidth: "95vw",
-                    maxHeight: "95vh",
+                    // The overlay has p-4 (1rem each side). A percentage of the
+                    // viewport (95vw/95vh) is bigger than the space left on small
+                    // screens, so the image overran its frame, border and corners.
+                    maxWidth: "calc(100vw - 2rem)",
+                    maxHeight: "calc(100vh - 2rem)",
                     width: "auto",
                     height: "auto",
                   }}

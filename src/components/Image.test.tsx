@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, act, within } from '@testing-library/react';
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import Image from './Image';
 import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
@@ -69,6 +69,16 @@ describe('Image', () => {
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+  });
+
+  it('limits the preview image to the space inside the overlay padding (1rem each side)', () => {
+    render(<Image src="test.jpg" alt="Test image" preview />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    const preview = within(screen.getByRole('dialog')).getByAltText('Test image');
+    // 95vw/95vh left the image bigger than its frame on small screens.
+    expect(preview.style.maxWidth).toBe('calc(100vw - 2rem)');
+    expect(preview.style.maxHeight).toBe('calc(100vh - 2rem)');
   });
 
   it('calls onPreviewOpen when preview is opened', () => {
