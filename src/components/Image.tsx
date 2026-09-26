@@ -24,6 +24,14 @@ import {
 export type ImageSize = "sm" | "md" | "lg";
 
 /**
+ * Built-in stand-in style shown when an image has no source.
+ * - `gradient`: a static neon gradient panel
+ * - `scanline`: the same panel with a scanline sweeping down it
+ *   (the scanline is motionless while the user prefers reduced motion)
+ */
+export type ImageFallbackStyle = "gradient" | "scanline";
+
+/**
  * Animation configuration for preview transitions.
  *
  * While the user prefers reduced motion (`prefers-reduced-motion: reduce`),
@@ -81,20 +89,34 @@ export interface ImageProps
       "size" | "onLoad" | "onError"
     >,
     ImageCallbacks {
-  /** Image source URL (required) */
-  src: string;
+  /**
+   * Image source URL. When it is missing or empty and no `fallback` URL is
+   * given, a built-in stand-in panel (see `fallbackStyle`) renders instead
+   * of an `<img>`.
+   */
+  src?: string;
   /** Alternative text for accessibility (required) */
   alt: string;
   /** Size of the image container */
   size?: ResponsiveValue<ImageSize>;
   /**
-   * Enable click-to-expand fullscreen preview on click.
-   * Must be explicitly set to `true` — disabled by default.
-   * @default false
+   * Enable click-to-expand fullscreen preview on click. Ignored by the
+   * built-in stand-in, which has nothing to enlarge.
+   * @default true
    */
   preview?: boolean;
-  /** Fallback image URL when main image fails to load */
+  /**
+   * Fallback image URL when main image fails to load. It is also shown as the
+   * image when `src` is missing or empty.
+   */
   fallback?: string;
+  /**
+   * Style of the built-in stand-in rendered when there is no image source
+   * (no `src` and no `fallback`). It has `role="img"` and `alt` as its
+   * accessible name.
+   * @default "gradient"
+   */
+  fallbackStyle?: ImageFallbackStyle;
   /** Custom loading placeholder component */
   placeholder?: React.ReactNode;
   /** Additional CSS classes */
@@ -116,11 +138,61 @@ const DEFAULT_ANIMATION: Required<ImageAnimationConfig> = {
   cyberpunkEffects: true,
 };
 
+interface ImageStandInProps {
+  alt: string;
+  fallbackStyle: ImageFallbackStyle;
+  size: ResponsiveValue<ImageSize>;
+  className: string;
+}
+
+/**
+ * Built-in stand-in rendered by Image when there is nothing to load: a static
+ * token-based gradient panel, plus a sweeping scanline for `scanline`.
+ * With an empty `alt` the panel is decorative (`aria-hidden`, no role).
+ * The sweep is a `.animate-scanline-sweep` element (stopped under reduced
+ * motion by the reduced-motion block in `src/index.css`).
+ */
+const ImageStandIn: React.FC<ImageStandInProps> = ({
+  alt,
+  fallbackStyle,
+  size,
+  className,
+}) => (
+  <div
+    {...(alt
+      ? { role: "img", "aria-label": alt }
+      : { "aria-hidden": true })}
+    className={cn(
+      "relative w-full aspect-video rounded-lg overflow-hidden border-2 border-accent/30 bg-linear-to-br from-primary/25 via-surface to-secondary/25",
+      getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.card),
+      className
+    )}
+  >
+    {/* One overlay child on purpose: the card size classes above include
+        `space-y-*`, which adds a bottom margin to every non-last direct
+        child and would push the bottom-right bracket up (it only showed
+        with the scanline layer, which made the bracket a non-last child). */}
+    <div className="absolute inset-0" aria-hidden="true">
+      {/* Hidden by Carousel, which draws its own corner brackets. */}
+      <div data-standin-corners="" className="absolute inset-0">
+        <div className="absolute top-2 left-2 w-4 h-4 border-l-2 border-t-2 border-secondary/60" />
+        <div className="absolute bottom-2 right-2 w-4 h-4 border-r-2 border-b-2 border-primary/60" />
+      </div>
+      {fallbackStyle === "scanline" && (
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute inset-x-0 top-0 h-1/3 border-b-2 border-accent bg-linear-to-b from-transparent to-accent/25 shadow-md-accent animate-scanline-sweep" />
+        </div>
+      )}
+    </div>
+  </div>
+);
+
 /**
  * CyberUI Image Component
  *
  * A cyberpunk-themed image component with click-to-expand preview functionality,
- * loading states, error handling, and smooth animations.
+ * loading states, error handling, and smooth animations. With no image source
+ * it renders a built-in gradient or scanline stand-in instead.
  *
  * @example
  * ```tsx
@@ -131,6 +203,12 @@ const DEFAULT_ANIMATION: Required<ImageAnimationConfig> = {
  *   onPreviewOpen={() => console.log('Preview opened')}
  * />
  * ```
+ *
+ * @example
+ * ```tsx
+ * // No assets yet: built-in stand-in
+ * <Image alt="Neon district" fallbackStyle="scanline" size="lg" />
+ * ```
  */
 const Image: React.FC<ImageProps> = memo(
   ({
@@ -139,6 +217,7 @@ const Image: React.FC<ImageProps> = memo(
     size = "md",
     preview = true,
     fallback,
+    fallbackStyle = "gradient",
     placeholder,
     className = "",
     animation,
@@ -164,9 +243,18 @@ const Image: React.FC<ImageProps> = memo(
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
     const [isOpening, setIsOpening] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [isLoadPending, setIsLoadPending] = useState(true);
     const [hasError, setHasError] = useState(false);
-    const [showFallback, setShowFallback] = useState(false);
+    const [fallbackActive, setFallbackActive] = useState(false);
+
+    // What can be shown: the `src`, else the `fallback` URL (a missing `src`
+    // counts as a failed load), else nothing (the stand-in renders).
+    const hasSrc = Boolean(src);
+    const hasImage = hasSrc || Boolean(fallback);
+    const showFallback = fallbackActive || (!hasSrc && Boolean(fallback));
+    // Nothing to load means nothing is loading; preview needs an image.
+    const isLoading = isLoadPending && hasImage;
+    const canPreview = preview && hasImage;
 
     // Refs
     const overlayRef = useRef<HTMLDivElement>(null);
@@ -183,7 +271,7 @@ const Image: React.FC<ImageProps> = memo(
     // Image event handlers with callbacks
     const handleImageLoad = useCallback(
       (event: React.SyntheticEvent<HTMLImageElement>) => {
-        setIsLoading(false);
+        setIsLoadPending(false);
         setHasError(false);
         onLoad?.(event);
       },
@@ -192,10 +280,10 @@ const Image: React.FC<ImageProps> = memo(
 
     const handleImageError = useCallback(
       (event: React.SyntheticEvent<HTMLImageElement>) => {
-        setIsLoading(false);
+        setIsLoadPending(false);
         if (fallback && !showFallback) {
           // Show fallback instead of error
-          setShowFallback(true);
+          setFallbackActive(true);
           setHasError(false);
         } else {
           // No fallback or fallback also failed
@@ -208,7 +296,7 @@ const Image: React.FC<ImageProps> = memo(
 
     // Preview controls
     const handleImageClick = useCallback(() => {
-      if (preview && !hasError) {
+      if (canPreview && !hasError) {
         setIsOpening(true);
         setIsPreviewOpen(true);
         onPreviewOpen?.();
@@ -217,7 +305,7 @@ const Image: React.FC<ImageProps> = memo(
           setIsOpening(false);
         }, openDuration);
       }
-    }, [preview, hasError, onPreviewOpen, openDuration]);
+    }, [canPreview, hasError, onPreviewOpen, openDuration]);
 
     const closePreview = useCallback(() => {
       setIsClosing(true);
@@ -248,8 +336,23 @@ const Image: React.FC<ImageProps> = memo(
       [closePreview]
     );
 
+    // The preview is only open while there is an image to show.
+    const previewOpen = isPreviewOpen && hasImage;
+
+    // The image went away (`src` and `fallback` both emptied) with the
+    // preview open: close it now and report it once, unless a close was
+    // already reported.
     useEffect(() => {
-      if (isPreviewOpen) {
+      if (isPreviewOpen && !hasImage) {
+        setIsPreviewOpen(false);
+        setIsOpening(false);
+        setIsClosing(false);
+        if (!isClosing) onPreviewClose?.();
+      }
+    }, [isPreviewOpen, hasImage, isClosing, onPreviewClose]);
+
+    useEffect(() => {
+      if (previewOpen) {
         document.addEventListener("keydown", handleKeyDown);
 
         // Store original values
@@ -275,31 +378,31 @@ const Image: React.FC<ImageProps> = memo(
           document.documentElement.style.scrollbarGutter = originalScrollbarGutter;
         };
       }
-    }, [isPreviewOpen, handleKeyDown]);
+    }, [previewOpen, handleKeyDown]);
 
     // Memoized class calculations
     const imageClasses = useMemo(
       () =>
         cn(
           "relative rounded-lg overflow-hidden border-2 border-accent/30 transition-all duration-300 ease-in-out transform flex justify-center content-center",
-          preview && !hasError
+          canPreview && !hasError
             ? "cursor-pointer hover:scale-105 motion-reduce:hover:scale-100 hover:border-accent hover:shadow-lg-accent focus:outline-none focus:ring-4 focus:ring-accent/50"
             : "",
           getSizeClasses(size),
           className
         ),
-      [preview, hasError, getSizeClasses, size, className]
+      [canPreview, hasError, getSizeClasses, size, className]
     );
 
     // Accessibility attributes
     const accessibilityProps = useMemo(
       () => ({
-        role: preview ? "button" : "img",
-        tabIndex: preview && !hasError ? 0 : -1,
-        "aria-label": preview ? `${alt}. Click to enlarge` : alt,
-        "aria-expanded": preview ? isPreviewOpen : undefined,
+        role: canPreview ? "button" : "img",
+        tabIndex: canPreview && !hasError ? 0 : -1,
+        "aria-label": canPreview ? `${alt}. Click to enlarge` : alt,
+        "aria-expanded": canPreview ? isPreviewOpen : undefined,
         onKeyDown:
-          preview && !hasError
+          canPreview && !hasError
             ? (e: React.KeyboardEvent) => {
                 if (e.key === "Enter" || e.key === " ") {
                   e.preventDefault();
@@ -308,7 +411,7 @@ const Image: React.FC<ImageProps> = memo(
               }
             : undefined,
       }),
-      [preview, hasError, alt, isPreviewOpen, handleImageClick]
+      [canPreview, hasError, alt, isPreviewOpen, handleImageClick]
     );
 
     // Main image element with enhanced accessibility and error handling
@@ -358,7 +461,7 @@ const Image: React.FC<ImageProps> = memo(
               onLoad={handleImageLoad}
               onError={() => {
                 setHasError(true);
-                setShowFallback(false);
+                setFallbackActive(false);
               }}
               loading={eager ? "eager" : "lazy"}
               decoding="async"
@@ -380,7 +483,7 @@ const Image: React.FC<ImageProps> = memo(
           )}
 
           {/* Preview Overlay */}
-          {preview && !isLoading && !hasError && (
+          {canPreview && !isLoading && !hasError && (
             <div
               className="absolute inset-0 bg-black/0 hover:bg-black/20 transition-all duration-300 flex items-center justify-center opacity-0 hover:opacity-100"
               aria-hidden="true"
@@ -407,16 +510,29 @@ const Image: React.FC<ImageProps> = memo(
         props,
         src,
         handleImageError,
-        preview,
+        canPreview,
       ]
     );
+
+    // Nothing to load: the built-in stand-in. Returned after every hook above
+    // so the hook order never changes when `src` comes and goes.
+    if (!hasImage) {
+      return (
+        <ImageStandIn
+          alt={alt}
+          fallbackStyle={fallbackStyle}
+          size={size}
+          className={className}
+        />
+      );
+    }
 
     return (
       <>
         {imageElement}
 
         {/* Preview Overlay */}
-        {isPreviewOpen && createPortal(
+        {previewOpen && createPortal(
           <div
             ref={overlayRef}
             className={`fixed z-50 flex items-center justify-center p-4 transition-all ease-out ${previewClassName} ${
@@ -551,14 +667,17 @@ const Image: React.FC<ImageProps> = memo(
                 <img
                   src={showFallback ? fallback : src}
                   alt={showFallback ? `${alt} (fallback)` : alt}
-                  className={`max-w-[95vw] max-h-[95vh] w-auto h-auto object-contain rounded-lg transition-all duration-300 motion-reduce:duration-150 ease-out ${
+                  className={`max-w-[calc(100vw-2rem)] max-h-[calc(100vh-2rem)] w-auto h-auto object-contain rounded-lg transition-all duration-300 motion-reduce:duration-150 ease-out ${
                     isClosing
                       ? "filter blur-sm brightness-50"
                       : "filter blur-0 brightness-100"
                   }`}
                   style={{
-                    maxWidth: "95vw",
-                    maxHeight: "95vh",
+                    // The overlay has p-4 (1rem each side). A percentage of the
+                    // viewport (95vw/95vh) is bigger than the space left on small
+                    // screens, so the image overran its frame, border and corners.
+                    maxWidth: "calc(100vw - 2rem)",
+                    maxHeight: "calc(100vh - 2rem)",
                     width: "auto",
                     height: "auto",
                   }}
