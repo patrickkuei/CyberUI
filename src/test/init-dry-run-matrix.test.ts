@@ -6,7 +6,10 @@
 // the content the preview showed.
 import { afterEach, describe, expect, it } from 'vitest';
 import {
+  CLAUDE_IMPORT_BLOCK,
   CLI_TIMEOUT,
+  END,
+  GEMINI_IMPORT_BLOCK,
   HEADING,
   START,
   USER_NOTES,
@@ -21,6 +24,9 @@ interface Case {
   // Expected [file, action] pairs, in any order.
   expect: Array<[string, string]>;
   warns?: boolean;
+  // Exact content of these files after the real run, for cases whose user
+  // text must survive.
+  after?: Record<string, string>;
 }
 
 const LEGACY_BLOCK = `${block('## CyberUI (cyberui-2045 v2.0.0)\n\nold inline guide')}\n`;
@@ -75,6 +81,32 @@ const CASES: Record<string, Case> = {
     args: ['--copilot'],
     seed: { '.github/copilot-instructions.md': `${USER_NOTES}\n${LEGACY_BLOCK}` },
     expect: [['.github/copilot-instructions.md', 'removed'], ...COPILOT_OWN],
+  },
+  '--all over all four legacy inline files, each with user text around the block': {
+    args: ['--all'],
+    seed: {
+      'CLAUDE.md': `${USER_NOTES}\n${LEGACY_BLOCK}\nClaude tail.\n`,
+      'GEMINI.md': `# Gemini notes\n\n${LEGACY_BLOCK}\nGemini tail.\n`,
+      '.cursorrules': `# Cursor rules\n\n${LEGACY_BLOCK}\n# More rules\n`,
+      '.github/copilot-instructions.md': `${USER_NOTES}\n${LEGACY_BLOCK}\nCopilot tail.\n`,
+    },
+    expect: [
+      ['CLAUDE.md', 'migrated'],
+      ['.claude/cyberui.md', 'created'],
+      ['GEMINI.md', 'migrated'],
+      ['.gemini/cyberui.md', 'created'],
+      ['.cursorrules', 'removed'],
+      ...CURSOR_OWN,
+      ['.github/copilot-instructions.md', 'removed'],
+      ...COPILOT_OWN,
+      ...AGENTS,
+    ],
+    after: {
+      'CLAUDE.md': `${USER_NOTES}\n${CLAUDE_IMPORT_BLOCK}\n\nClaude tail.\n`,
+      'GEMINI.md': `# Gemini notes\n\n${GEMINI_IMPORT_BLOCK}\n\nGemini tail.\n`,
+      '.cursorrules': '# Cursor rules\n\n# More rules\n',
+      '.github/copilot-instructions.md': `${USER_NOTES}\nCopilot tail.\n`,
+    },
   },
 };
 
@@ -131,7 +163,19 @@ describe('init --dry-run matrix', { timeout: CLI_TIMEOUT }, () => {
     const listed = parseDryRun(dryResult.stdout);
     expect(sorted(listed.map((l) => [l.file, l.action]))).toEqual(sorted(c.expect));
     for (const l of listed) {
-      if (l.action === 'deleted' || l.action === 'removed') continue;
+      if (l.action === 'deleted' || l.action === 'removed') {
+        // The exact lines taken out, then what happens to the rest of the file.
+        expect(l.preview).toMatch(/^Takes out these \d+ lines/);
+        expect(l.preview).toContain(`\n  - ${START}\n`);
+        expect(l.preview).toContain(`\n  - ${END}\n`);
+        if (l.action === 'deleted') {
+          expect(l.preview).toContain('Nothing else is left, so the file is deleted.');
+        } else {
+          const kept = (c.after?.[l.file] ?? USER_NOTES).split('\n').slice(0, -1);
+          expect(l.preview).toContain(`Keeps the other ${kept.length} lines, starting:\n    ${kept[0]}`);
+        }
+        continue;
+      }
       expect(l.preview.includes(HEADING) || l.preview.includes('@')).toBe(true);
     }
 
@@ -145,7 +189,7 @@ describe('init --dry-run matrix', { timeout: CLI_TIMEOUT }, () => {
         expect(real.exists(l.file)).toBe(false);
       } else if (l.action === 'removed') {
         expect(real.read(l.file)).not.toContain(START);
-        expect(real.read(l.file)).toBe(USER_NOTES);
+        expect(real.read(l.file)).toBe(c.after?.[l.file] ?? USER_NOTES);
       } else if (l.preview.startsWith(START)) {
         expect(real.read(l.file)).toContain(l.preview);
       } else {
@@ -153,5 +197,7 @@ describe('init --dry-run matrix', { timeout: CLI_TIMEOUT }, () => {
         expect(real.read(l.file)).toBe(`${l.preview}\n`);
       }
     }
+    // User text around the blocks survives.
+    for (const [file, content] of Object.entries(c.after ?? {})) expect(real.read(file)).toBe(content);
   });
 });

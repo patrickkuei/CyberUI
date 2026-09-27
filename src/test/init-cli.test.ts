@@ -276,6 +276,69 @@ describe.each([
     expect(sb.snapshot()).toEqual(before);
   });
 
+  it('--dry-run shows the exact lines it takes out and what stays, and writes nothing', () => {
+    sb.write(legacyFile, `${USER_NOTES.trimEnd()}\n\n${legacyBlock}`);
+    const before = sb.snapshot();
+    const { status, stdout } = sb.run(flag, '--dry-run');
+    expect(status).toBe(0);
+    expect(sb.snapshot()).toEqual(before);
+    expect(stdout).toContain(
+      [
+        `── ${legacyFile} (removed — took out the cyberui-2045 block, now in ${ownFile}; kept the rest of the file) ──`,
+        'Takes out these 5 lines, plus 1 blank line next to them:',
+        `  - ${START}`,
+        '  - ## CyberUI (cyberui-2045 v2.0.0)',
+        '  -',
+        '  - old inline guide',
+        `  - ${END}`,
+        'Keeps the other 3 lines, starting:',
+        '    # My project',
+        '',
+        '    Keep the neon at 11.',
+      ].join('\n'),
+    );
+  });
+
+  it('--dry-run shortens a long block and a long remainder', () => {
+    const rules = Array.from({ length: 20 }, (_, i) => `rule ${i + 1}`).join('\n');
+    const notes = Array.from({ length: 10 }, (_, i) => `note ${i + 1}`).join('\n');
+    sb.write(legacyFile, `${notes}\n\n${block(rules)}\n`);
+    const { stdout } = sb.run(flag, '--dry-run');
+    expect(stdout).toContain(
+      [
+        'Takes out these 22 lines, plus 1 blank line next to them:',
+        `  - ${START}`,
+        '  - rule 1',
+        '  - rule 2',
+        '  - … (17 more lines)',
+        '  - rule 20',
+        `  - ${END}`,
+        'Keeps the other 10 lines, starting:',
+        '    note 1',
+        '    note 2',
+        '    note 3',
+        '    … (7 more lines)',
+      ].join('\n'),
+    );
+  });
+
+  it('--dry-run of a legacy file holding only the block says it will be deleted', () => {
+    sb.write(legacyFile, legacyBlock);
+    const { stdout } = sb.run(flag, '--dry-run');
+    expect(stdout).toContain(
+      [
+        'Takes out these 5 lines:',
+        `  - ${START}`,
+        '  - ## CyberUI (cyberui-2045 v2.0.0)',
+        '  -',
+        '  - old inline guide',
+        `  - ${END}`,
+        'Nothing else is left, so the file is deleted.',
+      ].join('\n'),
+    );
+    expect(sb.read(legacyFile)).toBe(legacyBlock);
+  });
+
   it('keeps user content on both sides of the removed block', () => {
     sb.write(legacyFile, `# Top\n\n${legacyBlock}\n# Bottom\n`);
     expect(sb.run(flag).status).toBe(0);

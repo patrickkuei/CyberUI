@@ -142,7 +142,7 @@ async function main() {
     if (plan.problem) {
       skipped = true;
       console.error(
-        `  ✗  Skipped  ${plan.problem.file} — ${plan.problem.text}. Fix or remove the marker by hand, then re-run init. Nothing was written for ${TARGETS[key].name}.`,
+        `  ✗  ${'Skipped'.padEnd(9)} ${plan.problem.file} — ${plan.problem.text}. Fix or remove the marker by hand, then re-run init. Nothing was written for ${TARGETS[key].name}.`,
       );
       continue;
     }
@@ -339,9 +339,10 @@ function planOwnFile(file, text) {
   return { file, action, preview: text, next };
 }
 
-// Take the marked block (and the line break and blank line init put around
-// it) out of `file`, keeping everything else as it is. Delete the file if the
-// block was all it held.
+// Take the marked block out of `file`, with its line break and the blank line
+// init put next to it; when the block ends the file, trailing whitespace before
+// it goes too. Everything else stays. Delete the file if the block was all it
+// held.
 function planRemoveBlock(file, existing, found, movedTo) {
   const eol = detectEol(existing);
   const before = existing.slice(0, found.start);
@@ -351,22 +352,61 @@ function planRemoveBlock(file, existing, found, movedTo) {
 
   const rest = after.trim() === '' ? (before.trim() === '' ? '' : `${before.trimEnd()}${eol}`) : `${before}${after}`;
 
+  // The dry-run preview shows exactly which lines go and what stays.
+  const blockLines = linesOf(existing.slice(found.start, found.end));
+  // Each block line takes its own line break with it; any more are blank lines.
+  const blank = Math.max(0, countLineBreaks(existing) - countLineBreaks(rest) - blockLines.length);
+  const removed = [
+    `Takes out these ${plural(blockLines.length, 'line')}${blank ? `, plus ${plural(blank, 'blank line')} next to them` : ''}:`,
+    excerpt(blockLines, '  - ', 3, 2),
+  ];
+
   if (rest.trim() === '') {
     return {
       file,
       action: 'Deleted',
-      preview: '(file deleted: it held only the cyberui-2045 guide)',
+      preview: [...removed, 'Nothing else is left, so the file is deleted.'].join('\n'),
       next: null,
       note: `it held only the cyberui-2045 guide, now in ${movedTo}`,
     };
   }
+  const restLines = linesOf(rest);
   return {
     file,
     action: 'Removed',
-    preview: '(the cyberui-2045 block is taken out; the rest of the file stays as it is)',
+    preview: [
+      ...removed,
+      `Keeps the other ${plural(restLines.length, 'line')}, starting:`,
+      excerpt(restLines, '    ', 3, 0),
+    ].join('\n'),
     next: rest,
     note: `took out the cyberui-2045 block, now in ${movedTo}; kept the rest of the file`,
   };
+}
+
+// The lines of `text`, whatever its line ending, without the empty one after a
+// final line break.
+function linesOf(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines[lines.length - 1] === '') lines.pop();
+  return lines;
+}
+
+function countLineBreaks(text) {
+  return (text.match(/\n/g) ?? []).length;
+}
+
+function plural(n, word) {
+  return `${n} ${word}${n === 1 ? '' : 's'}`;
+}
+
+// `lines`, each after `prefix`; when there are too many, only the first `head`
+// and last `tail` of them around a "… (N more lines)" line.
+function excerpt(lines, prefix, head, tail) {
+  const shown = lines.length <= head + tail + 1
+    ? lines
+    : [...lines.slice(0, head), `… (${plural(lines.length - head - tail, 'more line')})`, ...lines.slice(lines.length - tail)];
+  return shown.map((line) => `${prefix}${line}`.trimEnd()).join('\n');
 }
 
 // ─── Apply a planned write ────────────────────────────────────────────────────
@@ -387,7 +427,8 @@ function apply({ file, action, preview, next, note }) {
     mkdirSync(dirname(filePath), { recursive: true });
     writeFileSync(filePath, next, 'utf8');
   }
-  console.log(`  ✓  ${action.padEnd(8)} ${file}${suffix}`);
+  // 9 = the longest action, "Unchanged", so every file name lines up.
+  console.log(`  ✓  ${action.padEnd(9)} ${file}${suffix}`);
 }
 
 // ─── Run ──────────────────────────────────────────────────────────────────────
