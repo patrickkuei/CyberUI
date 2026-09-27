@@ -591,7 +591,9 @@ const Image: React.FC<ImageProps> = memo(
             >
               {/* Animated Close Button */}
               <button
+                type="button"
                 onClick={closePreview}
+                aria-label="Close preview"
                 className={`absolute top-4 right-4 text-white hover:text-accent/80 transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 motion-reduce:rotate-0 motion-reduce:hover:scale-100 font-bold z-20 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transform ${
                   isClosing
                     ? "bg-black/0 scale-50 rotate-180 opacity-0"

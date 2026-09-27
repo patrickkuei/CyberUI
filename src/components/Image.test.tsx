@@ -68,13 +68,46 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+  });
+
+  it('gives the preview close button an accessible name', () => {
+    render(<Image src="test.jpg" alt="Test image" preview />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
+    const closeButton = within(dialog).getByRole('button', { name: 'Close preview' });
+    expect(closeButton).toHaveAttribute('type', 'button');
+  });
+
+  it('is not wrapped in an aria-hidden ancestor (the #46 Modal bug pattern), so getByRole finds it without { hidden: true }', () => {
+    render(<Image src="test.jpg" alt="Test image" preview />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
+    let node: HTMLElement | null = dialog;
+    while (node) {
+      expect(node).not.toHaveAttribute('aria-hidden', 'true');
+      node = node.parentElement;
+    }
   });
 
   it('limits the preview image to the space inside the overlay padding (1rem each side)', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     const preview = within(screen.getByRole('dialog')).getByAltText('Test image');
     // 95vw/95vh left the image bigger than its frame on small screens.
     expect(preview.style.maxWidth).toBe('calc(100vw - 2rem)');
@@ -86,6 +119,9 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview onPreviewOpen={handlePreviewOpen} />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(handlePreviewOpen).toHaveBeenCalledTimes(1);
   });
 
@@ -116,6 +152,9 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
   });
 });
