@@ -88,6 +88,26 @@ describe('CyberNotificationProvider', () => {
     expect(shell.style.transform).toContain('scale(0.75)');
   });
 
+  it('does not read scrollWidth again for a toast that is already measured', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+    const shell = toastShell();
+    expect(shell.style.transform).toContain('translateX(0px)');
+
+    const reads: HTMLElement[] = [];
+    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+      configurable: true,
+      get(this: HTMLElement) {
+        reads.push(this);
+        return 320;
+      },
+    });
+    // Re-render the provider (and so this toast) by closing it.
+    fireEvent.click(screen.getByLabelText('Close notification'));
+    expect(shell.style.transform).toContain('translateX(100%)');
+    expect(reads).not.toContain(shell);
+  });
+
   describe('when the browser reports a zero width (e.g. jsdom, or a toast rendered in a hidden container)', () => {
     beforeEach(() => {
       // Overrides the outer beforeEach's stub back to jsdom's real behavior.

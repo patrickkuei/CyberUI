@@ -52,8 +52,10 @@ const ToastSlot: React.FC<ToastSlotProps> = ({
   // (covers environments without ResizeObserver). Only a positive width is
   // reported, so this cannot trigger a render loop.
   useLayoutEffect(() => {
+    // Once measured, skip the read: scrollWidth forces layout.
+    if (measured) return;
     const width = shellRef.current?.scrollWidth ?? 0;
-    if (!measured && width > 0) onWidth(id, width);
+    if (width > 0) onWidth(id, width);
   });
 
   // A toast that measured 0 (hidden/zero-size container) is re-measured when
