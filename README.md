@@ -105,7 +105,7 @@ npx cyberui-2045 init --all --inline      # paste the guide in everywhere instea
 npx cyberui-2045 init --all --dry-run     # show every file it would write; write nothing
 ```
 
-With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers, and nothing outside them is touched. For Claude Code, `CLAUDE.md` gets only this:
+With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
 
 ```md
 <!-- cyberui-2045:start -->
@@ -113,7 +113,7 @@ With no flags, `init` asks which tools to set up, then "own file (recommended) o
 <!-- cyberui-2045:end -->
 ```
 
-Re-run `init` after upgrading: it rewrites only the guide file, and a file that is already up to date is left alone. If an older version pasted the guide into `CLAUDE.md` or `GEMINI.md`, that block becomes the import line; if it pasted it into `.cursorrules` or `.github/copilot-instructions.md`, the block is taken out of that file (deleted only if nothing else was in it) and the new rule file takes over. `init` prints what it did to each file.
+Re-run `init` after upgrading: it rewrites only the guide file, and a file that is already up to date is left alone. If an older version pasted the guide into `CLAUDE.md` or `GEMINI.md`, that block becomes the import line; if it pasted it into `.cursorrules` or `.github/copilot-instructions.md`, the block is taken out of that file together with the blank line next to it (and, if the block was at the end, any trailing blank lines and spaces before it), the file is deleted only if nothing else was in it, and the new rule file takes over. `init` prints what it did to each file, and `--dry-run` shows the exact lines it would take out.
 
 **Commit the generated guide file** (`.claude/cyberui.md`, `.gemini/cyberui.md`, `.cursor/rules/cyberui.mdc` or `.github/instructions/cyberui.instructions.md`). If its folder is gitignored, teammates and CI get a dangling import or no guide at all.
 
