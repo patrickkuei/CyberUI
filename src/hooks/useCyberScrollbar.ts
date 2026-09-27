@@ -159,9 +159,14 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  *
  * Page-level mode notices content changes by observing the size of `html`
  * and `body`, plus the size of each of `body`'s direct children (re-observed
- * whenever a child is added or removed). That keeps it working even when
+ * whenever a child is added or removed). That keeps it working when
  * `html, body { height: 100% }` pins `body`'s own box to the viewport size:
- * a child growing or shrinking inside it still reports its own size change.
+ * a direct child of `body` growing or shrinking still reports its own size
+ * change. It does **not** cover a fixed-height wrapper *below* `body` — for
+ * example `html, body, #root { height: 100% }`, as in a Next.js `__next`
+ * root or a similar SPA shell. That wrapper's box is pinned the same way,
+ * but its children aren't observed, so content growth inside it is only
+ * noticed on the next `window` resize.
  *
  * @example
  * ```tsx
