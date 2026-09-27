@@ -1,7 +1,17 @@
 // Consumer-facing AI usage guide for cyberui-2045.
-// Injected into CLAUDE.md / .cursorrules / copilot-instructions.md by `init`.
+// Written by `init` to each tool's own file (.claude/cyberui.md,
+// .gemini/cyberui.md, .cursor/rules/cyberui.mdc,
+// .github/instructions/cyberui.instructions.md), or pasted between markers
+// into CLAUDE.md / GEMINI.md / .cursorrules / .github/copilot-instructions.md
+// (--inline) and AGENTS.md (always).
 
-export function getUsageContent(version = '2.6.0') {
+// `version` is required: init passes the installed package.json version. There
+// is deliberately no default — a stale hard-coded one would put a wrong version
+// heading in the user's file.
+export function getUsageContent(version) {
+  if (typeof version !== 'string' || version === '') {
+    throw new Error('getUsageContent(version): the cyberui-2045 version is required');
+  }
   return `## CyberUI (cyberui-2045 v${version})
 
 Cyberpunk-themed React UI library. Docs & live examples: https://patrickkuei.github.io/CyberUI/storybook/

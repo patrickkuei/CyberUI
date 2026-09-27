@@ -13,7 +13,10 @@ import { warnOnce } from "./utils/devWarn";
  * ```bash
  * npx cyberui-2045 init
  * ```
- * Writes a full usage guide into CLAUDE.md / .cursorrules / copilot-instructions.md.
+ * Adds a full usage guide for Claude Code (.claude/cyberui.md, imported from CLAUDE.md),
+ * Gemini CLI (.gemini/cyberui.md, imported from GEMINI.md), Cursor (.cursor/rules/cyberui.mdc),
+ * GitHub Copilot (.github/instructions/cyberui.instructions.md) or AGENTS.md.
+ * `--inline` pastes it into the tool's main instruction file instead.
  *
  * ⚠️ REQUIRED: import the stylesheet once in your app entry (e.g. main.tsx / index.tsx):
  * ```tsx

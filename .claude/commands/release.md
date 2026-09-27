@@ -29,8 +29,8 @@ Run `git diff CLAUDE.md AGENT.md README.md public/llms.txt bin/usage-content.js 
 Update the version string to `$ARGUMENTS` in:
 1. `package.json` → `"version"` field
 2. `src/index.ts` → `export const version = "..."` line
-3. `bin/init.js` → `let version = '...'` fallback (used only if `package.json` can't be read)
-4. `bin/usage-content.js` → `getUsageContent(version = '...')` default param
+
+(`bin/usage-content.js` has no version to bump: `init` passes it the installed `package.json` version.)
 
 Then run `npm install` (no package changes expected — this just re-syncs `package-lock.json`'s version fields to match `package.json`). Confirm `git diff package-lock.json` only shows version-string changes, not dependency changes, before proceeding.
 

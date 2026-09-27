@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Image`** — the `fallback` URL is now also shown when `src` is missing or empty, not only when `src` fails to load (#3).
 - **`Carousel`** — slides without a `src` render the `Image` stand-in, styled by a new Carousel-level `fallbackStyle` prop. The stand-in's own corner brackets are hidden inside a Carousel, which draws its own (#3).
 - **Demo Application** — `Table` now appears in the `Console` tab, driven by the archive filter and the `Pagination` control above it, with an empty state for filters that match nothing.
+- **`init --inline`** — new flag that pastes the whole usage guide into the tool's main instruction file between the `cyberui-2045` markers (`CLAUDE.md`, `GEMINI.md`, `.cursorrules` or `.github/copilot-instructions.md`) instead of giving it a file of its own. The interactive prompt asks "own file (recommended) or inline?" once, when any selected tool has an own-file mode, with own file preselected (#53).
+- **`init --gemini`** — new target for Gemini CLI, included in `--all`. The guide goes in `.gemini/cyberui.md` and `GEMINI.md` gets a marked block with one import line, `@./.gemini/cyberui.md`; with `--inline` the guide is pasted into `GEMINI.md`. A `GEMINI.md` that already has the pasted guide has that block replaced by the import line (#53).
+- **`init --cursor` / `init --copilot` own-file mode** — Cursor gets `.cursor/rules/cyberui.mdc` with `alwaysApply: true` frontmatter; Copilot gets `.github/instructions/cyberui.instructions.md` with `applyTo: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx,**/*.css"`. The version heading sits right under the frontmatter (#53).
+- **`init --help`** — lists the targets, where each one puts the guide, and the `--inline` and `--dry-run` options (#53).
+- **`docs/agent-instruction-files.md`** — what Claude Code, Gemini CLI, Cursor, GitHub Copilot and `AGENTS.md` each support for instruction files, with links to their docs, and how `init` uses it (#53).
 
 ### Changed
 
@@ -25,6 +30,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Reduced motion: decorative loops stop** — the scan line and spin animations, the idle `Modal`/`Drawer` glow loops (which hold a static glow instead), `Skeleton` and loading pulses, `Steps` chevron pulses, and hover zoom on `Image` thumbnails are off. `Button`'s press scale, `Toggle`'s knob slide and `Accordion`'s chevron and panel transitions also stop. The new `usePrefersReducedMotion` hook handles the ones set through inline styles (#4).
 - **`Carousel` under reduced motion** — autoplay does not advance, and resumes after an image preview closes only when motion is allowed. `matrix` and `signal-glitch` transitions render as `fade`, and `slide` changes slides without sliding (#4).
 - **`useCyberScrollbar` under reduced motion** — the velocity glow and arrow animation are skipped and transitions are off (#32).
+- **`init --claude` adds the guide as an import** — the guide now goes in its own file, `.claude/cyberui.md`, and `CLAUDE.md` gets only a marked block with one line, `@.claude/cyberui.md`, instead of about 150 pasted lines. Re-running after an upgrade rewrites only `.claude/cyberui.md`; a `CLAUDE.md` that already has the pasted guide has that block replaced by the import line, and `init` says so. `--dry-run` shows both files (#53).
+- **`init --cursor` and `init --copilot` write their own rule file by default** — instead of pasting the guide into `.cursorrules` or `.github/copilot-instructions.md` (use `--inline` for that). A guide an older `init` pasted there is taken out once the rule file is written, together with the blank line next to it; the file is deleted only if the guide was all it held. `init` prints `Removed` or `Deleted` for it, and `--dry-run` shows the exact lines it would take out and the start of what stays. `AGENTS.md` still always gets the guide pasted in (#53).
+- **`init --inline` while a guide file of its own exists** — `init` writes the inline block and prints a note about the own file (for Cursor and Copilot: that the tool now reads the guide twice) instead of deleting it (#53).
 
 ### Fixed
 
@@ -36,6 +44,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Image` preview overflowed its frame on small screens** — the enlarged image was capped at `95vw`/`95vh`, but the overlay has 1rem of padding on every side, so on short or narrow viewports the image stuck out past the frame that carries the border, glow, corner accents and caption. It is now capped at `calc(100vw - 2rem)` by `calc(100vh - 2rem)`.
 - **`Image` `preview` default documented correctly** — the JSDoc and Storybook table said `false`, but the default has always been `true`. Behaviour is unchanged.
 - **`Image` stories** — `Gallery Layout` and `All Sizes` no longer shrink their images on narrow screens (and `All Sizes` no longer claims pixel sizes `size` never set), and the stand-in stories centre their custom-size examples.
+- **`init` wrote the wrong version on Windows** — `bin/init.js` built the `package.json` path from `URL.pathname`, which is `/C:/…` on Windows and can't be opened, so it silently fell back to a hard-coded `2.6.0` and the guide's `cyberui-2045 vX.Y.Z` heading was wrong for any other version. It now uses `fileURLToPath`, and the hard-coded fallback is gone: if `package.json` can't be read, `init` exits with an error instead of guessing (#53).
+- **`init` appended a second guide to a file with a broken marker** — a start marker without an end marker got a new block appended after it, and an end marker before the start marker made the replacement copy text. Now a file with a lone or out-of-order marker is left alone: `init` skips that tool, says which file to fix, and exits with code 1 (#53).
+- **`init` reported an empty marked block as `Migrated`** — a start marker directly followed by an end marker is now filled and reported as `Updated` (#53).
+- **`init` and CRLF files** — `init` wrote LF line endings into CRLF files and rewrote an up-to-date CRLF guide on every run. It now keeps each file's line endings, so an up-to-date CRLF file is reported `Unchanged` and not rewritten (#53).
+- **`init` checks its own install first** — the package version is read before any prompt, so a broken install fails before you answer questions (#53).
+- **`init --agents --inline` warns** — `--inline` with no selected tool that has an own-file mode prints a one-line warning instead of being silently ignored (#53).
+- **`getUsageContent()` had a stale default version** — `bin/usage-content.js` defaulted to `2.6.0`, so a caller that forgot the version got a wrong heading. The version is now required, and the `/release` step that bumped the default is gone (#53).
 
 ## [2.6.0] - 2026-09-25
 

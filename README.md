@@ -82,22 +82,42 @@ Also includes hooks (`useCyberScrollbar`, `useCyberNotifications`, `useAnimatedP
 
 ## AI Coding Setup
 
-If you use an AI coding assistant (Claude Code, Cursor, GitHub Copilot, or any tool that reads the open `AGENTS.md` standard), run this once after installing:
+If you use an AI coding assistant (Claude Code, Gemini CLI, Cursor, GitHub Copilot, or any tool that reads the open `AGENTS.md` standard), run this once after installing:
 
 ```bash
 npx cyberui-2045 init
 ```
 
-It writes a concise CyberUI usage guide — components, hooks, tokens, and patterns — directly into your AI config file (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`, or `AGENTS.md`). Idempotent: safe to re-run after upgrades.
+It gives your assistant a concise CyberUI usage guide — components, hooks, tokens, and patterns — in the way each tool supports best. By default the guide goes in a file of its own, so your own instruction file stays short:
+
+| Flag | Default: the guide's own file | With `--inline` |
+|---|---|---|
+| `--claude` | `.claude/cyberui.md`, imported from `CLAUDE.md` by one `@.claude/cyberui.md` line | pasted into `CLAUDE.md` |
+| `--gemini` | `.gemini/cyberui.md`, imported from `GEMINI.md` by one `@./.gemini/cyberui.md` line | pasted into `GEMINI.md` |
+| `--cursor` | `.cursor/rules/cyberui.mdc` (always applied) | pasted into `.cursorrules` |
+| `--copilot` | `.github/instructions/cyberui.instructions.md` (applies to TS/JS/CSS files) | pasted into `.github/copilot-instructions.md` |
+| `--agents` | pasted into `AGENTS.md` (the format has no alternative) | same |
 
 ```bash
-npx cyberui-2045 init --claude    # Claude Code only
-npx cyberui-2045 init --cursor    # Cursor only
-npx cyberui-2045 init --copilot   # GitHub Copilot only
-npx cyberui-2045 init --agents    # AGENTS.md standard only
-npx cyberui-2045 init --all       # all four
-npx cyberui-2045 init --dry-run   # preview without writing
+npx cyberui-2045 init --claude --cursor   # combine targets
+npx cyberui-2045 init --all               # all five
+npx cyberui-2045 init --all --inline      # paste the guide in everywhere instead
+npx cyberui-2045 init --all --dry-run     # show every file it would write; write nothing
 ```
+
+With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
+
+```md
+<!-- cyberui-2045:start -->
+@.claude/cyberui.md
+<!-- cyberui-2045:end -->
+```
+
+Re-run `init` after upgrading: it rewrites only the guide file, and a file that is already up to date is left alone. If an older version pasted the guide into `CLAUDE.md` or `GEMINI.md`, that block becomes the import line; if it pasted it into `.cursorrules` or `.github/copilot-instructions.md`, the block is taken out of that file together with the blank line next to it (and, if the block was at the end, any trailing blank lines and spaces before it), the file is deleted only if nothing else was in it, and the new rule file takes over. `init` prints what it did to each file, and `--dry-run` shows the exact lines it would take out.
+
+**Commit the generated guide file** (`.claude/cyberui.md`, `.gemini/cyberui.md`, `.cursor/rules/cyberui.mdc` or `.github/instructions/cyberui.instructions.md`). If its folder is gitignored, teammates and CI get a dangling import or no guide at all.
+
+[docs/agent-instruction-files.md](https://github.com/patrickkuei/CyberUI/blob/master/docs/agent-instruction-files.md) explains what each tool supports, with links to its documentation.
 
 ## Customization
 
