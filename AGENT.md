@@ -21,7 +21,7 @@ npx cyberui-2045 init --claude            # guide in .claude/cyberui.md; CLAUDE.
 npx cyberui-2045 init --claude --inline   # paste the whole guide into CLAUDE.md instead
 npx cyberui-2045 init --cursor | --copilot | --agents | --all
 ```
-Import mode is the default for Claude Code and keeps `CLAUDE.md` short; re-running `init` after an upgrade rewrites only `.claude/cyberui.md`, and turns an older inline block into the import line. `.cursorrules`, `.github/copilot-instructions.md` and `AGENTS.md` always get the guide inline. Add `--dry-run` to preview.
+Import mode is the default for Claude Code and keeps `CLAUDE.md` short; re-running `init` after an upgrade rewrites only `.claude/cyberui.md`, and turns an older inline block into the import line. `.cursorrules`, `.github/copilot-instructions.md` and `AGENTS.md` always get the guide inline. Add `--dry-run` to preview. Commit `.claude/cyberui.md` — if `.claude/` is gitignored, teammates and CI will see `CLAUDE.md`'s `@.claude/cyberui.md` import dangling.
 
 ## 2. Vibe Coding Principles (Consumer Edition)
 

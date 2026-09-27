@@ -108,7 +108,7 @@ For Claude Code, the guide goes in its own file, `.claude/cyberui.md`, and `CLAU
 <!-- cyberui-2045:end -->
 ```
 
-This keeps your `CLAUDE.md` short and gives the guide one place to be replaced: re-running `init` after an upgrade rewrites `.claude/cyberui.md` and leaves `CLAUDE.md` alone. Claude Code still loads the imported guide at launch, so it counts toward context the same as before. If your `CLAUDE.md` already has the guide pasted in from an older version, `init --claude` replaces that block with the import line. Pass `--inline` (or choose "inline" in the interactive prompt) to paste the whole guide into `CLAUDE.md` instead. The other targets always get the guide pasted in.
+This keeps your `CLAUDE.md` short and gives the guide one place to be replaced: re-running `init` after an upgrade rewrites `.claude/cyberui.md` and leaves `CLAUDE.md` alone. Claude Code still loads the imported guide at launch, so it counts toward context the same as before. If your `CLAUDE.md` already has the guide pasted in from an older version, `init --claude` replaces that block with the import line. Pass `--inline` (or choose "inline" in the interactive prompt) to paste the whole guide into `CLAUDE.md` instead. The other targets always get the guide pasted in. Commit `.claude/cyberui.md` — if `.claude/` is gitignored, teammates and CI will see `CLAUDE.md`'s `@.claude/cyberui.md` import dangling.
 
 ## Customization
 
