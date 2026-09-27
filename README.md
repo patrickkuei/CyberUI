@@ -88,16 +88,27 @@ If you use an AI coding assistant (Claude Code, Cursor, GitHub Copilot, or any t
 npx cyberui-2045 init
 ```
 
-It writes a concise CyberUI usage guide — components, hooks, tokens, and patterns — directly into your AI config file (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`, or `AGENTS.md`). Idempotent: safe to re-run after upgrades.
+It adds a concise CyberUI usage guide — components, hooks, tokens, and patterns — to your AI config file (`CLAUDE.md`, `.cursorrules`, `.github/copilot-instructions.md`, or `AGENTS.md`). Idempotent: safe to re-run after upgrades.
 
 ```bash
-npx cyberui-2045 init --claude    # Claude Code only
-npx cyberui-2045 init --cursor    # Cursor only
-npx cyberui-2045 init --copilot   # GitHub Copilot only
-npx cyberui-2045 init --agents    # AGENTS.md standard only
-npx cyberui-2045 init --all       # all four
-npx cyberui-2045 init --dry-run   # preview without writing
+npx cyberui-2045 init --claude            # Claude Code only (import mode, see below)
+npx cyberui-2045 init --claude --inline   # Claude Code, guide pasted into CLAUDE.md
+npx cyberui-2045 init --cursor            # Cursor only
+npx cyberui-2045 init --copilot           # GitHub Copilot only
+npx cyberui-2045 init --agents            # AGENTS.md standard only
+npx cyberui-2045 init --all               # all four
+npx cyberui-2045 init --dry-run           # preview without writing
 ```
+
+For Claude Code, the guide goes in its own file, `.claude/cyberui.md`, and `CLAUDE.md` gets only a marked one-line import:
+
+```md
+<!-- cyberui-2045:start -->
+@.claude/cyberui.md
+<!-- cyberui-2045:end -->
+```
+
+This keeps your `CLAUDE.md` short and gives the guide one place to be replaced: re-running `init` after an upgrade rewrites `.claude/cyberui.md` and leaves `CLAUDE.md` alone. Claude Code still loads the imported guide at launch, so it counts toward context the same as before. If your `CLAUDE.md` already has the guide pasted in from an older version, `init --claude` replaces that block with the import line. Pass `--inline` (or choose "inline" in the interactive prompt) to paste the whole guide into `CLAUDE.md` instead. The other targets always get the guide pasted in.
 
 ## Customization
 

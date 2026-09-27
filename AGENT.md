@@ -15,6 +15,14 @@ Add this to your root entry file (e.g., `main.tsx`, `App.tsx`):
 import "cyberui-2045/styles.css";
 ```
 
+**Give your AI assistant the usage guide (optional):**
+```bash
+npx cyberui-2045 init --claude            # guide in .claude/cyberui.md; CLAUDE.md gets one line: @.claude/cyberui.md
+npx cyberui-2045 init --claude --inline   # paste the whole guide into CLAUDE.md instead
+npx cyberui-2045 init --cursor | --copilot | --agents | --all
+```
+Import mode is the default for Claude Code and keeps `CLAUDE.md` short; re-running `init` after an upgrade rewrites only `.claude/cyberui.md`, and turns an older inline block into the import line. `.cursorrules`, `.github/copilot-instructions.md` and `AGENTS.md` always get the guide inline. Add `--dry-run` to preview.
+
 ## 2. Vibe Coding Principles (Consumer Edition)
 
 *   **Dark Mode Only**: CyberUI is designed for dark backgrounds. Always set your page background to a dark color (e.g., `bg-slate-900`, `#050505`).

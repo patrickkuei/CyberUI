@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Image`** — the `fallback` URL is now also shown when `src` is missing or empty, not only when `src` fails to load (#3).
 - **`Carousel`** — slides without a `src` render the `Image` stand-in, styled by a new Carousel-level `fallbackStyle` prop. The stand-in's own corner brackets are hidden inside a Carousel, which draws its own (#3).
 - **Demo Application** — `Table` now appears in the `Console` tab, driven by the archive filter and the `Pagination` control above it, with an empty state for filters that match nothing.
+- **`init --claude --inline`** — new flag that pastes the whole usage guide into `CLAUDE.md` between the `cyberui-2045` markers, which is what `init --claude` always did. The interactive prompt asks "import (recommended) or inline?" after you pick Claude Code, with import preselected (#53).
 
 ### Changed
 
@@ -25,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Reduced motion: decorative loops stop** — the scan line and spin animations, the idle `Modal`/`Drawer` glow loops (which hold a static glow instead), `Skeleton` and loading pulses, `Steps` chevron pulses, and hover zoom on `Image` thumbnails are off. `Button`'s press scale, `Toggle`'s knob slide and `Accordion`'s chevron and panel transitions also stop. The new `usePrefersReducedMotion` hook handles the ones set through inline styles (#4).
 - **`Carousel` under reduced motion** — autoplay does not advance, and resumes after an image preview closes only when motion is allowed. `matrix` and `signal-glitch` transitions render as `fade`, and `slide` changes slides without sliding (#4).
 - **`useCyberScrollbar` under reduced motion** — the velocity glow and arrow animation are skipped and transitions are off (#32).
+- **`init --claude` adds the guide as an import** — the guide now goes in its own file, `.claude/cyberui.md`, and `CLAUDE.md` gets only a marked block with one line, `@.claude/cyberui.md`, instead of about 150 pasted lines. Re-running after an upgrade rewrites only `.claude/cyberui.md`; a `CLAUDE.md` that already has the pasted guide has that block replaced by the import line, and `init` says so. `--dry-run` shows both files. `.cursorrules`, `.github/copilot-instructions.md` and `AGENTS.md` still get the guide pasted in (#53).
 
 ### Fixed
 

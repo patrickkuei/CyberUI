@@ -39,7 +39,7 @@ Run once after install to inject a full usage guide (props, gotchas, theming tok
 ```bash
 npx cyberui-2045 init
 ```
-Supports Claude Code (`CLAUDE.md`), Cursor (`.cursorrules`), GitHub Copilot (`.github/copilot-instructions.md`), and the open `AGENTS.md` standard. Idempotent — safe to re-run after upgrades.
+Supports Claude Code (the guide goes in `.claude/cyberui.md`, imported from `CLAUDE.md` with one `@.claude/cyberui.md` line; `--inline` pastes it into `CLAUDE.md` instead), Cursor (`.cursorrules`), GitHub Copilot (`.github/copilot-instructions.md`), and the open `AGENTS.md` standard. Idempotent — safe to re-run after upgrades.
 
 ## Usage Example
 ```tsx

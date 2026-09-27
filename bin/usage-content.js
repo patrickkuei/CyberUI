@@ -1,5 +1,6 @@
 // Consumer-facing AI usage guide for cyberui-2045.
-// Injected into CLAUDE.md / .cursorrules / copilot-instructions.md by `init`.
+// Written by `init` to .claude/cyberui.md (imported from CLAUDE.md), or pasted
+// into CLAUDE.md (--inline) / .cursorrules / copilot-instructions.md / AGENTS.md.
 
 export function getUsageContent(version = '2.6.0') {
   return `## CyberUI (cyberui-2045 v${version})
