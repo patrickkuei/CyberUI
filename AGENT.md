@@ -17,11 +17,15 @@ import "cyberui-2045/styles.css";
 
 **Give your AI assistant the usage guide (optional):**
 ```bash
-npx cyberui-2045 init --claude            # guide in .claude/cyberui.md; CLAUDE.md gets one line: @.claude/cyberui.md
-npx cyberui-2045 init --claude --inline   # paste the whole guide into CLAUDE.md instead
-npx cyberui-2045 init --cursor | --copilot | --agents | --all
+npx cyberui-2045 init --claude    # .claude/cyberui.md, imported from CLAUDE.md (@.claude/cyberui.md)
+npx cyberui-2045 init --gemini    # .gemini/cyberui.md, imported from GEMINI.md (@./.gemini/cyberui.md)
+npx cyberui-2045 init --cursor    # .cursor/rules/cyberui.mdc (always applied)
+npx cyberui-2045 init --copilot   # .github/instructions/cyberui.instructions.md (TS/JS/CSS files)
+npx cyberui-2045 init --agents    # pasted into AGENTS.md (always inline)
+npx cyberui-2045 init --all       # all five; add --inline to paste the guide into CLAUDE.md,
+                                  # GEMINI.md, .cursorrules and .github/copilot-instructions.md instead
 ```
-Import mode is the default for Claude Code and keeps `CLAUDE.md` short; re-running `init` after an upgrade rewrites only `.claude/cyberui.md`, and turns an older inline block into the import line. `.cursorrules`, `.github/copilot-instructions.md` and `AGENTS.md` always get the guide inline. Add `--dry-run` to preview. Commit `.claude/cyberui.md` — if `.claude/` is gitignored, teammates and CI will see `CLAUDE.md`'s `@.claude/cyberui.md` import dangling.
+Each tool gets the guide in a file of its own by default, so its instruction file stays short; re-running `init` after an upgrade rewrites only that file. A guide an older version pasted in is migrated: the `CLAUDE.md`/`GEMINI.md` block becomes the import line, and the `.cursorrules`/`.github/copilot-instructions.md` block is taken out (the file is deleted only if nothing else is in it). Add `--dry-run` to preview. Commit the generated guide file — if its folder is gitignored, teammates and CI get a dangling import or no guide. Details: [docs/agent-instruction-files.md](https://github.com/patrickkuei/CyberUI/blob/master/docs/agent-instruction-files.md).
 
 ## 2. Vibe Coding Principles (Consumer Edition)
 

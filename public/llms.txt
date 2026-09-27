@@ -39,7 +39,7 @@ Run once after install to inject a full usage guide (props, gotchas, theming tok
 ```bash
 npx cyberui-2045 init
 ```
-Supports Claude Code (the guide goes in `.claude/cyberui.md`, imported from `CLAUDE.md` with one `@.claude/cyberui.md` line — commit `.claude/cyberui.md`, or a gitignored `.claude/` leaves that import dangling for teammates and CI; `--inline` pastes it into `CLAUDE.md` instead), Cursor (`.cursorrules`), GitHub Copilot (`.github/copilot-instructions.md`), and the open `AGENTS.md` standard. Idempotent — safe to re-run after upgrades.
+Each tool gets the guide in its own file by default: Claude Code (`--claude`: `.claude/cyberui.md`, imported from `CLAUDE.md` with one `@.claude/cyberui.md` line), Gemini CLI (`--gemini`: `.gemini/cyberui.md`, imported from `GEMINI.md` with `@./.gemini/cyberui.md`), Cursor (`--cursor`: `.cursor/rules/cyberui.mdc`, always applied), GitHub Copilot (`--copilot`: `.github/instructions/cyberui.instructions.md`, for TS/JS/CSS files), and the open `AGENTS.md` standard (`--agents`: always pasted into `AGENTS.md`). `--all` does all five; `--inline` pastes the guide into `CLAUDE.md`, `GEMINI.md`, `.cursorrules` or `.github/copilot-instructions.md` instead; `--dry-run` previews. Commit the generated guide file — if its folder is gitignored, teammates and CI get a dangling import or no guide. Idempotent — safe to re-run after upgrades, and it migrates a guide an older version pasted in.
 
 ## Usage Example
 ```tsx
