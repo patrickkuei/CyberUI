@@ -72,9 +72,10 @@ describe('useResponsiveValue', () => {
     const container = document.createElement('div');
     container.innerHTML = html;
     document.body.appendChild(container);
+    let root: ReturnType<typeof hydrateRoot> | undefined;
     try {
       await act(async () => {
-        hydrateRoot(container, <OrientationProbe />);
+        root = hydrateRoot(container, <OrientationProbe />);
       });
       const span = container.querySelector('span')!;
       expect(span.textContent).toBe('vertical');
@@ -91,6 +92,7 @@ describe('useResponsiveValue', () => {
       });
       expect(span.textContent).toBe('vertical');
     } finally {
+      act(() => root?.unmount());
       container.remove();
     }
   });
