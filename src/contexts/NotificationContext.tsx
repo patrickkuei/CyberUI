@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useRef, type ReactNode } from "react";
+import React, {
+  useState,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  type ReactNode,
+} from "react";
 import Notification from "../components/Notification";
 import {
   REDUCED_MOTION_DURATION,
@@ -10,6 +16,119 @@ import {
   type NotificationOptions,
   type NotificationContextType,
 } from "./NotificationContextBase";
+
+type ToastPosition = NonNullable<CyberNotificationProviderProps["position"]>;
+
+interface ToastSlotProps {
+  notification: CyberNotification;
+  index: number;
+  position: ToastPosition;
+  reduceMotion: boolean;
+  onWidth: (id: string, width: number) => void;
+  onClose: (id: string) => void;
+}
+
+/**
+ * One positioned toast. Owns measuring the toast's width, which the slide-in
+ * needs before it can leave its off-screen enter position.
+ *
+ * A measured 0 (jsdom, or a toast in a zero-size / `display: none` container)
+ * isn't a real width yet: it is ignored (never stored, so state doesn't change
+ * and nothing loops) and the toast is measured again as soon as it can be.
+ */
+const ToastSlot: React.FC<ToastSlotProps> = ({
+  notification,
+  index,
+  position,
+  reduceMotion,
+  onWidth,
+  onClose,
+}) => {
+  const shellRef = useRef<HTMLDivElement>(null);
+  const { id } = notification;
+  const measured = Boolean(notification.width);
+
+  // Measure before paint, and again after any render while still unmeasured
+  // (covers environments without ResizeObserver). Only a positive width is
+  // reported, so this cannot trigger a render loop.
+  useLayoutEffect(() => {
+    // Once measured, skip the read: scrollWidth forces layout.
+    if (measured) return;
+    const width = shellRef.current?.scrollWidth ?? 0;
+    if (width > 0) onWidth(id, width);
+  });
+
+  // A toast that measured 0 (hidden/zero-size container) is re-measured when
+  // its size changes. Absent in some environments (e.g. jsdom): the effect
+  // above is then the only measurement.
+  useLayoutEffect(() => {
+    const el = shellRef.current;
+    if (measured || !el || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => {
+      const width = el.scrollWidth;
+      if (width > 0) {
+        onWidth(id, width);
+        observer.disconnect();
+      }
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [measured, id, onWidth]);
+
+  const isRight = position.includes("right");
+
+  return (
+    <div
+      className="absolute"
+      style={{
+        right: isRight ? 0 : undefined,
+        left: position.includes("left") ? 0 : undefined,
+        top: `${index * 70}px`,
+        width: notification.width ? `${notification.width}px` : "auto",
+      }}
+    >
+      <div
+        // Slide/enter/exit movement lives only in the inline `transform`
+        // below (it needs the unmeasured-width nuance — see its comment). No
+        // `translate-x-full`/`translate-x-0` utility here: in Tailwind v4
+        // those set the CSS `translate` property, which is separate from
+        // `transform` and would compose with it, doubling the movement. The
+        // `motion-reduce:translate-x-0` variant is still needed as a CSS-only
+        // guarantee (independent of the JS `reduceMotion` read) that
+        // reduced-motion users never get translate.
+        // The 0.75 shrink is likewise only in the inline `scale(0.75)` (a
+        // `scale-75` utility would set the separate `scale` property and
+        // square it to ~0.56).
+        className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out opacity-90 w-full ${
+          isRight ? "flex justify-end" : "flex justify-start"
+        } ${notification.isClosing ? "opacity-0" : "opacity-90"}`}
+        style={{
+          whiteSpace: "nowrap" as const,
+          transformOrigin: isRight ? "right center" : "left center",
+          // Reduced motion: no slide — the toast stays in place and
+          // fades in once measured, and out on close.
+          transform: reduceMotion
+            ? "scale(0.75)"
+            : notification.isClosing
+            ? `translateX(${isRight ? "100%" : "-100%"}) scale(0.75)`
+            : `translateX(${
+                notification.width ? "0px" : isRight ? "100%" : "-100%"
+              }) scale(0.75)`,
+          ...(reduceMotion && !notification.width ? { opacity: 0 } : {}),
+        }}
+        ref={shellRef}
+      >
+        <Notification
+          type={notification.type}
+          title={notification.title}
+          message={notification.message}
+          onClose={() => onClose(id)}
+          size="sm"
+        />
+      </div>
+    </div>
+  );
+};
 
 export interface CyberNotificationProviderProps {
   children: ReactNode;
@@ -116,68 +235,15 @@ export const CyberNotificationProvider: React.FC<
           aria-atomic="true"
         >
           {notifications.map((notification, index) => (
-            <div
+            <ToastSlot
               key={notification.id}
-              className="absolute"
-              style={{
-                right: position.includes("right") ? 0 : undefined,
-                left: position.includes("left") ? 0 : undefined,
-                top: `${index * 70}px`,
-                width: notification.width ? `${notification.width}px` : "auto",
-              }}
-            >
-              <div
-                className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out scale-75 opacity-90 w-full ${
-                  position.includes("right")
-                    ? "flex justify-end"
-                    : "flex justify-start"
-                } ${
-                  notification.isClosing
-                    ? `${
-                        position.includes("right")
-                          ? "translate-x-full"
-                          : "-translate-x-full"
-                      } opacity-0`
-                    : "translate-x-0 opacity-90"
-                }`}
-                style={{
-                  whiteSpace: "nowrap" as const,
-                  transformOrigin: position.includes("right")
-                    ? "right center"
-                    : "left center",
-                  // Reduced motion: no slide — the toast stays in place and
-                  // fades in once measured, and out on close.
-                  transform: reduceMotion
-                    ? "scale(0.75)"
-                    : notification.isClosing
-                    ? `translateX(${
-                        position.includes("right") ? "100%" : "-100%"
-                      }) scale(0.75)`
-                    : `translateX(${
-                        notification.width
-                          ? "0px"
-                          : position.includes("right")
-                          ? "100%"
-                          : "-100%"
-                      }) scale(0.75)`,
-                  ...(reduceMotion && !notification.width ? { opacity: 0 } : {}),
-                }}
-                ref={(el) => {
-                  if (el && !notification.width) {
-                    const scaledWidth = el.scrollWidth;
-                    updateNotificationWidth(notification.id, scaledWidth);
-                  }
-                }}
-              >
-                <Notification
-                  type={notification.type}
-                  title={notification.title}
-                  message={notification.message}
-                  onClose={() => hideNotification(notification.id)}
-                  size="sm"
-                />
-              </div>
-            </div>
+              notification={notification}
+              index={index}
+              position={position}
+              reduceMotion={reduceMotion}
+              onWidth={updateNotificationWidth}
+              onClose={hideNotification}
+            />
           ))}
         </div>
       )}

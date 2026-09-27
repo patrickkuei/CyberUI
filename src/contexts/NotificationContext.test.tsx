@@ -58,6 +58,104 @@ describe('CyberNotificationProvider', () => {
     expect(screen.queryByText('Uplink secured')).toBeNull();
   });
 
+  it('moves a closing toast with only one mechanism (no doubled translate)', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+    fireEvent.click(screen.getByLabelText('Close notification'));
+
+    const shell = toastShell();
+    // The inline transform is the one mechanism that should move the toast.
+    expect(shell.style.transform).toContain('translateX(100%)');
+    // A Tailwind v4 translate-x-* utility sets the separate `translate`
+    // CSS property, which composes with (doubles) the inline transform's
+    // translateX above — it must not also be present.
+    expect(shell.className).not.toMatch(/(?:^|\s)-?translate-x-full(?:\s|$)/);
+  });
+
+  it('expresses the toast scale once, in the inline transform (no doubled scale)', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+
+    const shell = toastShell();
+    // A Tailwind v4 scale-* utility sets the separate `scale` CSS property,
+    // which composes with (squares) the inline transform's scale(0.75).
+    expect(shell.className).not.toMatch(/(?:^|\s)-?scale-/);
+    expect(shell.style.transform.match(/scale\(/g)).toHaveLength(1);
+    expect(shell.style.transform).toContain('scale(0.75)');
+
+    fireEvent.click(screen.getByLabelText('Close notification'));
+    expect(shell.style.transform.match(/scale\(/g)).toHaveLength(1);
+    expect(shell.style.transform).toContain('scale(0.75)');
+  });
+
+  it('does not read scrollWidth again for a toast that is already measured', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+    const shell = toastShell();
+    expect(shell.style.transform).toContain('translateX(0px)');
+
+    const reads: HTMLElement[] = [];
+    Object.defineProperty(HTMLElement.prototype, 'scrollWidth', {
+      configurable: true,
+      get(this: HTMLElement) {
+        reads.push(this);
+        return 320;
+      },
+    });
+    // Re-render the provider (and so this toast) by closing it.
+    fireEvent.click(screen.getByLabelText('Close notification'));
+    expect(shell.style.transform).toContain('translateX(100%)');
+    expect(reads).not.toContain(shell);
+  });
+
+  describe('when the browser reports a zero width (e.g. jsdom, or a toast rendered in a hidden container)', () => {
+    beforeEach(() => {
+      // Overrides the outer beforeEach's stub back to jsdom's real behavior.
+      Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => 0 });
+    });
+
+    it('measures once and stops, instead of looping forever', () => {
+      expect(() => {
+        renderProvider();
+        fireEvent.click(screen.getByText('Ping'));
+      }).not.toThrow();
+      expect(screen.getByText('Uplink secured')).toBeInTheDocument();
+    });
+
+    it('applies the width once the toast can be measured (via ResizeObserver)', () => {
+      const observers: Array<() => void> = [];
+      class FakeResizeObserver {
+        constructor(cb: () => void) {
+          observers.push(cb);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      }
+      vi.stubGlobal('ResizeObserver', FakeResizeObserver);
+      try {
+        let width = 0;
+        Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => width });
+
+        renderProvider();
+        fireEvent.click(screen.getByText('Ping'));
+        // Unmeasured: parked at its off-screen enter position.
+        expect(toastShell().style.transform).toContain('translateX(100%)');
+        expect(toastShell().parentElement?.style.width).toBe('auto');
+
+        // The toast becomes measurable (e.g. its container gets a real size).
+        width = 320;
+        act(() => {
+          observers.forEach((cb) => cb());
+        });
+        expect(toastShell().style.transform).toContain('translateX(0px)');
+        expect(toastShell().parentElement?.style.width).toBe('320px');
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
+  });
+
   describe('under prefers-reduced-motion', () => {
     beforeEach(() => {
       motion.set(true);
