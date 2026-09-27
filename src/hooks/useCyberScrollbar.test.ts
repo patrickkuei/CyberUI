@@ -746,6 +746,38 @@ describe('useCyberScrollbar — page-level single-child chain below body', () =>
     expect(getScrollbar()).toBeNull();
   });
 
+  it('follows every body child\'s chain side by side, including a body child that appears after mount', async () => {
+    const { app } = buildShell(); // body > #root > #app > [header, main]
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    // A portal root with its own single-child chain mounts later.
+    const dialog = el('div', el('p'), el('p'));
+    const panel = el('div', dialog);
+    const portal = el('div', panel);
+    portal.id = 'portal-root';
+    document.body.appendChild(portal);
+    await flushMutations();
+
+    const observer = FakeResizeObserver.instances[0];
+    [app, portal, panel, dialog].forEach((node) => expect(observer.observed.has(node)).toBe(true));
+    const watched = liveMutationObservers()[0].observedTargets;
+    [app, portal, panel, dialog].forEach((node) => expect(watched.has(node)).toBe(true));
+
+    // Growth in either chain re-evaluates without a window resize.
+    bodyScrollHeight = 3000;
+    fireResizeFor(dialog);
+    expect(getScrollbar()).not.toBeNull();
+    bodyScrollHeight = 400;
+    fireResizeFor(app);
+    expect(getScrollbar()).toBeNull();
+    bodyScrollHeight = 2800;
+    fireResizeFor(panel);
+    expect(getScrollbar()).not.toBeNull();
+  });
+
   it('stops the walk at the depth cap of 8 levels below each body child', () => {
     const levels: HTMLElement[] = [el('div')];
     for (let i = 1; i <= 12; i++) {

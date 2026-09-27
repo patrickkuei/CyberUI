@@ -165,8 +165,9 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  * Page-level mode notices content changes by observing the size of `html`
  * and `body`, of each of `body`'s direct children, and of the chain below each
  * of those children for as long as every element in it has exactly one
- * element child — up to 8 levels deep. The targets are re-computed whenever a
- * child is added to or removed from `body` or an element in that chain. That
+ * element child, down to a fixed depth cap (`CONFIG.PAGE_CHAIN_DEPTH` levels
+ * below each `body` child). The targets are re-computed whenever a child is
+ * added to or removed from `body` or an element in that chain. That
  * keeps it working when `html, body { height: 100% }` pins `body`'s box to the
  * viewport, and also for a pinned wrapper below it — for example
  * `html, body, #root { height: 100% }`, as in a Next.js `__next` root or a
@@ -175,7 +176,8 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  * does **not** cover a pinned element with more than one element child (the
  * chain ends there and those children are not observed): growth inside one
  * of them is only noticed on the next `window` resize or when a child is
- * added to or removed from that pinned element.
+ * added to or removed from that pinned element. The same applies to pinned
+ * elements deeper than the depth cap.
  *
  * @example
  * ```tsx
