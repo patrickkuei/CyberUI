@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 export type ResponsiveObject<T> = {
   base?: T;
@@ -239,9 +239,43 @@ export const resolveResponsiveValue = <T>(
   return resolved;
 };
 
+// Breakpoint keys in ascending order of their min width (derived from
+// BREAKPOINT_PIXELS so the two can never drift apart).
+const BREAKPOINT_ORDER = Object.keys(BREAKPOINT_PIXELS) as Breakpoint[];
+
+// -1 is never a real breakpoint index; it means "width unknown" (server
+// render, or hydration before the client has committed its first snapshot).
+const SERVER_BREAKPOINT_SNAPSHOT = -1;
+
+// The external-store snapshot is the active breakpoint's index, not the raw
+// width: it is a primitive that only changes when a breakpoint is crossed, so
+// subscribers re-render at most once per crossing instead of once per resize
+// event.
+function getBreakpointSnapshot(): number {
+  if (typeof window === "undefined") return SERVER_BREAKPOINT_SNAPSHOT;
+  const width = window.innerWidth;
+  let active = 0;
+  for (let i = 0; i < BREAKPOINT_ORDER.length; i++) {
+    if (width >= BREAKPOINT_PIXELS[BREAKPOINT_ORDER[i]]) active = i;
+  }
+  return active;
+}
+
+// Server render and hydration both resolve to `fallback` (this sentinel
+// stands for "width unknown"); React then re-renders with the real breakpoint
+// after mount, so hydration never mismatches — same approach as
+// usePrefersReducedMotion's getServerSnapshot.
+function getServerBreakpointSnapshot(): number {
+  return SERVER_BREAKPOINT_SNAPSHOT;
+}
+
 // React hook to resolve a ResponsiveValue<T> and update on resize
 /**
  * A hook that returns the current resolved value based on window resize events.
+ *
+ * SSR-safe: renders `fallback` on the server and during hydration (even if
+ * the real viewport would resolve to something else), then switches to the
+ * resolved value once mounted on the client, so hydration never mismatches.
  *
  * @param prop The responsive value configuration
  * @param fallback Default value to use during SSR or initial render
@@ -251,26 +285,35 @@ export const useResponsiveValue = <T>(
   prop: ResponsiveValue<T>,
   fallback: T
 ): T => {
-  const get = useCallback(
-    () =>
-      typeof window === "undefined"
-        ? fallback
-        : resolveResponsiveValue(prop, window.innerWidth, fallback),
-    [fallback, prop]
+  const responsive = isResponsiveObject<T>(prop);
+
+  // Only a responsive object needs to react to resize; a static value never
+  // changes, so skip subscribing to avoid needless listeners/re-renders.
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      if (!responsive || typeof window === "undefined") return () => {};
+      window.addEventListener("resize", onChange);
+      return () => window.removeEventListener("resize", onChange);
+    },
+    [responsive]
   );
 
-  const [value, setValue] = useState<T>(get);
+  const breakpointIndex = useSyncExternalStore(
+    subscribe,
+    getBreakpointSnapshot,
+    getServerBreakpointSnapshot
+  );
 
-  useEffect(() => {
-    if (!isResponsiveObject<T>(prop)) {
-      setValue((prop as T) ?? fallback);
-      return;
+  return useMemo(() => {
+    if (!responsive) {
+      return (prop as T) ?? fallback;
     }
-    const onResize = () => setValue(get());
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [fallback, get, prop]);
-
-  return value;
+    if (breakpointIndex === SERVER_BREAKPOINT_SNAPSHOT) {
+      return fallback;
+    }
+    // resolveResponsiveValue only compares against breakpoint minimums, so the
+    // active breakpoint's own min width resolves identically to the real width.
+    const width = BREAKPOINT_PIXELS[BREAKPOINT_ORDER[breakpointIndex]];
+    return resolveResponsiveValue(prop, width, fallback);
+  }, [responsive, prop, fallback, breakpointIndex]);
 };
