@@ -3,6 +3,7 @@
 import { createInterface } from 'node:readline';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { getUsageContent } from './usage-content.js';
 import { replaceMarkedBlock } from './markers.js';
 
@@ -122,6 +123,26 @@ function promptTargets() {
   });
 }
 
+// ─── Package version ──────────────────────────────────────────────────────────
+
+// The version of this installed package, for the guide's heading. Uses
+// fileURLToPath (not URL.pathname, which is `/C:/...` on Windows and can't be
+// opened). No hard-coded fallback: package.json always ships with the package,
+// and a guessed version would put a wrong heading in the user's file.
+function readPackageVersion() {
+  const pkgPath = fileURLToPath(new URL('../package.json', import.meta.url));
+  let pkg;
+  try {
+    pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
+  } catch (err) {
+    throw new Error(`Could not read the cyberui-2045 version from ${pkgPath}: ${err.message}`);
+  }
+  if (typeof pkg.version !== 'string' || pkg.version === '') {
+    throw new Error(`No "version" field in ${pkgPath}`);
+  }
+  return pkg.version;
+}
+
 // ─── Write / update target file ───────────────────────────────────────────────
 
 function writeTarget(key) {
@@ -129,17 +150,7 @@ function writeTarget(key) {
   const cwd = process.cwd();
   const filePath = join(cwd, target.file);
 
-  // Read current package version
-  let version = '2.6.0';
-  try {
-    const pkgPath = new URL('../package.json', import.meta.url).pathname;
-    const pkg = JSON.parse(readFileSync(pkgPath, 'utf8'));
-    version = pkg.version ?? version;
-  } catch {
-    // fallback to hardcoded version
-  }
-
-  const content = getUsageContent(version);
+  const content = getUsageContent(readPackageVersion());
   const block = `${MARKER_START}\n${content}\n${MARKER_END}`;
 
   if (isDryRun) {

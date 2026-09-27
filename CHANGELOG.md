@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`Image` preview overflowed its frame on small screens** — the enlarged image was capped at `95vw`/`95vh`, but the overlay has 1rem of padding on every side, so on short or narrow viewports the image stuck out past the frame that carries the border, glow, corner accents and caption. It is now capped at `calc(100vw - 2rem)` by `calc(100vh - 2rem)`.
 - **`Image` `preview` default documented correctly** — the JSDoc and Storybook table said `false`, but the default has always been `true`. Behaviour is unchanged.
 - **`Image` stories** — `Gallery Layout` and `All Sizes` no longer shrink their images on narrow screens (and `All Sizes` no longer claims pixel sizes `size` never set), and the stand-in stories centre their custom-size examples.
+- **`init` wrote the wrong version on Windows** — `bin/init.js` built the `package.json` path from `URL.pathname`, which is `/C:/…` on Windows and can't be opened, so it silently fell back to a hard-coded `2.6.0` and the guide's `cyberui-2045 vX.Y.Z` heading was wrong for any other version. It now uses `fileURLToPath`, and the hard-coded fallback is gone: if `package.json` can't be read, `init` exits with an error instead of guessing (#53).
 
 ## [2.6.0] - 2026-09-25
 
