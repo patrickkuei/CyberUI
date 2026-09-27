@@ -1,81 +1,125 @@
 #!/usr/bin/env node
 
 import { createInterface } from 'node:readline';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, rmSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { getUsageContent } from './usage-content.js';
-import { replaceMarkedBlock } from './markers.js';
+import { detectEol, findMarkedBlock, withEol } from './markers.js';
+import { parseModeAnswer, parseTargetAnswer } from './prompts.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MARKER_START = '<!-- cyberui-2045:start -->';
 const MARKER_END = '<!-- cyberui-2045:end -->';
 
-// Claude Code import mode: the guide lives in its own file and CLAUDE.md gets a
-// marked block holding one `@` import line. The path resolves relative to
-// CLAUDE.md and stays inside the project, so Claude Code loads it without an
-// external-imports approval prompt. The line must stay plain text — Claude Code
-// skips `@` imports inside code spans and fenced blocks.
-const CLAUDE_GUIDE_FILE = '.claude/cyberui.md';
-const CLAUDE_IMPORT_LINE = `@${CLAUDE_GUIDE_FILE}`;
+// Each tool gets the guide the way it supports best (see
+// docs/agent-instruction-files.md for the sources):
+//
+// - `import`: the guide lives in its own file and the tool's instruction file
+//   gets a marked block holding one `@` import line. Both Claude Code and
+//   Gemini CLI resolve the path relative to the importing file and skip `@`
+//   inside code spans and fenced blocks, so the line stays plain text. Both
+//   paths stay inside the project: Claude Code loads them without an
+//   external-import approval prompt, and Gemini CLI only allows imports from
+//   inside the project root.
+// - `rules`: the tool has no import syntax but reads a directory of rule files,
+//   so the guide goes in a rule file of its own, with the frontmatter the tool
+//   needs above it.
+// - no `own`: the tool has neither (AGENTS.md), so the guide is always pasted
+//   into its instruction file between the markers.
+//
+// `inlineFile` is where the guide is pasted with --inline (and where older
+// versions of init always pasted it, so it is also where a migration looks).
+
+// Cursor: `alwaysApply: true` is the "Always Apply" rule type, so no globs.
+// The description shows in Cursor's rules UI. Plain YAML, no quotes or colons.
+const CURSOR_FRONTMATTER =
+  '---\ndescription: Usage guide for the cyberui-2045 React UI library (components, hooks, theming)\nalwaysApply: true\n---\n\n';
+// Copilot: comma-separated globs, relative to the repo root. The guide is about
+// writing React/TS code and CSS token overrides against this library, so it
+// applies to script and stylesheet files, not to (say) docs or backend config.
+const COPILOT_FRONTMATTER = '---\napplyTo: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx,**/*.css"\n---\n\n';
 
 const TARGETS = {
   claude: {
-    label: 'Claude Code   → CLAUDE.md',
-    file: 'CLAUDE.md',
+    flag: '--claude',
+    name: 'Claude Code',
+    inlineFile: 'CLAUDE.md',
+    own: { kind: 'import', file: '.claude/cyberui.md', importLine: '@.claude/cyberui.md' },
+  },
+  gemini: {
+    flag: '--gemini',
+    name: 'Gemini CLI',
+    inlineFile: 'GEMINI.md',
+    own: { kind: 'import', file: '.gemini/cyberui.md', importLine: '@./.gemini/cyberui.md' },
   },
   cursor: {
-    label: 'Cursor        → .cursorrules',
-    file: '.cursorrules',
+    flag: '--cursor',
+    name: 'Cursor',
+    inlineFile: '.cursorrules',
+    own: { kind: 'rules', file: '.cursor/rules/cyberui.mdc', frontmatter: CURSOR_FRONTMATTER },
   },
   copilot: {
-    label: 'GitHub Copilot → .github/copilot-instructions.md',
-    file: '.github/copilot-instructions.md',
+    flag: '--copilot',
+    name: 'GitHub Copilot',
+    inlineFile: '.github/copilot-instructions.md',
+    own: { kind: 'rules', file: '.github/instructions/cyberui.instructions.md', frontmatter: COPILOT_FRONTMATTER },
   },
   agents: {
-    label: 'AGENTS.md standard → AGENTS.md',
-    file: 'AGENTS.md',
+    flag: '--agents',
+    name: 'AGENTS.md standard',
+    inlineFile: 'AGENTS.md',
+    own: null,
   },
 };
+
+// Where the guide goes for `target` in `mode`, for menus and usage text.
+function describeTarget(target, mode) {
+  if (!target.own || mode === 'inline') return target.inlineFile;
+  if (target.own.kind === 'import') return `${target.own.file}, imported from ${target.inlineFile}`;
+  return target.own.file;
+}
 
 // ─── Arg parsing ──────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
 const isDryRun = args.includes('--dry-run');
-// `--inline` only changes the Claude target; the others are always inline.
-let claudeMode = args.includes('--inline') ? 'inline' : 'import';
+const inlineFlag = args.includes('--inline');
 
 let selectedKeys = [];
 if (args.includes('--all')) {
   selectedKeys = Object.keys(TARGETS);
 } else {
-  if (args.includes('--claude')) selectedKeys.push('claude');
-  if (args.includes('--cursor')) selectedKeys.push('cursor');
-  if (args.includes('--copilot')) selectedKeys.push('copilot');
-  if (args.includes('--agents')) selectedKeys.push('agents');
+  selectedKeys = Object.keys(TARGETS).filter((key) => args.includes(TARGETS[key].flag));
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  if (args.includes('--help') || args.includes('-h')) {
+    printUsage();
+    return;
+  }
+
+  // First, before any prompt: a broken install should fail before the user
+  // has answered questions.
+  const version = readPackageVersion();
+
   console.log('\n  cyberui-2045 — AI assistant setup\n');
+
+  let mode = inlineFlag ? 'inline' : 'own';
 
   if (selectedKeys.length === 0) {
     if (!process.stdin.isTTY) {
       // Non-interactive (CI / piped input)
-      console.log('  Non-interactive environment detected. Run one of:\n');
-      console.log('    npx cyberui-2045 init --claude            # guide in .claude/cyberui.md, imported from CLAUDE.md');
-      console.log('    npx cyberui-2045 init --claude --inline   # guide pasted into CLAUDE.md');
-      console.log('    npx cyberui-2045 init --cursor');
-      console.log('    npx cyberui-2045 init --copilot');
-      console.log('    npx cyberui-2045 init --agents');
-      console.log('    npx cyberui-2045 init --all\n');
+      console.log('  Non-interactive environment detected. Run it with a target flag:\n');
+      printUsage();
       process.exit(0);
     }
-    selectedKeys = await promptTargets();
-    if (selectedKeys.includes('claude') && !args.includes('--inline')) {
-      claudeMode = await promptClaudeMode();
+    selectedKeys = await promptTargets(mode);
+    if (!inlineFlag && selectedKeys.some((key) => TARGETS[key].own)) {
+      mode = await promptMode(selectedKeys);
     }
   }
 
@@ -84,19 +128,54 @@ async function main() {
     process.exit(0);
   }
 
-  const content = getUsageContent(readPackageVersion());
+  if (inlineFlag && !selectedKeys.some((key) => TARGETS[key].own)) {
+    console.warn('  Warning: --inline has no effect here: AGENTS.md always gets the guide inline.');
+  }
+
+  const guide = getUsageContent(version);
 
   console.log(isDryRun ? '\n  [dry-run] Would write:\n' : '');
 
+  let skipped = false;
   for (const key of selectedKeys) {
-    let writes;
-    if (key !== 'claude') writes = [planMarkedBlock(TARGETS[key].file, content)];
-    else if (claudeMode === 'import') writes = planClaudeImport(content);
-    else writes = [planClaudeInline(content)];
-    for (const write of writes) apply(write);
+    const plan = planTarget(TARGETS[key], mode, guide);
+    if (plan.problem) {
+      skipped = true;
+      console.error(
+        `  ✗  Skipped  ${plan.problem.file} — ${plan.problem.text}. Fix or remove the marker by hand, then re-run init. Nothing was written for ${TARGETS[key].name}.`,
+      );
+      continue;
+    }
+    for (const write of plan.writes) apply(write);
   }
 
-  console.log('\n  Done! Your AI assistant now has CyberUI context.\n');
+  if (skipped) {
+    process.exitCode = 1;
+    console.error('\n  Finished with errors: see the skipped files above.\n');
+  } else if (isDryRun) {
+    console.log('  Dry run: nothing was written.\n');
+  } else {
+    console.log('\n  Done! Your AI assistant now has CyberUI context.\n');
+  }
+}
+
+function printUsage() {
+  const line = (flag, text) => `    npx cyberui-2045 init ${flag.padEnd(9)} # ${text}`;
+  const lines = Object.values(TARGETS).map((t) =>
+    line(t.flag, `${t.name}: ${describeTarget(t, 'own')}${t.own ? '' : ' (always inline)'}`),
+  );
+  console.log(`  Usage: npx cyberui-2045 init [targets] [--inline] [--dry-run]
+
+  Targets (combine as many as you like; none opens an interactive menu):
+${lines.join('\n')}
+${line('--all', 'all of the above')}
+
+  Options:
+    --inline    paste the whole guide into CLAUDE.md, GEMINI.md, .cursorrules or
+                .github/copilot-instructions.md instead of its own file
+    --dry-run   show every file that would be written, and write nothing
+    --help      show this help
+`);
 }
 
 // ─── Interactive prompt ───────────────────────────────────────────────────────
@@ -106,55 +185,48 @@ function ask(question) {
     const rl = createInterface({ input: process.stdin, output: process.stdout });
     rl.question(question, (answer) => {
       rl.close();
-      resolve(answer.trim());
+      resolve(answer);
     });
   });
 }
 
-async function promptTargets() {
+function isSetUp(target) {
+  if (target.own && existsSync(join(process.cwd(), target.own.file))) return true;
+  const inline = readIfExists(target.inlineFile);
+  return inline !== null && inline.includes(MARKER_START);
+}
+
+async function promptTargets(mode) {
   const keys = Object.keys(TARGETS);
-  const cwd = process.cwd();
 
-  console.log('  Which AI config file should the CyberUI usage guide be added to?\n');
-
+  console.log('  Which AI assistant should get the CyberUI usage guide?\n');
   keys.forEach((key, i) => {
     const target = TARGETS[key];
-    const filePath = join(cwd, target.file);
-    const exists = existsSync(filePath);
-    const hasSection = exists && readFileSync(filePath, 'utf8').includes(MARKER_START);
-    const status = hasSection ? ' (update)' : exists ? ' (append)' : ' (create)';
-    console.log(`    ${i + 1}. ${target.label}${status}`);
+    const status = isSetUp(target) ? ' (update)' : '';
+    console.log(`    ${i + 1}. ${target.name.padEnd(18)} → ${describeTarget(target, mode)}${status}`);
   });
-
   console.log(`    ${keys.length + 1}. All of the above`);
   console.log('\n  Enter number(s) separated by commas (e.g. 1,3), or press Enter to cancel:');
 
-  const raw = await ask('  > ');
-  if (!raw) return [];
-
-  const chosen = [];
-  for (const part of raw.split(',')) {
-    const n = parseInt(part.trim(), 10);
-    if (n === keys.length + 1) return [...keys]; // "All"
-    if (n >= 1 && n <= keys.length) {
-      const key = keys[n - 1];
-      if (!chosen.includes(key)) chosen.push(key);
-    }
-  }
-  return chosen;
+  return parseTargetAnswer(await ask('  > '), keys);
 }
 
-async function promptClaudeMode() {
-  console.log('\n  Add the guide as an import (recommended) or inline?\n');
-  console.log(`    1. Import — guide in ${CLAUDE_GUIDE_FILE}, CLAUDE.md gets one line: ${CLAUDE_IMPORT_LINE}`);
-  console.log('    2. Inline — paste the whole guide into CLAUDE.md');
-  console.log('\n  Enter 1 or 2 (press Enter for import):');
+async function promptMode(keys) {
+  const targets = keys.map((key) => TARGETS[key]);
+  const withOwn = targets.filter((t) => t.own);
+
+  console.log('\n  Put the guide in its own file (recommended) or inline?\n');
+  console.log('    1. Own file — the tool\'s file stays short; upgrades only rewrite the guide file');
+  for (const t of withOwn) console.log(`         ${t.name}: ${describeTarget(t, 'own')}`);
+  console.log('    2. Inline — paste the whole guide into');
+  for (const t of withOwn) console.log(`         ${t.name}: ${t.inlineFile}`);
+  if (targets.some((t) => !t.own)) console.log('\n  (AGENTS.md always gets the guide inline.)');
+  console.log('\n  Enter 1 or 2 (press Enter for own file):');
 
   for (;;) {
-    const answer = (await ask('  > ')).toLowerCase();
-    if (answer === '' || answer === '1' || answer === 'import') return 'import';
-    if (answer === '2' || answer === 'inline') return 'inline';
-    console.log('  Please enter 1 (import) or 2 (inline).');
+    const mode = parseModeAnswer(await ask('  > '));
+    if (mode !== null) return mode;
+    console.log('  Please enter 1 (own file) or 2 (inline).');
   }
 }
 
@@ -180,74 +252,121 @@ function readPackageVersion() {
 
 // ─── Plan writes ──────────────────────────────────────────────────────────────
 //
-// Each planner returns what it would write — { file, action, preview, next,
-// note? } — without touching disk. `next` is the file's full new content,
-// `preview` is what --dry-run shows, and `action` is one of Created / Appended
-// / Updated / Migrated / Unchanged.
+// Planners return what they would write — { file, action, preview, next,
+// note? } — without touching disk. `next` is the file's full new content (null
+// to delete it), `preview` is what --dry-run shows, and `action` is one of
+// Created / Appended / Updated / Migrated / Removed / Deleted / Unchanged.
+//
+// Every write keeps the line ending the file already uses, so a CRLF checkout
+// with an up-to-date guide is reported Unchanged instead of rewritten.
 
 function readIfExists(file) {
   const filePath = join(process.cwd(), file);
   return existsSync(filePath) ? readFileSync(filePath, 'utf8') : null;
 }
 
-function hasMarkedBlock(text) {
-  return text !== null && text.includes(MARKER_START) && text.includes(MARKER_END);
+// All writes for one target, or { problem } when its instruction file has
+// broken markers — then nothing is written for that target at all, so a guide
+// file is never left behind with nothing importing it.
+function planTarget(target, mode, guide) {
+  const inlineFile = target.inlineFile;
+  const existing = readIfExists(inlineFile);
+  const found = existing === null ? { kind: 'none' } : findMarkedBlock(existing, MARKER_START, MARKER_END);
+  if (found.kind === 'malformed') return { problem: { file: inlineFile, text: found.problem } };
+
+  const own = target.own;
+
+  if (!own || mode === 'inline') {
+    const write = planMarkedBlock(inlineFile, existing, found, guide);
+    if (own && existsSync(join(process.cwd(), own.file))) {
+      write.note = own.kind === 'import'
+        ? `${own.file} is no longer imported; delete it if nothing else uses it`
+        : `${own.file} still exists, so ${target.name} loads the guide twice; delete it to keep only the inline copy`;
+    }
+    return { writes: [write] };
+  }
+
+  // The guide file first, so an import never points at a file not yet written.
+  const writes = [planOwnFile(own.file, `${own.frontmatter ?? ''}${guide}`)];
+
+  if (own.kind === 'import') {
+    if (found.kind === 'block' && found.body === own.importLine) {
+      // Already imported: leave the file byte-for-byte alone, so upgrades only
+      // ever touch the guide file.
+      writes.push({ file: inlineFile, action: 'Unchanged', preview: markedBlock(own.importLine), next: existing });
+    } else {
+      const write = planMarkedBlock(inlineFile, existing, found, own.importLine);
+      // An empty block had no guide in it, so filling it is a plain update.
+      if (found.kind === 'block' && found.body !== '') {
+        write.action = 'Migrated';
+        write.note = `replaced the inline guide with ${own.importLine}`;
+      }
+      writes.push(write);
+    }
+  } else if (found.kind === 'block') {
+    // A guide pasted into the legacy shared file by an older init: take it out,
+    // now that the rule file carries it.
+    writes.push(planRemoveBlock(inlineFile, existing, found, own.file));
+  }
+  return { writes };
 }
 
-// The text between the markers, or null if there's no marked block.
-function markedBlockBody(text) {
-  if (!hasMarkedBlock(text)) return null;
-  return text.slice(text.indexOf(MARKER_START) + MARKER_START.length, text.indexOf(MARKER_END)).trim();
+function markedBlock(body) {
+  return `${MARKER_START}\n${body}\n${MARKER_END}`;
 }
 
-// Put `body` between the markers in `file`: replace an existing marked block,
+// Put `body` between the markers in `file`: replace the existing marked block,
 // otherwise append one (or create the file).
-function planMarkedBlock(file, body) {
-  const block = `${MARKER_START}\n${body}\n${MARKER_END}`;
-  const existing = readIfExists(file);
-
+function planMarkedBlock(file, existing, found, body) {
+  const preview = markedBlock(body);
   if (existing === null) {
-    return { file, action: 'Created', preview: block, next: `${block}\n` };
+    return { file, action: 'Created', preview, next: `${preview}\n` };
   }
-  if (!hasMarkedBlock(existing)) {
-    return { file, action: 'Appended', preview: block, next: `${existing.trimEnd()}\n\n${block}\n` };
+  const eol = detectEol(existing);
+  const block = withEol(preview, eol);
+  if (found.kind === 'none') {
+    return { file, action: 'Appended', preview, next: `${existing.trimEnd()}${eol}${eol}${block}${eol}` };
   }
-  const next = replaceMarkedBlock(existing, MARKER_START, MARKER_END, body);
-  return { file, action: next === existing ? 'Unchanged' : 'Updated', preview: block, next };
+  const next = `${existing.slice(0, found.start)}${block}${existing.slice(found.end)}`;
+  return { file, action: next === existing ? 'Unchanged' : 'Updated', preview, next };
 }
 
-function planClaudeInline(content) {
-  const claudeFile = TARGETS.claude.file;
-  const previousBody = markedBlockBody(readIfExists(claudeFile));
-  const write = planMarkedBlock(claudeFile, content);
-  if (previousBody === CLAUDE_IMPORT_LINE && readIfExists(CLAUDE_GUIDE_FILE) !== null) {
-    write.note = `${CLAUDE_GUIDE_FILE} is no longer imported; delete it if nothing else uses it`;
-  }
-  return write;
+// A file init owns outright: its whole content is `text`.
+function planOwnFile(file, text) {
+  const existing = readIfExists(file);
+  const next = withEol(`${text}\n`, detectEol(existing));
+  const action = existing === null ? 'Created' : existing === next ? 'Unchanged' : 'Updated';
+  return { file, action, preview: text, next };
 }
 
-function planClaudeImport(content) {
-  const claudeFile = TARGETS.claude.file;
-  const existing = readIfExists(claudeFile);
-  const previousBody = markedBlockBody(existing);
-  const claudeWrite = previousBody === CLAUDE_IMPORT_LINE
-    // Already imported: leave CLAUDE.md byte-for-byte alone (even if an editor
-    // changed its line endings), so upgrades only ever touch the guide file.
-    ? { file: claudeFile, action: 'Unchanged', preview: `${MARKER_START}\n${CLAUDE_IMPORT_LINE}\n${MARKER_END}`, next: existing }
-    : planMarkedBlock(claudeFile, CLAUDE_IMPORT_LINE);
-  if (previousBody !== null && previousBody !== CLAUDE_IMPORT_LINE) {
-    claudeWrite.action = 'Migrated';
-    claudeWrite.note = `replaced the inline guide with ${CLAUDE_IMPORT_LINE}`;
+// Take the marked block (and the line break and blank line init put around
+// it) out of `file`, keeping everything else as it is. Delete the file if the
+// block was all it held.
+function planRemoveBlock(file, existing, found, movedTo) {
+  const eol = detectEol(existing);
+  const before = existing.slice(0, found.start);
+  let after = existing.slice(found.end);
+  if (after.startsWith(eol)) after = after.slice(eol.length);
+  if ((before === '' || before.endsWith(eol + eol)) && after.startsWith(eol)) after = after.slice(eol.length);
+
+  const rest = after.trim() === '' ? (before.trim() === '' ? '' : `${before.trimEnd()}${eol}`) : `${before}${after}`;
+
+  if (rest.trim() === '') {
+    return {
+      file,
+      action: 'Deleted',
+      preview: '(file deleted: it held only the cyberui-2045 guide)',
+      next: null,
+      note: `it held only the cyberui-2045 guide, now in ${movedTo}`,
+    };
   }
-
-  const guideNext = `${content}\n`;
-  const guideExisting = readIfExists(CLAUDE_GUIDE_FILE);
-  const guideAction = guideExisting === null
-    ? 'Created'
-    : guideExisting === guideNext ? 'Unchanged' : 'Updated';
-  const guideWrite = { file: CLAUDE_GUIDE_FILE, action: guideAction, preview: content, next: guideNext };
-
-  return [claudeWrite, guideWrite];
+  return {
+    file,
+    action: 'Removed',
+    preview: '(the cyberui-2045 block is taken out; the rest of the file stays as it is)',
+    next: rest,
+    note: `took out the cyberui-2045 block, now in ${movedTo}; kept the rest of the file`,
+  };
 }
 
 // ─── Apply a planned write ────────────────────────────────────────────────────
@@ -260,9 +379,11 @@ function apply({ file, action, preview, next, note }) {
     return;
   }
 
-  if (action !== 'Unchanged') {
-    const filePath = join(process.cwd(), file);
-    // Ensure parent directory exists (e.g. .github/ or .claude/)
+  const filePath = join(process.cwd(), file);
+  if (next === null) {
+    rmSync(filePath);
+  } else if (action !== 'Unchanged') {
+    // Ensure parent directory exists (e.g. .github/instructions/ or .claude/)
     mkdirSync(dirname(filePath), { recursive: true });
     writeFileSync(filePath, next, 'utf8');
   }
