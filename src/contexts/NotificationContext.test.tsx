@@ -58,6 +58,35 @@ describe('CyberNotificationProvider', () => {
     expect(screen.queryByText('Uplink secured')).toBeNull();
   });
 
+  it('moves a closing toast with only one mechanism (no doubled translate)', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+    fireEvent.click(screen.getByLabelText('Close notification'));
+
+    const shell = toastShell();
+    // The inline transform is the one mechanism that should move the toast.
+    expect(shell.style.transform).toContain('translateX(100%)');
+    // A Tailwind v4 translate-x-* utility sets the separate `translate`
+    // CSS property, which composes with (doubles) the inline transform's
+    // translateX above — it must not also be present.
+    expect(shell.className).not.toMatch(/(?:^|\s)-?translate-x-full(?:\s|$)/);
+  });
+
+  describe('when the browser reports a zero width (e.g. jsdom, or a toast rendered in a hidden container)', () => {
+    beforeEach(() => {
+      // Overrides the outer beforeEach's stub back to jsdom's real behavior.
+      Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => 0 });
+    });
+
+    it('measures once and stops, instead of looping forever', () => {
+      expect(() => {
+        renderProvider();
+        fireEvent.click(screen.getByText('Ping'));
+      }).not.toThrow();
+      expect(screen.getByText('Uplink secured')).toBeInTheDocument();
+    });
+  });
+
   describe('under prefers-reduced-motion', () => {
     beforeEach(() => {
       motion.set(true);

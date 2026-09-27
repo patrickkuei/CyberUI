@@ -127,19 +127,20 @@ export const CyberNotificationProvider: React.FC<
               }}
             >
               <div
+                // Slide/enter/exit movement lives only in the inline
+                // `transform` below (it needs the unmeasured-width nuance —
+                // see its comment). No `translate-x-full`/`translate-x-0`
+                // utility here: in Tailwind v4 those set the CSS `translate`
+                // property, which is separate from `transform` and would
+                // compose with it, doubling the movement. The
+                // `motion-reduce:translate-x-0` variant is still needed as a
+                // CSS-only guarantee (independent of the JS `reduceMotion`
+                // read) that reduced-motion users never get translate.
                 className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out scale-75 opacity-90 w-full ${
                   position.includes("right")
                     ? "flex justify-end"
                     : "flex justify-start"
-                } ${
-                  notification.isClosing
-                    ? `${
-                        position.includes("right")
-                          ? "translate-x-full"
-                          : "-translate-x-full"
-                      } opacity-0`
-                    : "translate-x-0 opacity-90"
-                }`}
+                } ${notification.isClosing ? "opacity-0" : "opacity-90"}`}
                 style={{
                   whiteSpace: "nowrap" as const,
                   transformOrigin: position.includes("right")
@@ -163,9 +164,13 @@ export const CyberNotificationProvider: React.FC<
                   ...(reduceMotion && !notification.width ? { opacity: 0 } : {}),
                 }}
                 ref={(el) => {
-                  if (el && !notification.width) {
-                    const scaledWidth = el.scrollWidth;
-                    updateNotificationWidth(notification.id, scaledWidth);
+                  // A measured 0 (jsdom, or a toast rendered into a
+                  // zero-size/`display: none` container) isn't a real width
+                  // yet — treat it as "not measurable" and don't update, or
+                  // this inline callback (which runs after every render)
+                  // would re-trigger the state update forever.
+                  if (el && !notification.width && el.scrollWidth > 0) {
+                    updateNotificationWidth(notification.id, el.scrollWidth);
                   }
                 }}
               >
