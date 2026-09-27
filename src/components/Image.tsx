@@ -279,6 +279,24 @@ const Image: React.FC<ImageProps> = memo(
     const [hasError, setHasError] = useState(false);
     const [fallbackActive, setFallbackActive] = useState(false);
 
+    // A new `src` starts a fresh load: drop any error/fallback state left
+    // over from a previous `src`'s failure so its `Failed to load image`
+    // panel doesn't linger, and so the new `src` isn't ignored in favour of
+    // `fallback` (#49). This resets during render — React's documented
+    // "adjusting state when a prop changes" pattern — rather than in a
+    // `useEffect`: calling a setter while rendering makes React discard this
+    // render and immediately re-render with the updated state before
+    // anything commits, so the very first paint for the new `src` already
+    // shows the loading state instead of briefly committing the previous
+    // src's stale error panel and only fixing it up after an effect runs.
+    const [prevSrc, setPrevSrc] = useState(src);
+    if (src !== prevSrc) {
+      setPrevSrc(src);
+      setHasError(false);
+      setFallbackActive(false);
+      setIsLoadPending(true);
+    }
+
     // What can be shown: the `src`, else the `fallback` URL (a missing `src`
     // counts as a failed load), else nothing (the stand-in renders).
     const hasSrc = Boolean(src);
@@ -370,16 +388,6 @@ const Image: React.FC<ImageProps> = memo(
 
     // The preview is only open while there is an image to show.
     const previewOpen = isPreviewOpen && hasImage;
-
-    // A new `src` starts a fresh load: drop any error/fallback state left
-    // over from a previous `src`'s failure so its `Failed to load image`
-    // panel doesn't linger, and so the new `src` isn't ignored in favour of
-    // `fallback` (#49). Runs on mount too, which is a no-op there.
-    useEffect(() => {
-      setHasError(false);
-      setFallbackActive(false);
-      setIsLoadPending(true);
-    }, [src]);
 
     // The image went away (`src` and `fallback` both emptied) with the
     // preview open: close it now and report it once, unless a close was

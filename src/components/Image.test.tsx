@@ -1,5 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { Profiler } from 'react';
 import { render, screen, fireEvent, cleanup, act, within } from '@testing-library/react';
 import { describe, it, expect, expectTypeOf, vi, afterEach, beforeEach } from 'vitest';
 import Image from './Image';
@@ -392,6 +393,39 @@ describe('Image stand-in (no src)', () => {
     const img = screen.getByAltText('Test image');
     expect(img).toHaveAttribute('src', 'new.jpg');
     expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading image');
+  });
+
+  it('never paints the stale error panel on any commit after src changes (the reset must happen during render, not in a passive effect)', () => {
+    // React's <Profiler onRender> fires once per commit of the wrapped
+    // tree — including a second commit an effect schedules within the same
+    // act()-flushed rerender — unlike a plain assertion after rerender(),
+    // which only ever sees the final, already-settled DOM. Recording
+    // whether the error panel is present at every commit catches an
+    // effect-based reset that briefly commits the stale panel before
+    // resetting it, which a post-rerender assertion alone cannot.
+    const commits: boolean[] = [];
+    const onRender = () => {
+      commits.push(document.querySelector('[role="alert"]') !== null);
+    };
+
+    const { rerender } = render(
+      <Profiler id="image-src-reset" onRender={onRender}>
+        <Image src="broken.jpg" alt="Test image" />
+      </Profiler>
+    );
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    commits.length = 0; // only the commits from the src change below matter
+
+    rerender(
+      <Profiler id="image-src-reset" onRender={onRender}>
+        <Image src="new.jpg" alt="Test image" />
+      </Profiler>
+    );
+
+    expect(commits.length).toBeGreaterThan(0);
+    expect(commits).not.toContain(true);
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('switches between the stand-in and a real image as src comes and goes', () => {
