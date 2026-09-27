@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { getReducedMotionPreference, subscribeReducedMotionChange } from "./reducedMotionSubscription";
 
 /**
  * Scrollbar background/border style variants
@@ -156,9 +157,11 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  *    decision is not revisited; pass `pageLevel={false}` for a container that
  *    renders after the first commit.
  *
- * Page-level mode notices content changes through the size of `html` and
- * `body`. If both have a fixed height (for example `html, body { height: 100% }`),
- * content growing inside them is only noticed on the next window resize.
+ * Page-level mode notices content changes by observing the size of `html`
+ * and `body`, plus the size of each of `body`'s direct children (re-observed
+ * whenever a child is added or removed). That keeps it working even when
+ * `html, body { height: 100% }` pins `body`'s own box to the viewport size:
+ * a child growing or shrinking inside it still reports its own size change.
  *
  * @example
  * ```tsx
@@ -225,11 +228,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     if (disabled) return;
 
     const isPage = pageLevel ?? autoPageLevelRef.current === true;
-    const motionQuery =
-      typeof window.matchMedia === "function"
-        ? window.matchMedia("(prefers-reduced-motion: reduce)")
-        : null;
-    let reducedMotion = motionQuery?.matches ?? false;
+    let reducedMotion = getReducedMotionPreference();
 
     let container: HTMLDivElement | null = null;
     let element: HTMLDivElement | null = null;
@@ -485,6 +484,13 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       if (isPage) {
         resizeObserver.observe(document.documentElement);
         resizeObserver.observe(document.body);
+        // `body`'s own box may be pinned (e.g. `height: 100%`), so also watch
+        // each direct child: a growing/shrinking child still reports its own
+        // size change. Exclude the scrollbar's own element to avoid observing
+        // (and reacting to) its own re-layout.
+        Array.from(document.body.children).forEach(child => {
+          if (child !== element) resizeObserver?.observe(child);
+        });
       } else if (container) {
         resizeObserver.observe(container);
         Array.from(container.children).forEach(child => resizeObserver?.observe(child));
@@ -585,12 +591,27 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       updateScrollbarVisuals();
     };
 
-    const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
-      reducedMotion = event.matches;
+    const onMotionPreferenceChange = (matches: boolean) => {
+      reducedMotion = matches;
       applyMotionPreference();
     };
 
     // ---- Attach / detach --------------------------------------------------
+
+    // Page-level mode has no single container to watch for childList changes,
+    // so it watches `body` directly. A mutation solely about the scrollbar's
+    // own element (added when it appears, removed when it's torn down) is
+    // ignored — otherwise the element re-triggers the observer that placed it.
+    const onBodyChildrenChanged: MutationCallback = mutations => {
+      const isOwnElement = (node: Node) => node === element;
+      const relevant = mutations.some(
+        m => Array.from(m.addedNodes).some(n => !isOwnElement(n)) || Array.from(m.removedNodes).some(n => !isOwnElement(n))
+      );
+      if (relevant) {
+        observeTargets();
+        scheduleEvaluate();
+      }
+    };
 
     const attachContainer = (el: HTMLDivElement) => {
       container = el;
@@ -637,9 +658,15 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     };
 
     window.addEventListener("resize", scheduleEvaluate);
-    motionQuery?.addEventListener?.("change", onMotionPreferenceChange);
+    const unsubscribeReducedMotion = subscribeReducedMotionChange(onMotionPreferenceChange);
     if (isPage) {
       window.addEventListener("scroll", handleScroll, { passive: true });
+      if (typeof MutationObserver !== "undefined") {
+        // New or removed children under body change what should be observed
+        // (see the fixed-height note in the JSDoc above).
+        mutationObserver = new MutationObserver(onBodyChildrenChanged);
+        mutationObserver.observe(document.body, { childList: true });
+      }
       observeTargets();
       evaluate();
     } else {
@@ -650,9 +677,11 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     return () => {
       syncContainerRef.current = null;
       window.removeEventListener("resize", scheduleEvaluate);
-      motionQuery?.removeEventListener?.("change", onMotionPreferenceChange);
+      unsubscribeReducedMotion();
       if (isPage) {
         window.removeEventListener("scroll", handleScroll);
+        mutationObserver?.disconnect();
+        mutationObserver = undefined;
       } else {
         detachContainer();
       }

@@ -1,4 +1,4 @@
-import { createElement } from 'react';
+import { createElement, StrictMode } from 'react';
 import { render, renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useCyberScrollbar, type UseCyberScrollbarOptions } from './useCyberScrollbar';
@@ -565,6 +565,74 @@ describe('useCyberScrollbar — resize and content changes', () => {
     resizeWindow(1024); // the window resize listener still re-evaluates
     expect(getScrollbar()).not.toBeNull();
   });
+
+  it('still creates a container scrollbar when ResizeObserver is unavailable', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const { getByTestId } = render(createElement(Host, { pageLevel: false }));
+    flushFrames();
+
+    expect(getScrollbar()).not.toBeNull();
+    expect(getByTestId('container').classList.contains('cyber-scrollbar-container')).toBe(true);
+  });
+
+  // Regression: with `html, body { height: 100% }`, body's own border box
+  // never changes size as content grows or shrinks inside it, so observing
+  // only `documentElement`/`body` misses the change until the next window
+  // resize. Page-level mode now also observes body's direct children (their
+  // own boxes do change) and re-observes when children are added/removed.
+  it('observes body\'s direct children in page-level mode (fixed-height html/body)', () => {
+    const existingChild = document.createElement('section');
+    document.body.appendChild(existingChild);
+    bodyScrollHeight = 3000;
+
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    const observer = FakeResizeObserver.instances[0];
+    expect(observer.observed.has(existingChild)).toBe(true);
+    // The scrollbar's own element must not be self-observed.
+    expect(observer.observed.has(getScrollbar()!)).toBe(false);
+  });
+
+  it('re-evaluates the page-level scrollbar when a child is added directly under body, without a window resize', async () => {
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    // Simulate content growing inside a fixed-height html/body: a new child
+    // appears under body (no resize event, no documentElement/body size
+    // change reported).
+    bodyScrollHeight = 3000;
+    const content = document.createElement('div');
+    document.body.appendChild(content);
+
+    await act(async () => {
+      await Promise.resolve(); // MutationObserver callbacks are microtasks
+      vi.advanceTimersByTime(20);
+      await Promise.resolve();
+    });
+
+    expect(getScrollbar()).not.toBeNull();
+  });
+
+  it('stops observing a body child once it is removed', async () => {
+    const child = document.createElement('section');
+    document.body.appendChild(child);
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    expect(FakeResizeObserver.instances[0].observed.has(child)).toBe(true);
+
+    child.remove();
+    await act(async () => {
+      await Promise.resolve();
+      vi.advanceTimersByTime(20);
+    });
+
+    expect(FakeResizeObserver.instances[0].observed.has(child)).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -738,5 +806,44 @@ describe('useCyberScrollbar — prefers-reduced-motion', () => {
 
     scrollWindowTo(300);
     expect(litArrows(bar).length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// React.StrictMode: effects run, clean up, and run again on mount
+// ---------------------------------------------------------------------------
+describe('useCyberScrollbar — React.StrictMode double-mount', () => {
+  it('ends up with exactly one page-level scrollbar and one live observer', () => {
+    bodyScrollHeight = 3000;
+    const { unmount } = render(createElement(StrictMode, null, createElement(Host, { pageLevel: true })));
+    flushFrames();
+
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+    expect(getScrollbar()).not.toBeNull();
+    expect(FakeResizeObserver.instances.filter((o) => !o.disconnected)).toHaveLength(1);
+
+    unmount();
+    expect(getScrollbar()).toBeNull();
+    expect(FakeResizeObserver.instances.every((o) => o.disconnected)).toBe(true);
+  });
+
+  it('ends up with exactly one container scrollbar after a double-mount, and still tracks scroll', () => {
+    const { getByTestId, unmount } = render(createElement(StrictMode, null, createElement(Host, { pageLevel: false })));
+    flushFrames();
+
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+    const container = getByTestId('container');
+    expect(container.classList.contains('cyber-scrollbar-container')).toBe(true);
+
+    container.scrollTop = 120;
+    container.dispatchEvent(new Event('scroll'));
+    flushFrames();
+    const lit = Array.from(getScrollbar()!.querySelectorAll<HTMLElement>('.cyber-arrow-down')).filter(
+      (a) => a.style.opacity !== '0',
+    );
+    expect(lit.length).toBeGreaterThan(0);
+
+    unmount();
+    expect(getScrollbar()).toBeNull();
   });
 });
