@@ -336,6 +336,34 @@ describe('Image stand-in (no src)', () => {
     expect(screen.getByAltText('Test image (fallback)')).toHaveAttribute('src', 'backup.jpg');
   });
 
+  it('resets the error state and starts a fresh load when src changes after a failure', () => {
+    const { rerender } = render(<Image src="broken.jpg" alt="Test image" />);
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-label', 'Failed to load image');
+
+    rerender(<Image src="new.jpg" alt="Test image" />);
+
+    expect(screen.queryByRole('alert')).toBeNull();
+    const img = screen.getByAltText('Test image');
+    expect(img).toHaveAttribute('src', 'new.jpg');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading image');
+    fireEvent.load(img);
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('resets the fallback state and loads the new src when src changes after the fallback took over', () => {
+    const { rerender } = render(<Image src="broken.jpg" alt="Test image" fallback="backup.jpg" />);
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByAltText('Test image (fallback)')).toHaveAttribute('src', 'backup.jpg');
+
+    rerender(<Image src="new.jpg" alt="Test image" fallback="backup.jpg" />);
+
+    expect(screen.queryByAltText('Test image (fallback)')).toBeNull();
+    const img = screen.getByAltText('Test image');
+    expect(img).toHaveAttribute('src', 'new.jpg');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading image');
+  });
+
   it('switches between the stand-in and a real image as src comes and goes', () => {
     const { rerender, container } = render(<Image alt="Neon district" />);
     expect(container.querySelector('img')).toBeNull();

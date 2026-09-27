@@ -339,6 +339,16 @@ const Image: React.FC<ImageProps> = memo(
     // The preview is only open while there is an image to show.
     const previewOpen = isPreviewOpen && hasImage;
 
+    // A new `src` starts a fresh load: drop any error/fallback state left
+    // over from a previous `src`'s failure so its `Failed to load image`
+    // panel doesn't linger, and so the new `src` isn't ignored in favour of
+    // `fallback` (#49). Runs on mount too, which is a no-op there.
+    useEffect(() => {
+      setHasError(false);
+      setFallbackActive(false);
+      setIsLoadPending(true);
+    }, [src]);
+
     // The image went away (`src` and `fallback` both emptied) with the
     // preview open: close it now and report it once, unless a close was
     // already reported.
