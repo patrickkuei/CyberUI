@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { getReducedMotionPreference, subscribeReducedMotionChange } from "./reducedMotionSubscription";
 
 /**
  * Scrollbar background/border style variants
@@ -45,7 +46,12 @@ const CONFIG = {
   DISTANCE_THRESHOLD: 100,
   MAX_ANIMATION_SPEED: 5,
   MIN_GLOW_DURATION: 150,
+  /** Page-level: how far to follow a single-element-child chain below each body child. */
+  PAGE_CHAIN_DEPTH: 8,
 } as const;
+
+const sameElements = (a: readonly Element[], b: readonly Element[]) =>
+  a.length === b.length && a.every((el, i) => el === b[i]);
 
 
 const getVariantStyles = (variant: ScrollbarVariant) => {
@@ -156,9 +162,22 @@ const hideNativeScrollbars = (container: HTMLElement | null) => {
  *    decision is not revisited; pass `pageLevel={false}` for a container that
  *    renders after the first commit.
  *
- * Page-level mode notices content changes through the size of `html` and
- * `body`. If both have a fixed height (for example `html, body { height: 100% }`),
- * content growing inside them is only noticed on the next window resize.
+ * Page-level mode notices content changes by observing the size of `html`
+ * and `body`, of each of `body`'s direct children, and of the chain below each
+ * of those children for as long as every element in it has exactly one
+ * element child, down to a fixed depth cap (`CONFIG.PAGE_CHAIN_DEPTH` levels
+ * below each `body` child). The targets are re-computed whenever a child is
+ * added to or removed from `body` or an element in that chain. That
+ * keeps it working when `html, body { height: 100% }` pins `body`'s box to the
+ * viewport, and also for a pinned wrapper below it — for example
+ * `html, body, #root { height: 100% }`, as in a Next.js `__next` root or a
+ * similar SPA shell: the first element in the chain whose height follows its
+ * content (e.g. the app's single top-level element) reports the change. It
+ * does **not** cover a pinned element with more than one element child (the
+ * chain ends there and those children are not observed): growth inside one
+ * of them is only noticed on the next `window` resize or when a child is
+ * added to or removed from that pinned element. The same applies to pinned
+ * elements deeper than the depth cap.
  *
  * @example
  * ```tsx
@@ -225,11 +244,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     if (disabled) return;
 
     const isPage = pageLevel ?? autoPageLevelRef.current === true;
-    const motionQuery =
-      typeof window.matchMedia === "function"
-        ? window.matchMedia("(prefers-reduced-motion: reduce)")
-        : null;
-    let reducedMotion = motionQuery?.matches ?? false;
+    let reducedMotion = getReducedMotionPreference();
 
     let container: HTMLDivElement | null = null;
     let element: HTMLDivElement | null = null;
@@ -241,6 +256,14 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     let layoutIsMobile: boolean | null = null;
     let resizeObserver: ResizeObserver | undefined;
     let mutationObserver: MutationObserver | undefined;
+    // Page-level: what is currently observed below body (null = not yet), so
+    // an unchanged chain costs no observer churn.
+    let pageResizeTargets: Element[] | null = null;
+    let pageChildListTargets: Element[] = [];
+    // Every scrollbar element this effect has put in the DOM — also after it
+    // was removed and `element` reset — so its own insertion/removal records
+    // never count as page mutations.
+    const ownElements = new WeakSet<Node>();
 
     const clearAnimationTimeouts = () => {
       animationTimeoutsRef.current.forEach(timeout => clearTimeout(timeout));
@@ -464,6 +487,7 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
         hideNativeScrollbars(isPage ? null : container);
         element = document.createElement("div");
         element.className = `cyber-scrollbar ${className}`.trim();
+        ownElements.add(element);
         document.body.appendChild(element);
       }
       layout();
@@ -478,14 +502,68 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       });
     };
 
+    // Page-level targets below body. `body`'s own box may be pinned (e.g.
+    // `height: 100%`), and so may a wrapper below it (`#root { height: 100% }`),
+    // so watch each direct child of body and, from there, walk down while the
+    // element has exactly one element child (up to PAGE_CHAIN_DEPTH levels):
+    // the first box in that chain that isn't pinned reports content growth.
+    // Each walked element's childList is watched too, since a child entering
+    // or leaving changes the chain. Scrollbar elements are skipped: their own
+    // re-layout must not feed back into the observers.
+    const collectPageTargets = () => {
+      const resizeTargets: Element[] = [];
+      const childListTargets: Element[] = [];
+      Array.from(document.body.children).forEach(child => {
+        if (ownElements.has(child) || child.classList.contains("cyber-scrollbar")) return;
+        let node: Element = child;
+        resizeTargets.push(node);
+        for (let depth = 0; depth < CONFIG.PAGE_CHAIN_DEPTH; depth++) {
+          childListTargets.push(node);
+          const next = node.firstElementChild;
+          if (node.childElementCount !== 1 || next === null) break;
+          node = next;
+          resizeTargets.push(node);
+        }
+      });
+      return { resizeTargets, childListTargets };
+    };
+
+    const observePageTargets = () => {
+      const { resizeTargets, childListTargets } = collectPageTargets();
+      if (
+        pageResizeTargets !== null &&
+        sameElements(resizeTargets, pageResizeTargets) &&
+        sameElements(childListTargets, pageChildListTargets)
+      ) {
+        return;
+      }
+      pageResizeTargets = resizeTargets;
+      pageChildListTargets = childListTargets;
+
+      if (typeof ResizeObserver !== "undefined") {
+        resizeObserver ??= new ResizeObserver(scheduleEvaluate);
+        resizeObserver.disconnect();
+        resizeObserver.observe(document.documentElement);
+        resizeObserver.observe(document.body);
+        resizeTargets.forEach(target => resizeObserver?.observe(target));
+      }
+      if (mutationObserver) {
+        // MutationObserver has no unobserve: re-target by reconnecting.
+        mutationObserver.disconnect();
+        mutationObserver.observe(document.body, { childList: true });
+        childListTargets.forEach(target => mutationObserver?.observe(target, { childList: true }));
+      }
+    };
+
     const observeTargets = () => {
+      if (isPage) {
+        observePageTargets();
+        return;
+      }
       if (typeof ResizeObserver === "undefined") return;
       resizeObserver ??= new ResizeObserver(scheduleEvaluate);
       resizeObserver.disconnect();
-      if (isPage) {
-        resizeObserver.observe(document.documentElement);
-        resizeObserver.observe(document.body);
-      } else if (container) {
+      if (container) {
         resizeObserver.observe(container);
         Array.from(container.children).forEach(child => resizeObserver?.observe(child));
       }
@@ -585,12 +663,29 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
       updateScrollbarVisuals();
     };
 
-    const onMotionPreferenceChange = (event: MediaQueryListEvent) => {
-      reducedMotion = event.matches;
+    const onMotionPreferenceChange = (matches: boolean) => {
+      reducedMotion = matches;
       applyMotionPreference();
     };
 
     // ---- Attach / detach --------------------------------------------------
+
+    // Page-level mode has no single container to watch for childList changes,
+    // so it watches `body` and the single-child chain below it (see
+    // collectPageTargets). A mutation solely about the scrollbar's own element
+    // (added when it appears, removed when it's torn down) is ignored —
+    // otherwise the element re-triggers the observer that placed it.
+    // observeTargets is a no-op when the chain is unchanged.
+    const onPageChildrenChanged: MutationCallback = mutations => {
+      const isOwnElement = (node: Node) => ownElements.has(node);
+      const relevant = mutations.some(
+        m => Array.from(m.addedNodes).some(n => !isOwnElement(n)) || Array.from(m.removedNodes).some(n => !isOwnElement(n))
+      );
+      if (relevant) {
+        observeTargets();
+        scheduleEvaluate();
+      }
+    };
 
     const attachContainer = (el: HTMLDivElement) => {
       container = el;
@@ -637,9 +732,14 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     };
 
     window.addEventListener("resize", scheduleEvaluate);
-    motionQuery?.addEventListener?.("change", onMotionPreferenceChange);
+    const unsubscribeReducedMotion = subscribeReducedMotionChange(onMotionPreferenceChange);
     if (isPage) {
       window.addEventListener("scroll", handleScroll, { passive: true });
+      if (typeof MutationObserver !== "undefined") {
+        // New or removed children under body (or along the chain below it)
+        // change what should be observed; observeTargets connects it.
+        mutationObserver = new MutationObserver(onPageChildrenChanged);
+      }
       observeTargets();
       evaluate();
     } else {
@@ -650,9 +750,11 @@ export const useCyberScrollbar = (options: UseCyberScrollbarOptions = {}) => {
     return () => {
       syncContainerRef.current = null;
       window.removeEventListener("resize", scheduleEvaluate);
-      motionQuery?.removeEventListener?.("change", onMotionPreferenceChange);
+      unsubscribeReducedMotion();
       if (isPage) {
         window.removeEventListener("scroll", handleScroll);
+        mutationObserver?.disconnect();
+        mutationObserver = undefined;
       } else {
         detachContainer();
       }

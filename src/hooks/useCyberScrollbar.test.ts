@@ -1,4 +1,4 @@
-import { createElement } from 'react';
+import { createElement, StrictMode } from 'react';
 import { render, renderHook, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { useCyberScrollbar, type UseCyberScrollbarOptions } from './useCyberScrollbar';
@@ -46,6 +46,8 @@ class FakeResizeObserver {
   static instances: FakeResizeObserver[] = [];
   observed = new Set<Element>();
   disconnected = false;
+  /** Total observe() calls, to detect observer churn. */
+  observeCalls = 0;
   private callback: ROCallback;
   constructor(callback: ROCallback) {
     this.callback = callback;
@@ -53,6 +55,7 @@ class FakeResizeObserver {
   }
   observe(el: Element) {
     this.disconnected = false;
+    this.observeCalls += 1;
     this.observed.add(el);
   }
   unobserve(el: Element) {
@@ -65,7 +68,48 @@ class FakeResizeObserver {
   fire() {
     if (!this.disconnected) this.callback([], this);
   }
+  /** Report a size change of `el` only — a no-op unless `el` is observed. */
+  fireFor(el: Element) {
+    if (!this.disconnected && this.observed.has(el)) this.callback([], this);
+  }
 }
+
+/** Report a size change of one element to every live ResizeObserver, then flush. */
+const fireResizeFor = (el: Element) => {
+  FakeResizeObserver.instances.forEach((o) => o.fireFor(el));
+  flushFrames();
+};
+
+// -- MutationObserver tracker: jsdom's real observer, plus bookkeeping --
+const NativeMutationObserver = globalThis.MutationObserver;
+class TrackingMutationObserver extends NativeMutationObserver {
+  static instances: TrackingMutationObserver[] = [];
+  observedTargets = new Set<Node>();
+  disconnected = false;
+  constructor(callback: MutationCallback) {
+    super(callback);
+    TrackingMutationObserver.instances.push(this);
+  }
+  observe(target: Node, options?: MutationObserverInit) {
+    super.observe(target, options);
+    this.disconnected = false;
+    this.observedTargets.add(target);
+  }
+  disconnect() {
+    super.disconnect();
+    this.observedTargets.clear();
+    this.disconnected = true;
+  }
+}
+
+/** Let MutationObserver callbacks (microtasks) and the rAF debounce run. */
+const flushMutations = async () => {
+  await act(async () => {
+    await Promise.resolve();
+    vi.advanceTimersByTime(20);
+    await Promise.resolve();
+  });
+};
 
 /** Fire every live ResizeObserver, then let the hook's rAF debounce run. */
 const fireResizeObservers = () => {
@@ -158,6 +202,8 @@ beforeEach(() => {
   reducedMotion = false;
   FakeResizeObserver.instances = [];
   vi.stubGlobal('ResizeObserver', FakeResizeObserver);
+  TrackingMutationObserver.instances = [];
+  vi.stubGlobal('MutationObserver', TrackingMutationObserver);
   stubMatchMedia();
   stubGeometry();
   setViewport(1024, 768);
@@ -565,6 +611,294 @@ describe('useCyberScrollbar — resize and content changes', () => {
     resizeWindow(1024); // the window resize listener still re-evaluates
     expect(getScrollbar()).not.toBeNull();
   });
+
+  it('still creates a container scrollbar when ResizeObserver is unavailable', () => {
+    vi.stubGlobal('ResizeObserver', undefined);
+    const { getByTestId } = render(createElement(Host, { pageLevel: false }));
+    flushFrames();
+
+    expect(getScrollbar()).not.toBeNull();
+    expect(getByTestId('container').classList.contains('cyber-scrollbar-container')).toBe(true);
+  });
+
+  // Regression: with `html, body { height: 100% }`, body's own border box
+  // never changes size as content grows or shrinks inside it, so observing
+  // only `documentElement`/`body` misses the change until the next window
+  // resize. Page-level mode now also observes body's direct children (their
+  // own boxes do change) and re-observes when children are added/removed.
+  it('observes body\'s direct children in page-level mode (fixed-height html/body)', () => {
+    const existingChild = document.createElement('section');
+    document.body.appendChild(existingChild);
+    bodyScrollHeight = 3000;
+
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    const observer = FakeResizeObserver.instances[0];
+    expect(observer.observed.has(existingChild)).toBe(true);
+    // The scrollbar's own element must not be self-observed.
+    expect(observer.observed.has(getScrollbar()!)).toBe(false);
+  });
+
+  it('re-evaluates the page-level scrollbar when a child is added directly under body, without a window resize', async () => {
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    // Simulate content growing inside a fixed-height html/body: a new child
+    // appears under body (no resize event, no documentElement/body size
+    // change reported).
+    bodyScrollHeight = 3000;
+    const content = document.createElement('div');
+    document.body.appendChild(content);
+
+    await act(async () => {
+      await Promise.resolve(); // MutationObserver callbacks are microtasks
+      vi.advanceTimersByTime(20);
+      await Promise.resolve();
+    });
+
+    expect(getScrollbar()).not.toBeNull();
+  });
+
+  it('stops observing a body child once it is removed', async () => {
+    const child = document.createElement('section');
+    document.body.appendChild(child);
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    expect(FakeResizeObserver.instances[0].observed.has(child)).toBe(true);
+
+    child.remove();
+    await act(async () => {
+      await Promise.resolve();
+      vi.advanceTimersByTime(20);
+    });
+
+    expect(FakeResizeObserver.instances[0].observed.has(child)).toBe(false);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Page-level: fixed-height wrappers below body (#51)
+// ---------------------------------------------------------------------------
+// With `html, body, #root { height: 100% }` (Next.js `__next`, SPA shells) the
+// wrapper under body is pinned to the viewport too, so the hook also observes
+// the single-element-child chain below each body child, up to a depth cap.
+describe('useCyberScrollbar — page-level single-child chain below body', () => {
+  const el = (tag: string, ...children: Element[]) => {
+    const node = document.createElement(tag);
+    children.forEach((c) => node.appendChild(c));
+    return node;
+  };
+
+  /** body > #root > #app > [header, main] — a typical SPA shell. */
+  const buildShell = () => {
+    const header = el('header');
+    const main = el('main');
+    const app = el('div', header, main);
+    const root = el('div', app);
+    root.id = 'root';
+    document.body.appendChild(root);
+    return { root, app, header, main };
+  };
+
+  const liveMutationObservers = () => TrackingMutationObserver.instances.filter((o) => !o.disconnected);
+
+  it('resize-observes each element of the chain and watches its childList, but not beyond the chain', () => {
+    const { root, app, header, main } = buildShell();
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    const observed = FakeResizeObserver.instances[0].observed;
+    expect(observed.has(root)).toBe(true);
+    expect(observed.has(app)).toBe(true);
+    // `app` has two element children: the chain stops there (no subtree).
+    expect(observed.has(header)).toBe(false);
+    expect(observed.has(main)).toBe(false);
+
+    expect(liveMutationObservers()).toHaveLength(1);
+    const watched = liveMutationObservers()[0].observedTargets;
+    expect(watched.has(document.body)).toBe(true);
+    expect(watched.has(root)).toBe(true);
+    expect(watched.has(app)).toBe(true);
+    expect(watched.has(header)).toBe(false);
+    expect(watched.has(getScrollbar()!)).toBe(false);
+  });
+
+  it('re-evaluates when a nested wrapper in the chain grows, without a window resize', () => {
+    const { app } = buildShell();
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    // html, body and #root are pinned; only #app's box reports the growth.
+    bodyScrollHeight = 3000;
+    fireResizeFor(app);
+    expect(getScrollbar()).not.toBeNull();
+
+    bodyScrollHeight = 400;
+    fireResizeFor(app);
+    expect(getScrollbar()).toBeNull();
+  });
+
+  it('follows every body child\'s chain side by side, including a body child that appears after mount', async () => {
+    const { app } = buildShell(); // body > #root > #app > [header, main]
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    // A portal root with its own single-child chain mounts later.
+    const dialog = el('div', el('p'), el('p'));
+    const panel = el('div', dialog);
+    const portal = el('div', panel);
+    portal.id = 'portal-root';
+    document.body.appendChild(portal);
+    await flushMutations();
+
+    const observer = FakeResizeObserver.instances[0];
+    [app, portal, panel, dialog].forEach((node) => expect(observer.observed.has(node)).toBe(true));
+    const watched = liveMutationObservers()[0].observedTargets;
+    [app, portal, panel, dialog].forEach((node) => expect(watched.has(node)).toBe(true));
+
+    // Growth in either chain re-evaluates without a window resize.
+    bodyScrollHeight = 3000;
+    fireResizeFor(dialog);
+    expect(getScrollbar()).not.toBeNull();
+    bodyScrollHeight = 400;
+    fireResizeFor(app);
+    expect(getScrollbar()).toBeNull();
+    bodyScrollHeight = 2800;
+    fireResizeFor(panel);
+    expect(getScrollbar()).not.toBeNull();
+  });
+
+  it('stops the walk at the depth cap of 8 levels below each body child', () => {
+    const levels: HTMLElement[] = [el('div')];
+    for (let i = 1; i <= 12; i++) {
+      const next = el('div');
+      levels[i - 1].appendChild(next);
+      levels.push(next);
+    }
+    document.body.appendChild(levels[0]);
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+
+    const observed = FakeResizeObserver.instances[0].observed;
+    for (let i = 0; i <= 8; i++) expect(observed.has(levels[i])).toBe(true);
+    for (let i = 9; i <= 12; i++) expect(observed.has(levels[i])).toBe(false);
+    const watched = liveMutationObservers()[0].observedTargets;
+    // The capped element's children are never looked at, so its childList isn't watched.
+    expect(watched.has(levels[7])).toBe(true);
+    expect(watched.has(levels[8])).toBe(false);
+  });
+
+  it('unobserves elements that leave the chain and observes elements that enter it', async () => {
+    const { root, app } = buildShell();
+    bodyScrollHeight = 3000;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const observer = FakeResizeObserver.instances[0];
+    expect(observer.observed.has(app)).toBe(true);
+
+    // A second child under #root breaks the chain at #root.
+    const toast = el('aside');
+    root.appendChild(toast);
+    await flushMutations();
+    expect(observer.observed.has(root)).toBe(true);
+    expect(observer.observed.has(app)).toBe(false);
+    expect(observer.observed.has(toast)).toBe(false);
+
+    // Removing it restores the chain.
+    toast.remove();
+    await flushMutations();
+    expect(observer.observed.has(app)).toBe(true);
+
+    // A single wrapper inserted below a chain element joins the chain.
+    const header = app.firstElementChild!;
+    const main = app.lastElementChild!;
+    const layout = el('div', header, main); // moves both into the new wrapper
+    app.appendChild(layout);
+    await flushMutations();
+    expect(observer.observed.has(layout)).toBe(true);
+    expect(liveMutationObservers()[0].observedTargets.has(layout)).toBe(true);
+  });
+
+  it('observes a wrapper that was empty at mount once it gets its first child', async () => {
+    const root = el('div');
+    document.body.appendChild(root);
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(getScrollbar()).toBeNull();
+
+    const app = el('div');
+    root.appendChild(app);
+    await flushMutations();
+    expect(FakeResizeObserver.instances[0].observed.has(app)).toBe(true);
+
+    bodyScrollHeight = 3000;
+    fireResizeFor(app);
+    expect(getScrollbar()).not.toBeNull();
+  });
+
+  it('does not re-observe when a mutation leaves the chain unchanged, but still re-evaluates', async () => {
+    const { main } = buildShell();
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const observer = FakeResizeObserver.instances[0];
+    const callsBefore = observer.observeCalls;
+
+    // `app` stays multi-child; `main` is below the chain end and not watched.
+    bodyScrollHeight = 3000;
+    main.appendChild(el('p'));
+    main.parentElement!.appendChild(el('footer'));
+    await flushMutations();
+
+    expect(observer.observeCalls).toBe(callsBefore);
+    expect(getScrollbar()).not.toBeNull(); // the watched #app childList change re-evaluated
+  });
+
+  it('is not re-triggered by its own scrollbar element coming and going', async () => {
+    buildShell();
+    bodyScrollHeight = 500;
+    renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    const observer = FakeResizeObserver.instances[0];
+    const callsBefore = observer.observeCalls;
+    const moCount = TrackingMutationObserver.instances.length;
+
+    bodyScrollHeight = 3000;
+    resizeWindow(1024); // scrollbar appended to body
+    await flushMutations();
+    expect(getScrollbar()).not.toBeNull();
+    bodyScrollHeight = 400;
+    resizeWindow(1024); // scrollbar removed from body
+    await flushMutations();
+    expect(getScrollbar()).toBeNull();
+
+    expect(observer.observeCalls).toBe(callsBefore);
+    expect(TrackingMutationObserver.instances).toHaveLength(moCount);
+  });
+
+  it('disconnects the ResizeObserver and every MutationObserver on unmount', () => {
+    buildShell();
+    bodyScrollHeight = 3000;
+    const { unmount } = renderHook(() => useCyberScrollbar({ pageLevel: true }));
+    flushFrames();
+    expect(liveMutationObservers()).toHaveLength(1);
+
+    unmount();
+    expect(FakeResizeObserver.instances.every((o) => o.disconnected)).toBe(true);
+    expect(TrackingMutationObserver.instances.every((o) => o.disconnected)).toBe(true);
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -738,5 +1072,74 @@ describe('useCyberScrollbar — prefers-reduced-motion', () => {
 
     scrollWindowTo(300);
     expect(litArrows(bar).length).toBeGreaterThan(0);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// React.StrictMode: effects run, clean up, and run again on mount
+// ---------------------------------------------------------------------------
+describe('useCyberScrollbar — React.StrictMode double-mount', () => {
+  it('ends up with exactly one page-level scrollbar and one live observer', () => {
+    bodyScrollHeight = 3000;
+    const { unmount } = render(createElement(StrictMode, null, createElement(Host, { pageLevel: true })));
+    flushFrames();
+
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+    expect(getScrollbar()).not.toBeNull();
+    expect(FakeResizeObserver.instances.filter((o) => !o.disconnected)).toHaveLength(1);
+
+    unmount();
+    expect(getScrollbar()).toBeNull();
+    expect(FakeResizeObserver.instances.every((o) => o.disconnected)).toBe(true);
+  });
+
+  it('ends up with exactly one live MutationObserver in page-level mode, and still follows the chain', async () => {
+    const app = document.createElement('div');
+    const root = document.createElement('div');
+    root.appendChild(app);
+    document.body.appendChild(root);
+    bodyScrollHeight = 500;
+    const { unmount } = render(createElement(StrictMode, null, createElement(Host, { pageLevel: true })));
+    flushFrames();
+
+    const liveMOs = () => TrackingMutationObserver.instances.filter((o) => !o.disconnected);
+    const liveROs = () => FakeResizeObserver.instances.filter((o) => !o.disconnected);
+    expect(TrackingMutationObserver.instances.length).toBeGreaterThanOrEqual(2); // mounted twice
+    expect(liveMOs()).toHaveLength(1);
+    expect(liveROs()).toHaveLength(1);
+    expect(liveROs()[0].observed.has(app)).toBe(true);
+
+    // The surviving observers still react: a chain change is picked up once.
+    const inner = document.createElement('div');
+    app.appendChild(inner);
+    await flushMutations();
+    expect(liveROs()[0].observed.has(inner)).toBe(true);
+    bodyScrollHeight = 3000;
+    fireResizeFor(inner);
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+
+    unmount();
+    expect(TrackingMutationObserver.instances.every((o) => o.disconnected)).toBe(true);
+    expect(FakeResizeObserver.instances.every((o) => o.disconnected)).toBe(true);
+  });
+
+  it('ends up with exactly one container scrollbar after a double-mount, and still tracks scroll', () => {
+    const { getByTestId, unmount } = render(createElement(StrictMode, null, createElement(Host, { pageLevel: false })));
+    flushFrames();
+
+    expect(document.querySelectorAll('.cyber-scrollbar')).toHaveLength(1);
+    const container = getByTestId('container');
+    expect(container.classList.contains('cyber-scrollbar-container')).toBe(true);
+
+    container.scrollTop = 120;
+    container.dispatchEvent(new Event('scroll'));
+    flushFrames();
+    const lit = Array.from(getScrollbar()!.querySelectorAll<HTMLElement>('.cyber-arrow-down')).filter(
+      (a) => a.style.opacity !== '0',
+    );
+    expect(lit.length).toBeGreaterThan(0);
+
+    unmount();
+    expect(getScrollbar()).toBeNull();
   });
 });

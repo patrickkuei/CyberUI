@@ -1,6 +1,5 @@
 import { useSyncExternalStore } from 'react';
-
-const QUERY = '(prefers-reduced-motion: reduce)';
+import { getReducedMotionPreference, subscribeReducedMotionChange } from './reducedMotionSubscription';
 
 /**
  * Duration in ms of the opacity-only fade that replaces open/close motion
@@ -10,24 +9,8 @@ const QUERY = '(prefers-reduced-motion: reduce)';
  */
 export const REDUCED_MOTION_DURATION = 150;
 
-function hasMatchMedia(): boolean {
-  return typeof window !== 'undefined' && typeof window.matchMedia === 'function';
-}
-
 function subscribe(onChange: () => void): () => void {
-  if (!hasMatchMedia()) return () => {};
-  const mql = window.matchMedia(QUERY);
-  if (typeof mql.addEventListener === 'function') {
-    mql.addEventListener('change', onChange);
-    return () => mql.removeEventListener('change', onChange);
-  }
-  // Safari < 14 only implements the deprecated listener API.
-  mql.addListener(onChange);
-  return () => mql.removeListener(onChange);
-}
-
-function getSnapshot(): boolean {
-  return hasMatchMedia() && window.matchMedia(QUERY).matches;
+  return subscribeReducedMotionChange(() => onChange());
 }
 
 // Server render and hydration both use `false`; React then re-renders with
@@ -49,5 +32,5 @@ function getServerSnapshot(): boolean {
  * <div style={{ animation: reduceMotion ? 'none' : 'neon-flicker 1s infinite' }} />
  */
 export function usePrefersReducedMotion(): boolean {
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return useSyncExternalStore(subscribe, getReducedMotionPreference, getServerSnapshot);
 }
