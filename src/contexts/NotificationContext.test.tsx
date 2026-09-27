@@ -101,6 +101,39 @@ describe('CyberNotificationProvider', () => {
       }).not.toThrow();
       expect(screen.getByText('Uplink secured')).toBeInTheDocument();
     });
+
+    it('applies the width once the toast can be measured (via ResizeObserver)', () => {
+      const observers: Array<() => void> = [];
+      class FakeResizeObserver {
+        constructor(cb: () => void) {
+          observers.push(cb);
+        }
+        observe() {}
+        unobserve() {}
+        disconnect() {}
+      }
+      vi.stubGlobal('ResizeObserver', FakeResizeObserver);
+      try {
+        let width = 0;
+        Object.defineProperty(HTMLElement.prototype, 'scrollWidth', { configurable: true, get: () => width });
+
+        renderProvider();
+        fireEvent.click(screen.getByText('Ping'));
+        // Unmeasured: parked at its off-screen enter position.
+        expect(toastShell().style.transform).toContain('translateX(100%)');
+        expect(toastShell().parentElement?.style.width).toBe('auto');
+
+        // The toast becomes measurable (e.g. its container gets a real size).
+        width = 320;
+        act(() => {
+          observers.forEach((cb) => cb());
+        });
+        expect(toastShell().style.transform).toContain('translateX(0px)');
+        expect(toastShell().parentElement?.style.width).toBe('320px');
+      } finally {
+        vi.unstubAllGlobals();
+      }
+    });
   });
 
   describe('under prefers-reduced-motion', () => {
