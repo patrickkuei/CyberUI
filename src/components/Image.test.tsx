@@ -1,9 +1,11 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { Profiler } from 'react';
 import { render, screen, fireEvent, cleanup, act, within } from '@testing-library/react';
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, expectTypeOf, vi, afterEach, beforeEach } from 'vitest';
 import Image from './Image';
 import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
+import type { ImageFallbackStyle, ImageSize, CarouselTransition } from '../components';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -68,13 +70,46 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
+  });
+
+  it('gives the preview close button an accessible name', () => {
+    render(<Image src="test.jpg" alt="Test image" preview />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
+    const closeButton = within(dialog).getByRole('button', { name: 'Close preview' });
+    expect(closeButton).toHaveAttribute('type', 'button');
+  });
+
+  it('is not wrapped in an aria-hidden ancestor (the #46 Modal bug pattern), so getByRole finds it without { hidden: true }', () => {
+    render(<Image src="test.jpg" alt="Test image" preview />);
+    fireEvent.load(screen.getByAltText('Test image'));
+    fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
+    const dialog = screen.getByRole('dialog', { name: 'Preview: Test image' });
+    let node: HTMLElement | null = dialog;
+    while (node) {
+      expect(node).not.toHaveAttribute('aria-hidden', 'true');
+      node = node.parentElement;
+    }
   });
 
   it('limits the preview image to the space inside the overlay padding (1rem each side)', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     const preview = within(screen.getByRole('dialog')).getByAltText('Test image');
     // 95vw/95vh left the image bigger than its frame on small screens.
     expect(preview.style.maxWidth).toBe('calc(100vw - 2rem)');
@@ -86,6 +121,9 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview onPreviewOpen={handlePreviewOpen} />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.click(screen.getByRole('button'));
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(handlePreviewOpen).toHaveBeenCalledTimes(1);
   });
 
@@ -116,6 +154,9 @@ describe('Image', () => {
     render(<Image src="test.jpg" alt="Test image" preview />);
     fireEvent.load(screen.getByAltText('Test image'));
     fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
+    act(() => {
+      vi.advanceTimersByTime(50);
+    });
     expect(screen.getByRole('dialog', { name: 'Preview: Test image' })).toBeInTheDocument();
   });
 });
@@ -199,6 +240,14 @@ describe('Image reduced motion', () => {
   });
 });
 
+describe('Image exported types (#50)', () => {
+  it('exports ImageFallbackStyle, ImageSize and CarouselTransition from the package entry, so consumers can name them', () => {
+    expectTypeOf<ImageFallbackStyle>().toEqualTypeOf<'gradient' | 'scanline'>();
+    expectTypeOf<ImageSize>().toEqualTypeOf<'sm' | 'md' | 'lg'>();
+    expectTypeOf<CarouselTransition>().toEqualTypeOf<'slide' | 'fade' | 'matrix' | 'signal-glitch'>();
+  });
+});
+
 describe('Image stand-in (no src)', () => {
   it('renders a role="img" panel named by alt, and no <img>', () => {
     const { container } = render(<Image alt="Neon district" />);
@@ -259,6 +308,27 @@ describe('Image stand-in (no src)', () => {
     expect(panel).toHaveClass('custom-panel', 'h-40', 'p-8');
   });
 
+  it('forwards id, style, title, data-*, and aria-* to the stand-in panel', () => {
+    render(
+      <Image
+        alt="Neon district"
+        id="hero-image"
+        style={{ marginTop: 8 }}
+        title="Neon district panel"
+        data-testid="stand-in-panel"
+        aria-describedby="caption-1"
+      />
+    );
+    const panel = screen.getByTestId('stand-in-panel');
+    expect(panel).toHaveAttribute('id', 'hero-image');
+    expect(panel).toHaveAttribute('title', 'Neon district panel');
+    expect(panel).toHaveAttribute('aria-describedby', 'caption-1');
+    expect(panel.style.marginTop).toBe('8px');
+    // The panel's own computed role/aria-label (driven by alt) still win.
+    expect(panel).toHaveAttribute('role', 'img');
+    expect(panel).toHaveAttribute('aria-label', 'Neon district');
+  });
+
   it('does not spread <img>-only props onto the panel', () => {
     render(<Image alt="Neon district" loading="eager" decoding="sync" />);
     const panel = screen.getByRole('img', { name: 'Neon district' });
@@ -295,6 +365,67 @@ describe('Image stand-in (no src)', () => {
     render(<Image src="broken.jpg" alt="Test image" fallback="backup.jpg" />);
     fireEvent.error(screen.getByAltText('Test image'));
     expect(screen.getByAltText('Test image (fallback)')).toHaveAttribute('src', 'backup.jpg');
+  });
+
+  it('resets the error state and starts a fresh load when src changes after a failure', () => {
+    const { rerender } = render(<Image src="broken.jpg" alt="Test image" />);
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByRole('alert')).toHaveAttribute('aria-label', 'Failed to load image');
+
+    rerender(<Image src="new.jpg" alt="Test image" />);
+
+    expect(screen.queryByRole('alert')).toBeNull();
+    const img = screen.getByAltText('Test image');
+    expect(img).toHaveAttribute('src', 'new.jpg');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading image');
+    fireEvent.load(img);
+    expect(screen.queryByRole('status')).toBeNull();
+  });
+
+  it('resets the fallback state and loads the new src when src changes after the fallback took over', () => {
+    const { rerender } = render(<Image src="broken.jpg" alt="Test image" fallback="backup.jpg" />);
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByAltText('Test image (fallback)')).toHaveAttribute('src', 'backup.jpg');
+
+    rerender(<Image src="new.jpg" alt="Test image" fallback="backup.jpg" />);
+
+    expect(screen.queryByAltText('Test image (fallback)')).toBeNull();
+    const img = screen.getByAltText('Test image');
+    expect(img).toHaveAttribute('src', 'new.jpg');
+    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Loading image');
+  });
+
+  it('never paints the stale error panel on any commit after src changes (the reset must happen during render, not in a passive effect)', () => {
+    // React's <Profiler onRender> fires once per commit of the wrapped
+    // tree — including a second commit an effect schedules within the same
+    // act()-flushed rerender — unlike a plain assertion after rerender(),
+    // which only ever sees the final, already-settled DOM. Recording
+    // whether the error panel is present at every commit catches an
+    // effect-based reset that briefly commits the stale panel before
+    // resetting it, which a post-rerender assertion alone cannot.
+    const commits: boolean[] = [];
+    const onRender = () => {
+      commits.push(document.querySelector('[role="alert"]') !== null);
+    };
+
+    const { rerender } = render(
+      <Profiler id="image-src-reset" onRender={onRender}>
+        <Image src="broken.jpg" alt="Test image" />
+      </Profiler>
+    );
+    fireEvent.error(screen.getByAltText('Test image'));
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+    commits.length = 0; // only the commits from the src change below matter
+
+    rerender(
+      <Profiler id="image-src-reset" onRender={onRender}>
+        <Image src="new.jpg" alt="Test image" />
+      </Profiler>
+    );
+
+    expect(commits.length).toBeGreaterThan(0);
+    expect(commits).not.toContain(true);
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('switches between the stand-in and a real image as src comes and goes', () => {

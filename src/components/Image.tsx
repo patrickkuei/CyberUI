@@ -143,6 +143,36 @@ interface ImageStandInProps {
   fallbackStyle: ImageFallbackStyle;
   size: ResponsiveValue<ImageSize>;
   className: string;
+  /** A safe subset of the props forwarded to the real <img> (id, style,
+   *  title, data-*, aria-*) that also makes sense on this <div> panel. */
+  panelProps: Partial<React.HTMLAttributes<HTMLDivElement>>;
+}
+
+/** Global attribute names (beyond `data-*`/`aria-*`) that make sense on the
+ *  stand-in's <div> panel, unlike img-only attributes such as `loading` or
+ *  `decoding`. See `pickPanelProps`. */
+const PANEL_PASSTHROUGH_KEYS = new Set(["id", "style", "title"]);
+
+/**
+ * Picks the subset of `ImageProps`' rest props (spread onto the real <img>)
+ * that also apply to the built-in stand-in's plain <div>: `id`, `style`,
+ * `title`, and any `data-*`/`aria-*` attribute. img-only attributes (
+ * `loading`, `decoding`, `crossOrigin`, `src`, ...) are left out (#50).
+ */
+function pickPanelProps(
+  props: object
+): Partial<React.HTMLAttributes<HTMLDivElement>> {
+  const picked: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (
+      PANEL_PASSTHROUGH_KEYS.has(key) ||
+      key.startsWith("data-") ||
+      key.startsWith("aria-")
+    ) {
+      picked[key] = value;
+    }
+  }
+  return picked as Partial<React.HTMLAttributes<HTMLDivElement>>;
 }
 
 /**
@@ -157,8 +187,10 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
   fallbackStyle,
   size,
   className,
+  panelProps,
 }) => (
   <div
+    {...panelProps}
     {...(alt
       ? { role: "img", "aria-label": alt }
       : { "aria-hidden": true })}
@@ -246,6 +278,24 @@ const Image: React.FC<ImageProps> = memo(
     const [isLoadPending, setIsLoadPending] = useState(true);
     const [hasError, setHasError] = useState(false);
     const [fallbackActive, setFallbackActive] = useState(false);
+
+    // A new `src` starts a fresh load: drop any error/fallback state left
+    // over from a previous `src`'s failure so its `Failed to load image`
+    // panel doesn't linger, and so the new `src` isn't ignored in favour of
+    // `fallback` (#49). This resets during render — React's documented
+    // "adjusting state when a prop changes" pattern — rather than in a
+    // `useEffect`: calling a setter while rendering makes React discard this
+    // render and immediately re-render with the updated state before
+    // anything commits, so the very first paint for the new `src` already
+    // shows the loading state instead of briefly committing the previous
+    // src's stale error panel and only fixing it up after an effect runs.
+    const [prevSrc, setPrevSrc] = useState(src);
+    if (src !== prevSrc) {
+      setPrevSrc(src);
+      setHasError(false);
+      setFallbackActive(false);
+      setIsLoadPending(true);
+    }
 
     // What can be shown: the `src`, else the `fallback` URL (a missing `src`
     // counts as a failed load), else nothing (the stand-in renders).
@@ -514,6 +564,10 @@ const Image: React.FC<ImageProps> = memo(
       ]
     );
 
+    // The subset of `props` (id, style, title, data-*, aria-*) also
+    // forwarded to the stand-in panel below when there is no image (#50).
+    const standInPanelProps = useMemo(() => pickPanelProps(props), [props]);
+
     // Nothing to load: the built-in stand-in. Returned after every hook above
     // so the hook order never changes when `src` comes and goes.
     if (!hasImage) {
@@ -523,6 +577,7 @@ const Image: React.FC<ImageProps> = memo(
           fallbackStyle={fallbackStyle}
           size={size}
           className={className}
+          panelProps={standInPanelProps}
         />
       );
     }
@@ -591,7 +646,9 @@ const Image: React.FC<ImageProps> = memo(
             >
               {/* Animated Close Button */}
               <button
+                type="button"
                 onClick={closePreview}
+                aria-label="Close preview"
                 className={`absolute top-4 right-4 text-white hover:text-accent/80 transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100 motion-reduce:rotate-0 motion-reduce:hover:scale-100 font-bold z-20 rounded-full w-10 h-10 flex items-center justify-center cursor-pointer transform ${
                   isClosing
                     ? "bg-black/0 scale-50 rotate-180 opacity-0"
