@@ -143,6 +143,36 @@ interface ImageStandInProps {
   fallbackStyle: ImageFallbackStyle;
   size: ResponsiveValue<ImageSize>;
   className: string;
+  /** A safe subset of the props forwarded to the real <img> (id, style,
+   *  title, data-*, aria-*) that also makes sense on this <div> panel. */
+  panelProps: Partial<React.HTMLAttributes<HTMLDivElement>>;
+}
+
+/** Global attribute names (beyond `data-*`/`aria-*`) that make sense on the
+ *  stand-in's <div> panel, unlike img-only attributes such as `loading` or
+ *  `decoding`. See `pickPanelProps`. */
+const PANEL_PASSTHROUGH_KEYS = new Set(["id", "style", "title"]);
+
+/**
+ * Picks the subset of `ImageProps`' rest props (spread onto the real <img>)
+ * that also apply to the built-in stand-in's plain <div>: `id`, `style`,
+ * `title`, and any `data-*`/`aria-*` attribute. img-only attributes (
+ * `loading`, `decoding`, `crossOrigin`, `src`, ...) are left out (#50).
+ */
+function pickPanelProps(
+  props: object
+): Partial<React.HTMLAttributes<HTMLDivElement>> {
+  const picked: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(props)) {
+    if (
+      PANEL_PASSTHROUGH_KEYS.has(key) ||
+      key.startsWith("data-") ||
+      key.startsWith("aria-")
+    ) {
+      picked[key] = value;
+    }
+  }
+  return picked as Partial<React.HTMLAttributes<HTMLDivElement>>;
 }
 
 /**
@@ -157,8 +187,10 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
   fallbackStyle,
   size,
   className,
+  panelProps,
 }) => (
   <div
+    {...panelProps}
     {...(alt
       ? { role: "img", "aria-label": alt }
       : { "aria-hidden": true })}
@@ -524,6 +556,10 @@ const Image: React.FC<ImageProps> = memo(
       ]
     );
 
+    // The subset of `props` (id, style, title, data-*, aria-*) also
+    // forwarded to the stand-in panel below when there is no image (#50).
+    const standInPanelProps = useMemo(() => pickPanelProps(props), [props]);
+
     // Nothing to load: the built-in stand-in. Returned after every hook above
     // so the hook order never changes when `src` comes and goes.
     if (!hasImage) {
@@ -533,6 +569,7 @@ const Image: React.FC<ImageProps> = memo(
           fallbackStyle={fallbackStyle}
           size={size}
           className={className}
+          panelProps={standInPanelProps}
         />
       );
     }

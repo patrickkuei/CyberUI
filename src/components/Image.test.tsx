@@ -1,9 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { render, screen, fireEvent, cleanup, act, within } from '@testing-library/react';
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, expectTypeOf, vi, afterEach, beforeEach } from 'vitest';
 import Image from './Image';
 import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
+import type { ImageFallbackStyle, ImageSize, CarouselTransition } from '../components';
 
 beforeEach(() => {
   vi.useFakeTimers();
@@ -238,6 +239,14 @@ describe('Image reduced motion', () => {
   });
 });
 
+describe('Image exported types (#50)', () => {
+  it('exports ImageFallbackStyle, ImageSize and CarouselTransition from the package entry, so consumers can name them', () => {
+    expectTypeOf<ImageFallbackStyle>().toEqualTypeOf<'gradient' | 'scanline'>();
+    expectTypeOf<ImageSize>().toEqualTypeOf<'sm' | 'md' | 'lg'>();
+    expectTypeOf<CarouselTransition>().toEqualTypeOf<'slide' | 'fade' | 'matrix' | 'signal-glitch'>();
+  });
+});
+
 describe('Image stand-in (no src)', () => {
   it('renders a role="img" panel named by alt, and no <img>', () => {
     const { container } = render(<Image alt="Neon district" />);
@@ -296,6 +305,27 @@ describe('Image stand-in (no src)', () => {
     render(<Image alt="Neon district" size="lg" className="custom-panel h-40" />);
     const panel = screen.getByRole('img', { name: 'Neon district' });
     expect(panel).toHaveClass('custom-panel', 'h-40', 'p-8');
+  });
+
+  it('forwards id, style, title, data-*, and aria-* to the stand-in panel', () => {
+    render(
+      <Image
+        alt="Neon district"
+        id="hero-image"
+        style={{ marginTop: 8 }}
+        title="Neon district panel"
+        data-testid="stand-in-panel"
+        aria-describedby="caption-1"
+      />
+    );
+    const panel = screen.getByTestId('stand-in-panel');
+    expect(panel).toHaveAttribute('id', 'hero-image');
+    expect(panel).toHaveAttribute('title', 'Neon district panel');
+    expect(panel).toHaveAttribute('aria-describedby', 'caption-1');
+    expect(panel.style.marginTop).toBe('8px');
+    // The panel's own computed role/aria-label (driven by alt) still win.
+    expect(panel).toHaveAttribute('role', 'img');
+    expect(panel).toHaveAttribute('aria-label', 'Neon district');
   });
 
   it('does not spread <img>-only props onto the panel', () => {
