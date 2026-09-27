@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useSyncExternalStore } from "react";
 
 export type ResponsiveObject<T> = {
   base?: T;
@@ -239,9 +239,29 @@ export const resolveResponsiveValue = <T>(
   return resolved;
 };
 
+// -1 is never a real viewport width; it means "width unknown" (server render,
+// or hydration before the client has committed its first snapshot).
+const SERVER_WIDTH_SNAPSHOT = -1;
+
+function getWidthSnapshot(): number {
+  return typeof window === "undefined" ? SERVER_WIDTH_SNAPSHOT : window.innerWidth;
+}
+
+// Server render and hydration both resolve to `fallback` (this sentinel
+// stands for "width unknown"); React then re-renders with the real width
+// after mount, so hydration never mismatches — same approach as
+// usePrefersReducedMotion's getServerSnapshot.
+function getServerWidthSnapshot(): number {
+  return SERVER_WIDTH_SNAPSHOT;
+}
+
 // React hook to resolve a ResponsiveValue<T> and update on resize
 /**
  * A hook that returns the current resolved value based on window resize events.
+ *
+ * SSR-safe: renders `fallback` on the server and during hydration (even if
+ * the real viewport would resolve to something else), then switches to the
+ * resolved value once mounted on the client, so hydration never mismatches.
  *
  * @param prop The responsive value configuration
  * @param fallback Default value to use during SSR or initial render
@@ -251,26 +271,32 @@ export const useResponsiveValue = <T>(
   prop: ResponsiveValue<T>,
   fallback: T
 ): T => {
-  const get = useCallback(
-    () =>
-      typeof window === "undefined"
-        ? fallback
-        : resolveResponsiveValue(prop, window.innerWidth, fallback),
-    [fallback, prop]
+  const responsive = isResponsiveObject<T>(prop);
+
+  // Only a responsive object needs to react to resize; a static value never
+  // changes, so skip subscribing to avoid needless listeners/re-renders.
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      if (!responsive || typeof window === "undefined") return () => {};
+      window.addEventListener("resize", onChange);
+      return () => window.removeEventListener("resize", onChange);
+    },
+    [responsive]
   );
 
-  const [value, setValue] = useState<T>(get);
+  const width = useSyncExternalStore(
+    subscribe,
+    getWidthSnapshot,
+    getServerWidthSnapshot
+  );
 
-  useEffect(() => {
-    if (!isResponsiveObject<T>(prop)) {
-      setValue((prop as T) ?? fallback);
-      return;
+  return useMemo(() => {
+    if (!responsive) {
+      return (prop as T) ?? fallback;
     }
-    const onResize = () => setValue(get());
-    onResize();
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [fallback, get, prop]);
-
-  return value;
+    if (width === SERVER_WIDTH_SNAPSHOT) {
+      return fallback;
+    }
+    return resolveResponsiveValue(prop, width, fallback);
+  }, [responsive, prop, fallback, width]);
 };
