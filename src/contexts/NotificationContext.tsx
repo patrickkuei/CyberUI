@@ -136,7 +136,10 @@ export const CyberNotificationProvider: React.FC<
                 // `motion-reduce:translate-x-0` variant is still needed as a
                 // CSS-only guarantee (independent of the JS `reduceMotion`
                 // read) that reduced-motion users never get translate.
-                className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out scale-75 opacity-90 w-full ${
+                // The 0.75 shrink is likewise only in the inline `scale(0.75)`
+                // (a `scale-75` utility would set the separate `scale`
+                // property and square it to ~0.56).
+                className={`transform transition-all duration-500 motion-reduce:duration-150 motion-reduce:translate-x-0 ease-out opacity-90 w-full ${
                   position.includes("right")
                     ? "flex justify-end"
                     : "flex justify-start"

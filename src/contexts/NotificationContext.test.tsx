@@ -72,6 +72,22 @@ describe('CyberNotificationProvider', () => {
     expect(shell.className).not.toMatch(/(?:^|\s)-?translate-x-full(?:\s|$)/);
   });
 
+  it('expresses the toast scale once, in the inline transform (no doubled scale)', () => {
+    renderProvider();
+    fireEvent.click(screen.getByText('Ping'));
+
+    const shell = toastShell();
+    // A Tailwind v4 scale-* utility sets the separate `scale` CSS property,
+    // which composes with (squares) the inline transform's scale(0.75).
+    expect(shell.className).not.toMatch(/(?:^|\s)-?scale-/);
+    expect(shell.style.transform.match(/scale\(/g)).toHaveLength(1);
+    expect(shell.style.transform).toContain('scale(0.75)');
+
+    fireEvent.click(screen.getByLabelText('Close notification'));
+    expect(shell.style.transform.match(/scale\(/g)).toHaveLength(1);
+    expect(shell.style.transform).toContain('scale(0.75)');
+  });
+
   describe('when the browser reports a zero width (e.g. jsdom, or a toast rendered in a hidden container)', () => {
     beforeEach(() => {
       // Overrides the outer beforeEach's stub back to jsdom's real behavior.
