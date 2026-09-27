@@ -97,6 +97,50 @@ describe('useResponsiveValue', () => {
     }
   });
 
+  it('re-renders only when a breakpoint is crossed, not on every resize within one', async () => {
+    let renders = 0;
+    function CountingProbe() {
+      renders += 1;
+      const orientation = useResponsiveValue({ base: 'vertical', md: 'horizontal' }, 'vertical');
+      return <span>{orientation}</span>;
+    }
+    const resizeTo = async (width: number) => {
+      await act(async () => {
+        setInnerWidth(width);
+        window.dispatchEvent(new Event('resize'));
+      });
+    };
+
+    setInnerWidth(800); // md (768-1023)
+    const { container, unmount } = render(<CountingProbe />);
+    try {
+      expect(container.textContent).toBe('horizontal');
+      const afterMount = renders;
+
+      // Dragging within md (768 <= w < 1024) must not re-render.
+      await resizeTo(801);
+      await resizeTo(900);
+      await resizeTo(1023);
+      expect(renders).toBe(afterMount);
+
+      // Crossing md -> lg keeps the same resolved value but the breakpoint changed:
+      // exactly one update.
+      await resizeTo(1024);
+      expect(renders).toBe(afterMount + 1);
+      await resizeTo(1100);
+      expect(renders).toBe(afterMount + 1);
+
+      // Crossing down into base changes the resolved value: exactly one more update.
+      await resizeTo(400);
+      expect(renders).toBe(afterMount + 2);
+      expect(container.textContent).toBe('vertical');
+      await resizeTo(320);
+      expect(renders).toBe(afterMount + 2);
+    } finally {
+      unmount();
+    }
+  });
+
   it('does not subscribe to resize for a static (non-responsive) value', () => {
     function StaticProbe() {
       const size = useResponsiveValue('md', 'sm');

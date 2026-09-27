@@ -239,20 +239,34 @@ export const resolveResponsiveValue = <T>(
   return resolved;
 };
 
-// -1 is never a real viewport width; it means "width unknown" (server render,
-// or hydration before the client has committed its first snapshot).
-const SERVER_WIDTH_SNAPSHOT = -1;
+// Breakpoint keys in ascending order of their min width (derived from
+// BREAKPOINT_PIXELS so the two can never drift apart).
+const BREAKPOINT_ORDER = Object.keys(BREAKPOINT_PIXELS) as Breakpoint[];
 
-function getWidthSnapshot(): number {
-  return typeof window === "undefined" ? SERVER_WIDTH_SNAPSHOT : window.innerWidth;
+// -1 is never a real breakpoint index; it means "width unknown" (server
+// render, or hydration before the client has committed its first snapshot).
+const SERVER_BREAKPOINT_SNAPSHOT = -1;
+
+// The external-store snapshot is the active breakpoint's index, not the raw
+// width: it is a primitive that only changes when a breakpoint is crossed, so
+// subscribers re-render at most once per crossing instead of once per resize
+// event.
+function getBreakpointSnapshot(): number {
+  if (typeof window === "undefined") return SERVER_BREAKPOINT_SNAPSHOT;
+  const width = window.innerWidth;
+  let active = 0;
+  for (let i = 0; i < BREAKPOINT_ORDER.length; i++) {
+    if (width >= BREAKPOINT_PIXELS[BREAKPOINT_ORDER[i]]) active = i;
+  }
+  return active;
 }
 
 // Server render and hydration both resolve to `fallback` (this sentinel
-// stands for "width unknown"); React then re-renders with the real width
+// stands for "width unknown"); React then re-renders with the real breakpoint
 // after mount, so hydration never mismatches — same approach as
 // usePrefersReducedMotion's getServerSnapshot.
-function getServerWidthSnapshot(): number {
-  return SERVER_WIDTH_SNAPSHOT;
+function getServerBreakpointSnapshot(): number {
+  return SERVER_BREAKPOINT_SNAPSHOT;
 }
 
 // React hook to resolve a ResponsiveValue<T> and update on resize
@@ -284,19 +298,22 @@ export const useResponsiveValue = <T>(
     [responsive]
   );
 
-  const width = useSyncExternalStore(
+  const breakpointIndex = useSyncExternalStore(
     subscribe,
-    getWidthSnapshot,
-    getServerWidthSnapshot
+    getBreakpointSnapshot,
+    getServerBreakpointSnapshot
   );
 
   return useMemo(() => {
     if (!responsive) {
       return (prop as T) ?? fallback;
     }
-    if (width === SERVER_WIDTH_SNAPSHOT) {
+    if (breakpointIndex === SERVER_BREAKPOINT_SNAPSHOT) {
       return fallback;
     }
+    // resolveResponsiveValue only compares against breakpoint minimums, so the
+    // active breakpoint's own min width resolves identically to the real width.
+    const width = BREAKPOINT_PIXELS[BREAKPOINT_ORDER[breakpointIndex]];
     return resolveResponsiveValue(prop, width, fallback);
-  }, [responsive, prop, fallback, width]);
+  }, [responsive, prop, fallback, breakpointIndex]);
 };
