@@ -53,6 +53,19 @@ describe('Drawer Component', () => {
     expect(screen.getByText('Filters').id).toBe(dialog.getAttribute('aria-labelledby'));
   });
 
+  it('exposes the open drawer to assistive tech (not just to hidden-inclusive queries)', () => {
+    // Regression: an open drawer must be discoverable by its accessible name
+    // through the default (non-hidden) accessibility tree — if some ancestor
+    // ever regressed to aria-hidden="true" while the drawer was open, this
+    // query would find nothing and only `{ hidden: true }` would still see it.
+    render(
+      <Drawer isOpen={true} onClose={vi.fn()} title="Neon Archive">
+        <div>Content</div>
+      </Drawer>
+    );
+    expect(screen.getByRole('dialog', { name: 'Neon Archive' })).toBeInTheDocument();
+  });
+
   it('falls back to ariaLabel when no title is set', () => {
     render(
       <Drawer isOpen={true} onClose={vi.fn()} ariaLabel="Custom Drawer">

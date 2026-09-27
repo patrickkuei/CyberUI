@@ -241,6 +241,18 @@ describe('Modal Component', () => {
     expect(screen.getByText('Content').parentElement!.className).toContain('motion-reduce:translate-y-0');
   });
 
+  it('exposes the dialog to assistive technology (no aria-hidden ancestor hides it)', () => {
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} title="System Title">
+        <div>Modal Content</div>
+      </Modal>
+    );
+    // Deliberately queried WITHOUT { hidden: true } — if any ancestor
+    // (e.g. the overlay wrapper) carries aria-hidden, this throws instead
+    // of finding the dialog.
+    expect(screen.getByRole('dialog', { name: 'System Title' })).toBeInTheDocument();
+  });
+
   it('shows title, body and footer at full opacity from the start under reduced motion (one 150ms dialog fade)', () => {
     render(
       <Modal isOpen={true} onClose={vi.fn()} title="Uplink" onConfirm={vi.fn()}>

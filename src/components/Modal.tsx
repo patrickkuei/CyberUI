@@ -274,7 +274,6 @@ const Modal: React.FC<ModalProps> = memo(
           height: "100vh",
         }}
         onClick={handleOverlayClick}
-        aria-hidden={true}
       >
         <div
           ref={modalRef}
