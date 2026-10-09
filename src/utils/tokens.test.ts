@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, extname } from 'node:path';
+import { join, extname, relative } from 'node:path';
 import { describe, it, expect } from 'vitest';
 
 const REPO_ROOT = join(__dirname, '..', '..');
@@ -107,5 +107,26 @@ describe('design tokens', () => {
           `(this is exactly how --color-inverse sat dead until this test was added; see CHANGELOG.md).`
       );
     }
+  });
+});
+
+describe('bare text-base utility', () => {
+  // `--color-base` is a colour token, so Tailwind's `text-base` sets the text
+  // colour to the page background (#1a1a2e) as well as the font size, and the
+  // text vanishes. See src/index.css's top comment; the size alone is
+  // `text-(length:--text-base)`.
+  const BARE_TEXT_BASE = /(^|[\s"'`:])text-base(?=[\s"'`]|$)/;
+
+  it('is never used in source (use text-(length:--text-base) for the size)', () => {
+    const offenders: string[] = [];
+    for (const file of walkSourceFiles(SRC_DIR)) {
+      if (file.endsWith('.css') || /\.test\.tsx?$/.test(file)) continue;
+      readFileSync(file, 'utf8').split('\n').forEach((line, index) => {
+        const trimmed = line.trim();
+        if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) return;
+        if (BARE_TEXT_BASE.test(line)) offenders.push(`${relative(REPO_ROOT, file)}:${index + 1}`);
+      });
+    }
+    expect(offenders).toEqual([]);
   });
 });
