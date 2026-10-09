@@ -1,5 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Notification from './Notification';
+import { CyberNotificationProvider } from '../contexts/NotificationContext';
+import { useCyberNotifications } from '../hooks/useCyberNotifications';
 
 const meta: Meta<typeof Notification> = {
   title: 'Components/Notification',
@@ -174,5 +177,54 @@ export const WithCloseButton: Story = {
     title: 'Dismissible Notification',
     message: 'This notification can be closed',
     onClose: () => console.log('Notification closed'),
+  },
+};
+
+function BottomToastDemo() {
+  const { showNotification } = useCyberNotifications();
+
+  return (
+    <button
+      type="button"
+      className="px-4 py-2 border border-cyan-400 text-cyan-300 font-mono"
+      onClick={() => {
+        showNotification('success', 'UPLINK.SYS', 'Neural handshake complete', { autoHide: false });
+      }}
+    >
+      Jack in
+    </button>
+  );
+}
+
+export const BottomPosition: Story = {
+  parameters: {
+    layout: 'fullscreen',
+    docs: {
+      description: {
+        story:
+          'Toasts from a `CyberNotificationProvider` with `position="bottom-right"` or `"bottom-left"` appear above the bottom edge of the viewport and stack upward, newest on top.',
+      },
+    },
+  },
+  render: () => (
+    <CyberNotificationProvider position="bottom-right">
+      <div className="p-8">
+        <BottomToastDemo />
+      </div>
+    </CyberNotificationProvider>
+  ),
+  play: async ({ canvasElement }) => {
+    const button = within(canvasElement).getByRole('button', { name: /jack in/i });
+    await userEvent.click(button);
+    await userEvent.click(button);
+    const toasts = await within(document.body).findAllByText('UPLINK.SYS');
+    expect(toasts).toHaveLength(2);
+    await waitFor(() => {
+      for (const toast of toasts) {
+        const { top, bottom } = toast.getBoundingClientRect();
+        expect(top).toBeGreaterThanOrEqual(0);
+        expect(bottom).toBeLessThanOrEqual(window.innerHeight);
+      }
+    });
   },
 };

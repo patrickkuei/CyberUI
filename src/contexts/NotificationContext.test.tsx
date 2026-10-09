@@ -108,6 +108,63 @@ describe('CyberNotificationProvider', () => {
     expect(reads).not.toContain(shell);
   });
 
+  describe('toast placement by position', () => {
+    type Position = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
+
+    function Pair() {
+      const { showNotification } = useCyberNotifications();
+      return (
+        <button
+          onClick={() => {
+            showNotification('success', 'Uplink secured', 'Neural handshake complete', { autoHide: false });
+            vi.advanceTimersByTime(1); // toast ids come from Date.now(); keep them distinct
+            showNotification('warning', 'Firewall breach', 'Trace detected', { autoHide: false });
+          }}
+        >
+          Ping
+        </button>
+      );
+    }
+
+    /** The absolutely positioned wrapper of each toast, in render order. */
+    const renderSlots = (position: Position) => {
+      render(
+        <CyberNotificationProvider position={position}>
+          <Pair />
+        </CyberNotificationProvider>
+      );
+      fireEvent.click(screen.getByText('Ping'));
+      return Array.from(document.querySelectorAll<HTMLElement>('[aria-live] > .absolute'));
+    };
+
+    it.each<Position>(['top-right', 'top-left'])('anchors %s toasts with top, stacking downward in 70px steps', (position) => {
+      const slots = renderSlots(position);
+      expect(slots.map((s) => s.style.top)).toEqual(['0px', '70px']);
+      expect(slots.every((s) => s.style.bottom === '')).toBe(true);
+    });
+
+    it.each<Position>(['bottom-right', 'bottom-left'])('anchors %s toasts with bottom, stacking upward in 70px steps', (position) => {
+      const slots = renderSlots(position);
+      expect(slots.map((s) => s.style.bottom)).toEqual(['0px', '70px']);
+      expect(slots.every((s) => s.style.top === '')).toBe(true);
+    });
+
+    it.each<[Position, string, string]>([
+      ['bottom-right', 'translateX(0px)', 'translateX(100%)'],
+      ['bottom-left', 'translateX(0px)', 'translateX(-100%)'],
+    ])('keeps the %s slide transform on enter and exit', (position, entered, exited) => {
+      render(
+        <CyberNotificationProvider position={position}>
+          <Trigger />
+        </CyberNotificationProvider>
+      );
+      fireEvent.click(screen.getByText('Ping'));
+      expect(toastShell().style.transform).toContain(entered);
+      fireEvent.click(screen.getByLabelText('Close notification'));
+      expect(toastShell().style.transform).toContain(exited);
+    });
+  });
+
   describe('when the browser reports a zero width (e.g. jsdom, or a toast rendered in a hidden container)', () => {
     beforeEach(() => {
       // Overrides the outer beforeEach's stub back to jsdom's real behavior.
