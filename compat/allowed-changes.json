@@ -1,0 +1,25 @@
+{
+  "//": "Reviewed, intentional differences from compat/baseline.json that must not fail `npm run check:compat`. Friction on purpose: every entry needs an id (copy it from the failure output), a reason a reviewer can check, and the version that introduces it. Prefer deprecating and keeping the old API; only genuinely compatible-in-practice changes or deliberate (major) breaks belong here. Entries that stop matching anything are reported so they get removed (they become obsolete once the baseline is regenerated at release time).",
+  "allowed": [
+    {
+      "id": "type-member-type:SliderProps.value",
+      "reason": "SliderProps became SliderProps<V extends SliderValue = SliderValue>; `value?: V` with the default V is exactly the old `SliderValue`. Bare `SliderProps`, React.FC<SliderProps> and ComponentProps<typeof Slider> are pinned in compat/consumer.fixture.tsx.",
+      "since": "2.7.0"
+    },
+    {
+      "id": "type-member-type:SliderProps.defaultValue",
+      "reason": "Same generic-with-default change as SliderProps.value: `defaultValue?: V` with V = SliderValue is the old `SliderValue`.",
+      "since": "2.7.0"
+    },
+    {
+      "id": "prop-type:Slider.onValueChange",
+      "reason": "Only the manifest's printed text differs: the new generic callback type resolves to `(value: number | [number, number]) => void` for the default V, which is the old `(value: SliderValue) => void` with the alias expanded. Pinned by the Slider lines in compat/consumer.fixture.tsx.",
+      "since": "2.7.0"
+    },
+    {
+      "id": "prop-type:Carousel.images",
+      "reason": "Only the manifest differs: it prints Carousel's props from the first call signature (the stand-in one), where images is CarouselSlideData[] ((CarouselImageData | CarouselStandInData)[]). The types consumers read are unchanged: CarouselProps['images'] and ComponentProps<typeof Carousel>['images'] are still CarouselImageData[] with src: string, and Image/Carousel still assign to FC<ImageProps> / NamedExoticComponent<CarouselProps>. Pinned by the Carousel and Image lines in compat/consumer.fixture.tsx and by src/test/imageCarouselTypeCompat.test.tsx, checked against 2.6.0 and the merged build. Stays an entry until the baseline is regenerated at the 2.7.0 release.",
+      "since": "2.7.0"
+    }
+  ]
+}

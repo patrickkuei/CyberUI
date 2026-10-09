@@ -58,5 +58,11 @@ jobs:
       - name: Check package integrity
         run: npm run check:package
 
+      # Fails when the build breaks anything a 2.x user relies on (removed or
+      # narrowed exports/props/CSS variables, consumer code that stopped
+      # compiling). See CONTRIBUTING.md, "Compatibility and deprecation policy".
+      - name: Check backward compatibility
+        run: npm run check:compat
+
       - name: Check bundle size
         run: npm run size

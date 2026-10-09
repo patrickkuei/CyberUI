@@ -19,6 +19,7 @@ npm run storybook     # Storybook on :6006
 npm run lint          # ESLint
 npm run type-check    # tsc --noEmit (fast, no bundle)
 npm run build         # Library build (typecheck + bundle → dist/)
+npm run check:compat  # After build: fail if the dist breaks anything the last release exposed
 npm test              # All tests (unit + Storybook/Playwright)
 ```
 
@@ -82,9 +83,12 @@ Key rules from `.claude/settings.json` — Claude Code respects these in every s
 - When adding or modifying a component's public API (props, variants, hooks): update `AGENT.md`'s component table and the matching entry in `bin/usage-content.js`
 - Stories are required — Default + variants + sizes + disabled + AllVariants render story
 - Use cyberpunk-flavored copy in stories (not generic placeholder text)
+- **Backward compatibility: nothing a current user's code can rely on may stop working or compiling in a minor or patch release.** That covers exports (values and types), props and their types and required-ness, CSS custom properties the shipped CSS declares, and documented behaviour. Removing or narrowing any of it is a deprecation first (keep it working, mark it `@deprecated`), and a real removal only in a major release. A behaviour change needs an opt-in prop. `npm run check:compat` (CI's bundle-size job, and a blocking step in `/release`) enforces this against `compat/baseline.json`; it does not cover runtime behaviour, the `init` CLI or class names, so pin those in unit tests. Intentional, reviewed exceptions go in `compat/allowed-changes.json`. Never hand-edit `compat/baseline.json`, and never edit a line of `compat/consumer.fixture.tsx` to make it pass. See CONTRIBUTING.md, "Compatibility and deprecation policy".
 
 ## Validation Before Every PR
 
 ```bash
 npm run lint && npm run type-check && npm test -- --project=unit
 ```
+
+If the PR touches anything exported, a prop, a type or the stylesheet, also run `npm run build && npm run check:compat` (CI does).

@@ -1,0 +1,18 @@
+{
+  "//": "Type-checks compat/consumer.fixture.tsx the way a consumer's project would, against the BUILT declarations (dist/index.d.ts). Run by scripts/check-compat.js after `npm run build`. Not part of the library build or the published package.",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": [],
+    "paths": {
+      "cyberui-2045": ["../dist/index.d.ts"]
+    }
+  },
+  "include": ["consumer.fixture.tsx"]
+}

@@ -23,4 +23,10 @@ export default tseslint.config([
       globals: globals.browser,
     },
   },
+  {
+    // compat/consumer.fixture.tsx is type-checked, never run or hot-reloaded:
+    // it exports plain values and components side by side on purpose.
+    files: ['compat/**/*.{ts,tsx}'],
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ], storybook.configs["flat/recommended"]);
