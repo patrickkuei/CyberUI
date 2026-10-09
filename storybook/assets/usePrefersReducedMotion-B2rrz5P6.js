@@ -1,1 +1,0 @@
-import{r}from"./iframe-CvRfRZsf.js";import{g as t,s as n}from"./reducedMotionSubscription-DIxCKqWn.js";const a=150;function o(e){return n(()=>e())}function s(){return!1}function i(){return r.useSyncExternalStore(o,t,s)}export{a as R,i as u};
