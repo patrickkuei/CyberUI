@@ -439,7 +439,8 @@ export function runCheck({
     result.accepted.forEach((p) => lines.push(`  - [${p.id}] allowed since ${p.since}: ${p.reason}`));
   }
   if (result.unusedAllowed.length > 0) {
-    lines.push(`⚠ ${result.unusedAllowed.length} entr${result.unusedAllowed.length === 1 ? 'y' : 'ies'} in compat/allowed-changes.json no longer match anything; remove ${result.unusedAllowed.length === 1 ? 'it' : 'them'}:`);
+    const one = result.unusedAllowed.length === 1;
+    lines.push(`⚠ ${result.unusedAllowed.length} entr${one ? 'y' : 'ies'} in compat/allowed-changes.json no longer match${one ? 'es' : ''} anything; remove ${one ? 'it' : 'them'}:`);
     result.unusedAllowed.forEach((a) => lines.push(`  - [${a.id}]`));
   }
   if (result.warnings.length > 0) {
