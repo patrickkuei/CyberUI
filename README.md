@@ -38,6 +38,26 @@ function App() {
 }
 ```
 
+## Templates
+
+[cyberui-templates](https://github.com/patrickkuei/cyberui-templates) are complete example apps built with CyberUI that you can start a new app from.
+
+| Template | What it is | Live preview |
+|----------|------------|--------------|
+| [AI Product Monitoring](https://github.com/patrickkuei/cyberui-templates/tree/main/packages/monitoring) (`monitoring`) | Request volume, latency percentiles, error rate, and a live alerts feed for an AI API. | [Open](https://patrickkuei.github.io/cyberui-templates/live/monitoring/) |
+| [Agent Control Panel](https://github.com/patrickkuei/cyberui-templates/tree/main/packages/agent-panel) (`agent-panel`) | A conversation, task queue, live status and reasoning trace for an AI assistant, with a human approval step. | [Open](https://patrickkuei.github.io/cyberui-templates/live/agent-panel/) |
+
+Start a **new** app from a template:
+
+```bash
+npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
+cd my-app && npm install && npm run dev
+```
+
+In an existing app, read a template's source for patterns instead of copying it in.
+
+Browse all templates on the [templates site](https://patrickkuei.github.io/cyberui-templates/). The [repository](https://github.com/patrickkuei/cyberui-templates) has the current list as more templates are added.
+
 ## Components
 
 <!-- cyberui-2045:manifest:start -->
