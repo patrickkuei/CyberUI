@@ -15,6 +15,11 @@
       "id": "prop-type:Slider.onValueChange",
       "reason": "Only the manifest's printed text differs: the new generic callback type resolves to `(value: number | [number, number]) => void` for the default V, which is the old `(value: SliderValue) => void` with the alias expanded. Pinned by the Slider lines in compat/consumer.fixture.tsx.",
       "since": "2.7.0"
+    },
+    {
+      "id": "prop-type:Carousel.images",
+      "reason": "Carousel.images widened from CarouselImageData[] to CarouselSlideData[] ((CarouselImageData | CarouselStandInData)[]) so slides without a src are possible WITHOUT making CarouselImageData.src optional. Every 2.6 call site (a CarouselImageData[] passed in) still compiles, and CarouselImageData.src stays a required string (pinned by src/test/imageCarouselTypeCompat.test.tsx and the Carousel fixture lines). The one pattern that changes: reading an element's `.src` off ComponentProps<typeof Carousel>['images'] (rare), and the owner must confirm that trade-off when merging the fix. Stays an entry until the baseline is regenerated at the 2.7.0 release.",
+      "since": "2.7.0"
     }
   ]
 }
