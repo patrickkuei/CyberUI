@@ -80,6 +80,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`CyberNotificationProvider`** — toasts shown in the same millisecond no longer share an id, so they no longer trigger React's duplicate-key warning or dismiss, auto-hide and resize together. Ids now come from a per-provider counter instead of `Date.now()` (#81).
 - **`llms.txt`** — the Agent Guide link pointed at the nonexistent `main` branch (now `master`), and the file is now included in the published package (#71).
 - **`AGENT.md` page-background advice** — it said to set the page background with a class such as `bg-slate-900`, which has no effect: `styles.css` already paints `html` and `body` with `--color-base` in a later cascade layer than Tailwind's utilities. It now says to override `--color-base` or write an unlayered `body` rule (#85).
+- **Demo app** — the header tagline and the "Browse the templates" line were invisible at `md` and up, and the Home tab's feature headings on phones, because `text-base` sets the text colour to the page background (`--color-base`) as well as the size. They use `text-(length:--text-base)` now, and a unit test fails if bare `text-base` returns to the source (#87).
 
 ## [2.6.0] - 2026-09-25
 

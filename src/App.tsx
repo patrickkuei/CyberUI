@@ -42,10 +42,10 @@ const DemoPage: React.FC = () => {
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-2 text-primary">
             Cyberpunk UI Demo
           </h1>
-          <p className="text-sm md:text-base text-muted">
+          <p className="text-sm md:text-(length:--text-base) text-muted">
             Experience the neon theme in a real interface.
           </p>
-          <p className="text-sm md:text-base text-muted mt-1">
+          <p className="text-sm md:text-(length:--text-base) text-muted mt-1">
             Starting a new app?{" "}
             <a
               href="https://patrickkuei.github.io/cyberui-templates/"

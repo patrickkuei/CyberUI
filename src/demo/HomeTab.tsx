@@ -23,17 +23,17 @@ const HomeTab: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
         <div className="text-center p-4 md:p-6 bg-surface border border-border-default rounded-lg">
           <div className="text-primary text-xl md:text-2xl mb-2 md:mb-3">⚡</div>
-          <h3 className="text-base md:text-lg font-semibold text-secondary mb-2">Fast & Lightweight</h3>
+          <h3 className="text-(length:--text-base) md:text-lg font-semibold text-secondary mb-2">Fast & Lightweight</h3>
           <p className="text-muted text-sm">Optimized components with minimal bundle size</p>
         </div>
         <div className="text-center p-4 md:p-6 bg-surface border border-border-default rounded-lg">
           <div className="text-accent text-xl md:text-2xl mb-2 md:mb-3">🎨</div>
-          <h3 className="text-base md:text-lg font-semibold text-secondary mb-2">Cyberpunk Theme</h3>
+          <h3 className="text-(length:--text-base) md:text-lg font-semibold text-secondary mb-2">Cyberpunk Theme</h3>
           <p className="text-muted text-sm">Neon colors, glitch effects, and futuristic styling</p>
         </div>
         <div className="text-center p-4 md:p-6 bg-surface border border-border-default rounded-lg">
           <div className="text-primary text-xl md:text-2xl mb-2 md:mb-3">📱</div>
-          <h3 className="text-base md:text-lg font-semibold text-secondary mb-2">Fully Responsive</h3>
+          <h3 className="text-(length:--text-base) md:text-lg font-semibold text-secondary mb-2">Fully Responsive</h3>
           <p className="text-muted text-sm">Works perfectly on all screen sizes</p>
         </div>
       </div>
