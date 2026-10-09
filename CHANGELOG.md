@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.7.0] - 2026-10-09
+
 ### Added
 
 - **`LinearProgress`** — `animate` prop (default `true`). `animate={false}` drops the width transition, so a bar driven every frame (for example from a `requestAnimationFrame` loop) tracks `progress` exactly instead of lagging behind it (#34).

@@ -51,7 +51,7 @@ import { warnOnce } from "./utils/devWarn";
  *
  * Docs: https://patrickkuei.github.io/CyberUI/storybook/
  */
-export const version = "2.6.0";
+export const version = "2.7.0";
 
 // Runtime CSS check — fires when dev server starts if styles.css was not imported.
 // AI agents and developers see this in the browser console / terminal output.
