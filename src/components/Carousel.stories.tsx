@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import { useState } from "react";
 import Carousel from "./Carousel";
+import type { CarouselStandInData } from "./Carousel";
 
 const meta: Meta<typeof Carousel> = {
   title: "Components/Carousel",
@@ -11,7 +12,7 @@ const meta: Meta<typeof Carousel> = {
       description: {
         component: `A cyberpunk-themed image carousel with auto-play, navigation controls, and smooth transitions.
 
-A slide with no \`src\` (and no \`fallbackSrc\`) shows a built-in stand-in chosen by the Carousel's \`fallbackStyle\`: a static neon gradient panel (\`gradient\`, the default) or the same panel with a scanline sweeping down it (\`scanline\`). Captions, navigation and keyboard behavior are the same as for slides with images. A slide with no \`src\` but a \`fallbackSrc\` shows the \`fallbackSrc\` image.
+A slide with no image source (an empty \`src\`, or a \`CarouselStandInData\` slide that leaves \`src\` out) and no \`fallbackSrc\` shows a built-in stand-in chosen by the Carousel's \`fallbackStyle\`: a static neon gradient panel (\`gradient\`, the default) or the same panel with a scanline sweeping down it (\`scanline\`). Captions, navigation and keyboard behavior are the same as for slides with images. A slide with no \`src\` but a \`fallbackSrc\` shows the \`fallbackSrc\` image. \`CarouselImageData.src\` is a required \`string\`; \`images\` also accepts \`CarouselStandInData\` slides, so an array can mix both.
 
 Under \`prefers-reduced-motion: reduce\`, \`autoPlay\` does not advance (also after an image preview closes), \`matrix\` and \`signal-glitch\` render as a plain \`fade\` with no glitch overlays, \`slide\` changes slides without sliding, the stand-in scanline stops, and the indicators hold still.
 
@@ -80,7 +81,7 @@ const images = [
 />
 
 // No assets yet: slides without a src render a built-in stand-in
-const placeholders = [
+const placeholders: CarouselStandInData[] = [
   { alt: 'Neon district', caption: 'Sector 7' },
   { alt: 'Corporate tower', caption: 'Megacorp HQ' },
 ];
@@ -102,7 +103,7 @@ const placeholders = [
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| \`images\` | \`CarouselImageData[]\` | ✅ | - | Array of images to display |
+| \`images\` | \`(CarouselImageData \\| CarouselStandInData)[]\` | ✅ | - | Array of slides to display; a slide may leave \`src\` out to show the stand-in |
 | \`currentIndex\` | \`number\` | ✅ | - | Current slide index (controlled) |
 | \`onChange\` | \`(index: number) => void\` | ✅ | - | Callback when slide changes |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Carousel size (supports responsive values) |
@@ -122,11 +123,14 @@ const placeholders = [
 
 \`\`\`tsx
 interface CarouselImageData {
-  src?: string;       // Image source URL; omit for the built-in stand-in
+  src: string;        // Image source URL; an empty string shows the built-in stand-in
   alt: string;        // Alternative text for accessibility
   fallbackSrc?: string; // Optional fallback image URL on error; also shown when src is missing
   caption?: string;     // Optional caption text overlay
 }
+
+// A slide with no image source: CarouselImageData without the required src
+type CarouselStandInData = Omit<CarouselImageData, 'src'> & { src?: undefined };
 \`\`\`
 `,
       },
@@ -463,7 +467,9 @@ export const AllSizes: Story = {
 };
 
 // Slides with no assets at all
-const placeholderSlides = [
+// Typed CarouselStandInData: CarouselImageData.src is required, so slides with
+// no src use the stand-in type.
+const placeholderSlides: CarouselStandInData[] = [
   { alt: "Neon district (asset pending)", caption: "Sector 7 Uplink" },
   { alt: "Corporate tower (asset pending)", caption: "Megacorp Atrium" },
   { alt: "Back-alley market (asset pending)", caption: "Black Market Feed" },
@@ -483,7 +489,6 @@ export const FallbackGradient: Story = {
     },
   },
   args: {
-    images: placeholderSlides,
     autoPlay: false,
   },
   render: (args) => {
@@ -494,6 +499,7 @@ export const FallbackGradient: Story = {
         <div className="w-full max-w-2xl">
           <Carousel
             {...args}
+            images={placeholderSlides}
             currentIndex={currentIndex}
             onChange={setCurrentIndex}
           />
@@ -517,7 +523,6 @@ export const FallbackScanline: Story = {
     },
   },
   args: {
-    images: placeholderSlides,
     autoPlay: false,
     fallbackStyle: "scanline",
   },
@@ -529,6 +534,7 @@ export const FallbackScanline: Story = {
         <div className="w-full max-w-2xl">
           <Carousel
             {...args}
+            images={placeholderSlides}
             currentIndex={currentIndex}
             onChange={setCurrentIndex}
           />

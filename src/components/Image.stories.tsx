@@ -11,7 +11,7 @@ const meta: Meta<typeof Image> = {
       description: {
         component: `A cyberpunk-themed image component with click-to-expand preview functionality, loading states, and smooth animations.
 
-With no image source (\`src\` missing or empty, and no \`fallback\` URL), it renders a built-in stand-in instead of an \`<img>\`: a static neon gradient panel (\`fallbackStyle="gradient"\`, the default) or the same panel with a scanline sweeping down it (\`fallbackStyle="scanline"\`). The stand-in has \`role="img"\` with \`alt\` as its accessible name (with an empty \`alt\` it is hidden from assistive technology), is 16:9 by default (pass \`className\` to change the shape), ignores \`preview\`, and forwards \`id\`/\`style\`/\`title\`/\`data-*\`/\`aria-*\` (but not img-only attributes like \`loading\`). If \`src\` is missing or empty but \`fallback\` is set, the \`fallback\` URL is shown as the image.
+With no image source (\`src\` left out via \`ImageStandInProps\`, or an empty string, and no \`fallback\` URL), it renders a built-in stand-in instead of an \`<img>\`: a static neon gradient panel (\`fallbackStyle="gradient"\`, the default) or the same panel with a scanline sweeping down it (\`fallbackStyle="scanline"\`). The stand-in has \`role="img"\` with \`alt\` as its accessible name (with an empty \`alt\` it is hidden from assistive technology), is 16:9 by default (pass \`className\` to change the shape), ignores \`preview\`, and forwards \`id\`/\`style\`/\`title\`/\`data-*\`/\`aria-*\` (but not img-only attributes like \`loading\`). If \`src\` is missing or empty but \`fallback\` is set, the \`fallback\` URL is shown as the image.
 
 Under \`prefers-reduced-motion: reduce\`, the preview opens and closes with a 150ms opacity-only fade (\`animation.openDuration\`/\`closeDuration\` are capped at 150ms), the scan line and pulsing effects hold still, the stand-in scanline stops, and the thumbnail does not zoom on hover.
 
@@ -86,7 +86,7 @@ import 'cyberui-2045/styles.css';
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| \`src\` | \`string\` | ❌ | - | Image source URL. With no \`src\` and no \`fallback\`, the built-in stand-in renders |
+| \`src\` | \`string\` | ✅ | - | Image source URL. Leave it out (\`ImageStandInProps\`) or pass \`""\` with no \`fallback\` to render the built-in stand-in |
 | \`alt\` | \`string\` | ✅ | - | Alternative text for accessibility |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Image container size (supports responsive values) |
 | \`preview\` | \`boolean\` | ❌ | \`true\` | Enable click-to-expand preview. Ignored by the stand-in |
@@ -109,7 +109,7 @@ All standard HTML img props are also supported.
     src: {
       control: "text",
       description:
-        "Image source URL; with no src and no fallback the built-in stand-in renders",
+        "Image source URL (required); an empty string, or no src via ImageStandInProps, with no fallback renders the built-in stand-in",
     },
     alt: {
       control: "text",
@@ -291,7 +291,6 @@ export const FallbackGradient: Story = {
     },
   },
   args: {
-    src: undefined,
     alt: "Neon district, sector 7 (asset pending)",
   },
   render: (args) => (
@@ -311,7 +310,6 @@ export const FallbackScanline: Story = {
     },
   },
   args: {
-    src: undefined,
     alt: "Black-market terminal feed (asset pending)",
     fallbackStyle: "scanline",
   },

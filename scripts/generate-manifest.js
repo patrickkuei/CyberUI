@@ -49,8 +49,8 @@ const DOC_SUMMARIES = {
   Toggle: 'Cyberpunk switch.',
   Select: 'Styled dropdown.',
   Skeleton: 'Loading placeholder.',
-  Image: 'Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).',
-  Carousel: 'Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`).',
+  Image: 'Image with cyberpunk frame/effects and click-to-enlarge preview. With no source (`src=""`, or `src` left out via `ImageStandInProps`) it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).',
+  Carousel: 'Image carousel. Slides with no source (`src: ""`, or a `CarouselStandInData` slide without `src`) show the built-in Image stand-in (`fallbackStyle`).',
   Checkbox: 'Neon-styled checkbox with SVG icons.',
   Divider: 'Gradient/solid/dashed content separator.',
   GradientText: 'Text with cyberpunk gradient effects.',
@@ -167,6 +167,31 @@ const PROP_TYPE_OVERRIDES = {
   },
 };
 
+// Image and Carousel are typed with two call signatures: the 2.6.0 one
+// (`ImageProps` / `CarouselProps`, `src` and `images` required) and one for
+// "no src" (`ImageStandInProps` / `CarouselStandInProps`). react-docgen-typescript
+// reads the first signature, which is the stand-in one, so it reports `src` as
+// `undefined` and `images` as `CarouselSlideData[]`. These entries put back what
+// the docs should say; the descriptions are the JSDoc of `ImageProps.src` and
+// `CarouselProps.images`.
+const PROP_OVERRIDES = {
+  Image: {
+    src: {
+      type: 'string',
+      required: true,
+      description:
+        'Image source URL (required). Pass an empty string, or use `ImageStandInProps` and leave `src` out, to show the built-in stand-in panel (see `fallbackStyle`) instead of an `<img>` when no `fallback` URL is given either.',
+    },
+  },
+  Carousel: {
+    images: {
+      type: '(CarouselImageData | CarouselStandInData)[]',
+      description:
+        'Array of slides to display. A slide may leave `src` out (`CarouselStandInData`) to show the built-in stand-in.',
+    },
+  },
+};
+
 // ─── Extraction ────────────────────────────────────────────────────────────────
 
 function makeParser() {
@@ -217,7 +242,8 @@ function extractComponent(parser, name, category) {
     manifestOverride: false,
     props: mapProps(doc.props).map((p) => {
       const type = PROP_TYPE_OVERRIDES[name]?.[p.name];
-      return type ? { ...p, type } : p;
+      const withType = type ? { ...p, type } : p;
+      return { ...withType, ...PROP_OVERRIDES[name]?.[p.name] };
     }),
   };
 }

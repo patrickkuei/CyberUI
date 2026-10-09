@@ -62,7 +62,7 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 | `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
 | `LinearProgress` | Smooth horizontal progress bar. By default a fixed width chosen by `size` (`className` replaces it); this default is deprecated, so set `fullWidth` to fill the container (from 3.0 it will). `animate={false}` drops the width transition for values driven every frame. |
 | `TabNavigation` | Animated tab bar. |
-| `Carousel` | Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`). |
+| `Carousel` | Image carousel. Slides with no source (`src: ""`, or a `CarouselStandInData` slide without `src`) show the built-in Image stand-in (`fallbackStyle`). |
 | `Steps` | Multi-step progress indicator. |
 | `DropdownMenu` | Dropdown/context menu anchored to a trigger element. Arrow-key navigation, `danger` item styling, click-outside/Escape dismissal. |
 | `Pagination` | Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls. |
@@ -70,7 +70,7 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 | `SectionTitle` | Title with decorative gradient line. |
 | `Timeline` | Vertical event history display. |
 | `Table` | Semantic `columns`/`data` table, generic over your row type (`TableColumn<Row>[]`, typed `render`/`onRowClick`). Neon header row, hover-glow rows, optional `variant="striped"` alternating tint. |
-| `Image` | Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`). |
+| `Image` | Image with cyberpunk frame/effects and click-to-enlarge preview. With no source (`src=""`, or `src` left out via `ImageStandInProps`) it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`). |
 | `Avatar` | Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot. |
 <!-- cyberui-2045:manifest:end -->
 
