@@ -146,6 +146,8 @@ Override in your global CSS after importing `cyberui-2045/styles.css`:
 
 These tokens are **guaranteed stable** across minor versions. All other CSS variables (shadows, gradients, animation values, `--tw-*`) are internal and may change.
 
+Which components read which token (so you know what else changes when you re-theme one subtree), and the global rules `styles.css` applies to the page: [Design Tokens in Storybook](https://patrickkuei.github.io/CyberUI/storybook/?path=/docs/foundation-design-tokens--docs).
+
 ### className prop
 
 All components accept a `className` prop, merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
