@@ -56,6 +56,19 @@ function walkSourceFiles(dir: string, files: string[] = []): string[] {
   return files;
 }
 
+describe('scoped colour overrides (#68)', () => {
+  it("never reads a colour-bearing --shadow-*/--neon-* theme variable via var() in index.css", () => {
+    // `--shadow-lg-accent: 0 0 12px var(--color-accent)` is resolved at :root,
+    // so `box-shadow: var(--shadow-lg-accent)` ignores a `--color-accent`
+    // override on a wrapper. Write the value out instead (see the comment in
+    // the @theme block). The shadow-* utilities are fine: Tailwind copies the
+    // value into the utility, so the colour resolves on the element.
+    const css = readFileSync(THEME_CSS_PATH, 'utf8');
+    const outsideTheme = css.replace(/@theme\s*\{[\s\S]*?\n\}/, '');
+    expect(outsideTheme).not.toMatch(/var\(\s*--(?:shadow|neon)-/);
+  });
+});
+
 describe('design tokens', () => {
   const tokenNames = extractCustomColorTokenNames();
 

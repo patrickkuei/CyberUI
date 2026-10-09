@@ -46,6 +46,13 @@
   --color-error: #ff4f4f; /* Error */
   --color-warning: #ffaa00; /* Warning */
   --color-info: #00aaff; /* Info */
+  /* A custom property whose value contains `var(--color-*)` is resolved
+     where it is declared (here, :root), so reading it with `var(--x)` on a
+     wrapper that overrides `--color-*` still gives the :root colour. Tailwind's
+     `shadow-*` utilities are safe (they copy the value, so the colour resolves
+     on the element), but never read `--shadow-*` / `--neon-*` via `var()` in
+     this stylesheet; write the value out with `var(--color-*)` instead.
+     `src/utils/tokens.test.ts` enforces this. */
   --neon-success-glow: 0 0 8px var(--color-success),
     0 0 16px var(--color-success);
   --neon-error-glow: 0 0 8px var(--color-error), 0 0 16px var(--color-error);
@@ -899,13 +906,13 @@
   .animate-rgb-glow {
     animation: none;
     border-color: var(--color-accent);
-    box-shadow: var(--shadow-lg-accent);
+    box-shadow: 0 0 12px var(--color-accent);
   }
 
   .animate-danger-glow {
     animation: none;
     border-color: var(--color-error);
-    box-shadow: var(--shadow-error);
+    box-shadow: 0 0 8px var(--color-error);
   }
 
   /* CRT power-on/off: opacity-only fade. */

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import React, { useState } from "react";
+import { expect } from "storybook/test";
 import Modal from "./Modal";
 import Button from "./Button";
 
@@ -251,5 +252,63 @@ export const Default: Story = {
       </div>
     </ModalWrapper>
   ),
+};
+
+export const ReducedMotionGlowFollowsScopedColor: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Under `prefers-reduced-motion: reduce` the idle glow pulse becomes a static glow in the same colours. That glow follows a `--color-accent` or `--color-error` override on an ancestor. The test reads the reduced-motion rule and applies it inside a violet wrapper.',
+      },
+    },
+  },
+  render: () => (
+    <div
+      className="p-6 bg-base"
+      style={{ '--color-accent': '#c084fc', '--color-error': '#c084fc' } as React.CSSProperties}
+    >
+      <div data-testid="glow-probe" className="border-2 p-4 text-default">
+        Static glow, violet sector
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const probe = canvasElement.querySelector<HTMLElement>('[data-testid="glow-probe"]');
+    if (!probe) throw new Error('probe did not render');
+
+    // A play function can't flip the media query, so find the rules inside the
+    // reduced-motion block and apply their box-shadow to the probe instead.
+    const reducedRules: CSSStyleRule[] = [];
+    for (const sheet of Array.from(document.styleSheets)) {
+      let rules: CSSRuleList;
+      try {
+        rules = sheet.cssRules;
+      } catch {
+        continue;
+      }
+      for (const rule of Array.from(rules)) {
+        if (rule instanceof CSSMediaRule && rule.conditionText.includes('prefers-reduced-motion: reduce')) {
+          for (const inner of Array.from(rule.cssRules)) {
+            if (inner instanceof CSSStyleRule) reducedRules.push(inner);
+          }
+        }
+      }
+    }
+    const shadowFor = (selector: string): string => {
+      const rule = reducedRules.find((r) => r.selectorText.split(',').some((s) => s.trim() === selector));
+      if (!rule) throw new Error(`no reduced-motion rule for ${selector}`);
+      return rule.style.getPropertyValue('box-shadow');
+    };
+
+    // #c084fc = rgb(192, 132, 252); the defaults are accent #fffb00 and error #ff4f4f.
+    probe.style.boxShadow = shadowFor('.animate-rgb-glow');
+    await expect(getComputedStyle(probe).boxShadow).toContain('192, 132, 252');
+    await expect(getComputedStyle(probe).boxShadow).not.toContain('255, 251, 0');
+
+    probe.style.boxShadow = shadowFor('.animate-danger-glow');
+    await expect(getComputedStyle(probe).boxShadow).toContain('192, 132, 252');
+    await expect(getComputedStyle(probe).boxShadow).not.toContain('255, 79, 79');
+  },
 };
 
