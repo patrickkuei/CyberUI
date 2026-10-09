@@ -1849,17 +1849,10 @@
       "sourceFile": "src/components/Carousel.tsx",
       "displayName": "Carousel",
       "description": "",
-      "docSummary": "Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`).",
+      "docSummary": "Image carousel. Slides with no source (`src: \"\"`, or a `CarouselStandInData` slide without `src`) show the built-in Image stand-in (`fallbackStyle`).",
       "storybookPath": "components-carousel--docs",
       "manifestOverride": false,
       "props": [
-        {
-          "name": "images",
-          "type": "CarouselImageData[]",
-          "required": true,
-          "default": null,
-          "description": "Array of images to display"
-        },
         {
           "name": "currentIndex",
           "type": "number",
@@ -1971,6 +1964,13 @@
           "required": false,
           "default": null,
           "description": "Fired after slide change"
+        },
+        {
+          "name": "images",
+          "type": "(CarouselImageData | CarouselStandInData)[]",
+          "required": true,
+          "default": null,
+          "description": "Array of slides to display. A slide may leave `src` out (`CarouselStandInData`) to show the built-in stand-in."
         }
       ]
     },
@@ -2399,17 +2399,31 @@
       "category": "Media",
       "sourceFile": "src/components/Image.tsx",
       "displayName": "Image",
-      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations. With no image source\nit renders a built-in gradient or scanline stand-in instead.",
-      "docSummary": "Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).",
+      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations. With no image source\nit renders a built-in gradient or scanline stand-in instead. It accepts\n`ImageProps` (`src` is a required string) or `ImageStandInProps` (no `src`).",
+      "docSummary": "Image with cyberpunk frame/effects and click-to-enlarge preview. With no source (`src=\"\"`, or `src` left out via `ImageStandInProps`) it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).",
       "storybookPath": "components-image--docs",
       "manifestOverride": false,
       "props": [
         {
-          "name": "src",
-          "type": "string | undefined",
+          "name": "size",
+          "type": "ResponsiveValue<ImageSize> | undefined",
           "required": false,
           "default": null,
-          "description": "Image source URL. When it is missing or empty and no `fallback` URL is\ngiven, a built-in stand-in panel (see `fallbackStyle`) renders instead\nof an `<img>`."
+          "description": "Scale of the frame (padding) around the image; it does not set the image's width or height"
+        },
+        {
+          "name": "onLoad",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image loads successfully"
+        },
+        {
+          "name": "onError",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image fails to load"
         },
         {
           "name": "alt",
@@ -2419,11 +2433,11 @@
           "description": "Alternative text for accessibility (required)"
         },
         {
-          "name": "size",
-          "type": "ResponsiveValue<ImageSize> | undefined",
+          "name": "className",
+          "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Scale of the frame (padding) around the image; it does not set the image's width or height"
+          "description": "Additional CSS classes"
         },
         {
           "name": "preview",
@@ -2452,13 +2466,6 @@
           "required": false,
           "default": null,
           "description": "Custom loading placeholder component"
-        },
-        {
-          "name": "className",
-          "type": "string | undefined",
-          "required": false,
-          "default": null,
-          "description": "Additional CSS classes"
         },
         {
           "name": "animation",
@@ -2496,18 +2503,11 @@
           "description": "Fired when preview closes"
         },
         {
-          "name": "onLoad",
-          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
-          "required": false,
+          "name": "src",
+          "type": "string",
+          "required": true,
           "default": null,
-          "description": "Fired when image loads successfully"
-        },
-        {
-          "name": "onError",
-          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
-          "required": false,
-          "default": null,
-          "description": "Fired when image fails to load"
+          "description": "Image source URL (required). Pass an empty string, or use `ImageStandInProps` and leave `src` out, to show the built-in stand-in panel (see `fallbackStyle`) instead of an `<img>` when no `fallback` URL is given either."
         }
       ]
     },
