@@ -36,19 +36,19 @@ describe('GradientText', () => {
   it('applies primary gradient class by default', () => {
     const { container } = render(<GradientText>Text</GradientText>);
     const el = container.firstChild as HTMLElement;
-    expect(el.className).toContain('--gradient-primary');
+    expect(el).toHaveClass('bg-linear-135/srgb', 'from-secondary', 'to-primary');
   });
 
   it('applies secondary gradient class when variant="secondary"', () => {
     const { container } = render(<GradientText variant="secondary">Text</GradientText>);
     const el = container.firstChild as HTMLElement;
-    expect(el.className).toContain('--gradient-secondary');
+    expect(el).toHaveClass('bg-linear-135/srgb', 'from-primary', 'to-accent');
   });
 
   it('applies accent gradient class when variant="accent"', () => {
     const { container } = render(<GradientText variant="accent">Text</GradientText>);
     const el = container.firstChild as HTMLElement;
-    expect(el.className).toContain('--gradient-accent');
+    expect(el).toHaveClass('bg-linear-135/srgb', 'from-accent', 'to-secondary');
   });
 
   it('applies base text-transparent and bg-clip-text classes', () => {

@@ -65,7 +65,7 @@ const Notification: React.FC<NotificationProps> = ({
     switch (type) {
       case 'success':
         return {
-          container: 'bg-linear-(--gradient-accent) shadow-lg-accent',
+          container: 'bg-linear-135/srgb from-accent from-10% to-secondary to-90% shadow-lg-accent',
           textColor: 'text-inverse',
           icon: (
             <svg className="w-6 h-6 text-inverse" fill="currentColor" viewBox="0 0 20 20">

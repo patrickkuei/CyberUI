@@ -274,7 +274,7 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
             before:content-[''] before:absolute before:left-1/2 before:-translate-x-1/2 before:-bottom-[6px] before:w-1.5 before:h-1.5 before:bg-accent before:rotate-45 before:rounded-[2px] before:opacity-0 before:transition-opacity before:duration-200
             ${
               activeTab === tab
-                ? "text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100"
+                ? "text-secondary after:bg-linear-135/srgb after:from-accent after:from-10% after:to-secondary after:to-90% after:shadow-lg-accent after:scale-x-100"
                 : `text-muted hover:text-secondary hover:before:opacity-70`
             }
             ${tabsClassName}

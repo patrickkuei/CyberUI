@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { expect } from 'storybook/test';
 import GradientText from './GradientText';
 
 const meta: Meta<typeof GradientText> = {
@@ -97,5 +98,43 @@ export const AsHeading: Story = {
     variant: 'primary',
     children: 'Main Heading',
     className: 'text-5xl font-black uppercase tracking-tighter',
+  },
+};
+
+export const ScopedColorOverride: Story = {
+  args: {
+    children: 'Ghost in the Wire',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Overriding `--color-secondary` and `--color-primary` on a wrapper re-colours the gradient text inside it.',
+      },
+    },
+  },
+  render: (args) => (
+    <div
+      className="p-6 bg-base"
+      style={
+        {
+          '--color-secondary': '#c084fc',
+          '--color-primary': '#c084fc',
+        } as React.CSSProperties
+      }
+    >
+      <GradientText variant="primary" className="text-3xl font-bold">
+        {args.children}
+      </GradientText>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const text = canvasElement.querySelector('span');
+    if (!text) throw new Error('GradientText did not render');
+    const image = getComputedStyle(text).backgroundImage;
+    // #c084fc = rgb(192, 132, 252); the defaults are secondary #00fff9 and primary #ff005d.
+    await expect(image).toContain('192, 132, 252');
+    await expect(image).not.toContain('0, 255, 249');
+    await expect(image).not.toContain('255, 0, 93');
   },
 };

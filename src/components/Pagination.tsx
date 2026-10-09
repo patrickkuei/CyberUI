@@ -119,7 +119,7 @@ const variantStyles: Record<
   { active: string; inactiveHover: string }
 > = {
   primary: {
-    active: 'bg-linear-(--gradient-accent) text-inverse shadow-primary border-transparent',
+    active: 'bg-linear-135/srgb from-accent from-10% to-secondary to-90% text-inverse shadow-primary border-transparent',
     inactiveHover: 'hover:border-accent hover:text-accent hover:shadow-primary',
   },
   secondary: {

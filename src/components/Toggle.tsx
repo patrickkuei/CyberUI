@@ -87,7 +87,7 @@ const Toggle: React.FC<ToggleProps> = ({
     }
 
     const variants = {
-      primary: 'bg-gray-600 peer-checked:bg-linear-(--gradient-accent) peer-focus:ring-primary',
+      primary: 'bg-gray-600 peer-checked:bg-linear-135/srgb peer-checked:from-accent peer-checked:from-10% peer-checked:to-secondary peer-checked:to-90% peer-focus:ring-primary',
       secondary: 'bg-gray-600 peer-checked:bg-secondary peer-focus:ring-secondary',
       accent: 'bg-gray-600 peer-checked:bg-accent peer-focus:ring-accent'
     };

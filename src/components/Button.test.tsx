@@ -10,7 +10,7 @@ describe('Button', () => {
 
   it('renders with different variants', () => {
     const { rerender } = render(<Button variant="primary">Primary</Button>);
-    expect(screen.getByRole('button')).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(screen.getByRole('button')).toHaveClass('bg-linear-135/srgb', 'from-accent', 'to-secondary');
 
     rerender(<Button variant="secondary">Secondary</Button>);
     expect(screen.getByRole('button')).toHaveClass('border-secondary');
@@ -67,13 +67,13 @@ describe('Button', () => {
     const { rerender } = render(<Button variant="primary">Jack In</Button>);
     const button = screen.getByRole('button');
     const cover = button.querySelector('[aria-hidden="true"]');
-    expect(button).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(button).toHaveClass('bg-linear-135/srgb', 'from-accent', 'to-secondary');
     expect(cover).toHaveClass('transition-opacity', 'opacity-0');
 
     rerender(<Button variant="primary" disabled>Jack In</Button>);
     // The gradient stays put and the same cover element only changes opacity,
     // so the switch animates rather than cutting out.
-    expect(button).toHaveClass('bg-linear-(--gradient-accent)');
+    expect(button).toHaveClass('bg-linear-135/srgb', 'from-accent', 'to-secondary');
     expect(button.querySelector('[aria-hidden="true"]')).toBe(cover);
     expect(cover).toHaveClass('opacity-100', 'inset-ring-2');
   });
@@ -86,7 +86,9 @@ describe('Button', () => {
     );
     const button = screen.getByRole('button');
     expect(button).toHaveClass('bg-linear-to-r');
-    expect(button).not.toHaveClass('bg-linear-(--gradient-accent)');
+    expect(button).not.toHaveClass('bg-linear-135/srgb');
+    expect(button).not.toHaveClass('from-accent');
+    expect(button).not.toHaveClass('to-secondary');
   });
 });
 

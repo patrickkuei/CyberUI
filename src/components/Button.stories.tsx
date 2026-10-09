@@ -233,3 +233,50 @@ export const DisabledKeepsSize: Story = {
     }
   },
 };
+
+export const ScopedColorOverride: Story = {
+  args: {
+    children: 'Execute Protocol',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Overriding `--color-accent` and `--color-secondary` on a wrapper re-colours the primary gradient inside it. A default-themed button sits below for comparison.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-6 p-6 bg-base">
+      <div
+        className="flex gap-4 p-4 border border-border-default"
+        style={
+          {
+            '--color-accent': '#c084fc',
+            '--color-secondary': '#c084fc',
+          } as React.CSSProperties
+        }
+      >
+        <Button variant="primary" data-testid="violet-button">
+          Violet Uplink
+        </Button>
+      </div>
+      <div className="flex gap-4 p-4 border border-border-default">
+        <Button variant="primary" data-testid="default-button">
+          Neon Uplink
+        </Button>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const scoped = getComputedStyle(canvas.getByTestId('violet-button')).backgroundImage;
+    const root = getComputedStyle(canvas.getByTestId('default-button')).backgroundImage;
+    // #c084fc = rgb(192, 132, 252); the defaults are accent #fffb00 and secondary #00fff9.
+    await expect(scoped).toContain('192, 132, 252');
+    await expect(scoped).not.toContain('255, 251, 0');
+    await expect(scoped).not.toContain('0, 255, 249');
+    await expect(root).toBe('linear-gradient(135deg, rgb(255, 251, 0) 10%, rgb(0, 255, 249) 90%)');
+    await expect(root).toContain('0, 255, 249');
+  },
+};

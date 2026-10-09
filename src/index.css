@@ -52,9 +52,6 @@
   --animate-spin-slow: spin-slow 4s linear infinite;
   --animate-scan: scan 2s ease-in-out infinite;
 
-  --gradient-primary: 135deg, var(--color-secondary) 10%, var(--color-primary) 90%;
-  --gradient-secondary: 135deg, var(--color-primary) 10%, var(--color-accent) 90%;
-  --gradient-accent: 135deg, var(--color-accent) 10%, var(--color-secondary) 90%;
   --shadow-lg-accent: 0 0 12px var(--color-accent);
   --shadow-md-accent: 0 0 8px var(--color-accent);
   --shadow-secondary: 0 0 16px var(--color-secondary);
