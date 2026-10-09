@@ -6,7 +6,7 @@
 CyberUI 2045 is a React component library built with Tailwind CSS v4. It provides a set of pre-styled, responsive, and accessible components designed for "Cyberpunk" or "Sci-Fi" interfaces. Key features include neon glows, glassmorphism, and CRT effects.
 
 ## Documentation
-- **Agent Guide**: [AGENT.md](https://github.com/patrickkuei/CyberUI/blob/main/AGENT.md) - Best practices for AI agents.
+- **Agent Guide**: [AGENT.md](https://github.com/patrickkuei/CyberUI/blob/master/AGENT.md) - Best practices for AI agents.
 - **Storybook**: [Live Demo](https://patrickkuei.github.io/CyberUI/storybook) - Interactive component explorer.
 - **Repository**: [GitHub](https://github.com/patrickkuei/CyberUI) - Source code and issues.
 
@@ -14,6 +14,18 @@ CyberUI 2045 is a React component library built with Tailwind CSS v4. It provide
 ```bash
 npm install cyberui-2045
 ```
+
+## Templates
+Templates are for STARTING a new app. For an existing app, read the template source for patterns instead of forking it.
+- **AI Product Monitoring** (`monitoring`): request volume, latency percentiles, error rate and a live alerts feed for an AI API.
+- **Agent Control Panel** (`agent-panel`): conversation, task queue, live status and reasoning trace for an AI assistant with a human approval step.
+
+Fork one into a new folder:
+```bash
+npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
+```
+- **Repository**: [cyberui-templates](https://github.com/patrickkuei/cyberui-templates) - Source and the current list of templates.
+- **Site**: [Live demos](https://patrickkuei.github.io/cyberui-templates/)
 
 <!-- cyberui-2045:manifest:start -->
 ## Components (33)
