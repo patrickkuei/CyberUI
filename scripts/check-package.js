@@ -64,7 +64,11 @@ for (const file of packed) {
   }
 }
 
-for (const entry of [pkg.main, pkg.module, pkg.types, ...Object.values(pkg.exports['.'])]) {
+// Every string target in `exports` (including nested conditions) must ship in the tarball.
+const exportTargets = (value) =>
+  typeof value === 'string' ? [value] : Object.values(value ?? {}).flatMap(exportTargets);
+
+for (const entry of [pkg.main, pkg.module, pkg.types, ...exportTargets(pkg.exports)]) {
   const path = entry.replace(/^\.\//, '');
   if (!packed.has(path)) errors.push(`package.json entry "${entry}" is not in the published package`);
 }
