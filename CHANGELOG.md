@@ -21,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`init --help`** — lists the targets, where each one puts the guide, and the `--inline` and `--dry-run` options (#53).
 - **`docs/agent-instruction-files.md`** — what Claude Code, Gemini CLI, Cursor, GitHub Copilot and `AGENTS.md` each support for instruction files, with links to their docs, and how `init` uses it (#53).
 - **`ImageFallbackStyle`, `ImageSize`, `CarouselTransition`** — now exported from the package entry (#50).
+- **`npx cyberui-2045 templates`** — lists the app templates (name, description and a live preview of each) and links the cyberui-templates repository, which has the current list (#72).
+- **`npx cyberui-2045 create <template> [dir]`** — starts a new app from a template by running `npx tiged` for you. It accepts only known template names and a plain directory name (letters, digits, `. _ - / \`), refuses a directory that exists and is not empty, and supports `--dry-run` and `--help` (#72).
+- **`init` points to `templates`** — the last line of `init`'s output now mentions `npx cyberui-2045 templates`. The files `init` writes are unchanged (#72).
+- **`cyberui-2045/component-manifest.json`** — now exported from the package, so tools can read the component list without building a path into `node_modules` (#63).
+- **README, Storybook and demo** — the README has a Templates section (with the `tiged` fork command), and the Storybook welcome page and the demo header link to the templates site (#69).
+- **`llms.txt`** — a Templates section: when to use a template, the two current templates, the `npx tiged` fork command and links to the repository and the site (#71).
 
 ### Changed
 
@@ -35,6 +41,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`init --claude` adds the guide as an import** — the guide now goes in its own file, `.claude/cyberui.md`, and `CLAUDE.md` gets only a marked block with one line, `@.claude/cyberui.md`, instead of about 150 pasted lines. Re-running after an upgrade rewrites only `.claude/cyberui.md`; a `CLAUDE.md` that already has the pasted guide has that block replaced by the import line, and `init` says so. `--dry-run` shows both files (#53).
 - **`init --cursor` and `init --copilot` write their own rule file by default** — instead of pasting the guide into `.cursorrules` or `.github/copilot-instructions.md` (use `--inline` for that). A guide an older `init` pasted there is taken out once the rule file is written, together with the blank line next to it; the file is deleted only if the guide was all it held. `init` prints `Removed` or `Deleted` for it, and `--dry-run` shows the exact lines it would take out and the start of what stays. `AGENTS.md` still always gets the guide pasted in (#53).
 - **`init --inline` while a guide file of its own exists** — `init` writes the inline block and prints a note about the own file (for Cursor and Copilot: that the tool now reads the guide twice) instead of deleting it (#53).
+- **`LinearProgress` fills its container by default** — as the docs always said. `size` now sets the height only and no longer picks a fixed width (`w-48`/`w-80`/`w-96`), and `className` is merged after the base classes instead of replacing the width, so `w-64` overrides the width and `my-4` no longer changes it. Visible to existing callers: a bar with no `className` was a fixed width and is now full width; wrap it in a constrained element or pass a `w-*` class to keep a fixed width (#67).
+- **`--gradient-primary`, `--gradient-secondary` and `--gradient-accent` removed** — components now build their gradients from the colour tokens on each element. These variables were documented as internal and may change (#68).
 
 ### Fixed
 
@@ -62,6 +70,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`init` checks its own install first** — the package version is read before any prompt, so a broken install fails before you answer questions (#53).
 - **`init --agents --inline` warns** — `--inline` with no selected tool that has an own-file mode prints a one-line warning instead of being silently ignored (#53).
 - **`getUsageContent()` had a stale default version** — `bin/usage-content.js` defaulted to `2.6.0`, so a caller that forgot the version got a wrong heading. The version is now required, and the `/release` step that bumped the default is gone (#53).
+- **`CyberNotificationProvider`** — toasts at `bottom-left` and `bottom-right` rendered below the viewport, because each toast was placed with `top` inside a zero-height container. They now anchor with `bottom` and stack upward; top positions are unchanged (#66).
+- **`LinearProgress`** — passing any `className` no longer removes the size-based width (#67).
+- **Scoped colour overrides** — overriding `--color-accent`, `--color-secondary` or `--color-primary` on a wrapper now re-colours the gradients inside it: the primary `Button`, `GradientText`, `Notification`, `Pagination`, `Steps`, `TabNavigation` and `Toggle`. Glows and shadows still follow the root colours (#68).
+- **`llms.txt`** — the Agent Guide link pointed at the nonexistent `main` branch (now `master`), and the file is now included in the published package (#71).
 
 ## [2.6.0] - 2026-09-25
 
