@@ -76,6 +76,11 @@ const ToastSlot: React.FC<ToastSlotProps> = ({
   }, [measured, id, onWidth]);
 
   const isRight = position.includes("right");
+  // Toasts are absolutely positioned inside a zero-height container, so they
+  // must grow away from the container's anchor edge: down from the top line
+  // for top positions, up from the bottom line for bottom positions.
+  const isBottom = position.startsWith("bottom");
+  const offset = `${index * 70}px`;
 
   return (
     <div
@@ -83,7 +88,8 @@ const ToastSlot: React.FC<ToastSlotProps> = ({
       style={{
         right: isRight ? 0 : undefined,
         left: position.includes("left") ? 0 : undefined,
-        top: `${index * 70}px`,
+        top: isBottom ? undefined : offset,
+        bottom: isBottom ? offset : undefined,
         width: notification.width ? `${notification.width}px` : "auto",
       }}
     >
