@@ -79,6 +79,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Scoped colour overrides under reduced motion** — the static glow `Modal` and `Drawer` show with `prefers-reduced-motion: reduce` ignored a scoped `--color-accent` or `--color-error`, because it read a shadow variable that resolves at `:root`. It now follows the scoped colour; the default glow is unchanged (#68).
 - **`CyberNotificationProvider`** — toasts shown in the same millisecond no longer share an id, so they no longer trigger React's duplicate-key warning or dismiss, auto-hide and resize together. Ids now come from a per-provider counter instead of `Date.now()` (#81).
 - **`llms.txt`** — the Agent Guide link pointed at the nonexistent `main` branch (now `master`), and the file is now included in the published package (#71).
+- **`AGENT.md` page-background advice** — it said to set the page background with a class such as `bg-slate-900`, which has no effect: `styles.css` already paints `html` and `body` with `--color-base` in a later cascade layer than Tailwind's utilities. It now says to override `--color-base` or write an unlayered `body` rule (#85).
 
 ## [2.6.0] - 2026-09-25
 
