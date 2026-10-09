@@ -108,6 +108,78 @@ describe('CyberNotificationProvider', () => {
     expect(reads).not.toContain(shell);
   });
 
+  describe('toast ids', () => {
+    function SameTick() {
+      const { showNotification } = useCyberNotifications();
+      return (
+        <button
+          onClick={() => {
+            // Fake timers freeze Date.now(), so both calls share a millisecond.
+            showNotification('success', 'Uplink secured', 'Neural handshake complete', { autoHide: false });
+            showNotification('warning', 'Firewall breach', 'Trace detected', { autoHide: false });
+          }}
+        >
+          Ping
+        </button>
+      );
+    }
+
+    it('gives toasts shown in the same tick distinct ids, so they do not share state or keys', () => {
+      const errors = vi.spyOn(console, 'error').mockImplementation(() => {});
+      try {
+        render(
+          <CyberNotificationProvider>
+            <SameTick />
+          </CyberNotificationProvider>
+        );
+        fireEvent.click(screen.getByText('Ping'));
+
+        expect(screen.getByText('Uplink secured')).toBeInTheDocument();
+        expect(screen.getByText('Firewall breach')).toBeInTheDocument();
+
+        // Dismissing one leaves the other untouched.
+        fireEvent.click(screen.getAllByLabelText('Close notification')[0]);
+        act(() => {
+          vi.advanceTimersByTime(500);
+        });
+        expect(screen.queryByText('Uplink secured')).toBeNull();
+        expect(screen.getByText('Firewall breach')).toBeInTheDocument();
+
+        const duplicateKeyWarnings = errors.mock.calls.filter((args) =>
+          args.some((a) => typeof a === 'string' && /same key/i.test(a))
+        );
+        expect(duplicateKeyWarnings).toEqual([]);
+      } finally {
+        errors.mockRestore();
+      }
+    });
+
+    it('returns a different id from each showNotification call', () => {
+      const ids: string[] = [];
+      function Capture() {
+        const { showNotification } = useCyberNotifications();
+        return (
+          <button
+            onClick={() => {
+              ids.push(showNotification('success', 'A', 'a', { autoHide: false }));
+              ids.push(showNotification('success', 'B', 'b', { autoHide: false }));
+            }}
+          >
+            Ping
+          </button>
+        );
+      }
+      render(
+        <CyberNotificationProvider>
+          <Capture />
+        </CyberNotificationProvider>
+      );
+      fireEvent.click(screen.getByText('Ping'));
+      expect(ids).toHaveLength(2);
+      expect(new Set(ids).size).toBe(2);
+    });
+  });
+
   describe('toast placement by position', () => {
     type Position = 'top-right' | 'top-left' | 'bottom-right' | 'bottom-left';
 
@@ -117,7 +189,6 @@ describe('CyberNotificationProvider', () => {
         <button
           onClick={() => {
             showNotification('success', 'Uplink secured', 'Neural handshake complete', { autoHide: false });
-            vi.advanceTimersByTime(1); // toast ids come from Date.now(); keep them distinct
             showNotification('warning', 'Firewall breach', 'Trace detected', { autoHide: false });
           }}
         >

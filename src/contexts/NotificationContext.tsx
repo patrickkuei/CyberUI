@@ -170,6 +170,9 @@ export const CyberNotificationProvider: React.FC<
   // preference in effect at dismissal time.
   const reduceMotionRef = useRef(reduceMotion);
   reduceMotionRef.current = reduceMotion;
+  // Monotonic per-provider counter: unlike Date.now(), it cannot repeat when
+  // several toasts are shown in the same millisecond.
+  const nextIdRef = useRef(0);
 
   const showNotification = useCallback(
     (
@@ -178,7 +181,7 @@ export const CyberNotificationProvider: React.FC<
       message: string,
       options: NotificationOptions = {}
     ): string => {
-      const id = Date.now().toString();
+      const id = String(++nextIdRef.current);
       const { autoHide = true, duration = defaultDuration } = options;
 
       setNotifications((prev) => [...prev, { id, type, title, message }]);
