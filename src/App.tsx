@@ -45,6 +45,18 @@ const DemoPage: React.FC = () => {
           <p className="text-sm md:text-base text-muted">
             Experience the neon theme in a real interface.
           </p>
+          <p className="text-sm md:text-base text-muted mt-1">
+            Starting a new app?{" "}
+            <a
+              href="https://patrickkuei.github.io/cyberui-templates/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded text-secondary underline hover:text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-secondary/70"
+            >
+              Browse the templates
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+          </p>
         </header>
 
         <TabNavigation
