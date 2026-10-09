@@ -110,6 +110,32 @@ describe('design tokens', () => {
   });
 });
 
+describe('deprecated --gradient-* variables (compatibility)', () => {
+  // 2.6 emitted these and the old Design Tokens page showed
+  // `bg-linear-(--gradient-accent)`, so user code may read them. They are
+  // deprecated, not removed: nothing a current user's code can rely on stops
+  // working in a minor release. Earliest removal is 3.0. `@theme static`
+  // makes Tailwind emit them although no utility references them.
+  const LEGACY_GRADIENTS: Record<string, string> = {
+    'gradient-primary': '135deg, var(--color-secondary) 10%, var(--color-primary) 90%',
+    'gradient-secondary': '135deg, var(--color-primary) 10%, var(--color-accent) 90%',
+    'gradient-accent': '135deg, var(--color-accent) 10%, var(--color-secondary) 90%',
+  };
+
+  const css = readFileSync(THEME_CSS_PATH, 'utf8');
+  const staticTheme = css.match(/@theme\s+static\s*\{([\s\S]*?)\n\}/);
+
+  it('declares them inside an `@theme static` block so Tailwind emits them without a referencing utility', () => {
+    expect(staticTheme).not.toBeNull();
+  });
+
+  it.each(Object.entries(LEGACY_GRADIENTS))("'--%s' keeps its 2.6 value", (name, value) => {
+    const body = staticTheme?.[1] ?? '';
+    const declaration = body.match(new RegExp(`--${name}\\s*:\\s*([^;]+);`));
+    expect(declaration?.[1].trim()).toBe(value);
+  });
+});
+
 describe('bare text-base utility', () => {
   // `--color-base` is a colour token, so Tailwind's `text-base` sets the text
   // colour to the page background (#1a1a2e) as well as the font size, and the

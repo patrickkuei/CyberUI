@@ -67,6 +67,22 @@
   --shadow-error: 0 0 8px var(--color-error);
 }
 
+/* DEPRECATED, kept so code written against 2.6 keeps working. Removal is not
+   planned before the next major (3.0).
+   Since 2.7 no component reads these: they build their gradients per element
+   from colour utilities (`bg-linear-135/srgb from-accent from-10%
+   to-secondary to-90%`). Because the value holds `var(--color-*)`, it is
+   resolved here at :root, so these do NOT follow a `--color-*` override on a
+   wrapper. For a gradient that does, use those utilities.
+   `static` makes Tailwind emit them even though no utility references them;
+   without it they would be dropped from dist/cyberui-2045.css.
+   `src/utils/tokens.test.ts` fails if a value here changes or one is removed. */
+@theme static {
+  --gradient-primary: 135deg, var(--color-secondary) 10%, var(--color-primary) 90%;
+  --gradient-secondary: 135deg, var(--color-primary) 10%, var(--color-accent) 90%;
+  --gradient-accent: 135deg, var(--color-accent) 10%, var(--color-secondary) 90%;
+}
+
 @layer cyberui {
   html,
   body {

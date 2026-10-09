@@ -26,16 +26,65 @@ describe('LinearProgress', () => {
     expect(inner.style.width).toBe('40%');
   });
 
-  describe('width and className', () => {
+  it('applies custom className', () => {
+    render(<LinearProgress progress={50} className="w-full" />);
+    expect(screen.getByRole('progressbar')).toHaveClass('w-full');
+  });
+
+  describe('default width (fixed by size, className replaces it)', () => {
     const WIDTH_CLASSES = ['w-48', 'w-80', 'w-96'];
 
-    it('fills its container by default', () => {
+    it('uses the md width and height by default', () => {
       render(<LinearProgress progress={50} />);
-      expect(screen.getByRole('progressbar')).toHaveClass('w-full');
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-80', 'h-3', 'bg-surface', 'rounded-full');
+      expect(bar).not.toHaveClass('w-full');
+    });
+
+    it.each([
+      ['sm', 'w-48', 'h-1.5'],
+      ['md', 'w-80', 'h-3'],
+      ['lg', 'w-96', 'h-4'],
+    ] as const)('size="%s" sets %s and %s', (size, width, height) => {
+      render(<LinearProgress progress={50} size={size} />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass(width, height);
+      for (const c of WIDTH_CLASSES.filter((w) => w !== width)) expect(bar).not.toHaveClass(c);
+    });
+
+    it('applies responsive size as width and height classes', () => {
+      render(<LinearProgress progress={60} size={{ base: 'sm', md: 'lg' }} />);
+      expect(screen.getByRole('progressbar')).toHaveClass('w-48', 'md:w-96', 'h-1.5', 'md:h-4');
+    });
+
+    it('replaces the size-based width when any className is passed', () => {
+      render(<LinearProgress progress={50} size="lg" className="my-4" />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('my-4', 'h-4');
+      for (const c of WIDTH_CLASSES) expect(bar).not.toHaveClass(c);
+      expect(bar).not.toHaveClass('w-full');
+    });
+
+    it('uses the className width in place of the size width', () => {
+      render(<LinearProgress progress={50} className="w-64" />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-64');
+      expect(bar).not.toHaveClass('w-80');
+    });
+  });
+
+  describe('fullWidth', () => {
+    const WIDTH_CLASSES = ['w-48', 'w-80', 'w-96'];
+
+    it('is w-full with no size-based width', () => {
+      render(<LinearProgress progress={50} fullWidth />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-full');
+      for (const c of WIDTH_CLASSES) expect(bar).not.toHaveClass(c);
     });
 
     it.each(['sm', 'md', 'lg'] as const)('keeps w-full and no fixed width for size="%s"', (size) => {
-      render(<LinearProgress progress={50} size={size} />);
+      render(<LinearProgress progress={50} size={size} fullWidth />);
       const bar = screen.getByRole('progressbar');
       expect(bar).toHaveClass('w-full');
       for (const c of WIDTH_CLASSES) expect(bar).not.toHaveClass(c);
@@ -44,30 +93,36 @@ describe('LinearProgress', () => {
     it('size changes the height only', () => {
       const heights = { sm: 'h-1.5', md: 'h-3', lg: 'h-4' } as const;
       for (const size of ['sm', 'md', 'lg'] as const) {
-        const { unmount } = render(<LinearProgress progress={50} size={size} />);
-        const bar = screen.getByRole('progressbar');
-        expect(bar).toHaveClass(heights[size], 'w-full');
+        const { unmount } = render(<LinearProgress progress={50} size={size} fullWidth />);
+        expect(screen.getByRole('progressbar')).toHaveClass(heights[size], 'w-full');
         unmount();
       }
     });
 
     it('applies responsive size as height classes and keeps w-full', () => {
-      render(<LinearProgress progress={60} size={{ base: 'sm', md: 'lg' }} />);
+      render(<LinearProgress progress={60} size={{ base: 'sm', md: 'lg' }} fullWidth />);
       const bar = screen.getByRole('progressbar');
       expect(bar).toHaveClass('h-1.5', 'md:h-4', 'w-full');
+      expect(bar).not.toHaveClass('md:w-96');
     });
 
     it('adds className without dropping w-full', () => {
-      render(<LinearProgress progress={50} className="my-4" />);
+      render(<LinearProgress progress={50} fullWidth className="my-4" />);
       const bar = screen.getByRole('progressbar');
-      expect(bar).toHaveClass('my-4', 'w-full');
-      expect(bar).toHaveClass('bg-surface', 'rounded-full');
+      expect(bar).toHaveClass('my-4', 'w-full', 'bg-surface', 'rounded-full');
     });
 
-    it('lets className override the width', () => {
-      render(<LinearProgress progress={50} className="w-64" />);
+    it('lets a className width class override w-full', () => {
+      render(<LinearProgress progress={50} fullWidth className="w-64" />);
       const bar = screen.getByRole('progressbar');
       expect(bar).toHaveClass('w-64');
+      expect(bar).not.toHaveClass('w-full');
+    });
+
+    it('behaves like the default when fullWidth={false}', () => {
+      render(<LinearProgress progress={50} fullWidth={false} />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-80');
       expect(bar).not.toHaveClass('w-full');
     });
   });

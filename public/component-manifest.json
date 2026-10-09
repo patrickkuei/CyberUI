@@ -1684,8 +1684,8 @@
       "category": "Progress",
       "sourceFile": "src/components/LinearProgress.tsx",
       "displayName": "CyberUI.LinearProgress",
-      "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nThe bar is `w-full` by default — it fills its container width, whatever the `size`.\n`size` sets the height only. Wrap the bar in a constrained element, or pass a width\nclass such as `w-64` in `className`, to control its width. `className` is added after\nthe base classes, so it never removes the default width unless it sets its own.",
-      "docSummary": "Smooth horizontal progress bar. Fills its container width; `size` sets the height only, and `className` is additive (a `w-*` class overrides the width). `animate={false}` drops the width transition for values driven every frame.",
+      "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nBy default the bar has a fixed width chosen by `size` (`sm` w-48, `md` w-80, `lg` w-96),\nand any `className` replaces that width. This default is deprecated: from 3.0 the bar\nwill fill its container, so set `fullWidth` now if that is what you want.\nWith `fullWidth` the bar is `w-full` and `className` is merged after the base classes.",
+      "docSummary": "Smooth horizontal progress bar. By default a fixed width chosen by `size` (`className` replaces it); this default is deprecated, so set `fullWidth` to fill the container (from 3.0 it will). `animate={false}` drops the width transition for values driven every frame.",
       "storybookPath": "components-linearprogress--docs",
       "manifestOverride": false,
       "props": [
@@ -1701,7 +1701,14 @@
           "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
           "required": false,
           "default": "md",
-          "description": "Height of the progress bar (`sm` 1.5, `md` 3, `lg` 4 spacing units). Does not affect width: the bar always fills its container."
+          "description": "Size of the progress bar (`sm` 1.5, `md` 3, `lg` 4 spacing units of height).\nWithout `fullWidth`, `size` also picks a fixed width (`sm` w-48, `md` w-80, `lg` w-96).\nThat fixed-width default is deprecated: from 3.0 the bar will fill its container and `size` will set the height only.\nSet `fullWidth` now if you want that."
+        },
+        {
+          "name": "fullWidth",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": false,
+          "description": "Whether the bar fills the width of its container (`w-full`).\nWith `fullWidth`, `className` is merged after the base classes: a width class such as `w-64` overrides the full width, and other classes such as `my-4` leave it unchanged.\nThis will be the only behaviour from 3.0; the fixed-width default is deprecated."
         },
         {
           "name": "animate",
@@ -1715,7 +1722,7 @@
           "type": "string | undefined",
           "required": false,
           "default": "",
-          "description": "Extra classes merged onto the track after the base classes (`w-full` included).\nPassing a width class such as `w-64` overrides the full width; other classes such as `my-4` leave it unchanged."
+          "description": "Custom class name for the track.\nWithout `fullWidth`, passing any `className` replaces the size-based width, so the bar has no width class unless you add one.\nThat replace behaviour is deprecated: from 3.0 `className` will be added after the base classes, as it already is with `fullWidth`."
         }
       ]
     },
@@ -1842,17 +1849,10 @@
       "sourceFile": "src/components/Carousel.tsx",
       "displayName": "Carousel",
       "description": "",
-      "docSummary": "Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`).",
+      "docSummary": "Image carousel. Slides with no source (`src: \"\"`, or a `CarouselStandInData` slide without `src`) show the built-in Image stand-in (`fallbackStyle`).",
       "storybookPath": "components-carousel--docs",
       "manifestOverride": false,
       "props": [
-        {
-          "name": "images",
-          "type": "CarouselImageData[]",
-          "required": true,
-          "default": null,
-          "description": "Array of images to display"
-        },
         {
           "name": "currentIndex",
           "type": "number",
@@ -1964,6 +1964,13 @@
           "required": false,
           "default": null,
           "description": "Fired after slide change"
+        },
+        {
+          "name": "images",
+          "type": "(CarouselImageData | CarouselStandInData)[]",
+          "required": true,
+          "default": null,
+          "description": "Array of slides to display. A slide may leave `src` out (`CarouselStandInData`) to show the built-in stand-in."
         }
       ]
     },
@@ -2392,17 +2399,31 @@
       "category": "Media",
       "sourceFile": "src/components/Image.tsx",
       "displayName": "Image",
-      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations. With no image source\nit renders a built-in gradient or scanline stand-in instead.",
-      "docSummary": "Image with cyberpunk frame/effects and click-to-enlarge preview. With no `src` it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).",
+      "description": "CyberUI Image Component\n\nA cyberpunk-themed image component with click-to-expand preview functionality,\nloading states, error handling, and smooth animations. With no image source\nit renders a built-in gradient or scanline stand-in instead. It accepts\n`ImageProps` (`src` is a required string) or `ImageStandInProps` (no `src`).",
+      "docSummary": "Image with cyberpunk frame/effects and click-to-enlarge preview. With no source (`src=\"\"`, or `src` left out via `ImageStandInProps`) it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`).",
       "storybookPath": "components-image--docs",
       "manifestOverride": false,
       "props": [
         {
-          "name": "src",
-          "type": "string | undefined",
+          "name": "size",
+          "type": "ResponsiveValue<ImageSize> | undefined",
           "required": false,
           "default": null,
-          "description": "Image source URL. When it is missing or empty and no `fallback` URL is\ngiven, a built-in stand-in panel (see `fallbackStyle`) renders instead\nof an `<img>`."
+          "description": "Scale of the frame (padding) around the image; it does not set the image's width or height"
+        },
+        {
+          "name": "onLoad",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image loads successfully"
+        },
+        {
+          "name": "onError",
+          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
+          "required": false,
+          "default": null,
+          "description": "Fired when image fails to load"
         },
         {
           "name": "alt",
@@ -2412,11 +2433,11 @@
           "description": "Alternative text for accessibility (required)"
         },
         {
-          "name": "size",
-          "type": "ResponsiveValue<ImageSize> | undefined",
+          "name": "className",
+          "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Scale of the frame (padding) around the image; it does not set the image's width or height"
+          "description": "Additional CSS classes"
         },
         {
           "name": "preview",
@@ -2445,13 +2466,6 @@
           "required": false,
           "default": null,
           "description": "Custom loading placeholder component"
-        },
-        {
-          "name": "className",
-          "type": "string | undefined",
-          "required": false,
-          "default": null,
-          "description": "Additional CSS classes"
         },
         {
           "name": "animation",
@@ -2489,18 +2503,11 @@
           "description": "Fired when preview closes"
         },
         {
-          "name": "onLoad",
-          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
-          "required": false,
+          "name": "src",
+          "type": "string",
+          "required": true,
           "default": null,
-          "description": "Fired when image loads successfully"
-        },
-        {
-          "name": "onError",
-          "type": "((event: SyntheticEvent<HTMLImageElement, Event>) => void) | undefined",
-          "required": false,
-          "default": null,
-          "description": "Fired when image fails to load"
+          "description": "Image source URL (required). Pass an empty string, or use `ImageStandInProps` and leave `src` out, to show the built-in stand-in panel (see `fallbackStyle`) instead of an `<img>` when no `fallback` URL is given either."
         }
       ]
     },

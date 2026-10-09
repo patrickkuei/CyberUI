@@ -434,6 +434,7 @@ import { ComponentTokenTable, TokenUsageIndex } from './TokenReference';
       <div className="effect-demo gradient" style={{ background: 'linear-gradient(90deg, #fffb00, #00fff9)' }}>
         <div className="token-name">bg-linear-135/srgb from-accent from-10% to-secondary to-90%</div>
         <div className="token-value">Built from the colour utilities, so a scoped --color-accent / --color-secondary override re-colours it</div>
+        <div className="token-value">The --gradient-primary, --gradient-secondary and --gradient-accent variables are deprecated (see below)</div>
       </div>
     </div>
 
@@ -521,6 +522,26 @@ import { ComponentTokenTable, TokenUsageIndex } from './TokenReference';
     ```
   </div>
 
+  ### Deprecated: the `--gradient-*` variables
+
+  `--gradient-primary`, `--gradient-secondary` and `--gradient-accent` are still declared on `:root` and still appear in `dist/cyberui-2045.css`, so code written for 2.6 that reads them keeps working. They are deprecated. Removal is not planned before the next major release (3.0).
+
+  <div className="usage-example">
+    ```css
+    --gradient-primary: 135deg, var(--color-secondary) 10%, var(--color-primary) 90%;
+    --gradient-secondary: 135deg, var(--color-primary) 10%, var(--color-accent) 90%;
+    --gradient-accent: 135deg, var(--color-accent) 10%, var(--color-secondary) 90%;
+    ```
+  </div>
+
+  Since 2.7 no component reads them. The components build their gradients on each element from colour utilities. The variables hold `var(--color-*)`, so they are resolved at `:root` and do not follow a `--color-*` override on a wrapper (see "Re-theming a subtree" below). For a gradient that follows the override, use the utilities:
+
+  <div className="usage-example">
+    ```html
+    <div class="h-48 w-full bg-linear-135/srgb from-accent from-10% to-secondary to-90%"></div>
+    ```
+  </div>
+
   <hr className="section-divider" />
 
   ## Which components read which tokens
@@ -563,6 +584,7 @@ import { ComponentTokenTable, TokenUsageIndex } from './TokenReference';
   What does not follow:
 
   - **`--shadow-*` and `--neon-*` read directly.** These variables hold `var(--color-*)` and are resolved at `:root`, so `var(--shadow-lg-accent)` in your own CSS gives the root accent glow whatever a wrapper sets. Use the `shadow-*` class, or write the glow out with `var(--color-*)`.
+  - **The deprecated `--gradient-*` variables.** `--gradient-primary`, `--gradient-secondary` and `--gradient-accent` hold `var(--color-*)` and are resolved at `:root`, so `bg-linear-(--gradient-accent)` gives the root colours whatever a wrapper sets. Use `bg-linear-135/srgb from-accent from-10% to-secondary to-90%` instead.
   - **Fixed colours.** The last column of the component table: Tailwind palette colours (`bg-gray-600`, `text-white`, `bg-black/30`) and literal `rgb()` values, as in the `Carousel` stand-in effects and arrows.
   - **The colour-cycling animations.** The idle glow on `Modal` and `Drawer` (`animate-rgb-glow`) and the cycling effects in `Carousel` use the `rgbGlow`, `rgbBorder`, `rgbStroke` and `rgbBackground` keyframes, and `rgbCycle` is defined the same way. The copies the browser uses are the unlayered ones at the end of `src/index.css`, which hold literal rgb values. In Chromium, `animate-rgb-glow` inside a wrapper that sets `--color-primary`, `--color-secondary`, `--color-success` and `--color-accent` to violet still cycles the default pink, cyan, green and yellow. The glow in the `Steps` chevron pulse (`chevronFlow`) is a fixed pink as well.
   - **Portals.** `Modal`, `Drawer` and the enlarged preview of `Image` render into `document.body`, outside the wrapper in the DOM, so a `--color-*` override on a wrapper around them does not reach them. Set the override on `:root` or `body` to re-colour them.
