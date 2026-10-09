@@ -9,7 +9,9 @@ const meta: Meta<typeof LinearProgress> = {
     layout: "centered",
     docs: {
       description: {
-        component: `A cyberpunk-themed linear progress bar with neon styling and smooth animations. The bar fills the width of its container; \`size\` sets the height only.
+        component: `A cyberpunk-themed linear progress bar with neon styling and smooth animations. By default the bar has a fixed width chosen by \`size\` (\`sm\` w-48, \`md\` w-80, \`lg\` w-96), and any \`className\` replaces that width. Set \`fullWidth\` to make the bar fill its container.
+
+**Deprecation:** the fixed-width default is deprecated. From 3.0 the bar will fill its container, \`size\` will set the height only, and \`className\` will be added after the base classes. Set \`fullWidth\` now if you want that.
 
 **Usage:**
 
@@ -18,32 +20,31 @@ import React from 'react';
 import { LinearProgress } from 'cyberui-2045';
 import 'cyberui-2045/styles.css';
 
-// Basic usage (medium height, fills its container)
+// Basic usage (medium size, w-80)
 <LinearProgress progress={50} />
 
-// Different heights
+// Different sizes (height and width)
 <LinearProgress progress={30} size="sm" />
 <LinearProgress progress={75} size="lg" />
 
-// Responsive height
+// Responsive sizing
 <LinearProgress
   progress={80}
   size={{ base: 'sm', md: 'md', lg: 'lg' }}
 />
 
+// Fills its container; size sets the height only
+<LinearProgress progress={90} fullWidth />
+
+// With fullWidth, className is added to the base classes
+<LinearProgress progress={90} fullWidth className="my-4" />
+<LinearProgress progress={90} fullWidth className="w-64" />
+
+// Without fullWidth, any className replaces the size-based width
+<LinearProgress progress={90} size="lg" className="w-48 max-w-lg" />
+
 // Bar driven every frame (e.g. requestAnimationFrame) — no width transition
 <LinearProgress progress={frameProgress} animate={false} />
-
-// Control the width with a wrapper
-<div className="w-64">
-  <LinearProgress progress={90} />
-</div>
-
-// Or with a width class in className
-<LinearProgress progress={90} className="w-64" />
-
-// className is added to the base classes, so other classes keep the full width
-<LinearProgress progress={90} className="my-4" />
 \`\`\`
 
 **Props:**
@@ -51,9 +52,10 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`progress\` | \`number\` | ✅ | - | The progress value (0-100) |
-| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Height of the bar (supports responsive values). Width is not affected |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Height of the bar (supports responsive values). Without \`fullWidth\` it also sets a fixed width: \`sm\` w-48, \`md\` w-80, \`lg\` w-96. That width is deprecated; from 3.0 \`size\` sets the height only |
+| \`fullWidth\` | \`boolean\` | ❌ | \`false\` | The bar fills its container (\`w-full\`) and \`className\` is added after the base classes. This becomes the only behaviour in 3.0 |
 | \`animate\` | \`boolean\` | ❌ | \`true\` | Animates width changes with a 500 ms ease-out transition. Set to \`false\` for values updated every frame so the bar tracks \`progress\` exactly. The transition is also disabled for users who prefer reduced motion |
-| \`className\` | \`string\` | ❌ | - | Classes added after the base classes. A width class (e.g. \`w-64\`) overrides the default \`w-full\` |
+| \`className\` | \`string\` | ❌ | - | Custom classes for the track. Without \`fullWidth\`, any \`className\` replaces the size-based width; this is deprecated and from 3.0 \`className\` is always added. With \`fullWidth\`, a width class (e.g. \`w-64\`) overrides \`w-full\` |
 `,
       },
     },
@@ -81,8 +83,15 @@ import 'cyberui-2045/styles.css';
         type: "select",
       },
       options: ["sm", "md", "lg"],
-      description: "Height of the progress bar. Width is not affected",
+      description:
+        "Size of the progress bar. Sets the height; without `fullWidth` it also sets a fixed width (sm w-48, md w-80, lg w-96). The fixed width is deprecated: from 3.0 `size` sets the height only",
       table: { defaultValue: { summary: "md" } },
+    },
+    fullWidth: {
+      control: "boolean",
+      description:
+        "Whether the bar fills its container. With `fullWidth`, `className` is added after the base classes. The fixed-width default is deprecated; this becomes the only behaviour in 3.0",
+      table: { defaultValue: { summary: "false" } },
     },
     animate: {
       control: "boolean",
@@ -92,16 +101,13 @@ import 'cyberui-2045/styles.css';
     className: {
       control: "text",
       description:
-        "Classes added after the base classes. A width class such as `w-64` overrides the default `w-full`",
+        "Custom classes for the track. Without `fullWidth`, any `className` replaces the size-based width (deprecated). With `fullWidth`, a width class such as `w-64` overrides `w-full`",
     },
   },
 };
 
 export default meta;
 type Story = StoryObj<typeof meta>;
-
-const sizeStoryDescription = (size: string) =>
-  `\`size="${size}"\` sets the bar height. The bar fills its container, here a \`w-96\` wrapper.`;
 
 export const Default: Story = {
   args: {
@@ -111,7 +117,7 @@ export const Default: Story = {
   parameters: {
     docs: {
       description: {
-        story: "The bar fills the width of its container. Here the container is a `w-96` wrapper.",
+        story: '`size="md"` gives a `w-80` bar, 3 spacing units high.',
       },
     },
   },
@@ -123,7 +129,11 @@ export const Small: Story = {
     size: "sm",
   },
   parameters: {
-    docs: { description: { story: sizeStoryDescription("sm") } },
+    docs: {
+      description: {
+        story: '`size="sm"` gives a `w-48` bar, 1.5 spacing units high.',
+      },
+    },
   },
 };
 
@@ -133,7 +143,11 @@ export const Large: Story = {
     size: "lg",
   },
   parameters: {
-    docs: { description: { story: sizeStoryDescription("lg") } },
+    docs: {
+      description: {
+        story: '`size="lg"` gives a `w-96` bar, 4 spacing units high.',
+      },
+    },
   },
 };
 
@@ -145,43 +159,67 @@ export const Responsive: Story = {
   parameters: {
     docs: {
       description: {
-        story:
-          "`size` accepts a responsive value that changes the bar height per breakpoint. The width stays the container width.",
+        story: "`size` accepts a responsive value that changes the bar height and width per breakpoint.",
       },
     },
   },
 };
 
-export const WidthViaWrapper: Story = {
+export const CustomWidth: Story = {
+  args: {
+    progress: 75,
+    size: "md",
+    className: "w-48 max-w-md",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "Without `fullWidth`, a `className` replaces the size-based width, so this bar is `w-48`. Any `className` does this, including one with no width class. This is deprecated: from 3.0 `className` is added after the base classes.",
+      },
+    },
+  },
+};
+
+export const FullWidth: Story = {
+  args: {
+    progress: 72,
+    size: "md",
+    fullWidth: true,
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`fullWidth` makes the bar fill its container, here a `w-96` wrapper. `size` sets the height only. This becomes the default in 3.0.",
+      },
+    },
+  },
+};
+
+export const FullWidthWithClassName: Story = {
   render: (args) => (
-    <div className="w-48">
-      <LinearProgress {...args} />
+    <div className="space-y-4">
+      <div className="space-y-1">
+        <span className="font-mono text-xs text-muted">NEURAL SYNC · my-4 keeps the full width</span>
+        <LinearProgress {...args} className="my-4" />
+      </div>
+      <div className="space-y-1">
+        <span className="font-mono text-xs text-muted">BUFFER · w-48 sets the width</span>
+        <LinearProgress {...args} className="w-48" />
+      </div>
     </div>
   ),
   args: {
-    progress: 75,
+    progress: 64,
     size: "md",
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: "Wrap the bar in a constrained element to control its width. This wrapper is `w-48`.",
-      },
-    },
-  },
-};
-
-export const WidthViaClassName: Story = {
-  args: {
-    progress: 75,
-    size: "md",
-    className: "w-48",
+    fullWidth: true,
   },
   parameters: {
     docs: {
       description: {
         story:
-          "A width class in `className` overrides the default `w-full`. Other classes, such as `my-4`, are added without changing the width.",
+          "With `fullWidth`, `className` is added after the base classes. `my-4` leaves the bar full width; a width class such as `w-48` overrides `w-full`.",
       },
     },
   },
@@ -241,7 +279,7 @@ const FrameDrivenDemo = () => {
         <span>UPLOADING NEURAL PATCH</span>
         <span>{progress.toFixed(1)}%</span>
       </div>
-      <LinearProgress progress={progress} animate={false} />
+      <LinearProgress progress={progress} animate={false} fullWidth />
     </div>
   );
 };
@@ -267,15 +305,19 @@ export const AllVariants: Story = {
           <LinearProgress progress={60} size={size} />
         </div>
       ))}
-      <div className="space-y-1">
-        <span className="font-mono text-xs text-muted">w-48 wrapper</span>
-        <div className="w-48">
-          <LinearProgress progress={60} />
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <div key={`full-${size}`} className="space-y-1">
+          <span className="font-mono text-xs text-muted">size={size} fullWidth</span>
+          <LinearProgress progress={60} size={size} fullWidth />
         </div>
-      </div>
+      ))}
       <div className="space-y-1">
         <span className="font-mono text-xs text-muted">className=&quot;w-48&quot;</span>
         <LinearProgress progress={60} className="w-48" />
+      </div>
+      <div className="space-y-1">
+        <span className="font-mono text-xs text-muted">fullWidth className=&quot;w-48&quot;</span>
+        <LinearProgress progress={60} fullWidth className="w-48" />
       </div>
       <div className="space-y-1">
         <span className="font-mono text-xs text-muted">animate (default)</span>
