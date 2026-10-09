@@ -45,7 +45,7 @@ const DemoPage: React.FC = () => {
           <p className="text-sm md:text-(length:--text-base) text-muted">
             Experience the neon theme in a real interface.
           </p>
-          <p className="text-sm md:text-(length:--text-base) text-muted mt-1">
+          <p className="text-sm md:text-(length:--text-base) text-muted mt-4">
             Starting a new app?{" "}
             <a
               href="https://patrickkuei.github.io/cyberui-templates/"
