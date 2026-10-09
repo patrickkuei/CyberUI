@@ -413,14 +413,16 @@ import { Meta } from '@storybook/addon-docs/blocks';
       background-color: var(--color-surface);
       color: var(--color-default);
       border: 1px solid var(--color-border-default);
-      box-shadow: var(--shadow-primary);
+      box-shadow: 0 0 12px var(--color-primary);
     }
 
     .neon-button {
       background: var(--color-primary);
-      box-shadow: var(--neon-success-glow);
+      box-shadow: 0 0 8px var(--color-success), 0 0 16px var(--color-success);
     }
     ```
+
+    Write glows out with `var(--color-*)` like this rather than reading `--shadow-*` or `--neon-*`. Those variables are resolved at `:root`, so a `--color-*` override on a wrapper would not reach them. The library's own `shadow-*` classes do follow a scoped override.
   </div>
 
   ### Using Tokens in Inline Styles

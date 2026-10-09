@@ -280,3 +280,56 @@ export const ScopedColorOverride: Story = {
     await expect(root).toContain('0, 255, 249');
   },
 };
+
+export const ScopedGlowOverride: Story = {
+  args: {
+    children: 'Execute Protocol',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Overriding `--color-primary` and `--color-secondary` on a wrapper re-colours the glow around the buttons inside it, not just their fills. A default-themed pair sits below for comparison.',
+      },
+    },
+  },
+  render: () => (
+    <div className="flex flex-col gap-6 p-6 bg-base">
+      <div
+        className="flex gap-4 p-4 border border-border-default"
+        style={
+          {
+            '--color-primary': '#c084fc',
+            '--color-secondary': '#c084fc',
+          } as React.CSSProperties
+        }
+      >
+        <Button variant="primary" data-testid="violet-primary">
+          Violet Uplink
+        </Button>
+        <Button variant="ghost" data-testid="violet-ghost">
+          Violet Ghost
+        </Button>
+      </div>
+      <div className="flex gap-4 p-4 border border-border-default">
+        <Button variant="primary" data-testid="default-primary">
+          Neon Uplink
+        </Button>
+        <Button variant="ghost" data-testid="default-ghost">
+          Neon Ghost
+        </Button>
+      </div>
+    </div>
+  ),
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const shadow = (id: string) => getComputedStyle(canvas.getByTestId(id)).boxShadow;
+    // #c084fc = rgb(192, 132, 252); the defaults are primary #ff005d and secondary #00fff9.
+    await expect(shadow('violet-primary')).toContain('192, 132, 252');
+    await expect(shadow('violet-primary')).not.toContain('255, 0, 93');
+    await expect(shadow('violet-ghost')).toContain('192, 132, 252');
+    await expect(shadow('violet-ghost')).not.toContain('0, 255, 249');
+    await expect(shadow('default-primary')).toContain('255, 0, 93');
+    await expect(shadow('default-ghost')).toContain('0, 255, 249');
+  },
+};
