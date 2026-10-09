@@ -18,7 +18,7 @@
     },
     {
       "id": "prop-type:Carousel.images",
-      "reason": "Carousel.images widened from CarouselImageData[] to CarouselSlideData[] ((CarouselImageData | CarouselStandInData)[]) so slides without a src are possible WITHOUT making CarouselImageData.src optional. Every 2.6 call site (a CarouselImageData[] passed in) still compiles, and CarouselImageData.src stays a required string (pinned by src/test/imageCarouselTypeCompat.test.tsx and the Carousel fixture lines). The one pattern that changes: reading an element's `.src` off ComponentProps<typeof Carousel>['images'] (rare), and the owner must confirm that trade-off when merging the fix. Stays an entry until the baseline is regenerated at the 2.7.0 release.",
+      "reason": "Only the manifest differs: it prints Carousel's props from the first call signature (the stand-in one), where images is CarouselSlideData[] ((CarouselImageData | CarouselStandInData)[]). The types consumers read are unchanged: CarouselProps['images'] and ComponentProps<typeof Carousel>['images'] are still CarouselImageData[] with src: string, and Image/Carousel still assign to FC<ImageProps> / NamedExoticComponent<CarouselProps>. Pinned by the Carousel and Image lines in compat/consumer.fixture.tsx and by src/test/imageCarouselTypeCompat.test.tsx, checked against 2.6.0 and the merged build. Stays an entry until the baseline is regenerated at the 2.7.0 release.",
       "since": "2.7.0"
     }
   ]

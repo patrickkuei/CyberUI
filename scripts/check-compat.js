@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 // Backward-compatibility guard. Nothing a current user's code can rely on may
 // stop working, or stop compiling, in a minor or patch release (see
 // CONTRIBUTING.md, "Compatibility and deprecation policy"). This script makes

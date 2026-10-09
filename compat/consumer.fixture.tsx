@@ -9,7 +9,7 @@
 // Add a line whenever a bug report shows a pattern the guard did not catch.
 // Remove or change a line only in a major release.
 import { useState } from 'react';
-import type { ComponentProps, FC, ReactNode } from 'react';
+import type { ComponentProps, FC, NamedExoticComponent, ReactNode } from 'react';
 import {
   Badge,
   Button,
@@ -71,6 +71,14 @@ export const forwardProgress = (p: LinearProgressProps) => <LinearProgress {...p
 
 export const Portrait = () => <Image src="/runner.png" alt="Runner" size="md" preview />;
 export const forwardImage = (p: ImageProps) => <Image {...p} />;
+// Reading types off the components' props, and assigning the components to their 2.6 types:
+// the stand-in call signatures must not change what these see.
+export const carouselSlideSrc = (i: ComponentProps<typeof Carousel>['images'][number]): string => i.src.toUpperCase();
+export const carouselPropsSrc = (p: CarouselProps): number[] => p.images.map((i) => i.src.length);
+export const imageComponentSrc = (p: ComponentProps<typeof Image>): string => p.src.toUpperCase();
+export const imageFirstParamSrc = (p: Parameters<typeof Image>[0]): string => p.src.toUpperCase();
+export const imageAsFC: FC<ImageProps> = Image;
+export const carouselAsExotic: NamedExoticComponent<CarouselProps> = Carousel;
 export const Gallery = () => {
   const [index, setIndex] = useState(0);
   const props: CarouselProps = { images: gallery, currentIndex: index, onChange: setIndex };
