@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "packageVersion": "2.6.0",
-  "generatedAt": "2026-09-26T13:27:12.916Z",
+  "generatedAt": "2026-10-09T01:00:55.265Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -1684,8 +1684,8 @@
       "category": "Progress",
       "sourceFile": "src/components/LinearProgress.tsx",
       "displayName": "CyberUI.LinearProgress",
-      "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nThe bar is `w-full` by default — it fills its container width.\nWrap it in a constrained element to control its width.",
-      "docSummary": "Smooth horizontal progress bar. `animate={false}` drops the width transition for values driven every frame.",
+      "description": "A sleek, animated linear progress bar with cyberpunk aesthetic.\n\nThe bar is `w-full` by default — it fills its container width, whatever the `size`.\n`size` sets the height only. Wrap the bar in a constrained element, or pass a width\nclass such as `w-64` in `className`, to control its width. `className` is added after\nthe base classes, so it never removes the default width unless it sets its own.",
+      "docSummary": "Smooth horizontal progress bar. Fills its container width; `size` sets the height only, and `className` is additive (a `w-*` class overrides the width). `animate={false}` drops the width transition for values driven every frame.",
       "storybookPath": "components-linearprogress--docs",
       "manifestOverride": false,
       "props": [
@@ -1701,7 +1701,7 @@
           "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
           "required": false,
           "default": "md",
-          "description": "Height of the progress bar."
+          "description": "Height of the progress bar (`sm` 1.5, `md` 3, `lg` 4 spacing units). Does not affect width: the bar always fills its container."
         },
         {
           "name": "animate",
@@ -1715,7 +1715,7 @@
           "type": "string | undefined",
           "required": false,
           "default": "",
-          "description": "Optional custom class name to override default styles"
+          "description": "Extra classes merged onto the track after the base classes (`w-full` included).\nPassing a width class such as `w-64` overrides the full width; other classes such as `my-4` leave it unchanged."
         }
       ]
     },
