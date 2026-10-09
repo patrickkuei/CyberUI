@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`npx cyberui-2045 create <template> [dir]`** — starts a new app from a template by running `npx tiged` for you. It accepts only known template names and a plain directory name (letters, digits, `. _ - / \`), refuses a directory that exists and is not empty, and supports `--dry-run` and `--help` (#72).
 - **`init` points to `templates`** — the last line of `init`'s output now mentions `npx cyberui-2045 templates`. The files `init` writes are unchanged (#72).
 - **Install message points to `templates`** — the message printed after `npm install` now also lists `Starter apps → npx cyberui-2045 templates`. It is still not printed under `CI` (#83).
+- **Storybook "Design Tokens" page** — now documents which colour tokens each component reads (by token and by component), how to re-theme a subtree, and the global rules `styles.css` applies to the page. A unit test keeps the table in step with the component sources (#64).
 - **`cyberui-2045/component-manifest.json`** — now exported from the package, so tools can read the component list without building a path into `node_modules` (#63).
 - **README, Storybook and demo** — the README has a Templates section (with the `tiged` fork command), and the Storybook welcome page and the demo header link to the templates site (#69).
 - **`llms.txt`** — a Templates section: when to use a template, the two current templates, the `npx tiged` fork command and links to the repository and the site (#71).
