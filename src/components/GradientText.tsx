@@ -54,9 +54,9 @@ const GradientText: React.FC<GradientTextProps> = ({
 }) => {
   const getVariantClasses = (variant: string): string => {
     const variants = {
-      primary: 'bg-linear-(--gradient-primary)',
-      secondary: 'bg-linear-(--gradient-secondary)',
-      accent: 'bg-linear-(--gradient-accent)',
+      primary: 'bg-linear-135/srgb from-secondary from-10% to-primary to-90%',
+      secondary: 'bg-linear-135/srgb from-primary from-10% to-accent to-90%',
+      accent: 'bg-linear-135/srgb from-accent from-10% to-secondary to-90%',
     };
     return variants[variant as keyof typeof variants];
   };

@@ -93,8 +93,8 @@ const Button: React.FC<ButtonProps> = ({
         // The gradient stays on the button in both states, so `className` can
         // still override it; disabled fades a cover layer in over it (see
         // below). No border in either state keeps the box size equal (#35).
-        enabled: 'bg-linear-(--gradient-accent) text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
-        disabled: 'bg-linear-(--gradient-accent) border-none text-accent/40 shadow-none opacity-50'
+        enabled: 'bg-linear-135/srgb from-accent from-10% to-secondary to-90% text-inverse shadow-primary border-none hover:shadow-lg-accent hover:brightness-110 focus-visible:ring-2 focus-visible:ring-accent/50 active:scale-95',
+        disabled: 'bg-linear-135/srgb from-accent from-10% to-secondary to-90% border-none text-accent/40 shadow-none opacity-50'
       },
       secondary: {
         enabled: 'bg-surface border-2 border-secondary text-secondary shadow-secondary/30 hover:bg-secondary hover:text-inverse hover:shadow-secondary focus-visible:ring-2 focus-visible:ring-secondary/50 active:scale-95',

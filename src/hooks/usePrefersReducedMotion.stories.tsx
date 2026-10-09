@@ -59,7 +59,7 @@ const MotionReadout = () => {
       </div>
       <div
         aria-hidden="true"
-        className="h-3 w-48 rounded bg-linear-(--gradient-primary)"
+        className="h-3 w-48 rounded bg-linear-135/srgb from-secondary from-10% to-primary to-90%"
         style={{
           animation: reduceMotion ? "none" : "pulse 2s ease-in-out infinite",
         }}

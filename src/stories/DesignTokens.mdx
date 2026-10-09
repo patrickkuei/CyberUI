@@ -356,8 +356,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
     <div className="token-card">
       <h3>🌈 Gradients</h3>
       <div className="effect-demo gradient" style={{ background: 'linear-gradient(90deg, #fffb00, #00fff9)' }}>
-        <div className="token-name">--gradient-accent</div>
-        <div className="token-value">90deg, var(--color-accent), var(--color-secondary)</div>
+        <div className="token-name">bg-linear-135/srgb from-accent from-10% to-secondary to-90%</div>
+        <div className="token-value">Built from the colour utilities, so a scoped --color-accent / --color-secondary override re-colours it</div>
       </div>
     </div>
 
@@ -396,8 +396,8 @@ import { Meta } from '@storybook/addon-docs/blocks';
     // Border colors
     <div className="border-2 border-border-default">With border</div>
 
-    // Accent gradient
-    <div class="h-48 w-full bg-linear-(--gradient-accent)">
+    // Accent gradient (accent to secondary)
+    <div class="h-48 w-full bg-linear-135/srgb from-accent from-10% to-secondary to-90%">
         Accent Gradient Background
     </div>
     ```

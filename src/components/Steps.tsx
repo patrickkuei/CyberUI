@@ -115,7 +115,7 @@ const Steps: React.FC<StepsProps> = ({
     );
 
     if (isCompleted) {
-      return cn(baseClasses, 'text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100');
+      return cn(baseClasses, 'text-secondary after:bg-linear-135/srgb after:from-accent after:from-10% after:to-secondary after:to-90% after:shadow-lg-accent after:scale-x-100');
     }
     if (isCurrent) {
       return cn(baseClasses, 'text-secondary before:opacity-100');
@@ -167,7 +167,7 @@ const Steps: React.FC<StepsProps> = ({
     );
 
     if (isCompleted) {
-      return cn(baseClasses, 'text-secondary after:bg-linear-(--gradient-accent) after:shadow-lg-accent after:scale-x-100');
+      return cn(baseClasses, 'text-secondary after:bg-linear-135/srgb after:from-accent after:from-10% after:to-secondary after:to-90% after:shadow-lg-accent after:scale-x-100');
     }
     if (isCurrent) return cn(baseClasses, 'text-secondary');
     if (isError) return cn(baseClasses, 'text-error');
