@@ -1,4 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
+import { ComponentTokenTable, TokenUsageIndex } from './TokenReference';
 
 <Meta title="Foundation/Design Tokens" />
 
@@ -209,6 +210,81 @@ import { Meta } from '@storybook/addon-docs/blocks';
 
     li {
       margin-bottom: 0.5rem;
+    }
+
+    /* Reference tables (TokenReference.tsx) */
+    .ref-scroll {
+      overflow-x: auto;
+      margin: 1rem 0 1.5rem;
+    }
+
+    .ref-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .ref-table th,
+    .ref-table td {
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #3c3c5e;
+      text-align: left;
+      vertical-align: top;
+      color: #e0e0e0;
+    }
+
+    /* Storybook zebra-stripes docs tables with a light row; keep these dark. */
+    .ref-table tr,
+    .ref-table tbody td,
+    .ref-table tbody th {
+      background-color: #1a1a2e !important;
+    }
+
+    .ref-table td,
+    .ref-table tbody th {
+      color: #e0e0e0 !important;
+    }
+
+    .ref-table thead th {
+      background-color: #2d2d44;
+      color: #00fff9 !important;
+    }
+
+    .ref-table tbody th {
+      background-color: #1a1a2e;
+      font-weight: 400;
+      min-width: 11rem;
+    }
+
+    .ref-component {
+      display: block;
+      font-weight: 600;
+      color: #00fff9;
+    }
+
+    .ref-note {
+      display: block;
+      margin-top: 0.375rem;
+      font-size: 0.75rem;
+      color: #8888aa;
+    }
+
+    .ref-line {
+      margin-bottom: 0.375rem;
+    }
+
+    .ref-token {
+      display: inline-block;
+      margin-right: 0.5rem;
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+      color: #fffb00;
+    }
+
+    .ref-table code {
+      display: inline-block;
+      margin: 0 0.25rem 0.25rem 0;
+      font-size: 0.75rem;
     }
   `}
 </style>
@@ -444,6 +520,92 @@ import { Meta } from '@storybook/addon-docs/blocks';
     );
     ```
   </div>
+
+  <hr className="section-divider" />
+
+  ## Which components read which tokens
+
+  Components paint with the tokens above, and some of those reads are not visible from a component's props: a `Card` title reads `secondary`, an `Image` frame reads `accent`, a `Badge` with `variant="secondary"` fills with `secondary`. Overriding a token changes every component inside that subtree that reads it.
+
+  The first table is organised by token: override one and these components change. The second is organised by component: the tokens it reads and the utilities that read them. Utility lists show representative classes, not every occurrence. The last column lists colours a component paints without a token. A token override does not change those.
+
+  ### By token
+
+  <TokenUsageIndex />
+
+  ### By component
+
+  <ComponentTokenTable />
+
+  Both tables are generated from `src/stories/tokenTable.ts`. A unit test (`src/utils/token-table.test.ts`) checks them against the component sources, so a new colour read in a component fails the test until its row is updated.
+
+  <hr className="section-divider" />
+
+  ## Re-theming a subtree
+
+  Set the `--color-*` tokens on a wrapper to re-colour the components inside it:
+
+  <div className="usage-example">
+    ```css
+    .tile-muted {
+      --color-accent: #8888aa;
+      --color-secondary: #8888aa;
+    }
+    ```
+  </div>
+
+  What follows the override:
+
+  - **Fills, borders, text, rings and glows.** The colour utilities and the `shadow-*` classes resolve `--color-*` on the element itself, so they use the wrapper's value.
+  - **Gradients.** They are built from `from-*` and `to-*` colour utilities (`bg-linear-135/srgb from-accent from-10% to-secondary to-90%`), so a scoped `--color-accent` or `--color-secondary` reaches the `Button` primary gradient, `GradientText`, `Notification` success, `Pagination`, `Steps`, `TabNavigation` and `Toggle`. The `ScopedColorOverride` stories of `Button` and `GradientText` test this.
+  - **Glows.** `Button`'s `ScopedGlowOverride` story tests the `shadow-*` classes. The static glow that `Modal` and `Drawer` show under `prefers-reduced-motion` follows too (`Modal`'s `ReducedMotionGlowFollowsScopedColor` story).
+
+  What does not follow:
+
+  - **`--shadow-*` and `--neon-*` read directly.** These variables hold `var(--color-*)` and are resolved at `:root`, so `var(--shadow-lg-accent)` in your own CSS gives the root accent glow whatever a wrapper sets. Use the `shadow-*` class, or write the glow out with `var(--color-*)`.
+  - **Fixed colours.** The last column of the component table: Tailwind palette colours (`bg-gray-600`, `text-white`, `bg-black/30`) and literal `rgb()` values, as in the `Carousel` stand-in effects and arrows.
+  - **The colour-cycling animations.** The idle glow on `Modal` and `Drawer` (`animate-rgb-glow`) and the cycling effects in `Carousel` use the `rgbGlow`, `rgbBorder`, `rgbStroke` and `rgbBackground` keyframes, and `rgbCycle` is defined the same way. The copies the browser uses are the unlayered ones at the end of `src/index.css`, which hold literal rgb values. In Chromium, `animate-rgb-glow` inside a wrapper that sets `--color-primary`, `--color-secondary`, `--color-success` and `--color-accent` to violet still cycles the default pink, cyan, green and yellow. The glow in the `Steps` chevron pulse (`chevronFlow`) is a fixed pink as well.
+  - **Portals.** `Modal`, `Drawer` and the enlarged preview of `Image` render into `document.body`, outside the wrapper in the DOM, so a `--color-*` override on a wrapper around them does not reach them. Set the override on `:root` or `body` to re-colour them.
+
+  <hr className="section-divider" />
+
+  ## Global rules `styles.css` applies
+
+  Importing `cyberui-2045/styles.css` also styles the page itself, not only the library's components. These are the rules that reach it, from the built `dist/cyberui-2045.css`.
+
+  ### Page background and scrollbar gutter
+
+  <div className="usage-example">
+    ```css
+    @layer cyberui {
+      html,
+      body {
+        scrollbar-gutter: stable;
+        background-color: var(--color-base);
+      }
+    }
+    ```
+  </div>
+
+  - `html` and `body` both get an opaque `--color-base` background. A decorative layer with a negative `z-index` paints behind the `body` background and is hidden. Give the wrapper that holds it `isolation: isolate` and it paints inside that wrapper.
+  - `scrollbar-gutter: stable` reserves the scrollbar's width at the side of the page whether or not the page scrolls. With classic scrollbars, `100vw` is then wider than the width you can use, by the scrollbar's width; in headless Chromium, `window.innerWidth` was 400 and `document.documentElement.clientWidth` 385 on a page with no overflow. With overlay scrollbars the gutter is empty and nothing changes.
+  - The rule is in the `cyberui` layer. An unlayered `body` rule of yours overrides the background on `body` (`html` keeps `--color-base`). A rule in a layer declared before it, such as a Tailwind `bg-*` utility on `<body>`, does not.
+
+  ### Tailwind's base reset
+
+  The stylesheet is built with Tailwind, so it carries Tailwind's preflight in `@layer base`. It applies to the whole page: `margin: 0`, `padding: 0` and `box-sizing: border-box` on every element, unstyled headings and links, no list markers on `ul`, `ol` and `menu`, `display: block` on `img` and `svg`, and form controls that inherit the page font. It sits in a layer, so your unlayered CSS overrides it. In an app that already uses Tailwind v4 it is the same reset twice.
+
+  ### Theme variables
+
+  The `--color-*` tokens are declared on `:root` (and `:host`) in `@layer theme`. Your own `:root { --color-primary: ... }` placed after the import is unlayered and takes precedence.
+
+  ### Class names and keyframes in the global namespace
+
+  A few helper classes (`.animate-scan`, `.animate-rgb-glow`, `.carousel-cover`) and their keyframes (`scan`, `spin-slow`, `rgbGlow`, and others) are defined without a prefix. A class or `@keyframes` of your own with the same name overrides or collides with them.
+
+  ### Reduced motion
+
+  Under `prefers-reduced-motion: reduce`, an unlayered block turns off `.animate-scan`, `.animate-scanline-sweep` and `.animate-spin-slow` for every element on the page that uses them. `.animate-rgb-glow` and `.animate-danger-glow` become a static glow, and `.animate-crt-power-on` and `.animate-crt-power-off` become a 150ms fade.
 
   <hr className="section-divider" />
 
