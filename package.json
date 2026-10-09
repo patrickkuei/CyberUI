@@ -22,6 +22,7 @@
     "dist/index.es.js",
     "dist/cyberui-2045.css",
     "dist/component-manifest.json",
+    "dist/llms.txt",
     "bin/",
     "README.md",
     "AGENT.md"
@@ -37,6 +38,7 @@
       "require": "./dist/index.cjs"
     },
     "./styles.css": "./dist/cyberui-2045.css",
+    "./component-manifest.json": "./dist/component-manifest.json",
     "./package.json": "./package.json"
   },
   "keywords": [
@@ -56,7 +58,10 @@
     "copilot",
     "agents.md",
     "design-system",
-    "component-library"
+    "component-library",
+    "template",
+    "starter",
+    "dashboard"
   ],
   "author": "Patrick Yang <azureroki@gmail.com>",
   "license": "MIT",
