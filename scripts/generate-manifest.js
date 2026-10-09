@@ -42,7 +42,7 @@ const DOC_SUMMARIES = {
   Modal: 'CRT-style modal dialog.',
   Notification: 'Toast notifications. Use `useCyberNotifications` hook.',
   CircularProgress: 'Dual-ring circular progress indicator.',
-  LinearProgress: 'Smooth horizontal progress bar. `animate={false}` drops the width transition for values driven every frame.',
+  LinearProgress: 'Smooth horizontal progress bar. Fills its container width; `size` sets the height only, and `className` is additive (a `w-*` class overrides the width). `animate={false}` drops the width transition for values driven every frame.',
   SegmentedProgress: 'Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯).',
   TabNavigation: 'Animated tab bar.',
   Badge: 'Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`.',

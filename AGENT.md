@@ -60,7 +60,7 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 | `Tooltip` | Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`. |
 | `CircularProgress` | Dual-ring circular progress indicator. |
 | `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
-| `LinearProgress` | Smooth horizontal progress bar. `animate={false}` drops the width transition for values driven every frame. |
+| `LinearProgress` | Smooth horizontal progress bar. Fills its container width; `size` sets the height only, and `className` is additive (a `w-*` class overrides the width). `animate={false}` drops the width transition for values driven every frame. |
 | `TabNavigation` | Animated tab bar. |
 | `Carousel` | Image carousel. Slides without a `src` show the built-in Image stand-in (`fallbackStyle`). |
 | `Steps` | Multi-step progress indicator. |

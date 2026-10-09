@@ -9,7 +9,7 @@ const meta: Meta<typeof LinearProgress> = {
     layout: "centered",
     docs: {
       description: {
-        component: `A cyberpunk-themed linear progress bar with neon styling and smooth animations.
+        component: `A cyberpunk-themed linear progress bar with neon styling and smooth animations. The bar fills the width of its container; \`size\` sets the height only.
 
 **Usage:**
 
@@ -18,14 +18,14 @@ import React from 'react';
 import { LinearProgress } from 'cyberui-2045';
 import 'cyberui-2045/styles.css';
 
-// Basic usage (medium size)
+// Basic usage (medium height, fills its container)
 <LinearProgress progress={50} />
 
-// Different sizes
+// Different heights
 <LinearProgress progress={30} size="sm" />
 <LinearProgress progress={75} size="lg" />
 
-// Responsive sizing
+// Responsive height
 <LinearProgress
   progress={80}
   size={{ base: 'sm', md: 'md', lg: 'lg' }}
@@ -34,9 +34,16 @@ import 'cyberui-2045/styles.css';
 // Bar driven every frame (e.g. requestAnimationFrame) — no width transition
 <LinearProgress progress={frameProgress} animate={false} />
 
-// Custom width with size
-<LinearProgress progress={90} size="lg" className="w-48 max-w-lg" />
-// ⚠️ Height classes in className may break the style
+// Control the width with a wrapper
+<div className="w-64">
+  <LinearProgress progress={90} />
+</div>
+
+// Or with a width class in className
+<LinearProgress progress={90} className="w-64" />
+
+// className is added to the base classes, so other classes keep the full width
+<LinearProgress progress={90} className="my-4" />
 \`\`\`
 
 **Props:**
@@ -44,15 +51,21 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`progress\` | \`number\` | ✅ | - | The progress value (0-100) |
-| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Size variant affecting height and default width (supports responsive values) |
+| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Height of the bar (supports responsive values). Width is not affected |
 | \`animate\` | \`boolean\` | ❌ | \`true\` | Animates width changes with a 500 ms ease-out transition. Set to \`false\` for values updated every frame so the bar tracks \`progress\` exactly. The transition is also disabled for users who prefer reduced motion |
-| \`className\` | \`string\` | ❌ | - | CSS classes for container styling (overrides default width) |
-\`\`\`
+| \`className\` | \`string\` | ❌ | - | Classes added after the base classes. A width class (e.g. \`w-64\`) overrides the default \`w-full\` |
 `,
       },
     },
   },
   tags: ["autodocs"],
+  decorators: [
+    (Story) => (
+      <div className="w-96 max-w-full">
+        <Story />
+      </div>
+    ),
+  ],
   argTypes: {
     progress: {
       control: {
@@ -68,7 +81,8 @@ import 'cyberui-2045/styles.css';
         type: "select",
       },
       options: ["sm", "md", "lg"],
-      description: "The size variant of the progress bar",
+      description: "Height of the progress bar. Width is not affected",
+      table: { defaultValue: { summary: "md" } },
     },
     animate: {
       control: "boolean",
@@ -77,7 +91,8 @@ import 'cyberui-2045/styles.css';
     },
     className: {
       control: "text",
-      description: "Additional CSS classes for styling",
+      description:
+        "Classes added after the base classes. A width class such as `w-64` overrides the default `w-full`",
     },
   },
 };
@@ -85,11 +100,20 @@ import 'cyberui-2045/styles.css';
 export default meta;
 type Story = StoryObj<typeof meta>;
 
+const sizeStoryDescription = (size: string) =>
+  `\`size="${size}"\` sets the bar height. The bar fills its container, here a \`w-96\` wrapper.`;
+
 export const Default: Story = {
   args: {
     progress: 50,
     size: "md",
-    className: "w-80",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "The bar fills the width of its container. Here the container is a `w-96` wrapper.",
+      },
+    },
   },
 };
 
@@ -98,12 +122,18 @@ export const Small: Story = {
     progress: 30,
     size: "sm",
   },
+  parameters: {
+    docs: { description: { story: sizeStoryDescription("sm") } },
+  },
 };
 
 export const Large: Story = {
   args: {
     progress: 90,
     size: "lg",
+  },
+  parameters: {
+    docs: { description: { story: sizeStoryDescription("lg") } },
   },
 };
 
@@ -112,13 +142,48 @@ export const Responsive: Story = {
     progress: 65,
     size: { base: "sm", md: "md", lg: "lg" },
   },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`size` accepts a responsive value that changes the bar height per breakpoint. The width stays the container width.",
+      },
+    },
+  },
 };
 
-export const CustomWidth: Story = {
+export const WidthViaWrapper: Story = {
+  render: (args) => (
+    <div className="w-48">
+      <LinearProgress {...args} />
+    </div>
+  ),
   args: {
     progress: 75,
     size: "md",
-    className: "w-48 max-w-md",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: "Wrap the bar in a constrained element to control its width. This wrapper is `w-48`.",
+      },
+    },
+  },
+};
+
+export const WidthViaClassName: Story = {
+  args: {
+    progress: 75,
+    size: "md",
+    className: "w-48",
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "A width class in `className` overrides the default `w-full`. Other classes, such as `my-4`, are added without changing the width.",
+      },
+    },
   },
 };
 
@@ -127,7 +192,6 @@ export const Animated: Story = {
     progress: 70,
     size: "md",
     animate: true,
-    className: "w-80",
   },
   parameters: {
     docs: {
@@ -144,7 +208,6 @@ export const NotAnimated: Story = {
     progress: 70,
     size: "md",
     animate: false,
-    className: "w-80",
   },
   parameters: {
     docs: {
@@ -173,7 +236,7 @@ const FrameDrivenDemo = () => {
   }, []);
 
   return (
-    <div className="w-80 space-y-2">
+    <div className="space-y-2">
       <div className="flex justify-between font-mono text-xs text-muted">
         <span>UPLOADING NEURAL PATCH</span>
         <span>{progress.toFixed(1)}%</span>
@@ -197,7 +260,23 @@ export const FrameDriven: Story = {
 
 export const AllVariants: Story = {
   render: () => (
-    <div className="w-80 space-y-4">
+    <div className="space-y-4">
+      {(["sm", "md", "lg"] as const).map((size) => (
+        <div key={size} className="space-y-1">
+          <span className="font-mono text-xs text-muted">size={size}</span>
+          <LinearProgress progress={60} size={size} />
+        </div>
+      ))}
+      <div className="space-y-1">
+        <span className="font-mono text-xs text-muted">w-48 wrapper</span>
+        <div className="w-48">
+          <LinearProgress progress={60} />
+        </div>
+      </div>
+      <div className="space-y-1">
+        <span className="font-mono text-xs text-muted">className=&quot;w-48&quot;</span>
+        <LinearProgress progress={60} className="w-48" />
+      </div>
       <div className="space-y-1">
         <span className="font-mono text-xs text-muted">animate (default)</span>
         <LinearProgress progress={60} />

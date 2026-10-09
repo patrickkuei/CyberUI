@@ -26,9 +26,50 @@ describe('LinearProgress', () => {
     expect(inner.style.width).toBe('40%');
   });
 
-  it('applies custom className', () => {
-    render(<LinearProgress progress={50} className="w-full" />);
-    expect(screen.getByRole('progressbar')).toHaveClass('w-full');
+  describe('width and className', () => {
+    const WIDTH_CLASSES = ['w-48', 'w-80', 'w-96'];
+
+    it('fills its container by default', () => {
+      render(<LinearProgress progress={50} />);
+      expect(screen.getByRole('progressbar')).toHaveClass('w-full');
+    });
+
+    it.each(['sm', 'md', 'lg'] as const)('keeps w-full and no fixed width for size="%s"', (size) => {
+      render(<LinearProgress progress={50} size={size} />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-full');
+      for (const c of WIDTH_CLASSES) expect(bar).not.toHaveClass(c);
+    });
+
+    it('size changes the height only', () => {
+      const heights = { sm: 'h-1.5', md: 'h-3', lg: 'h-4' } as const;
+      for (const size of ['sm', 'md', 'lg'] as const) {
+        const { unmount } = render(<LinearProgress progress={50} size={size} />);
+        const bar = screen.getByRole('progressbar');
+        expect(bar).toHaveClass(heights[size], 'w-full');
+        unmount();
+      }
+    });
+
+    it('applies responsive size as height classes and keeps w-full', () => {
+      render(<LinearProgress progress={60} size={{ base: 'sm', md: 'lg' }} />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('h-1.5', 'md:h-4', 'w-full');
+    });
+
+    it('adds className without dropping w-full', () => {
+      render(<LinearProgress progress={50} className="my-4" />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('my-4', 'w-full');
+      expect(bar).toHaveClass('bg-surface', 'rounded-full');
+    });
+
+    it('lets className override the width', () => {
+      render(<LinearProgress progress={50} className="w-64" />);
+      const bar = screen.getByRole('progressbar');
+      expect(bar).toHaveClass('w-64');
+      expect(bar).not.toHaveClass('w-full');
+    });
   });
 
   it('renders without crashing with responsive size', () => {
