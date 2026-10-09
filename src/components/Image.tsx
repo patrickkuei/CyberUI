@@ -90,11 +90,12 @@ export interface ImageProps
     >,
     ImageCallbacks {
   /**
-   * Image source URL. When it is missing or empty and no `fallback` URL is
-   * given, a built-in stand-in panel (see `fallbackStyle`) renders instead
-   * of an `<img>`.
+   * Image source URL (required). Pass an empty string, or use
+   * {@link ImageStandInProps} and leave `src` out, to show the built-in
+   * stand-in panel (see `fallbackStyle`) instead of an `<img>` when no
+   * `fallback` URL is given either.
    */
-  src?: string;
+  src: string;
   /** Alternative text for accessibility (required) */
   alt: string;
   /** Scale of the frame (padding) around the image; it does not set the image's width or height */
@@ -130,6 +131,28 @@ export interface ImageProps
 }
 
 /**
+ * Props for an {@link Image} with no source: `ImageProps` minus the required
+ * `src` (which may be left out, or `undefined`). The component then renders
+ * the built-in stand-in panel (see `fallbackStyle`), or the `fallback` URL if
+ * one is given.
+ *
+ * `ImageProps.src` stays a required `string` so code that reads it
+ * (`props.src.toUpperCase()`) keeps compiling; this type is the additive way
+ * to say "no source". An empty string, `<Image src="" alt="..." />`, behaves
+ * the same at runtime.
+ *
+ * @example
+ * <Image alt="Neon district" fallbackStyle="scanline" />
+ */
+export type ImageStandInProps = Omit<ImageProps, "src"> & {
+  /** Leave out (or `undefined`) to show the built-in stand-in panel. */
+  src?: undefined;
+};
+
+// The props the implementation accepts: `src` may be any string or missing.
+type ImageBaseProps = Omit<ImageProps, "src"> & { src?: string };
+
+/**
  * Default animation configuration
  */
 const DEFAULT_ANIMATION: Required<ImageAnimationConfig> = {
@@ -138,7 +161,7 @@ const DEFAULT_ANIMATION: Required<ImageAnimationConfig> = {
   cyberpunkEffects: true,
 };
 
-interface ImageStandInProps {
+interface StandInPanelProps {
   alt: string;
   fallbackStyle: ImageFallbackStyle;
   size: ResponsiveValue<ImageSize>;
@@ -182,7 +205,7 @@ function pickPanelProps(
  * The sweep is a `.animate-scanline-sweep` element (stopped under reduced
  * motion by the reduced-motion block in `src/index.css`).
  */
-const ImageStandIn: React.FC<ImageStandInProps> = ({
+const ImageStandIn: React.FC<StandInPanelProps> = ({
   alt,
   fallbackStyle,
   size,
@@ -219,30 +242,9 @@ const ImageStandIn: React.FC<ImageStandInProps> = ({
   </div>
 );
 
-/**
- * CyberUI Image Component
- *
- * A cyberpunk-themed image component with click-to-expand preview functionality,
- * loading states, error handling, and smooth animations. With no image source
- * it renders a built-in gradient or scanline stand-in instead.
- *
- * @example
- * ```tsx
- * <Image
- *   src="/cyber-city.jpg"
- *   alt="Cyberpunk cityscape"
- *   size="lg"
- *   onPreviewOpen={() => console.log('Preview opened')}
- * />
- * ```
- *
- * @example
- * ```tsx
- * // No assets yet: built-in stand-in
- * <Image alt="Neon district" fallbackStyle="scanline" size="lg" />
- * ```
- */
-const Image: React.FC<ImageProps> = memo(
+// The implementation. `src` is any string or missing; the public `Image`
+// below narrows that to the two documented prop shapes.
+const ImageBase: React.FC<ImageBaseProps> = memo(
   ({
     src,
     alt,
@@ -798,6 +800,38 @@ const Image: React.FC<ImageProps> = memo(
 );
 
 // Set display name for debugging
-Image.displayName = "CyberUI.Image";
+ImageBase.displayName = "CyberUI.Image";
+
+/**
+ * CyberUI Image Component
+ *
+ * A cyberpunk-themed image component with click-to-expand preview functionality,
+ * loading states, error handling, and smooth animations. With no image source
+ * it renders a built-in gradient or scanline stand-in instead. It accepts
+ * `ImageProps` (`src` is a required string) or `ImageStandInProps` (no `src`).
+ *
+ * @example
+ * ```tsx
+ * <Image
+ *   src="/cyber-city.jpg"
+ *   alt="Cyberpunk cityscape"
+ *   size="lg"
+ *   onPreviewOpen={() => console.log('Preview opened')}
+ * />
+ * ```
+ *
+ * @example
+ * ```tsx
+ * // No assets yet: built-in stand-in
+ * <Image alt="Neon district" fallbackStyle="scanline" size="lg" />
+ * ```
+ */
+// Two call signatures: `ImageProps` (`src` is a required string, as in 2.6.0)
+// and `ImageStandInProps` (no `src`). The stand-in one comes first on purpose:
+// type inference over an overloaded component (`React.ComponentProps<typeof
+// Image>`, `ComponentType<P>` parameters) reads the last signature, so those
+// keep seeing `ImageProps` with `src: string`.
+const Image: ((props: ImageStandInProps) => ReturnType<React.FC>) &
+  React.FC<ImageProps> = ImageBase;
 
 export default Image;

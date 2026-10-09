@@ -44,8 +44,15 @@ export type { BadgeProps } from './Badge';
 export type { ToggleProps } from './Toggle';
 export type { SelectProps, SelectOption } from './Select';
 export type { SkeletonProps } from './Skeleton';
-export type { ImageProps, ImageFallbackStyle, ImageSize } from './Image';
-export type { CarouselProps, CarouselImageData, CarouselTransition } from './Carousel';
+export type { ImageProps, ImageStandInProps, ImageFallbackStyle, ImageSize } from './Image';
+export type {
+  CarouselProps,
+  CarouselStandInProps,
+  CarouselImageData,
+  CarouselStandInData,
+  CarouselSlideData,
+  CarouselTransition,
+} from './Carousel';
 export type { ModalProps, ModalAnimationConfig, ModalCallbacks } from './Modal';
 export type { GradientTextProps } from './GradientText';
 export type { SectionTitleProps } from './SectionTitle';

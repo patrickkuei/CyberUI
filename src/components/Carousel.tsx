@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, memo, useMemo } from "react";
 import Image from "./Image";
-import type { ImageFallbackStyle } from "./Image";
+import type { ImageFallbackStyle, ImageProps } from "./Image";
 import type { ResponsiveValue } from "../utils/responsive";
 import {
   getResponsiveClasses,
@@ -29,10 +29,12 @@ export type CarouselObjectFit = "cover" | "contain";
  */
 export interface CarouselImageData {
   /**
-   * Image source URL. A slide with no `src` (and no `fallbackSrc`) shows the
-   * built-in stand-in chosen by the Carousel's `fallbackStyle`.
+   * Image source URL (required). An empty string, or a slide typed as
+   * {@link CarouselStandInData} with `src` left out, shows the built-in
+   * stand-in chosen by the Carousel's `fallbackStyle` (when there is no
+   * `fallbackSrc` either).
    */
-  src?: string;
+  src: string;
   /** Alt text for accessibility */
   alt: string;
   /** Optional fallback image URL. Shown as the image when `src` is missing or empty. */
@@ -40,6 +42,29 @@ export interface CarouselImageData {
   /** Optional caption */
   caption?: string;
 }
+
+/**
+ * A Carousel slide with no image source: `CarouselImageData` minus the
+ * required `src` (which may be left out, or `undefined`). It shows the
+ * built-in stand-in chosen by the Carousel's `fallbackStyle`, or the
+ * `fallbackSrc` URL if one is given.
+ *
+ * `CarouselImageData.src` stays a required `string` so code that reads it
+ * (`images.map((i) => i.src.toUpperCase())`) keeps compiling; this type is the
+ * additive way to say "no source". A slide with `src: ""` behaves the same.
+ */
+export type CarouselStandInData = Omit<CarouselImageData, "src"> & {
+  src?: undefined;
+};
+
+/**
+ * Any slide a Carousel accepts: one with an image source, or one without
+ * (the built-in stand-in). Use it to type an array that mixes both.
+ */
+export type CarouselSlideData = CarouselImageData | CarouselStandInData;
+
+/** The slide shape the implementation works with: `src` is a string or missing. */
+type CarouselSlide = Omit<CarouselImageData, "src"> & { src?: string };
 
 /**
  * Lifecycle callback functions for Carousel events
@@ -60,7 +85,7 @@ const INDICATOR_PULSE =
  * Props for the CyberUI Carousel component
  *
  * @example
- * // Basic carousel — images is CarouselImageData[]: { src?, alt, fallbackSrc?, caption? }
+ * // Basic carousel — images is CarouselImageData[]: { src, alt, fallbackSrc?, caption? }
  * <Carousel
  *   images={[
  *     { src: 'img1.jpg', alt: 'Cyber City', caption: 'Night District' },
@@ -128,6 +153,40 @@ export interface CarouselProps extends CarouselCallbacks {
 }
 
 /**
+ * Props for a Carousel whose `images` may include slides with no `src`
+ * (see {@link CarouselStandInData}). Identical to {@link CarouselProps}
+ * except for `images`.
+ *
+ * @example
+ * <Carousel
+ *   images={[
+ *     { src: 'city.jpg', alt: 'Neo-Tokyo' },
+ *     { alt: 'Classified sector' }
+ *   ]}
+ *   currentIndex={index}
+ *   onChange={setIndex}
+ * />
+ */
+export type CarouselStandInProps = Omit<CarouselProps, "images"> & {
+  /** Array of slides; any of them may omit `src` to show the stand-in */
+  images: CarouselSlideData[];
+};
+
+/**
+ * Image's two call signatures take `src: string` or no `src`; a slide's `src`
+ * is `string | undefined` at run time, so pick the signature here.
+ */
+const SlideImage: React.FC<Omit<ImageProps, "src"> & { src?: string }> = ({
+  src,
+  ...rest
+}) => (src === undefined ? <Image {...rest} /> : <Image {...rest} src={src} />);
+
+/** What the implementation accepts: `CarouselProps` with loose slides. */
+type CarouselBaseProps = Omit<CarouselProps, "images"> & {
+  images: CarouselSlide[];
+};
+
+/**
  * A cinematic, high-performance cyberpunk carousel with glitch transitions and responsive scaling.
  * 
  * @example
@@ -141,7 +200,7 @@ export interface CarouselProps extends CarouselCallbacks {
  *   transition="signal-glitch" 
  * />
  */
-const Carousel: React.FC<CarouselProps> = ({
+const Carousel: React.FC<CarouselBaseProps> = ({
   images,
   currentIndex,
   onChange,
@@ -324,7 +383,7 @@ const Carousel: React.FC<CarouselProps> = ({
     >
       {images.map((image, index) => (
         <div key={index} className="w-full h-full flex-shrink-0">
-          <Image
+          <SlideImage
             src={image.src}
             alt={image.alt}
             fallback={image.fallbackSrc}
@@ -390,7 +449,7 @@ const Carousel: React.FC<CarouselProps> = ({
                 : ("none" as React.CSSProperties["pointerEvents"]),
             }}
           >
-            <Image
+            <SlideImage
               src={image.src}
               alt={image.alt}
               fallback={image.fallbackSrc}
@@ -453,7 +512,7 @@ const Carousel: React.FC<CarouselProps> = ({
             className="absolute inset-0 w-full h-full"
             style={imageStyle}
           >
-            <Image
+            <SlideImage
               src={image.src}
               alt={image.alt}
               fallback={image.fallbackSrc}
@@ -941,4 +1000,12 @@ const Carousel: React.FC<CarouselProps> = ({
 
 Carousel.displayName = "CyberUI.Carousel";
 
-export default memo(Carousel);
+// The public `Carousel`: the 2.6.0 `NamedExoticComponent<CarouselProps>` plus
+// a second call signature for `CarouselStandInProps`. The stand-in signature
+// comes first on purpose: type inference over an overloaded component
+// (`React.ComponentProps<typeof Carousel>`) reads the last signature, so those
+// keep seeing `CarouselProps` with `images: CarouselImageData[]`.
+const CarouselExport: ((props: CarouselStandInProps) => React.ReactNode) &
+  React.NamedExoticComponent<CarouselProps> = memo(Carousel);
+
+export default CarouselExport;
