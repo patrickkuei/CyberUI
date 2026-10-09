@@ -43,6 +43,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`init --inline` while a guide file of its own exists** — `init` writes the inline block and prints a note about the own file (for Cursor and Copilot: that the tool now reads the guide twice) instead of deleting it (#53).
 - **`LinearProgress` fills its container by default** — as the docs always said. `size` now sets the height only and no longer picks a fixed width (`w-48`/`w-80`/`w-96`), and `className` is merged after the base classes instead of replacing the width, so `w-64` overrides the width and `my-4` no longer changes it. Visible to existing callers: a bar with no `className` was a fixed width and is now full width; wrap it in a constrained element or pass a `w-*` class to keep a fixed width (#67).
 - **`--gradient-primary`, `--gradient-secondary` and `--gradient-accent` removed** — components now build their gradients from the colour tokens on each element. These variables were documented as internal and may change (#68).
+- **`--shadow-error` no longer emitted** — nothing in the library reads it any more, so it is gone from the built stylesheet. `--shadow-*` and `--neon-*` variables that are still defined resolve at `:root`; read them through the `shadow-*` classes, or write the glow out with `var(--color-*)` (#68).
 
 ### Fixed
 
@@ -72,7 +73,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`getUsageContent()` had a stale default version** — `bin/usage-content.js` defaulted to `2.6.0`, so a caller that forgot the version got a wrong heading. The version is now required, and the `/release` step that bumped the default is gone (#53).
 - **`CyberNotificationProvider`** — toasts at `bottom-left` and `bottom-right` rendered below the viewport, because each toast was placed with `top` inside a zero-height container. They now anchor with `bottom` and stack upward; top positions are unchanged (#66).
 - **`LinearProgress`** — passing any `className` no longer removes the size-based width (#67).
-- **Scoped colour overrides** — overriding `--color-accent`, `--color-secondary` or `--color-primary` on a wrapper now re-colours the gradients inside it: the primary `Button`, `GradientText`, `Notification`, `Pagination`, `Steps`, `TabNavigation` and `Toggle`. Glows and shadows still follow the root colours (#68).
+- **Scoped colour overrides** — overriding `--color-accent`, `--color-secondary` or `--color-primary` on a wrapper now re-colours the gradients inside it: the primary `Button`, `GradientText`, `Notification`, `Pagination`, `Steps`, `TabNavigation` and `Toggle` (#68).
+- **Scoped colour overrides under reduced motion** — the static glow `Modal` and `Drawer` show with `prefers-reduced-motion: reduce` ignored a scoped `--color-accent` or `--color-error`, because it read a shadow variable that resolves at `:root`. It now follows the scoped colour; the default glow is unchanged (#68).
+- **`CyberNotificationProvider`** — toasts shown in the same millisecond no longer share an id, so they no longer trigger React's duplicate-key warning or dismiss, auto-hide and resize together. Ids now come from a per-provider counter instead of `Date.now()` (#81).
 - **`llms.txt`** — the Agent Guide link pointed at the nonexistent `main` branch (now `master`), and the file is now included in the published package (#71).
 
 ## [2.6.0] - 2026-09-25
