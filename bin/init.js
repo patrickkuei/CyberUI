@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { getUsageContent } from './usage-content.js';
 import { detectEol, findMarkedBlock, withEol } from './markers.js';
 import { parseModeAnswer, parseTargetAnswer } from './prompts.js';
+import { runCreate, runTemplates } from './template-commands.js';
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -81,6 +82,9 @@ function describeTarget(target, mode) {
   return target.own.file;
 }
 
+// Console output only, never written into a user file.
+const TEMPLATES_POINTER = '  Starting a new app? Run `npx cyberui-2045 templates` to see the app templates.\n';
+
 // ─── Arg parsing ──────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
@@ -97,6 +101,16 @@ if (args.includes('--all')) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
+  // Subcommands first. Everything else is `init`, with or without the word.
+  if (args[0] === 'templates') {
+    process.exitCode = runTemplates(args);
+    return;
+  }
+  if (args[0] === 'create') {
+    process.exitCode = runCreate(args);
+    return;
+  }
+
   if (args.includes('--help') || args.includes('-h')) {
     printUsage();
     return;
@@ -154,8 +168,10 @@ async function main() {
     console.error('\n  Finished with errors: see the skipped files above.\n');
   } else if (isDryRun) {
     console.log('  Dry run: nothing was written.\n');
+    console.log(TEMPLATES_POINTER);
   } else {
     console.log('\n  Done! Your AI assistant now has CyberUI context.\n');
+    console.log(TEMPLATES_POINTER);
   }
 }
 
@@ -175,6 +191,11 @@ ${line('--all', 'all of the above')}
                 .github/copilot-instructions.md instead of its own file
     --dry-run   show every file that would be written, and write nothing
     --help      show this help
+
+  Other commands:
+    npx cyberui-2045 templates                      # list the app templates
+    npx cyberui-2045 create <template> [dir]        # start a new app from one
+                                                    # (see create --help)
 `);
 }
 

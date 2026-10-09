@@ -50,8 +50,15 @@ function App() {
 Start a **new** app from a template:
 
 ```bash
-npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
+npx cyberui-2045 templates                  # list the templates, with live previews
+npx cyberui-2045 create monitoring my-app   # copy one into ./my-app (dir defaults to the template name)
 cd my-app && npm install && npm run dev
+```
+
+`create` runs `npx tiged` for you, so it needs network access. It refuses a directory that already has files in it, and `--dry-run` prints the command without running it. The same thing by hand:
+
+```bash
+npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
 ```
 
 In an existing app, read a template's source for patterns instead of copying it in.
