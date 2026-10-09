@@ -90,6 +90,8 @@
     "docs:generate": "node scripts/generate-manifest.js",
     "size": "size-limit",
     "check:package": "node scripts/check-package.js",
+    "check:compat": "node scripts/check-compat.js",
+    "compat:baseline": "node scripts/check-compat.js --update-baseline .",
     "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist",
     "prepublishOnly": "npm run build"
