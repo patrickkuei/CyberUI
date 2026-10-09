@@ -29,7 +29,7 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 
 ## 2. Vibe Coding Principles (Consumer Edition)
 
-*   **Dark Mode Only**: CyberUI is designed for dark backgrounds. Always set your page background to a dark color (e.g., `bg-slate-900`, `#050505`).
+*   **Dark Mode Only**: CyberUI is designed for dark backgrounds, and `styles.css` already paints `html` and `body` with `--color-base` (`#1a1a2e`). To use another dark colour, override `--color-base`, or write an unlayered `body { background-color: ... }` rule in your own CSS. A utility class such as `bg-slate-900` on `<body>` does not override it: the library's rule sits in a later cascade layer.
 *   **Use the Library**: Do not build custom UI components if a CyberUI component exists.
 *   **Neon Pop**: Use the library's built-in glow effects. Don't override them with flat colors unless necessary.
 *   **Responsive**: Use the `ResponsiveValue` prop pattern for mobile-first designs.
