@@ -828,7 +828,7 @@ const Carousel: React.FC<CarouselProps> = ({
             <div
               className={`absolute inset-0 border-2 transition-all duration-300 ${
                 index === currentIndex
-                  ? "border-primary bg-primary/30 shadow-lg-primary animate-[rgbBorder_1.5s_linear_infinite] motion-reduce:animate-none"
+                  ? "border-primary bg-primary/30 animate-[rgbBorder_1.5s_linear_infinite] motion-reduce:animate-none"
                   : "border-accent bg-surface/50 group-hover:border-primary group-hover:bg-primary/20 group-hover:shadow-primary group-hover:animate-[rgbBorder_1.5s_linear_infinite] motion-reduce:group-hover:animate-none"
               }`}
               style={{
