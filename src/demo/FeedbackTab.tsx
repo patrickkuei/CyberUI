@@ -62,7 +62,7 @@ const FeedbackTab: React.FC = () => {
               <span className="text-default font-medium">Data Transfer</span>
               <span className="text-accent font-mono text-sm">{progress}%</span>
             </div>
-            <LinearProgress progress={progress} className="w-full" />
+            <LinearProgress progress={progress} />
             <div className="text-xs text-muted">
               Uploading neural patterns...
             </div>

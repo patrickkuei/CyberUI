@@ -16,12 +16,16 @@ import { warnOnce } from "../utils/devWarn";
  * <LinearProgress progress={frameProgress} animate={false} />
  *
  * @example
- * // Large progress bar with custom class
+ * // Large progress bar with extra classes (still fills its container)
  * <LinearProgress
  *   progress={85}
  *   size="lg"
  *   className="my-4"
  * />
+ *
+ * @example
+ * // Fixed width through className
+ * <LinearProgress progress={85} className="w-64" />
  */
 export interface LinearProgressProps {
   /**
@@ -29,7 +33,7 @@ export interface LinearProgressProps {
    */
   progress: number;
   /**
-   * Height of the progress bar.
+   * Height of the progress bar (`sm` 1.5, `md` 3, `lg` 4 spacing units). Does not affect width: the bar always fills its container.
    * @default 'md'
    */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
@@ -40,15 +44,20 @@ export interface LinearProgressProps {
    * @default true
    */
   animate?: boolean;
-  /** Optional custom class name to override default styles */
+  /**
+   * Extra classes merged onto the track after the base classes (`w-full` included).
+   * Passing a width class such as `w-64` overrides the full width; other classes such as `my-4` leave it unchanged.
+   */
   className?: string;
 }
 
 /**
  * A sleek, animated linear progress bar with cyberpunk aesthetic.
  *
- * The bar is `w-full` by default — it fills its container width.
- * Wrap it in a constrained element to control its width.
+ * The bar is `w-full` by default — it fills its container width, whatever the `size`.
+ * `size` sets the height only. Wrap the bar in a constrained element, or pass a width
+ * class such as `w-64` in `className`, to control its width. `className` is added after
+ * the base classes, so it never removes the default width unless it sets its own.
  *
  * @example
  * // Full-width bar (fills parent)
@@ -66,10 +75,6 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
   animate = true,
   className = "",
 }) => {
-  const getWidthClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
-    return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.linearProgress.width);
-  };
-
   const getHeightClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string => {
     return getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.linearProgress.height);
   };
@@ -81,10 +86,9 @@ const LinearProgress: React.FC<LinearProgressProps> = ({
     );
   }
 
-  const widthClasses = getWidthClasses(size);
   const heightClasses = getHeightClasses(size);
 
-  const containerClasses = cn('bg-surface rounded-full shadow-inner', heightClasses, className || widthClasses);
+  const containerClasses = cn('w-full bg-surface rounded-full shadow-inner', heightClasses, className);
 
   const progressBarClasses = cn(
     'bg-gradient-to-r from-accent to-primary rounded-full shadow-lg-accent',
