@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packageVersion": "2.7.0",
-  "generatedAt": "2026-10-09T09:22:09.275Z",
+  "packageVersion": "2.7.1",
+  "generatedAt": "2026-10-16T05:54:06.458Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -821,7 +821,7 @@
           "name": "formatDate",
           "type": "((date: Date) => string) | undefined",
           "required": false,
-          "default": "(date: Date): string => {\r\n  const y = date.getFullYear();\r\n  const m = String(date.getMonth() + 1).padStart(2, '0');\r\n  const d = String(date.getDate()).padStart(2, '0');\r\n  return `${y}-${m}-${d}`;\r\n}",
+          "default": "(date: Date): string => {\n  const y = date.getFullYear();\n  const m = String(date.getMonth() + 1).padStart(2, '0');\n  const d = String(date.getDate()).padStart(2, '0');\n  return `${y}-${m}-${d}`;\n}",
           "description": "Formats the selected date for display in the trigger input."
         },
         {
