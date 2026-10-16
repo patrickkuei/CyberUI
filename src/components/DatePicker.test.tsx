@@ -147,7 +147,9 @@ describe('DatePicker', () => {
 
     fireEvent.keyDown(screen.getByRole('gridcell', { name: '15' }), { key: 'Escape' });
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
-    expect(trigger).toHaveFocus();
+    // Focus is restored in an effect that runs after the commit removing the
+    // dialog (useDialogBehavior), so it can land a tick after it is gone.
+    await waitFor(() => expect(trigger).toHaveFocus());
   });
 
   it('closes when clicking outside the calendar', async () => {

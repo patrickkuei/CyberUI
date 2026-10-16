@@ -248,7 +248,9 @@ describe('DropdownMenu', () => {
     fireEvent.keyDown(editItem, { key: 'Escape' });
 
     await waitFor(() => expect(screen.queryByRole('menu')).not.toBeInTheDocument());
-    expect(triggerButton).toHaveFocus();
+    // Focus is restored in an effect that runs after the commit removing the
+    // menu (useDialogBehavior), so it can land a tick after the menu is gone.
+    await waitFor(() => expect(triggerButton).toHaveFocus());
   });
 
   it('never opens when disabled', () => {
