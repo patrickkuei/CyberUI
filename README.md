@@ -132,7 +132,7 @@ npx cyberui-2045 init --all --inline      # paste the guide in everywhere instea
 npx cyberui-2045 init --all --dry-run     # show every file it would write; write nothing
 ```
 
-With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
+With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". In a non-interactive shell (CI, or an AI assistant running it for you) there is no one to ask, so pass a target flag: without one, `init` writes nothing, prints the usage and exits with code 2. Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
 
 ```md
 <!-- cyberui-2045:start -->

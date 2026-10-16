@@ -101,7 +101,15 @@ if (args.includes('--all')) {
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
 async function main() {
-  // Subcommands first. Everything else is `init`, with or without the word.
+  // Top-level help, only as the first argument: `init --help` (and
+  // `--claude --help`) still print the init help below.
+  if (args[0] === '--help' || args[0] === '-h' || args[0] === 'help') {
+    printTopLevelUsage();
+    return;
+  }
+
+  // Subcommands next. Everything else is `init`, with or without the word, so
+  // a bare `npx cyberui-2045` still runs init.
   if (args[0] === 'templates') {
     process.exitCode = runTemplates(args);
     return;
@@ -126,10 +134,16 @@ async function main() {
 
   if (selectedKeys.length === 0) {
     if (!process.stdin.isTTY) {
-      // Non-interactive (CI / piped input)
-      console.log('  Non-interactive environment detected. Run it with a target flag:\n');
-      printUsage();
-      process.exit(0);
+      // Non-interactive (CI, piped input, an AI assistant's shell): there is
+      // no one to answer the menu, so nothing gets written. Exit 2 (usage
+      // error), not 0: a script or AI assistant often checks only the exit
+      // code, and 0 would tell it the setup worked. To stderr, like the other
+      // errors. exitCode + return rather than process.exit(), so the usage
+      // text is fully flushed when stderr is a pipe.
+      console.error('  Non-interactive environment detected. Run it with a target flag:\n');
+      printUsage(console.error);
+      process.exitCode = 2;
+      return;
     }
     selectedKeys = await promptTargets(mode);
     if (!inlineFlag && selectedKeys.some((key) => TARGETS[key].own)) {
@@ -175,12 +189,14 @@ async function main() {
   }
 }
 
-function printUsage() {
+// The init help. `print` is console.log for --help, console.error when the
+// usage is shown because of an error.
+function printUsage(print = console.log) {
   const line = (flag, text) => `    npx cyberui-2045 init ${flag.padEnd(9)} # ${text}`;
   const lines = Object.values(TARGETS).map((t) =>
     line(t.flag, `${t.name}: ${describeTarget(t, 'own')}${t.own ? '' : ' (always inline)'}`),
   );
-  console.log(`  Usage: npx cyberui-2045 init [targets] [--inline] [--dry-run]
+  print(`  Usage: npx cyberui-2045 init [targets] [--inline] [--dry-run]
 
   Targets (combine as many as you like; none opens an interactive menu):
 ${lines.join('\n')}
@@ -196,6 +212,19 @@ ${line('--all', 'all of the above')}
     npx cyberui-2045 templates                      # list the app templates
     npx cyberui-2045 create <template> [dir]        # start a new app from one
                                                     # (see create --help)
+`);
+}
+
+// `npx cyberui-2045 --help` / `-h` / `help`: the commands, one line each.
+function printTopLevelUsage() {
+  console.log(`  Usage: npx cyberui-2045 <command> [options]
+
+  Commands:
+    npx cyberui-2045 init                       # give your AI assistant the CyberUI guide (default)
+    npx cyberui-2045 templates                  # list the app templates
+    npx cyberui-2045 create <template> [dir]    # start a new app from one
+
+  Run \`npx cyberui-2045 <command> --help\` for a command's options.
 `);
 }
 
