@@ -977,3 +977,53 @@
     animation: scanline-sweep 2.5s linear infinite;
   }
 }
+
+@layer components {
+  /* In `@layer components`, not `@layer cyberui`: the cyberui layer comes
+     after Tailwind's `utilities`, so a consumer utility passed through
+     TabNavigation's `containerClassName` (e.g. `[scrollbar-width:none]`)
+     would lose to this rule. Internal to the library; not a documented
+     utility class.
+
+     Thin themed scrollbar for an overflowing strip (TabNavigation's scroll
+     mode): border-default thumb on a transparent track, the thumb turning
+     secondary at 50% on hover. Plain CSS on purpose: the `scrollbar-*`
+     classes TabNavigation also carries come from the tailwind-scrollbar
+     plugin, which this build does not include, so they emit nothing.
+     `scrollbar-width`/`scrollbar-color` cover Firefox and Chrome 121+
+     (which then ignore the ::-webkit-scrollbar rules); the ::-webkit-
+     rules cover older Chrome and older Safari. Safari 18.2+ reads
+     `scrollbar-width` but not `scrollbar-color` before 26.2, so it may
+     show a thin default thumb instead of the themed one. The hover rules sit in
+     `@media (hover: hover)` like Tailwind's `hover:` variant, so a tap on
+     a touch screen does not leave the thumb highlighted. */
+  .cyberui-scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-border-default) transparent;
+  }
+
+  .cyberui-scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .cyberui-scrollbar-thin::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .cyberui-scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: var(--color-border-default);
+    border-radius: 9999px;
+  }
+
+  @media (hover: hover) {
+    .cyberui-scrollbar-thin:hover {
+      scrollbar-color: color-mix(in oklab, var(--color-secondary) 50%, transparent)
+        transparent;
+    }
+
+    .cyberui-scrollbar-thin:hover::-webkit-scrollbar-thumb {
+      background-color: color-mix(in oklab, var(--color-secondary) 50%, transparent);
+    }
+  }
+}

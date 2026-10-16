@@ -441,7 +441,7 @@ export const TOKEN_ROWS: readonly TokenRow[] = [
       base: ['bg-base/70'],
       muted: ['text-muted'],
     },
-    note: 'The active tab is secondary text with an accent-to-secondary underline.',
+    note: 'The active tab is secondary text with an accent-to-secondary underline. In scroll mode the scrollbar thumb is border-default, turning secondary at 50% on hover.',
   },
   {
     component: 'Timeline',
