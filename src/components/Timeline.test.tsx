@@ -103,6 +103,28 @@ describe('Timeline', () => {
     expect(desc.innerHTML).toBe('All modules loaded');
   });
 
+  it('renders nothing for an empty-string or boolean description', () => {
+    const { container } = render(
+      <Timeline
+        events={[
+          { title: 'Empty', description: '' },
+          { title: 'Flag', description: true },
+          { title: 'Off', description: false },
+        ]}
+      />
+    );
+    const contentColumns = container.querySelectorAll('.flex-1.pb-6');
+    expect(contentColumns).toHaveLength(3);
+    contentColumns.forEach((column) => expect(column.children).toHaveLength(1));
+  });
+
+  it('renders a numeric description in a <p>', () => {
+    render(<Timeline events={[{ title: 'Packets Lost', description: 42 }]} />);
+    const desc = screen.getByText('42');
+    expect(desc.tagName).toBe('P');
+    expect(desc.className).toBe('text-muted mt-1 text-sm');
+  });
+
   it('renders a React node description (link, code) in a <div>', () => {
     render(
       <Timeline

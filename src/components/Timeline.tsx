@@ -103,15 +103,13 @@ export interface TimelineItem {
  *   { title: "Upload", status: "neutral" }
  * ]} />
  */
-export interface TimelineProps<E extends TimelineItem = TimelineEvent> {
+export interface TimelineProps {
   /**
-   * Array of timeline entries to display. Accepts `TimelineEvent[]` (the
-   * original timestamped shape) or `TimelineItem[]` (optional `time`, React
-   * content in `description`, `'neutral'` status). The type parameter `E` is
-   * inferred by `Timeline`; it defaults to `TimelineEvent`, so a bare
-   * `TimelineProps` still describes `TimelineEvent[]`.
+   * Array of timeline events to display. For untimed steps, React-node
+   * descriptions or `'neutral'` status, pass `TimelineItem[]` instead
+   * (see {@link TimelineItemsProps}).
    */
-  events: E[];
+  events: TimelineEvent[];
   /**
    * Size of the timeline. Supports responsive values.
    * @default 'md'
@@ -123,11 +121,23 @@ export interface TimelineProps<E extends TimelineItem = TimelineEvent> {
   className?: string;
 }
 
-function Timeline<E extends TimelineItem = TimelineEvent>({
+/**
+ * `TimelineProps` with `events` widened to {@link TimelineItem}: optional
+ * `time`, React-node `description`, and `'neutral'` status. `Timeline` accepts
+ * either props type.
+ */
+export interface TimelineItemsProps extends Omit<TimelineProps, 'events'> {
+  /**
+   * Array of timeline entries to display. `TimelineEvent[]` is also accepted.
+   */
+  events: TimelineItem[];
+}
+
+const TimelineBase: React.FC<TimelineItemsProps> = ({
   events,
   size = 'md',
   className = '',
-}: TimelineProps<E>) {
+}) => {
   const diamondSizeMap = {
     sm: 'w-5 h-5',
     md: 'w-6 h-6',
@@ -220,7 +230,10 @@ function Timeline<E extends TimelineItem = TimelineEvent>({
         const isTextDescription = typeof event.description === 'string' || typeof event.description === 'number';
         const DescriptionTag = isTextDescription ? 'p' : 'div';
         const hasDescription =
-          event.description !== undefined && event.description !== null && event.description !== false && event.description !== '';
+          event.description !== undefined &&
+          event.description !== null &&
+          typeof event.description !== 'boolean' &&
+          event.description !== '';
 
         return (
           <div key={index} className={cn('flex', gapClasses, 'group')}>
@@ -262,9 +275,17 @@ function Timeline<E extends TimelineItem = TimelineEvent>({
       })}
     </div>
   );
-}
+};
 
-Timeline.displayName = "CyberUI.Timeline";
+TimelineBase.displayName = "CyberUI.Timeline";
+
+// Two call signatures: `TimelineItemsProps` (wider `TimelineItem[]` events) and
+// the original `TimelineProps` (`TimelineEvent[]`). The legacy one comes last on
+// purpose: type inference over an overloaded component (`React.ComponentProps<
+// typeof Timeline>`, `ComponentType<P>` parameters) reads the last signature, so
+// those keep seeing `TimelineProps` with `time: string`.
+const Timeline: ((props: TimelineItemsProps) => ReturnType<React.FC>) &
+  React.FC<TimelineProps> = TimelineBase;
 
 export default Timeline;
 

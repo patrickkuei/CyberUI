@@ -1,7 +1,12 @@
+import type { ComponentType } from 'react';
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import Timeline from './Timeline';
+import type { TimelineItemsProps } from './Timeline';
 
-const meta: Meta<typeof Timeline> = {
+// Typed with the wider TimelineItemsProps: `Meta<typeof Timeline>` would read
+// the legacy TimelineProps signature (TimelineEvent[]), and the stories below
+// use untimed, neutral and React-node entries.
+const meta: Meta<ComponentType<TimelineItemsProps>> = {
   title: 'Components/Timeline',
   component: Timeline,
   parameters: {
@@ -75,7 +80,7 @@ For process steps, leave out \`time\`, pass React content as \`description\`, an
   argTypes: {
     events: {
       control: 'object',
-      description: 'Array of event objects { title, time, description, status }',
+      description: 'Array of TimelineItem (or TimelineEvent) objects { title, time?, description?, status? }. time is optional; description accepts React content; status adds neutral',
     },
     size: {
       control: 'select',
@@ -87,7 +92,7 @@ For process steps, leave out \`time\`, pass React content as \`description\`, an
       description: 'Additional CSS classes',
     },
   },
-} satisfies Meta<typeof Timeline>;
+} satisfies Meta<ComponentType<TimelineItemsProps>>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;

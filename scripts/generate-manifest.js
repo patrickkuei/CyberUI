@@ -192,6 +192,19 @@ const PROP_OVERRIDES = {
         'Array of slides to display. A slide may leave `src` out (`CarouselStandInData`) to show the built-in stand-in.',
     },
   },
+  // Timeline has the same two-signature shape: `TimelineItemsProps` first
+  // (`events: TimelineItem[]`), then the 2.7.1 `TimelineProps`
+  // (`events: TimelineEvent[]`). The type stays the `TimelineProps` one, which
+  // is what `ComponentProps<typeof Timeline>` sees and what check:compat
+  // compares; the description names the wider form.
+  Timeline: {
+    events: {
+      type: 'TimelineEvent[]',
+      required: true,
+      description:
+        'Array of timeline events to display. `TimelineItem[]` (`TimelineItemsProps`) is also accepted: optional `time`, React-node `description`, and `\'neutral\'` status.',
+    },
+  },
 };
 
 // ─── Extraction ────────────────────────────────────────────────────────────────

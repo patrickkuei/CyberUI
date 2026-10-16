@@ -56,7 +56,7 @@ export type {
 export type { ModalProps, ModalAnimationConfig, ModalCallbacks } from './Modal';
 export type { GradientTextProps } from './GradientText';
 export type { SectionTitleProps } from './SectionTitle';
-export type { TimelineProps, TimelineEvent, TimelineItem, TimelineStatus } from './Timeline';
+export type { TimelineProps, TimelineEvent, TimelineItem, TimelineItemsProps, TimelineStatus } from './Timeline';
 export type { StepsProps, StepItem } from './Steps';
 export type { DividerProps } from './Divider';
 export type { CheckboxProps } from './Checkbox';
