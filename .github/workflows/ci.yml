@@ -64,5 +64,11 @@ jobs:
       - name: Check backward compatibility
         run: npm run check:compat
 
+      # Fails when a breakpoint-prefixed class getResponsiveClasses() can build
+      # (md:py-2 from size={{ base: 'sm', md: 'md' }}) is missing from the
+      # built CSS, i.e. a responsive prop would silently do nothing (#108).
+      - name: Check responsive classes are in the CSS
+        run: npm run check:responsive-css
+
       - name: Check bundle size
         run: npm run size
