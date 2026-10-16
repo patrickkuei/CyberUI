@@ -41,7 +41,7 @@ const DOC_SUMMARIES = {
   Button: 'Neon-styled button. Variants: `primary`, `secondary`, `danger`, `ghost`.',
   Card: 'Glassmorphism container with borders.',
   Input: 'Cyberpunk text input with focus glows.',
-  Modal: 'CRT-style modal dialog.',
+  Modal: 'CRT-style modal dialog. `size`: `sm`/`md`/`lg`/`xl`/`2xl` max widths or `fullscreen`, static or per breakpoint (`{ base: \'fullscreen\', lg: \'2xl\' }`).',
   Notification: 'Toast notifications. Use `useCyberNotifications` hook.',
   CircularProgress: 'Dual-ring circular progress indicator.',
   LinearProgress: 'Smooth horizontal progress bar. By default a fixed width chosen by `size` (`className` replaces it); this default is deprecated, so set `fullWidth` to fill the container (from 3.0 it will). `animate={false}` drops the width transition for values driven every frame.',

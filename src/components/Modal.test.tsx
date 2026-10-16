@@ -1,6 +1,9 @@
 import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import Modal from './Modal';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import Modal, { type ModalSize } from './Modal';
+import type { ResponsiveValue } from '../utils/responsive';
 import { stubReducedMotion, type ReducedMotionStub } from '../test/reducedMotion';
 
 // Mock the portal to render into the container for testing
@@ -358,5 +361,96 @@ describe('Modal under prefers-reduced-motion', () => {
       vi.advanceTimersByTime(150);
     });
     expect(handleClose).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('Modal size (#94)', () => {
+  // Everything on the panel except the size classes, as rendered on open with
+  // the default variant and CRT effects.
+  const PANEL_BASE =
+    'relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100';
+  const PANEL_STATE = 'animate-crt-power-on border-accent shadow-lg-accent';
+
+  const panelClass = (size?: ResponsiveValue<ModalSize>): string => {
+    render(
+      <Modal isOpen={true} onClose={vi.fn()} size={size}>
+        <div>Payload</div>
+      </Modal>
+    );
+    return screen.getByRole('dialog').className;
+  };
+
+  // Pinned from 2.7.1: a plain string size must keep rendering exactly this.
+  it.each([
+    ['sm', 'max-w-md'],
+    ['md', 'max-w-lg'],
+    ['lg', 'max-w-2xl'],
+    ['xl', 'max-w-4xl'],
+    ['fullscreen', 'max-w-none w-full h-full'],
+    [undefined, 'max-w-2xl'],
+  ] as const)('renders the same class list as before for size=%s', (size, sizeClasses) => {
+    expect(panelClass(size)).toBe(`${PANEL_BASE} ${sizeClasses} ${PANEL_STATE}`);
+  });
+
+  it('renders the 2xl step as a 72rem (1152px) max width', () => {
+    expect(panelClass('2xl')).toBe(`${PANEL_BASE} max-w-6xl ${PANEL_STATE}`);
+  });
+
+  it('gives each breakpoint of a responsive size its own prefixed classes', () => {
+    const tokens = panelClass({ base: 'sm', md: 'lg', xl: '2xl' }).split(' ');
+    expect(tokens).toEqual(
+      expect.arrayContaining([
+        'max-w-md', 'w-auto', 'h-auto',
+        'md:max-w-2xl', 'md:w-auto', 'md:h-auto',
+        'xl:max-w-6xl', 'xl:w-auto', 'xl:h-auto',
+      ])
+    );
+    expect(tokens.filter((t) => /^(sm|lg|2xl):/.test(t))).toEqual([]);
+  });
+
+  it('switches from fullscreen on phones to a fixed width on desktop, undoing full width and height', () => {
+    const tokens = panelClass({ base: 'fullscreen', lg: '2xl' }).split(' ');
+    expect(tokens).toEqual(
+      expect.arrayContaining(['max-w-none', 'w-full', 'h-full', 'lg:max-w-6xl', 'lg:w-auto', 'lg:h-auto'])
+    );
+    // fullscreen only changes width and height; the corners and 90vh cap stay.
+    expect(tokens).toEqual(expect.arrayContaining(['rounded-lg', 'max-h-[90vh]']));
+  });
+
+  it('switches from a fixed width to fullscreen at a larger breakpoint', () => {
+    const tokens = panelClass({ base: 'md', sm: 'fullscreen' }).split(' ');
+    expect(tokens).toEqual(
+      expect.arrayContaining(['max-w-lg', 'w-auto', 'h-auto', 'sm:max-w-none', 'sm:w-full', 'sm:h-full'])
+    );
+  });
+
+  it('uses lg below the first breakpoint when a responsive size has no base', () => {
+    const tokens = panelClass({ md: 'fullscreen' }).split(' ');
+    expect(tokens).toEqual(
+      expect.arrayContaining(['max-w-2xl', 'w-auto', 'h-auto', 'md:max-w-none', 'md:w-full', 'md:h-full'])
+    );
+  });
+
+  // getResponsiveClasses builds the prefixed classes at runtime, so Tailwind
+  // only generates them if Modal.tsx also spells them out literally.
+  it('spells out every responsive class literally in Modal.tsx so Tailwind generates it', () => {
+    const literal = new Set(readFileSync(join(__dirname, 'Modal.tsx'), 'utf8').split(/[\s"'`]+/));
+    const sizes: ModalSize[] = ['sm', 'md', 'lg', 'xl', '2xl', 'fullscreen'];
+    for (const bp of ['sm', 'md', 'lg', 'xl', '2xl'] as const) {
+      for (const size of sizes) {
+        const { unmount } = render(
+          <Modal isOpen={true} onClose={vi.fn()} size={{ [bp]: size }}>
+            <div>Payload</div>
+          </Modal>
+        );
+        const prefixed = screen
+          .getByRole('dialog')
+          .className.split(' ')
+          .filter((t) => t.startsWith(`${bp}:`));
+        expect(prefixed).toHaveLength(3);
+        for (const cls of prefixed) expect(literal.has(cls), cls).toBe(true);
+        unmount();
+      }
+    }
   });
 });
