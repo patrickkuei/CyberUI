@@ -53,7 +53,7 @@ export type {
   CarouselSlideData,
   CarouselTransition,
 } from './Carousel';
-export type { ModalProps, ModalAnimationConfig, ModalCallbacks } from './Modal';
+export type { ModalProps, ModalAnimationConfig, ModalCallbacks, ModalSize } from './Modal';
 export type { GradientTextProps } from './GradientText';
 export type { SectionTitleProps } from './SectionTitle';
 export type { TimelineProps, TimelineEvent } from './Timeline';
