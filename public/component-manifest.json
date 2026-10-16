@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
-  "packageVersion": "2.7.1",
-  "generatedAt": "2026-10-16T05:54:06.458Z",
+  "packageVersion": "2.8.0",
+  "generatedAt": "2026-10-16T08:15:46.134Z",
   "categoryOrder": [
     "Forms",
     "Layout",
@@ -900,7 +900,7 @@
       "sourceFile": "src/components/Modal.tsx",
       "displayName": "Modal",
       "description": "A cinematic Cyberpunk modal with CRT boot-up effects, RGB glow, and immersive animations.",
-      "docSummary": "CRT-style modal dialog.",
+      "docSummary": "CRT-style modal dialog. `size`: `sm`/`md`/`lg`/`xl`/`2xl` max widths or `fullscreen`, static or per breakpoint (`{ base: 'fullscreen', lg: '2xl' }`).",
       "storybookPath": "components-modal--docs",
       "manifestOverride": false,
       "props": [
@@ -990,10 +990,10 @@
         },
         {
           "name": "size",
-          "type": "\"sm\" | \"md\" | \"lg\" | \"xl\" | \"fullscreen\" | undefined",
+          "type": "ResponsiveValue<ModalSize> | undefined",
           "required": false,
           "default": "'lg'",
-          "description": "Width of the modal.\n- sm: 448px, md: 512px, lg: 672px, xl: 896px\nUse `lg` or `xl` for content-heavy modals (forms, tables, multi-step flows)."
+          "description": "Width of the modal. A static value or a responsive object.\n- sm: 448px, md: 512px, lg: 672px, xl: 896px, 2xl: 1152px\n- fullscreen: fills the overlay\nUse `lg` or `xl` for content-heavy modals (forms, tables, multi-step flows).\n\nA responsive object switches size per breakpoint, including to and from\n`fullscreen`: `{ base: 'fullscreen', lg: '2xl' }` is full screen on phones\nand 1152px wide from 1024px up. A breakpoint left out inherits the next\nsmaller one; with no `base`, sizes below the first given breakpoint use\n`lg`."
         },
         {
           "name": "variant",
@@ -1028,7 +1028,7 @@
           "type": "string | undefined",
           "required": false,
           "default": null,
-          "description": "Additional CSS classes for the modal panel."
+          "description": "Additional CSS classes for the modal panel.\nWith a responsive `size`, a plain width override such as `max-w-3xl` only\nreplaces the base max width; breakpoint classes such as `lg:max-w-6xl`\nstill apply from that breakpoint up, so override them with the matching\nprefixed class (`lg:max-w-3xl`)."
         },
         {
           "name": "overlayClassName",
@@ -1310,16 +1310,16 @@
       "sourceFile": "src/components/Badge.tsx",
       "displayName": "CyberUI.Badge",
       "description": "A compact Cyberpunk-style tag or indicator used for status, categories, or metrics.",
-      "docSummary": "Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`.",
+      "docSummary": "Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning` (filled), `neutral` (outline). `shape`: `pill`, `rounded` or `square`. `shadow={false}` for a flat badge. `clickable`/`onClick` makes it a focusable `role=\"button\"` (Enter/Space activate). Accepts `<span>` attributes (`aria-label`, `role`, `tabIndex`, `onKeyDown`, ...).",
       "storybookPath": "components-badge--docs",
       "manifestOverride": false,
       "props": [
         {
           "name": "variant",
-          "type": "\"primary\" | \"secondary\" | \"accent\" | \"success\" | \"error\" | \"warning\" | undefined",
+          "type": "\"primary\" | \"secondary\" | \"accent\" | \"success\" | \"error\" | \"warning\" | \"neutral\" | undefined",
           "required": false,
           "default": "primary",
-          "description": "Semantic style of the badge."
+          "description": "Semantic style of the badge.\n- `primary` / `secondary` / `accent` / `success` / `error` / `warning`:\n  solid color fill with dark (`text-inverse`) text.\n- `neutral`: no fill — a transparent badge with a `border-default`\n  outline and `default` text, for quiet labels that carry no status.\n  The outline is an inset ring rather than a CSS border, so a neutral\n  badge is exactly the same size as a filled one of the same `size`."
         },
         {
           "name": "size",
@@ -1361,14 +1361,28 @@
           "type": "boolean | undefined",
           "required": false,
           "default": false,
-          "description": "Whether the badge should show hover effects and a pointer cursor"
+          "description": "Whether the badge is interactive: hover effects, a pointer cursor, and\nbutton semantics (`role=\"button\"`, `tabIndex={0}`, Enter/Space\nactivation, a `focus-visible` ring). Passing `onClick` alone does the same."
         },
         {
           "name": "onClick",
           "type": "(() => void) | undefined",
           "required": false,
           "default": null,
-          "description": "Optional click handler"
+          "description": "Click handler. Also fired from the keyboard when the badge is\ninteractive: Enter on keydown, Space on keyup (WAI-ARIA button pattern).\nKeyboard activation dispatches a real click event, so it also bubbles to\nancestor click handlers, as a native button's would."
+        },
+        {
+          "name": "shadow",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Whether the badge carries its resting drop shadow (`shadow-lg`).\nSet `false` for a flat badge in dense layouts. Only the resting shadow\nis affected: a clickable badge keeps its hover effect."
+        },
+        {
+          "name": "shape",
+          "type": "\"pill\" | \"rounded\" | \"square\" | undefined",
+          "required": false,
+          "default": "pill",
+          "description": "Corner shape of the badge.\n- `pill`: fully rounded ends (`rounded-full`).\n- `rounded`: slightly rounded corners (`rounded-md`).\n- `square`: sharp corners (`rounded-none`)."
         }
       ]
     },
@@ -1438,8 +1452,8 @@
       "category": "Feedback",
       "sourceFile": "src/components/Tooltip.tsx",
       "displayName": "Tooltip",
-      "description": "A neon-bordered popover that reveals supplemental info on hover or keyboard focus.",
-      "docSummary": "Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.",
+      "description": "A neon-bordered popover that reveals supplemental info on hover, keyboard\nfocus, or (on touch devices) a tap on the trigger.",
+      "docSummary": "Neon-bordered popover on hover/focus/tap (touch: tap toggles, outside tap closes). Placements: `top`, `bottom`, `left`, `right`. `glow={false}` for a quieter panel next to dense content.",
       "storybookPath": "components-tooltip--docs",
       "manifestOverride": false,
       "props": [
@@ -1448,7 +1462,7 @@
           "type": "ReactElement<{ 'aria-describedby'?: string | undefined; }, string | JSXElementConstructor<any>>",
           "required": true,
           "default": null,
-          "description": "The trigger element. Must be a single React element that accepts an\n`aria-describedby` attribute (native elements, `Button`, `Badge`, etc).\nWrap plain text/icons in a `<span tabIndex={0}>` so the trigger is\nkeyboard-focusable — the tooltip only opens on hover or focus."
+          "description": "The trigger element. Must be a single React element that accepts an\n`aria-describedby` attribute (native elements, `Button`, `Badge`, etc).\nWrap plain text/icons in a `<span tabIndex={0}>` so the trigger is\nkeyboard-focusable — mouse users open the tooltip on hover, keyboard users\non focus, and touch users by tapping the trigger (see below).\n\nOn touch input (`pointerType: 'touch'`) a tap on the trigger toggles the\ntooltip immediately (no `delay`), and a tap anywhere outside closes it.\nThis works for non-focusable triggers too. A tap still reaches the\ntrigger itself, so a `Button` trigger's `onClick` runs as usual."
         },
         {
           "name": "content",
@@ -1472,6 +1486,13 @@
           "description": "Visual style, reusing the neon palette from Button/Card."
         },
         {
+          "name": "glow",
+          "type": "boolean | undefined",
+          "required": false,
+          "default": true,
+          "description": "Draws the neon glow (box-shadow) around the panel and arrow. Set `false`\nfor a quieter look next to dense content (tables, stat rows, icon\nstrips): the panel keeps its `variant`-colored border but drops the glow."
+        },
+        {
           "name": "size",
           "type": "ResponsiveValue<\"sm\" | \"md\" | \"lg\"> | undefined",
           "required": false,
@@ -1483,28 +1504,28 @@
           "type": "number | undefined",
           "required": false,
           "default": 200,
-          "description": "Delay in ms before the tooltip appears after hover/focus starts.\nHiding is always immediate so the panel doesn't linger."
+          "description": "Delay in ms before the tooltip appears after hover/focus starts.\nHiding is always immediate so the panel doesn't linger. Touch taps open\nimmediately and ignore this value.\n\nThe 200ms default suits standalone triggers (buttons, badges). For a\ndense row of small targets (icon strips, table headers, step labels)\nlower it to 0–100ms so moving across the row doesn't feel laggy."
         },
         {
           "name": "disabled",
           "type": "boolean | undefined",
           "required": false,
           "default": false,
-          "description": "Disables the tooltip — the trigger renders as-is with no hover/focus behavior."
+          "description": "Disables the tooltip — the trigger renders as-is with no hover, focus, or tap behavior."
         },
         {
           "name": "open",
           "type": "boolean | undefined",
           "required": false,
           "default": null,
-          "description": "Controlled visibility. When set, the tooltip stops managing its own open\nstate and `onOpenChange` becomes the only way to react to hover/focus/Escape."
+          "description": "Controlled visibility. When set, the tooltip stops managing its own open\nstate and `onOpenChange` becomes the only way to react to hover/focus/Escape/tap."
         },
         {
           "name": "onOpenChange",
           "type": "((open: boolean) => void) | undefined",
           "required": false,
           "default": null,
-          "description": "Fired whenever hover, focus, blur, or Escape would change visibility."
+          "description": "Fired whenever hover, focus, blur, Escape, or a touch tap would change visibility."
         },
         {
           "name": "className",
@@ -2283,9 +2304,9 @@
       "name": "Timeline",
       "category": "Display",
       "sourceFile": "src/components/Timeline.tsx",
-      "displayName": "CyberUI.Timeline",
+      "displayName": "Timeline",
       "description": "",
-      "docSummary": "Vertical event history display.",
+      "docSummary": "Vertical event history or process-step display. Each `TimelineItem` takes an optional `time` (omitted: no time shown), a React-node `description` (code, links, notes), and a `status` of `success`/`error`/`warning`/`info` (default, glowing) or `neutral` (unlit, no glow).",
       "storybookPath": "components-timeline--docs",
       "manifestOverride": false,
       "props": [
@@ -2294,7 +2315,7 @@
           "type": "TimelineEvent[]",
           "required": true,
           "default": null,
-          "description": "Array of timeline events to display."
+          "description": "Array of timeline events to display. `TimelineItem[]` (`TimelineItemsProps`) is also accepted: optional `time`, React-node `description`, and `'neutral'` status."
         },
         {
           "name": "size",

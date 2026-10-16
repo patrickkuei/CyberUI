@@ -50,14 +50,14 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 | `Combobox` | Searchable select — text input filters `options` as you type. WAI-ARIA combobox pattern, optional `allowCustomValue` for free-text entry. |
 | `DatePicker` | Single-date picker with a text-input trigger and a keyboard-navigable calendar grid popover. `minDate`/`maxDate` bounds, neon-highlighted selected day, glow on today. |
 | `Card` | Glassmorphism container with borders. |
-| `Modal` | CRT-style modal dialog. |
+| `Modal` | CRT-style modal dialog. `size`: `sm`/`md`/`lg`/`xl`/`2xl` max widths or `fullscreen`, static or per breakpoint (`{ base: 'fullscreen', lg: '2xl' }`). |
 | `Divider` | Gradient/solid/dashed content separator. |
 | `Accordion` | Collapsible section list. `mode`: `single` (default) or `multiple` open panels. |
 | `Drawer` | Slide-in side panel from any edge (`left`/`right`/`top`/`bottom`). Shares Modal's controlled `isOpen`/`onClose` pattern and overlay behavior. |
 | `Notification` | Toast notifications. Use `useCyberNotifications` hook. |
-| `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning`. |
+| `Badge` | Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning` (filled), `neutral` (outline). `shape`: `pill`, `rounded` or `square`. `shadow={false}` for a flat badge. `clickable`/`onClick` makes it a focusable `role="button"` (Enter/Space activate). Accepts `<span>` attributes (`aria-label`, `role`, `tabIndex`, `onKeyDown`, ...). |
 | `Skeleton` | Loading placeholder. |
-| `Tooltip` | Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`. |
+| `Tooltip` | Neon-bordered popover on hover/focus/tap (touch: tap toggles, outside tap closes). Placements: `top`, `bottom`, `left`, `right`. `glow={false}` for a quieter panel next to dense content. |
 | `CircularProgress` | Dual-ring circular progress indicator. |
 | `SegmentedProgress` | Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯). |
 | `LinearProgress` | Smooth horizontal progress bar. By default a fixed width chosen by `size` (`className` replaces it); this default is deprecated, so set `fullWidth` to fill the container (from 3.0 it will). `animate={false}` drops the width transition for values driven every frame. |
@@ -68,7 +68,7 @@ Each tool gets the guide in a file of its own by default, so its instruction fil
 | `Pagination` | Page control for lists/tables. Controlled `currentPage`/`totalPages`, compact ellipsis collapsing for large page counts, Previous/Next controls. |
 | `GradientText` | Text with cyberpunk gradient effects. |
 | `SectionTitle` | Title with decorative gradient line. |
-| `Timeline` | Vertical event history display. |
+| `Timeline` | Vertical event history or process-step display. Each `TimelineItem` takes an optional `time` (omitted: no time shown), a React-node `description` (code, links, notes), and a `status` of `success`/`error`/`warning`/`info` (default, glowing) or `neutral` (unlit, no glow). |
 | `Table` | Semantic `columns`/`data` table, generic over your row type (`TableColumn<Row>[]`, typed `render`/`onRowClick`). Neon header row, hover-glow rows, optional `variant="striped"` alternating tint. |
 | `Image` | Image with cyberpunk frame/effects and click-to-enlarge preview. With no source (`src=""`, or `src` left out via `ImageStandInProps`) it renders a built-in `gradient` or `scanline` stand-in (`fallbackStyle`). |
 | `Avatar` | Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot. |
