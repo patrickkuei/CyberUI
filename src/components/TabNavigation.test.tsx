@@ -132,8 +132,10 @@ describe('TabNavigation reduced motion', () => {
 // carries and the rule in src/index.css that the class refers to.
 describe('TabNavigation scroll-mode scrollbar (#96)', () => {
   const css = readFileSync(join(__dirname, '..', 'index.css'), 'utf8');
-  const layered = css.slice(css.indexOf('@layer cyberui {'));
-  /** Body of the first rule in `@layer cyberui` whose selector is exactly `selector`. */
+  // The rules live in `@layer components` so consumer utilities (which come
+  // later, in `utilities`) can still override them via containerClassName.
+  const layered = css.slice(css.indexOf('@layer components {'));
+  /** Body of the first rule in `@layer components` whose selector is exactly `selector`. */
   const rule = (selector: string): string => {
     const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     return layered.match(new RegExp(`(?:^|[\\s}])${escaped}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
@@ -142,6 +144,22 @@ describe('TabNavigation scroll-mode scrollbar (#96)', () => {
   it('gives the scroll container the cyberui-scrollbar-thin class', () => {
     render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="scroll" />);
     expect(screen.getByRole('tablist')).toHaveClass('cyberui-scrollbar-thin', 'overflow-x-auto');
+  });
+
+  it('keeps the earlier scrollbar-* classes on the container (class list only grows)', () => {
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="scroll" />);
+    expect(screen.getByRole('tablist')).toHaveClass(
+      'scrollbar-thin',
+      'scrollbar-thumb-border-default',
+      'scrollbar-track-transparent',
+      'hover:scrollbar-thumb-secondary/50'
+    );
+  });
+
+  it('is not in @layer cyberui, which would beat consumer utilities', () => {
+    const cyberuiLayers = css.split('@layer components {')[0];
+    expect(cyberuiLayers).not.toContain('.cyberui-scrollbar-thin');
+    expect(layered).toContain('.cyberui-scrollbar-thin {');
   });
 
   it('does not add it in wrap mode', () => {
