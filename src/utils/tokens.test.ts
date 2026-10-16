@@ -135,6 +135,7 @@ describe('text colour contrast (WCAG AA, #113)', () => {
 
   it('computes known ratios correctly (sanity check on the formula)', () => {
     expect(contrast('#ffffff', '#000000')).toBeCloseTo(21, 5);
+    // #8888aa is the pre-2.8.0 --color-muted (#113): it failed AA on surface.
     expect(contrast('#8888aa', '#2d2d44')).toBeCloseTo(3.92, 2);
   });
 
