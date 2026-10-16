@@ -107,11 +107,12 @@ describe('Badge', () => {
   });
 
   describe('neutral variant', () => {
-    it('renders transparent with a border-default outline and muted text', () => {
-      render(<Badge variant="neutral">Your decision</Badge>);
-      const el = getBadgeEl('Your decision');
-      expect(el).toHaveClass('bg-transparent', 'text-muted', 'ring-1', 'ring-inset', 'ring-border-default');
+    it('renders transparent with a border-default outline and default text', () => {
+      render(<Badge variant="neutral">Operator Call</Badge>);
+      const el = getBadgeEl('Operator Call');
+      expect(el).toHaveClass('bg-transparent', 'text-default', 'ring-1', 'ring-inset', 'ring-border-default');
       expect(el).not.toHaveClass('text-inverse');
+      expect(el).not.toHaveClass('text-muted');
       expect(el.className).not.toMatch(/\bbg-(primary|secondary|accent|success|error|warning)\b/);
     });
 
@@ -132,7 +133,7 @@ describe('Badge', () => {
       const handleClick = vi.fn();
       render(<Badge variant="neutral" onClick={handleClick}>Recon</Badge>);
       const el = getBadgeEl('Recon');
-      expect(el).toHaveClass('cursor-pointer', 'hover:ring-secondary', 'hover:text-secondary');
+      expect(el).toHaveClass('cursor-pointer', 'hover:ring-secondary', 'hover:text-secondary', 'transition-[color,box-shadow]');
       fireEvent.click(el);
       expect(handleClick).toHaveBeenCalledTimes(1);
     });
@@ -151,7 +152,7 @@ describe('Badge', () => {
       expect(el).toHaveClass('bg-secondary', 'text-inverse');
     });
 
-    it('keeps the hover glow on a clickable badge when shadow={false}', () => {
+    it('keeps the hover effect on a clickable badge when shadow={false}', () => {
       render(<Badge shadow={false} clickable>Hover</Badge>);
       const el = getBadgeEl('Hover');
       expect(el).not.toHaveClass('shadow-lg');

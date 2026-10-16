@@ -60,7 +60,7 @@ import 'cyberui-2045/styles.css';
 <Badge variant="error">OFFLINE</Badge>
 
 // Neutral outline for quiet labels
-<Badge variant="neutral">Your decision</Badge>
+<Badge variant="neutral">Operator Call</Badge>
 
 // Flat (no resting shadow) and corner shapes
 <Badge variant="secondary" shadow={false}>Included</Badge>
@@ -73,7 +73,7 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`string\` | ❌ | \`'primary'\` | Badge color variant |
-| \`shadow\` | \`boolean\` | ❌ | \`true\` | Resting drop shadow (\`shadow-lg\`). Clickable badges still glow on hover when \`false\` |
+| \`shadow\` | \`boolean\` | ❌ | \`true\` | Resting drop shadow (\`shadow-lg\`). A clickable badge keeps its hover effect when \`false\` |
 | \`shape\` | \`'pill' \\| 'rounded' \\| 'square'\` | ❌ | \`'pill'\` | Corner shape: fully rounded, slightly rounded, or sharp |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Badge size (supports responsive values) |
 | \`leftIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the left side |
@@ -85,7 +85,7 @@ import 'cyberui-2045/styles.css';
 
 **Variant options:** \`'primary'\`, \`'secondary'\`, \`'accent'\`, \`'success'\`, \`'error'\`, \`'warning'\`, \`'neutral'\`
 
-The six color variants are solid fills with dark text. \`neutral\` is transparent with a \`border-default\` outline and muted text, and is the same size as a filled badge. Use it for labels that carry no status.
+The six color variants are solid fills with dark text. \`neutral\` is transparent with a \`border-default\` outline and default-colored text, and is the same size as a filled badge. Use it for labels that carry no status.
 
 Additional HTML span attributes can be passed and will be applied to the badge element.
 `,
@@ -249,7 +249,7 @@ export const QuietLabels: Story = {
       <div className="flex items-center gap-3">
         <span className="w-4 h-4 border border-border-default"></span>
         <span className="text-default">Optic Implant Upgrade</span>
-        <Badge variant="neutral" shape="square" shadow={false} size="sm">Your decision</Badge>
+        <Badge variant="neutral" shape="square" shadow={false} size="sm">Operator Call</Badge>
       </div>
       <div className="flex items-center gap-3">
         <span className="w-4 h-4 border border-secondary bg-secondary"></span>

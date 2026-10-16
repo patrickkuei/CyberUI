@@ -27,7 +27,7 @@ export interface BadgeProps {
    * - `primary` / `secondary` / `accent` / `success` / `error` / `warning`:
    *   solid color fill with dark (`text-inverse`) text.
    * - `neutral`: no fill — a transparent badge with a `border-default`
-   *   outline and `muted` text, for quiet labels that carry no status.
+   *   outline and `default` text, for quiet labels that carry no status.
    *   The outline is an inset ring rather than a CSS border, so a neutral
    *   badge is exactly the same size as a filled one of the same `size`.
    * @default 'primary'
@@ -53,7 +53,7 @@ export interface BadgeProps {
   /**
    * Whether the badge carries its resting drop shadow (`shadow-lg`).
    * Set `false` for a flat badge in dense layouts. Only the resting shadow
-   * is affected: a clickable badge still glows on hover.
+   * is affected: a clickable badge keeps its hover effect.
    * @default true
    */
   shadow?: boolean;
@@ -99,7 +99,9 @@ const Badge: React.FC<BadgeProps> = ({
     // `text-inverse`, not `text-default` — every filled variant is a solid
     // color fill, so the label needs the dedicated "readable on a bright
     // background" token rather than the page's default text color.
-    // `neutral` has no fill, so it uses `text-muted` on the page background.
+    // `neutral` has no fill, so it uses `text-default`, which stays above
+    // 4.5:1 contrast on both `base` and `surface` (`text-muted` drops below
+    // it on `surface`, e.g. inside a Card).
     // Its outline is `ring-inset` (a box-shadow), not `border`, so it adds no
     // width/height and lines up with filled badges in the same row.
     const variants = {
@@ -109,7 +111,7 @@ const Badge: React.FC<BadgeProps> = ({
       success: 'bg-success text-inverse',
       error: 'bg-error text-inverse',
       warning: 'bg-warning text-inverse',
-      neutral: 'bg-transparent text-muted ring-1 ring-inset ring-border-default'
+      neutral: 'bg-transparent text-default ring-1 ring-inset ring-border-default'
     };
     return variants[variant as keyof typeof variants];
   };
@@ -126,7 +128,7 @@ const Badge: React.FC<BadgeProps> = ({
       success: 'hover:shadow-success transition-shadow cursor-pointer',
       error: 'hover:shadow-error transition-shadow cursor-pointer',
       warning: 'hover:shadow-warning transition-shadow cursor-pointer',
-      neutral: 'hover:ring-secondary hover:text-secondary transition-shadow cursor-pointer'
+      neutral: 'hover:ring-secondary hover:text-secondary transition-[color,box-shadow] cursor-pointer'
     };
     return hoverVariants[variant as keyof typeof hoverVariants];
   };

@@ -95,10 +95,10 @@ export const TOKEN_ROWS: readonly TokenRow[] = [
       error: ['bg-error', 'hover:shadow-error'],
       warning: ['bg-warning', 'hover:shadow-warning'],
       inverse: ['text-inverse'],
-      muted: ['text-muted'],
+      default: ['text-default'],
       'border-default': ['ring-border-default'],
     },
-    note: 'Each filled variant paints one token (fill, plus a glow on hover when clickable) and takes its text colour from inverse. The neutral variant has no fill: muted text inside a border-default ring, which turns secondary on hover when clickable.',
+    note: 'Each filled variant paints one token (fill, plus a glow on hover when clickable) and takes its text colour from inverse. The neutral variant has no fill: default-coloured text inside a border-default ring, which turns secondary on hover when clickable.',
   },
   {
     component: 'Button',
