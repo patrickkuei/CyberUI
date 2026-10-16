@@ -78,19 +78,24 @@
   "homepage": "https://patrickkuei.github.io/CyberUI",
   "scripts": {
     "postinstall": "node -e \"!process.env.CI && console.log('\\n  cyberui-2045 installed\\n\\n  AI coding setup \\u2192 npx cyberui-2045 init\\n  Starter apps    \\u2192 npx cyberui-2045 templates\\n  Docs         \\u2192 https://patrickkuei.github.io/CyberUI\\n')\"",
+    "predev": "npm run generate:responsive-safelist",
     "dev": "vite",
+    "prebuild": "npm run generate:responsive-safelist",
     "build": "vite build --mode library",
     "build:demo": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run",
     "type-check": "tsc --noEmit -p tsconfig.app.json && tsc --noEmit -p tsconfig.node.json",
+    "prestorybook": "npm run generate:responsive-safelist",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "docs:generate": "node scripts/generate-manifest.js",
     "size": "size-limit",
     "check:package": "node scripts/check-package.js",
     "check:compat": "node scripts/check-compat.js",
+    "generate:responsive-safelist": "node scripts/responsive-safelist.js",
+    "check:responsive-css": "node scripts/check-responsive-css.js",
     "compat:baseline": "node scripts/check-compat.js --update-baseline .",
     "predeploy": "npm run build:demo",
     "deploy": "gh-pages -d dist",
@@ -162,7 +167,7 @@
     {
       "name": "Stylesheet (CSS)",
       "path": "dist/cyberui-2045.css",
-      "limit": "17 KB",
+      "limit": "18 KB",
       "gzip": true
     }
   ]

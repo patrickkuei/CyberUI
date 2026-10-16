@@ -1,4 +1,8 @@
 @import "tailwindcss";
+/* Breakpoint-prefixed classes getResponsiveClasses() builds at runtime
+   (`md:py-2` from `size={{ base: "sm", md: "md" }}`). Generated from the
+   class maps by scripts/responsive-safelist.js; see that file. */
+@import "./generated/responsive-safelist.css";
 
 /**
  * Design tokens for the cyberpunk theme. Before adding a new one:
