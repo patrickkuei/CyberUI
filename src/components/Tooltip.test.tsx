@@ -169,6 +169,63 @@ describe('Tooltip', () => {
     expect(screen.getByRole('tooltip')).toHaveClass('top-full');
   });
 
+  // Pins each single placement's positioning (panel + arrow). The classes
+  // the old maps used must all survive cn()/twMerge alongside the resets.
+  const SINGLE_PLACEMENT = {
+    top: { panel: ['bottom-full', 'left-1/2', '-translate-x-1/2', 'mb-2'], arrow: ['top-full', 'left-1/2', '-translate-x-1/2', '-mt-[5px]'] },
+    bottom: { panel: ['top-full', 'left-1/2', '-translate-x-1/2', 'mt-2'], arrow: ['bottom-full', 'left-1/2', '-translate-x-1/2', '-mb-[5px]'] },
+    left: { panel: ['right-full', 'top-1/2', '-translate-y-1/2', 'mr-2'], arrow: ['left-full', 'top-1/2', '-translate-y-1/2', '-ml-[5px]'] },
+    right: { panel: ['left-full', 'top-1/2', '-translate-y-1/2', 'ml-2'], arrow: ['right-full', 'top-1/2', '-translate-y-1/2', '-mr-[5px]'] },
+  } as const;
+
+  it.each(['top', 'bottom', 'left', 'right'] as const)(
+    'positions panel and arrow for placement="%s" without breakpoint prefixes',
+    (placement) => {
+      render(
+        <Tooltip content="Info" open placement={placement}>
+          <button>Trigger</button>
+        </Tooltip>
+      );
+      const panel = screen.getByRole('tooltip');
+      const arrow = panel.lastElementChild as HTMLElement;
+      for (const cls of SINGLE_PLACEMENT[placement].panel) expect(panel).toHaveClass(cls);
+      for (const cls of SINGLE_PLACEMENT[placement].arrow) expect(arrow).toHaveClass(cls);
+      expect(panel.className).not.toMatch(/(^|\s)(sm|md|lg|xl|2xl):/);
+    }
+  );
+
+  it('resets the base placement at the breakpoint for a responsive placement (panel and arrow)', () => {
+    render(
+      <Tooltip content="Info" open placement={{ base: 'top', md: 'right' }}>
+        <button>Trigger</button>
+      </Tooltip>
+    );
+    const panel = screen.getByRole('tooltip');
+    const arrow = panel.lastElementChild as HTMLElement;
+    // Base: above the trigger.
+    for (const cls of SINGLE_PLACEMENT.top.panel) expect(panel).toHaveClass(cls);
+    for (const cls of SINGLE_PLACEMENT.top.arrow) expect(arrow).toHaveClass(cls);
+    // md+: right of the trigger, with every base-set property reset.
+    for (const cls of ['md:left-full', 'md:top-1/2', 'md:-translate-y-1/2', 'md:ml-2', 'md:bottom-auto', 'md:right-auto', 'md:translate-x-0', 'md:mb-0']) {
+      expect(panel).toHaveClass(cls);
+    }
+    for (const cls of ['md:right-full', 'md:top-1/2', 'md:-translate-y-1/2', 'md:-mr-[5px]', 'md:left-auto', 'md:bottom-auto', 'md:translate-x-0', 'md:mt-0']) {
+      expect(arrow).toHaveClass(cls);
+    }
+  });
+
+  it('defaults the base placement to top for a responsive placement without base', () => {
+    render(
+      <Tooltip content="Info" open placement={{ md: 'left' }}>
+        <button>Trigger</button>
+      </Tooltip>
+    );
+    const panel = screen.getByRole('tooltip');
+    for (const cls of SINGLE_PLACEMENT.top.panel) expect(panel).toHaveClass(cls);
+    expect(panel).toHaveClass('md:right-full');
+    expect(panel.lastElementChild as HTMLElement).toHaveClass('top-full', 'md:left-full');
+  });
+
   // Pins the full default look (border + glow) for panel and arrow; the
   // arrow is the panel's last decorative child.
   const GLOW_BY_VARIANT = {

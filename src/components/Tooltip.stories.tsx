@@ -202,6 +202,30 @@ export const Accent: Story = {
   ),
 };
 
+export const ResponsivePlacement: Story = {
+  args: {
+    placement: { base: 'top', md: 'right' },
+    content: 'Signal routed via orbital relay.',
+  },
+  argTypes: {
+    placement: { control: 'object' },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: '`placement={{ base: \'top\', md: \'right\' }}` — above the trigger on small screens, to its right from `md` up. The arrow follows the panel.',
+      },
+    },
+  },
+  render: (args) => (
+    <div className="p-16">
+      <Tooltip {...args}>
+        <Button variant="secondary">Route Signal</Button>
+      </Tooltip>
+    </div>
+  ),
+};
+
 export const Quiet: Story = {
   args: { glow: false, variant: 'secondary', content: 'Packet loss: 0.02%' },
   parameters: {

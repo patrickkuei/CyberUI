@@ -76,18 +76,31 @@ export interface TooltipProps {
   id?: string;
 }
 
+/*
+ * Placement maps for the panel and its arrow. Every entry sets ALL of the
+ * same properties — top/bottom/left/right, both translate axes, and all four
+ * margins — resetting the ones it doesn't use (`*-auto`, `translate-*-0`,
+ * `m*-0`). A responsive `placement` stacks entries at different breakpoints
+ * (e.g. `{ base: 'top', md: 'right' }` → top's classes plus `md:`-prefixed
+ * right's), so an entry that left a property unset would inherit the base
+ * entry's value and misplace the panel. The resets are no-ops for a single
+ * placement (they match the CSS initial values).
+ *
+ * Keep these plain const object literals passed straight to
+ * `getResponsiveClasses`: the build's CSS class scan reads them from here.
+ */
 const PLACEMENT_CLASSES: Record<TooltipPlacement, string> = {
-  top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-  bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
-  left: 'right-full top-1/2 -translate-y-1/2 mr-2',
-  right: 'left-full top-1/2 -translate-y-1/2 ml-2',
+  top: 'top-auto bottom-full left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-0 mb-2 ml-0 mr-0',
+  bottom: 'top-full bottom-auto left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-2 mb-0 ml-0 mr-0',
+  left: 'top-1/2 bottom-auto left-auto right-full translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-0 mr-2',
+  right: 'top-1/2 bottom-auto left-full right-auto translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-2 mr-0',
 };
 
 const ARROW_PLACEMENT_CLASSES: Record<TooltipPlacement, string> = {
-  top: 'top-full left-1/2 -translate-x-1/2 -mt-[5px]',
-  bottom: 'bottom-full left-1/2 -translate-x-1/2 -mb-[5px]',
-  left: 'left-full top-1/2 -translate-y-1/2 -ml-[5px]',
-  right: 'right-full top-1/2 -translate-y-1/2 -mr-[5px]',
+  top: 'top-full bottom-auto left-1/2 right-auto -translate-x-1/2 translate-y-0 -mt-[5px] mb-0 ml-0 mr-0',
+  bottom: 'top-auto bottom-full left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-0 -mb-[5px] ml-0 mr-0',
+  left: 'top-1/2 bottom-auto left-full right-auto translate-x-0 -translate-y-1/2 mt-0 mb-0 -ml-[5px] mr-0',
+  right: 'top-1/2 bottom-auto left-auto right-full translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-0 -mr-[5px]',
 };
 
 const BORDER_CLASSES: Record<'primary' | 'secondary' | 'accent', string> = {
@@ -245,9 +258,13 @@ const Tooltip: React.FC<TooltipProps> = ({
   const getSizeClasses = (size: ResponsiveValue<'sm' | 'md' | 'lg'>): string =>
     getResponsiveClasses(size, RESPONSIVE_SIZE_MAPS.tooltip);
 
-  const basePlacement = isResponsiveObject(placement) ? placement.base ?? 'top' : placement;
-  const placementClasses =
-    getResponsiveClasses(placement, PLACEMENT_CLASSES) || PLACEMENT_CLASSES[basePlacement];
+  // A responsive object without `base` (e.g. `{ md: 'right' }`) still needs
+  // base positioning below its first breakpoint, so default it to 'top'.
+  const resolvedPlacement: ResponsiveValue<TooltipPlacement> = isResponsiveObject(placement)
+    ? { ...placement, base: placement.base ?? 'top' }
+    : placement;
+  const placementClasses = getResponsiveClasses(resolvedPlacement, PLACEMENT_CLASSES);
+  const arrowPlacementClasses = getResponsiveClasses(resolvedPlacement, ARROW_PLACEMENT_CLASSES);
 
   const trigger = React.cloneElement(children, {
     'aria-describedby': isOpen ? tooltipId : undefined,
@@ -288,7 +305,7 @@ const Tooltip: React.FC<TooltipProps> = ({
             aria-hidden="true"
             className={cn(
               'absolute w-2.5 h-2.5 rotate-45 bg-surface border',
-              ARROW_PLACEMENT_CLASSES[basePlacement],
+              arrowPlacementClasses,
               BORDER_CLASSES[variant],
               glow && GLOW_CLASSES[variant]
             )}
