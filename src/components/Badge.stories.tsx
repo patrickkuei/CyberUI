@@ -78,16 +78,18 @@ import 'cyberui-2045/styles.css';
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Badge size (supports responsive values) |
 | \`leftIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the left side |
 | \`rightIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the right side |
-| \`clickable\` | \`boolean\` | ❌ | \`false\` | Whether the badge is clickable with hover effects |
+| \`clickable\` | \`boolean\` | ❌ | \`false\` | Makes the badge interactive: hover effects, pointer cursor, focusable button semantics and keyboard activation |
 | \`children\` | \`React.ReactNode\` | ✅ | - | Badge content |
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes |
-| \`onClick\` | \`() => void\` | ❌ | - | Click handler function |
+| \`onClick\` | \`() => void\` | ❌ | - | Click handler; fires on click, Enter and Space. Passing it also makes the badge interactive |
 
 **Variant options:** \`'primary'\`, \`'secondary'\`, \`'accent'\`, \`'success'\`, \`'error'\`, \`'warning'\`, \`'neutral'\`
 
 The six color variants are solid fills with dark text. \`neutral\` is transparent with a \`border-default\` outline and default-colored text, and is the same size as a filled badge. Use it for labels that carry no status.
 
-Additional HTML span attributes can be passed and will be applied to the badge element.
+An interactive badge (\`clickable\` or \`onClick\`) stays a \`<span>\` and gets \`role="button"\`, \`tabIndex={0}\` and a focus-visible ring. Enter activates it on keydown and Space on keyup. A non-interactive badge has none of these.
+
+Additional HTML span attributes can be passed and will be applied to the badge element. An explicit \`role\`, \`tabIndex\` or \`aria-*\` attribute takes precedence, and an \`onKeyDown\` or \`onKeyUp\` handler runs before the built-in keyboard activation. Calling \`preventDefault()\` in it skips the activation.
 `,
       },
     },
@@ -115,7 +117,7 @@ Additional HTML span attributes can be passed and will be applied to the badge e
     },
     clickable: {
       control: 'boolean',
-      description: 'Whether the badge is clickable with hover effects',
+      description: 'Makes the badge interactive: hover effects, pointer cursor, focusable button semantics and keyboard activation',
     },
     className: {
       control: 'text',
@@ -293,6 +295,13 @@ export const Clickable: Story = {
     children: 'Click Me',
     clickable: true,
     onClick: () => alert('Badge clicked!'),
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Tab to the badge to show its focus ring, then press Enter or Space to fire `onClick`. Screen readers announce it as a button.',
+      },
+    },
   },
 };
 

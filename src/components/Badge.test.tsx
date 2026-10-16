@@ -94,9 +94,19 @@ describe('Badge', () => {
       `inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-${variant} text-inverse shadow-lg transition-shadow`
     );
     unmount();
+    // Clickable badges gained Button's focus-visible ring in #112 (appended
+    // after the pre-2.8 classes, which are otherwise unchanged).
+    const ring = variant === 'secondary' ? 'focus-visible:ring-accent/50' : 'focus-visible:ring-secondary/50';
     render(<Badge variant={variant} clickable>Live</Badge>);
     expect(getBadgeEl('Live').className).toBe(
-      `inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-${variant} text-inverse shadow-lg ${hover} transition-shadow cursor-pointer`
+      `inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-${variant} text-inverse shadow-lg ${hover} transition-shadow cursor-pointer focus:outline-none focus-visible:ring-2 ${ring}`
+    );
+  });
+
+  it('renders a non-clickable badge with exactly the pre-#112 DOM', () => {
+    const { container } = render(<Badge variant="success">ONLINE</Badge>);
+    expect(container.innerHTML).toBe(
+      '<span class="inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-success text-inverse shadow-lg transition-shadow"><span>ONLINE</span></span>'
     );
   });
 
@@ -184,6 +194,120 @@ describe('Badge', () => {
       const el = getBadgeEl('Override');
       expect(el).toHaveClass('rounded-lg');
       expect(el).not.toHaveClass('rounded-none');
+    });
+  });
+
+  describe('keyboard and screen-reader access (#112)', () => {
+    it('has no role, tabIndex or focus ring when not clickable', () => {
+      render(<Badge>Passive</Badge>);
+      const el = getBadgeEl('Passive');
+      expect(el.getAttributeNames()).toEqual(['class']);
+      expect(el.className).not.toMatch(/focus/);
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    });
+
+    it.each([
+      ['clickable', { clickable: true }],
+      ['onClick', { onClick: () => {} }],
+    ] as const)('is a focusable button when given %s', (_, extra) => {
+      render(<Badge {...extra}>Jack In</Badge>);
+      const el = screen.getByRole('button', { name: 'Jack In' });
+      expect(el).toBe(getBadgeEl('Jack In'));
+      expect(el).toHaveAttribute('tabindex', '0');
+      expect(el.tagName).toBe('SPAN');
+      el.focus();
+      expect(el).toHaveFocus();
+    });
+
+    it("uses Button's focus-visible classes, contrasting with the fill", () => {
+      render(<Badge clickable>Pink</Badge>);
+      render(<Badge variant="secondary" clickable>Cyan</Badge>);
+      render(<Badge variant="neutral" clickable>Hollow</Badge>);
+      expect(getBadgeEl('Pink')).toHaveClass('focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-secondary/50');
+      expect(getBadgeEl('Cyan')).toHaveClass('focus:outline-none', 'focus-visible:ring-2', 'focus-visible:ring-accent/50');
+      expect(getBadgeEl('Hollow')).toHaveClass('ring-inset', 'focus-visible:ring-2', 'focus-visible:ring-secondary/50');
+    });
+
+    it('activates onClick with Enter on keydown', () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick}>Breach</Badge>);
+      const el = screen.getByRole('button');
+      fireEvent.keyDown(el, { key: 'Enter' });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      fireEvent.keyUp(el, { key: 'Enter' });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('activates onClick with Space on keyup and prevents the scroll on keydown', () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick}>Override</Badge>);
+      const el = screen.getByRole('button');
+      // fireEvent returns false when the event's default was prevented.
+      expect(fireEvent.keyDown(el, { key: ' ' })).toBe(false);
+      expect(handleClick).not.toHaveBeenCalled();
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('ignores other keys', () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick}>Idle</Badge>);
+      const el = screen.getByRole('button');
+      expect(fireEvent.keyDown(el, { key: 'a' })).toBe(true);
+      fireEvent.keyUp(el, { key: 'a' });
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('does not throw on Enter/Space when clickable has no onClick', () => {
+      render(<Badge clickable>Decoy</Badge>);
+      const el = screen.getByRole('button');
+      expect(() => {
+        fireEvent.keyDown(el, { key: 'Enter' });
+        fireEvent.keyUp(el, { key: ' ' });
+      }).not.toThrow();
+    });
+
+    // BadgeProps doesn't declare DOM attributes, but Badge forwards extra
+    // props at runtime; JSX spread is how such props reach it from TS.
+    it("still calls a consumer's onKeyDown and onKeyUp, alongside activation", () => {
+      const handleClick = vi.fn();
+      const onKeyDown = vi.fn();
+      const onKeyUp = vi.fn();
+      const extra = { onKeyDown, onKeyUp };
+      render(<Badge onClick={handleClick} {...extra}>Splice</Badge>);
+      const el = screen.getByRole('button');
+      fireEvent.keyDown(el, { key: 'Enter' });
+      fireEvent.keyDown(el, { key: ' ' });
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(onKeyDown).toHaveBeenCalledTimes(2);
+      expect(onKeyUp).toHaveBeenCalledTimes(1);
+      expect(handleClick).toHaveBeenCalledTimes(2);
+    });
+
+    it("skips activation when the consumer's handler calls preventDefault", () => {
+      const handleClick = vi.fn();
+      const extra = { onKeyDown: (e: { preventDefault: () => void }) => e.preventDefault() };
+      render(<Badge onClick={handleClick} {...extra}>Firewall</Badge>);
+      fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it("passes a consumer's onKeyDown through unchanged on a non-clickable badge", () => {
+      const onKeyDown = vi.fn();
+      const extra = { onKeyDown };
+      render(<Badge {...extra}>Static</Badge>);
+      fireEvent.keyDown(getBadgeEl('Static'), { key: 'Enter' });
+      expect(onKeyDown).toHaveBeenCalledTimes(1);
+    });
+
+    it('lets explicit role, tabIndex and aria-* props win', () => {
+      const extra = { role: 'link', tabIndex: -1, 'aria-label': 'Open dossier', 'aria-pressed': true };
+      render(<Badge onClick={() => {}} {...extra}>Dossier</Badge>);
+      const el = getBadgeEl('Dossier');
+      expect(el).toHaveAttribute('role', 'link');
+      expect(el).toHaveAttribute('tabindex', '-1');
+      expect(el).toHaveAttribute('aria-label', 'Open dossier');
+      expect(el).toHaveAttribute('aria-pressed', 'true');
     });
   });
 });
