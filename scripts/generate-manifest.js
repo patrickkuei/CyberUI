@@ -58,7 +58,7 @@ const DOC_SUMMARIES = {
   GradientText: 'Text with cyberpunk gradient effects.',
   SectionTitle: 'Title with decorative gradient line.',
   Steps: 'Multi-step progress indicator.',
-  Timeline: 'Vertical event history display.',
+  Timeline: 'Vertical event history or process-step display. Each `TimelineItem` takes an optional `time` (omitted: no time shown), a React-node `description` (code, links, notes), and a `status` of `success`/`error`/`warning`/`info` (default, glowing) or `neutral` (unlit, no glow).',
   Tooltip: 'Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.',
   FormField: 'Label/helper/error/success wrapper for any form control.',
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',

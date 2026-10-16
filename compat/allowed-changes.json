@@ -1,4 +1,10 @@
 {
   "//": "Reviewed, intentional differences from compat/baseline.json that must not fail `npm run check:compat`. Friction on purpose: every entry needs an id (copy it from the failure output), a reason a reviewer can check, and the version that introduces it. Prefer deprecating and keeping the old API; only genuinely compatible-in-practice changes or deliberate (major) breaks belong here. Entries that stop matching anything are reported so they get removed (they become obsolete once the baseline is regenerated at release time).",
-  "allowed": []
+  "allowed": [
+    {
+      "id": "type-member-type:TimelineProps.events",
+      "reason": "Issue #60: TimelineProps became generic, TimelineProps<E extends TimelineItem = TimelineEvent> { events: E[] }, so Timeline also accepts the new, wider TimelineItem (optional time, ReactNode description, 'neutral' status). Only the declaration text changed: with the default type argument a bare TimelineProps still has events: TimelineEvent[], so code that reads props.events[i].time / .description / .status keeps the same types, and TimelineEvent itself is unchanged. Existing <Timeline events={...} /> calls with TimelineEvent[] or inline literals still compile (pinned in Timeline.test.tsx).",
+      "since": "2.8.0"
+    }
+  ]
 }

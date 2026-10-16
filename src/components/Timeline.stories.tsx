@@ -33,22 +33,40 @@ const events = [
 <Timeline events={events} />
 \`\`\`
 
+For process steps, leave out \`time\`, pass React content as \`description\`, and use \`status: 'neutral'\` for plain steps:
+
+\`\`\`tsx
+<Timeline
+  events={[
+    { title: 'Recon', status: 'neutral' },
+    {
+      title: 'Breach',
+      status: 'warning',
+      description: <>Run <code>ice-breaker --stealth</code></>,
+    },
+    { title: 'Extract', status: 'neutral' },
+  ]}
+/>
+\`\`\`
+
 **Props:**
 
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
-| \`events\` | \`TimelineEvent[]\` | ✅ | - | Array of timeline events to display |
+| \`events\` | \`TimelineItem[]\` (or \`TimelineEvent[]\`) | ✅ | - | Array of timeline entries to display |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Timeline size (supports responsive values) |
 | \`className\` | \`string\` | ❌ | \`''\` | Additional CSS classes |
 
-**TimelineEvent Interface:**
+**TimelineItem Interface:**
 
 | Property | Type | Required | Description |
 |----------|------|----------|-------------|
-| \`title\` | \`string\` | ✅ | Event title |
-| \`time\` | \`string\` | ✅ | Event timestamp display string |
-| \`description\` | \`string\` | ❌ | Optional event description |
-| \`status\` | \`'success' \\| 'error' \\| 'warning' \\| 'info'\` | ❌ | Event status/type (default: 'info') |
+| \`title\` | \`string\` | ✅ | Entry title |
+| \`time\` | \`string\` | ❌ | Time shown beside the title. When omitted, no time element is rendered |
+| \`description\` | \`React.ReactNode\` | ❌ | Optional description. Strings render in a \`<p>\`, other React content in a \`<div>\` |
+| \`status\` | \`'success' \\| 'error' \\| 'warning' \\| 'info' \\| 'neutral'\` | ❌ | Status styling (default: 'info'). \`'neutral'\` renders an unlit diamond with no glow |
+
+\`TimelineEvent\` is the original, narrower shape (\`time\` required, string \`description\`, no \`'neutral'\`); every \`TimelineEvent\` is a valid \`TimelineItem\`.
 `,
       },
     },
@@ -124,4 +142,107 @@ export const Sizes: Story = {
       </div>
     </div>
   ),
+};
+
+export const AllVariants: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Every status: four glowing neon diamonds plus the unlit `neutral` diamond.',
+      },
+    },
+  },
+  args: {
+    events: [
+      { title: 'Uplink Established', time: '00:01', description: 'Neural link synced', status: 'success' },
+      { title: 'Firewall Breach', time: '00:07', description: 'ICE layer 3 compromised', status: 'error' },
+      { title: 'Heat Spike', time: '00:12', description: 'Core temperature climbing', status: 'warning' },
+      { title: 'Packet Relay', time: '00:15', description: 'Routing through node 9', status: 'info' },
+      { title: 'Standby', time: '00:20', description: 'Daemon idle, awaiting orders', status: 'neutral' },
+    ],
+  },
+};
+
+export const RichDescription: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: '`description` accepts React content: code excerpts, links and notes render inside the entry.',
+      },
+    },
+  },
+  args: {
+    events: [
+      {
+        title: 'Jack In',
+        time: '22:04',
+        status: 'success',
+        description: (
+          <>
+            Open the session with <code className="text-secondary">netrun connect --node 7</code>.
+          </>
+        ),
+      },
+      {
+        title: 'Bypass ICE',
+        time: '22:09',
+        status: 'warning',
+        description: (
+          <div className="space-y-2">
+            <pre className="bg-base border border-border-default rounded p-2 text-xs overflow-x-auto">
+              <code>{'ice-breaker --stealth \\\n  --target arasaka-subnet'}</code>
+            </pre>
+            <p className="text-xs text-warning">Note: the trace timer starts as soon as the first layer drops.</p>
+          </div>
+        ),
+      },
+      {
+        title: 'Read the Runbook',
+        time: '22:15',
+        status: 'info',
+        description: (
+          <a href="https://patrickkuei.github.io/CyberUI/" className="text-secondary underline">
+            Netrunner field manual
+          </a>
+        ),
+      },
+    ],
+  },
+};
+
+export const ProcessSteps: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Entries without `time` render no time element, for ordered process stages.',
+      },
+    },
+  },
+  args: {
+    events: [
+      { title: 'Stage 1: Recon', description: 'Map the target subnet', status: 'success' },
+      { title: 'Stage 2: Infiltrate', description: 'Slip past the perimeter daemons', status: 'success' },
+      { title: 'Stage 3: Extract', description: 'Pull the data shard', status: 'info' },
+      { title: 'Stage 4: Ghost', description: 'Wipe logs and disconnect', status: 'neutral' },
+    ],
+  },
+};
+
+export const NeutralWithHighlight: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Neutral steps with one highlighted stage: only the highlighted diamond glows.',
+      },
+    },
+  },
+  args: {
+    events: [
+      { title: 'Boot Cyberdeck', status: 'neutral' },
+      { title: 'Load Daemons', status: 'neutral' },
+      { title: 'Breach Mainframe', description: 'Current stage', status: 'warning' },
+      { title: 'Download Payload', status: 'neutral' },
+      { title: 'Flatline Trace', status: 'neutral' },
+    ],
+  },
 };
