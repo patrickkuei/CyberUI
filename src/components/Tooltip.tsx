@@ -14,7 +14,13 @@ export interface TooltipProps {
    * The trigger element. Must be a single React element that accepts an
    * `aria-describedby` attribute (native elements, `Button`, `Badge`, etc).
    * Wrap plain text/icons in a `<span tabIndex={0}>` so the trigger is
-   * keyboard-focusable — the tooltip only opens on hover or focus.
+   * keyboard-focusable — mouse users open the tooltip on hover, keyboard users
+   * on focus, and touch users by tapping the trigger (see below).
+   *
+   * On touch input (`pointerType: 'touch'`) a tap on the trigger toggles the
+   * tooltip immediately (no `delay`), and a tap anywhere outside closes it.
+   * This works for non-focusable triggers too. A tap still reaches the
+   * trigger itself, so a `Button` trigger's `onClick` runs as usual.
    */
   children: React.ReactElement<{ 'aria-describedby'?: string }>;
   /** Content rendered inside the tooltip panel. */
@@ -30,13 +36,25 @@ export interface TooltipProps {
    */
   variant?: 'primary' | 'secondary' | 'accent';
   /**
+   * Draws the neon glow (box-shadow) around the panel and arrow. Set `false`
+   * for a quieter look next to dense content (tables, stat rows, icon
+   * strips): the panel keeps its `variant`-colored border but drops the glow.
+   * @default true
+   */
+  glow?: boolean;
+  /**
    * Size of the tooltip panel (text size + padding). Supports responsive values.
    * @default 'md'
    */
   size?: ResponsiveValue<'sm' | 'md' | 'lg'>;
   /**
    * Delay in ms before the tooltip appears after hover/focus starts.
-   * Hiding is always immediate so the panel doesn't linger.
+   * Hiding is always immediate so the panel doesn't linger. Touch taps open
+   * immediately and ignore this value.
+   *
+   * The 200ms default suits standalone triggers (buttons, badges). For a
+   * dense row of small targets (icon strips, table headers, step labels)
+   * lower it to 0–100ms so moving across the row doesn't feel laggy.
    * @default 200
    */
   delay?: number;
@@ -50,7 +68,7 @@ export interface TooltipProps {
    * state and `onOpenChange` becomes the only way to react to hover/focus/Escape.
    */
   open?: boolean;
-  /** Fired whenever hover, focus, blur, or Escape would change visibility. */
+  /** Fired whenever hover, focus, blur, Escape, or a touch tap would change visibility. */
   onOpenChange?: (open: boolean) => void;
   /** Additional CSS classes for the tooltip panel. */
   className?: string;
@@ -72,14 +90,29 @@ const ARROW_PLACEMENT_CLASSES: Record<TooltipPlacement, string> = {
   right: 'right-full top-1/2 -translate-y-1/2 -mr-[5px]',
 };
 
-const VARIANT_CLASSES: Record<'primary' | 'secondary' | 'accent', string> = {
-  primary: 'border-primary shadow-primary',
-  secondary: 'border-secondary shadow-secondary',
-  accent: 'border-accent shadow-lg-accent',
+const BORDER_CLASSES: Record<'primary' | 'secondary' | 'accent', string> = {
+  primary: 'border-primary',
+  secondary: 'border-secondary',
+  accent: 'border-accent',
+};
+
+const GLOW_CLASSES: Record<'primary' | 'secondary' | 'accent', string> = {
+  primary: 'shadow-primary',
+  secondary: 'shadow-secondary',
+  accent: 'shadow-lg-accent',
 };
 
 /**
- * A neon-bordered popover that reveals supplemental info on hover or keyboard focus.
+ * After a touch tap, browsers fire emulated compatibility events on the same
+ * target (mouseenter/mouseover, focus, mousedown/up, click). Mouse/focus
+ * "show" events arriving within this window of the last touch pointer event
+ * are ignored so they can't re-open a tooltip the tap just closed.
+ */
+const TOUCH_EMULATION_WINDOW_MS = 1000;
+
+/**
+ * A neon-bordered popover that reveals supplemental info on hover, keyboard
+ * focus, or (on touch devices) a tap on the trigger.
  *
  * @example
  * <Tooltip content="Initiates a full system diagnostic scan.">
@@ -96,6 +129,7 @@ const Tooltip: React.FC<TooltipProps> = ({
   content,
   placement = 'top',
   variant = 'primary',
+  glow = true,
   size = 'md',
   delay = 200,
   disabled = false,
@@ -112,6 +146,11 @@ const Tooltip: React.FC<TooltipProps> = ({
   const tooltipId = id || `tooltip-${generatedId}`;
 
   const showTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const wrapperRef = useRef<HTMLSpanElement>(null);
+  /** Timestamp of the last touch pointerdown/pointerup on the trigger. */
+  const lastTouchRef = useRef(0);
+  /** True while the tooltip is open because of a touch tap (enables outside-tap close). */
+  const [openedByTouch, setOpenedByTouch] = useState(false);
 
   const clearShowTimeout = useCallback(() => {
     if (showTimeoutRef.current) {
@@ -130,16 +169,55 @@ const Tooltip: React.FC<TooltipProps> = ({
     [isControlled, onOpenChange]
   );
 
+  const isTouchEmulation = useCallback(
+    () => Date.now() - lastTouchRef.current < TOUCH_EMULATION_WINDOW_MS,
+    []
+  );
+
   const handleShow = useCallback(() => {
-    if (disabled) return;
+    if (disabled || isTouchEmulation()) return;
     clearShowTimeout();
     showTimeoutRef.current = setTimeout(() => setOpen(true), delay);
-  }, [disabled, delay, clearShowTimeout, setOpen]);
+  }, [disabled, delay, clearShowTimeout, setOpen, isTouchEmulation]);
 
   const handleHide = useCallback(() => {
     clearShowTimeout();
+    setOpenedByTouch(false);
     setOpen(false);
   }, [clearShowTimeout, setOpen]);
+
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    if (e.pointerType === 'touch') lastTouchRef.current = Date.now();
+  }, []);
+
+  // Toggle on pointerup rather than pointerdown: a touch that turns into a
+  // scroll fires pointercancel instead of pointerup, so scrolling past a
+  // trigger doesn't open its tooltip.
+  const handlePointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      if (e.pointerType !== 'touch' || disabled) return;
+      lastTouchRef.current = Date.now();
+      if (isOpen) {
+        handleHide();
+      } else {
+        clearShowTimeout();
+        setOpenedByTouch(true);
+        setOpen(true);
+      }
+    },
+    [disabled, isOpen, handleHide, clearShowTimeout, setOpen]
+  );
+
+  // Outside-tap dismissal, only for a tooltip a tap opened. Hover/focus-opened
+  // tooltips already close via mouseleave/blur.
+  useEffect(() => {
+    if (!isOpen || !openedByTouch) return;
+    const handleOutside = (e: PointerEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) handleHide();
+    };
+    document.addEventListener('pointerdown', handleOutside);
+    return () => document.removeEventListener('pointerdown', handleOutside);
+  }, [isOpen, openedByTouch, handleHide]);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent) => {
@@ -161,7 +239,10 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   return (
     <span
+      ref={wrapperRef}
       className="relative inline-flex w-fit"
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
       onMouseEnter={handleShow}
       onMouseLeave={handleHide}
       onFocus={handleShow}
@@ -177,7 +258,8 @@ const Tooltip: React.FC<TooltipProps> = ({
             'absolute z-50 overflow-hidden whitespace-nowrap rounded-md border bg-surface font-mono text-default pointer-events-none',
             getSizeClasses(size),
             placementClasses,
-            VARIANT_CLASSES[variant],
+            BORDER_CLASSES[variant],
+            glow && GLOW_CLASSES[variant],
             className
           )}
         >
@@ -191,7 +273,8 @@ const Tooltip: React.FC<TooltipProps> = ({
             className={cn(
               'absolute w-2.5 h-2.5 rotate-45 bg-surface border',
               ARROW_PLACEMENT_CLASSES[basePlacement],
-              VARIANT_CLASSES[variant]
+              BORDER_CLASSES[variant],
+              glow && GLOW_CLASSES[variant]
             )}
           />
         </span>

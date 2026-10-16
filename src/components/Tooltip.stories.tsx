@@ -10,7 +10,9 @@ const meta: Meta<typeof Tooltip> = {
     layout: 'centered',
     docs: {
       description: {
-        component: `A neon-bordered popover that reveals supplemental info on hover or keyboard focus.
+        component: `A neon-bordered popover that reveals supplemental info on hover, keyboard focus, or tap.
+
+On touch devices, tapping the trigger toggles the tooltip open or closed with no delay, and tapping anywhere else closes it. This works for non-focusable triggers such as a plain \`<span>\` label.
 
 **Usage:**
 
@@ -34,6 +36,16 @@ import 'cyberui-2045/styles.css';
   <Badge variant="success">ONLINE</Badge>
 </Tooltip>
 
+// Quiet: keeps the variant border, drops the neon glow
+<Tooltip content="Packet loss: 0.02%" glow={false}>
+  <span>PKT</span>
+</Tooltip>
+
+// Dense row of small targets: lower the delay
+<Tooltip content="CPU core temperature" delay={50} glow={false} size="sm">
+  <span>CPU</span>
+</Tooltip>
+
 // Controlled
 const [open, setOpen] = React.useState(false);
 <Tooltip content="Manually controlled." open={open} onOpenChange={setOpen}>
@@ -54,14 +66,19 @@ const [open, setOpen] = React.useState(false);
 | \`content\` | \`React.ReactNode\` | ✅ | - | Tooltip panel content |
 | \`placement\` | \`'top' \\| 'bottom' \\| 'left' \\| 'right' \\| ResponsiveValue<...>\` | ❌ | \`'top'\` | Side of the trigger the panel is anchored to (supports responsive values) |
 | \`variant\` | \`'primary' \\| 'secondary' \\| 'accent'\` | ❌ | \`'primary'\` | Neon color variant |
+| \`glow\` | \`boolean\` | ❌ | \`true\` | Neon glow around the panel; \`false\` keeps the border and drops the glow |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Panel text size / padding (supports responsive values) |
-| \`delay\` | \`number\` | ❌ | \`200\` | Delay in ms before showing on hover/focus |
+| \`delay\` | \`number\` | ❌ | \`200\` | Delay in ms before showing on hover/focus (taps open immediately) |
 | \`disabled\` | \`boolean\` | ❌ | \`false\` | Disables hover/focus behavior entirely |
 | \`open\` | \`boolean\` | ❌ | - | Controlled visibility |
-| \`onOpenChange\` | \`(open: boolean) => void\` | ❌ | - | Fired on visibility change attempts |
+| \`onOpenChange\` | \`(open: boolean) => void\` | ❌ | - | Fired on visibility change attempts (hover, focus, Escape, tap) |
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes for the panel |
 
-Most stories below force \`open\` for visual documentation. See **Interactive** for the real hover/focus/Escape behavior.
+**When to lower \`delay\`:** keep the 200ms default for standalone triggers such as buttons and badges. For a dense row of small targets (icon strips, table headers, step labels) use 0–100ms so moving across the row doesn't feel laggy.
+
+**When to use \`glow={false}\`:** next to dense content (tables, stat rows, icon strips) where a glowing panel competes with the data. Keep the default glow for standalone triggers.
+
+Most stories below force \`open\` for visual documentation. See **Interactive** for the real hover/focus/Escape behavior and **DenseRow** for tap and low-delay behavior.
 `,
       },
     },
@@ -77,6 +94,14 @@ Most stories below force \`open\` for visual documentation. See **Interactive** 
       control: { type: 'select' },
       options: ['primary', 'secondary', 'accent'],
       description: 'Neon color variant',
+    },
+    glow: {
+      control: 'boolean',
+      description: 'Neon glow around the panel; false keeps the border and drops the glow',
+    },
+    delay: {
+      control: { type: 'number' },
+      description: 'Delay in ms before showing on hover/focus (taps open immediately)',
     },
     size: {
       control: { type: 'select' },
@@ -177,6 +202,24 @@ export const Accent: Story = {
   ),
 };
 
+export const Quiet: Story = {
+  args: { glow: false, variant: 'secondary', content: 'Packet loss: 0.02%' },
+  parameters: {
+    docs: {
+      description: {
+        story: '`glow={false}` keeps the variant-colored border and drops the neon glow.',
+      },
+    },
+  },
+  render: (args) => (
+    <div className="p-16">
+      <Tooltip {...args}>
+        <Badge variant="secondary">PKT LOSS</Badge>
+      </Tooltip>
+    </div>
+  ),
+};
+
 export const Small: Story = {
   args: { size: 'sm', content: 'Compact readout.' },
   render: (args) => (
@@ -246,6 +289,47 @@ export const Interactive: Story = {
   ),
 };
 
+const DENSE_ROW_READOUTS = [
+  { label: 'CPU', detail: 'Core temp: 71°C' },
+  { label: 'MEM', detail: 'Neural cache: 12.4 / 16 GB' },
+  { label: 'NET', detail: 'Uplink latency: 12ms' },
+  { label: 'GPU', detail: 'Render cores: 98% load' },
+  { label: 'PWR', detail: 'Fusion cell: 64%' },
+  { label: 'ICE', detail: 'Intrusion countermeasures: armed' },
+];
+
+export const DenseRow: Story = {
+  args: {
+    // Overrides meta's forced `open: true` so every tooltip in the row runs uncontrolled.
+    open: undefined,
+    delay: 50,
+    glow: false,
+    size: 'sm',
+    variant: 'primary',
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'A dense row of non-focusable labels with `delay={50}` and `glow={false}`. Hover across the row, or on a touch device tap a label to open its tooltip, tap it again or tap elsewhere to close.',
+      },
+    },
+  },
+  render: (args) => (
+    <div className="p-16">
+      <div className="flex gap-2 font-mono text-sm text-muted">
+        {DENSE_ROW_READOUTS.map(({ label, detail }) => (
+          <Tooltip key={label} {...args} content={detail}>
+            <span className="px-2 py-1 border border-border-default rounded-sm cursor-default">
+              {label}
+            </span>
+          </Tooltip>
+        ))}
+      </div>
+    </div>
+  ),
+};
+
 export const AllVariants: Story = {
   render: () => (
     <div className="flex flex-col gap-16 p-16 bg-base">
@@ -276,6 +360,20 @@ export const AllVariants: Story = {
             <Badge variant="secondary">Secondary</Badge>
           </Tooltip>
           <Tooltip content="Accent variant" variant="accent" open>
+            <Badge variant="accent">Accent</Badge>
+          </Tooltip>
+        </div>
+      </div>
+      <div>
+        <h4 className="text-secondary font-semibold mb-4">Quiet (glow off)</h4>
+        <div className="flex gap-16 flex-wrap items-center">
+          <Tooltip content="Primary, no glow" variant="primary" glow={false} open>
+            <Badge variant="primary">Primary</Badge>
+          </Tooltip>
+          <Tooltip content="Secondary, no glow" variant="secondary" glow={false} open>
+            <Badge variant="secondary">Secondary</Badge>
+          </Tooltip>
+          <Tooltip content="Accent, no glow" variant="accent" glow={false} open>
             <Badge variant="accent">Accent</Badge>
           </Tooltip>
         </div>
