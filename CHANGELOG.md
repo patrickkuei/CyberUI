@@ -15,16 +15,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- **`npx cyberui-2045 --help` no longer prints the `init` options** — it now prints the command list above; use `npx cyberui-2045 init --help` for the init targets and flags (#98).
+- **`npx cyberui-2045 --help` / `-h`** — no longer print the `init` options; they print the command list above. Use `npx cyberui-2045 init --help` for the init targets and flags (#98).
 
 ### Fixed
 
-- **`init` without a target in a non-interactive shell exits 2** — run with no target flag where there is no terminal to show the menu (CI, piped input, an AI assistant's shell), `init` used to print its usage and exit 0 having written nothing, so a script or assistant that checks only the exit code assumed it worked. It now writes the message and usage to stderr and exits 2. Pass a target flag such as `--claude` or `--all` in those environments (#98).
+- **`init` (non-interactive, no target)** — run with no target flag where there is no terminal to show the menu (CI, piped input, an AI assistant's shell), `init` used to print its usage and exit 0 having written nothing, so a script or assistant that checks only the exit code assumed it worked. It now writes the message and usage to stderr and exits 2. Pass a target flag such as `--claude` or `--all` in those environments (#98).
 - **`llms.txt`** — the AI coding assistant setup section now tells assistants to run `npx cyberui-2045 init` with their tool's flag, since a bare `init` exits 2 in their shell (#98).
 - **`npx cyberui-2045 create`** — now runs `npx --yes tiged` instead of `npx tiged`, so npx doesn't stop to ask "Ok to proceed?" before downloading tiged. An AI assistant's non-interactive shell can't answer that prompt, so `create` stalled there (patrickkuei/cyberui-templates#57).
 - **README and `llms.txt`** — the by-hand template fork command is now `npx --yes tiged …`, matching `create` and the templates site (patrickkuei/cyberui-templates#59).
 - **`TabNavigation` scroll mode** — overflowing tabs now show a thin themed scrollbar (`--color-border-default` thumb, `--color-secondary` at 50% on hover) instead of the browser's default white one. The `scrollbar-*` classes it carried came from a plugin the build doesn't include, so they did nothing; the styling now comes from plain CSS in `@layer components`, so a scrollbar utility passed through `containerClassName` still wins (#96).
-- **Package doc comment in `index.d.ts`** — said "All 21 components" and left out 12 of the 33, including `Table`, `Pagination` and `Tooltip`. The list is now generated from the component manifest by `npm run docs:generate`, and a unit test fails if it drifts (#95).
+- **Package doc comment in `index.d.ts`** — said "All 21 components" and left out 12 of the 33, including `Table`, `Pagination` and `Tooltip`. The list is now generated from the component manifest by `npm run docs:generate`, and a unit test fails if it drifts. The guide `init` writes no longer gives a count either ("every component and hook") (#95).
 - **`init` usage guide and README: `className` without Tailwind** — say what to do in an app that only imports `cyberui-2045/styles.css`: pass your own CSS class names, which land on the component's main element (with the exceptions listed), and don't rely on any particular Tailwind utility being in the prebuilt stylesheet. `FormField`'s JSDoc shows a plain-CSS example too (#97).
 
 ## [2.7.0] - 2026-10-09

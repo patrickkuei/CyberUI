@@ -177,7 +177,7 @@ Which components read which token (so you know what else changes when you re-the
 
 ### className prop
 
-Most components accept a `className` prop (`TabNavigation` and `Notification` take more specific ones, such as `containerClassName`), merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
+Most components accept a `className` prop (`TabNavigation` takes more specific ones, such as `containerClassName`; `Notification` takes none), merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
 
 ```tsx
 <Button className="mt-8 w-full">Full width with margin</Button>

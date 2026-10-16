@@ -146,7 +146,7 @@ Override in your global CSS (after importing cyberui-2045/styles.css):
 
 ### className overrides
 
-Most components accept a \`className\` prop (TabNavigation and Notification take more specific ones, such as \`containerClassName\`) merged via \`tailwind-merge\` — your classes win on conflict.
+Most components accept a \`className\` prop (TabNavigation takes more specific ones, such as \`containerClassName\`; Notification takes none) merged via \`tailwind-merge\` — your classes win on conflict.
 
 \`\`\`tsx
 <Button className="w-full mt-4">Full width</Button>
