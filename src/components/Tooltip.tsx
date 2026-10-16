@@ -77,30 +77,33 @@ export interface TooltipProps {
 }
 
 /*
- * Placement maps for the panel and its arrow. Every entry sets ALL of the
- * same properties — top/bottom/left/right, both translate axes, and all four
- * margins — resetting the ones it doesn't use (`*-auto`, `translate-*-0`,
- * `m*-0`). A responsive `placement` stacks entries at different breakpoints
- * (e.g. `{ base: 'top', md: 'right' }` → top's classes plus `md:`-prefixed
- * right's), so an entry that left a property unset would inherit the base
- * entry's value and misplace the panel. The resets are no-ops for a single
- * placement (they match the CSS initial values).
+ * Placement maps for the panel and its arrow. Every entry fully defines the
+ * position: `inset-auto` resets all four sides before the side(s) it sets,
+ * `m-0` resets all margins before its one side margin, and both translate
+ * axes are always set. A responsive `placement` stacks entries at different
+ * breakpoints (e.g. `{ base: 'top', md: 'right' }` → top's classes plus
+ * `md:`-prefixed right's), so an entry that left a property unset would
+ * inherit the base entry's value and misplace the panel. This relies on
+ * Tailwind v4 emitting shorthands (`inset`, `margin`) before their longhands
+ * within a breakpoint, and prefixed breakpoints after unprefixed ones.
+ * Shorthand resets (not four `*-auto`/`m*-0` classes) keep the generated
+ * responsive safelist, and the CSS size budget, small.
  *
  * Keep these plain const object literals passed straight to
- * `getResponsiveClasses`: the build's CSS class scan reads them from here.
+ * `getResponsiveClasses`: scripts/responsive-safelist.js reads them from here.
  */
 const PLACEMENT_CLASSES: Record<TooltipPlacement, string> = {
-  top: 'top-auto bottom-full left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-0 mb-2 ml-0 mr-0',
-  bottom: 'top-full bottom-auto left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-2 mb-0 ml-0 mr-0',
-  left: 'top-1/2 bottom-auto left-auto right-full translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-0 mr-2',
-  right: 'top-1/2 bottom-auto left-full right-auto translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-2 mr-0',
+  top: 'inset-auto bottom-full left-1/2 -translate-x-1/2 translate-y-0 m-0 mb-2',
+  bottom: 'inset-auto top-full left-1/2 -translate-x-1/2 translate-y-0 m-0 mt-2',
+  left: 'inset-auto right-full top-1/2 translate-x-0 -translate-y-1/2 m-0 mr-2',
+  right: 'inset-auto left-full top-1/2 translate-x-0 -translate-y-1/2 m-0 ml-2',
 };
 
 const ARROW_PLACEMENT_CLASSES: Record<TooltipPlacement, string> = {
-  top: 'top-full bottom-auto left-1/2 right-auto -translate-x-1/2 translate-y-0 -mt-[5px] mb-0 ml-0 mr-0',
-  bottom: 'top-auto bottom-full left-1/2 right-auto -translate-x-1/2 translate-y-0 mt-0 -mb-[5px] ml-0 mr-0',
-  left: 'top-1/2 bottom-auto left-full right-auto translate-x-0 -translate-y-1/2 mt-0 mb-0 -ml-[5px] mr-0',
-  right: 'top-1/2 bottom-auto left-auto right-full translate-x-0 -translate-y-1/2 mt-0 mb-0 ml-0 -mr-[5px]',
+  top: 'inset-auto top-full left-1/2 -translate-x-1/2 translate-y-0 m-0 -mt-[5px]',
+  bottom: 'inset-auto bottom-full left-1/2 -translate-x-1/2 translate-y-0 m-0 -mb-[5px]',
+  left: 'inset-auto left-full top-1/2 translate-x-0 -translate-y-1/2 m-0 -ml-[5px]',
+  right: 'inset-auto right-full top-1/2 translate-x-0 -translate-y-1/2 m-0 -mr-[5px]',
 };
 
 const BORDER_CLASSES: Record<'primary' | 'secondary' | 'accent', string> = {

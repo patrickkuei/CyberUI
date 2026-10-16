@@ -190,6 +190,9 @@ describe('Tooltip', () => {
       const arrow = panel.lastElementChild as HTMLElement;
       for (const cls of SINGLE_PLACEMENT[placement].panel) expect(panel).toHaveClass(cls);
       for (const cls of SINGLE_PLACEMENT[placement].arrow) expect(arrow).toHaveClass(cls);
+      // The shorthand resets must survive cn()/twMerge next to the longhands.
+      expect(panel).toHaveClass('inset-auto', 'm-0');
+      expect(arrow).toHaveClass('inset-auto', 'm-0');
       expect(panel.className).not.toMatch(/(^|\s)(sm|md|lg|xl|2xl):/);
     }
   );
@@ -206,10 +209,10 @@ describe('Tooltip', () => {
     for (const cls of SINGLE_PLACEMENT.top.panel) expect(panel).toHaveClass(cls);
     for (const cls of SINGLE_PLACEMENT.top.arrow) expect(arrow).toHaveClass(cls);
     // md+: right of the trigger, with every base-set property reset.
-    for (const cls of ['md:left-full', 'md:top-1/2', 'md:-translate-y-1/2', 'md:ml-2', 'md:bottom-auto', 'md:right-auto', 'md:translate-x-0', 'md:mb-0']) {
+    for (const cls of ['md:inset-auto', 'md:left-full', 'md:top-1/2', 'md:translate-x-0', 'md:-translate-y-1/2', 'md:m-0', 'md:ml-2']) {
       expect(panel).toHaveClass(cls);
     }
-    for (const cls of ['md:right-full', 'md:top-1/2', 'md:-translate-y-1/2', 'md:-mr-[5px]', 'md:left-auto', 'md:bottom-auto', 'md:translate-x-0', 'md:mt-0']) {
+    for (const cls of ['md:inset-auto', 'md:right-full', 'md:top-1/2', 'md:translate-x-0', 'md:-translate-y-1/2', 'md:m-0', 'md:-mr-[5px]']) {
       expect(arrow).toHaveClass(cls);
     }
   });
