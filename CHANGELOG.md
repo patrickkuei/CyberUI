@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- **`npx cyberui-2045 create`** — now runs `npx --yes tiged` instead of `npx tiged`, so npx doesn't stop to ask "Ok to proceed?" before downloading tiged. An AI assistant's non-interactive shell can't answer that prompt, so `create` stalled there (patrickkuei/cyberui-templates#57).
+- **README and `llms.txt`** — the by-hand template fork command is now `npx --yes tiged …`, matching `create` and the templates site (patrickkuei/cyberui-templates#59).
+
 ## [2.7.0] - 2026-10-09
 
 ### Added

@@ -34,7 +34,7 @@ afterEach(() => {
   sb.cleanup();
 });
 
-const TIGED_MONITORING = 'npx tiged patrickkuei/cyberui-templates/packages/monitoring';
+const TIGED_MONITORING = 'npx --yes tiged patrickkuei/cyberui-templates/packages/monitoring';
 
 // Run `create` in-process against the sandbox project directory.
 function create(argv: string[], run?: Runner) {
@@ -104,7 +104,7 @@ describe('create: help and dry-run', { timeout: CLI_TIMEOUT }, () => {
   it('--dry-run works with the options before the arguments, and defaults dir to the template name', () => {
     const { status, stdout } = sb.run('create', '--dry-run', 'agent-panel');
     expect(status).toBe(0);
-    expect(stdout).toContain('npx tiged patrickkuei/cyberui-templates/packages/agent-panel agent-panel');
+    expect(stdout).toContain('npx --yes tiged patrickkuei/cyberui-templates/packages/agent-panel agent-panel');
   });
 
   it('--dry-run does not call the runner', () => {
@@ -115,18 +115,18 @@ describe('create: help and dry-run', { timeout: CLI_TIMEOUT }, () => {
 });
 
 describe('create: running tiged', () => {
-  it('runs npx tiged with the template path and the directory, then prints the next steps', () => {
+  it('runs npx --yes tiged with the template path and the directory, then prints the next steps', () => {
     const { status, stdout, calls } = create(['monitoring', 'my-app']);
     expect(status).toBe(0);
     expect(calls).toEqual([
-      { command: 'npx', args: ['tiged', 'patrickkuei/cyberui-templates/packages/monitoring', 'my-app'] },
+      { command: 'npx', args: ['--yes', 'tiged', 'patrickkuei/cyberui-templates/packages/monitoring', 'my-app'] },
     ]);
     expect(stdout).toContain('cd my-app && npm install && npm run dev');
   });
 
   it('defaults the directory to the template name', () => {
     const { calls } = create(['agent-panel']);
-    expect(calls[0].args).toEqual(['tiged', 'patrickkuei/cyberui-templates/packages/agent-panel', 'agent-panel']);
+    expect(calls[0].args).toEqual(['--yes', 'tiged', 'patrickkuei/cyberui-templates/packages/agent-panel', 'agent-panel']);
   });
 
   it('accepts nested and relative directories', () => {
