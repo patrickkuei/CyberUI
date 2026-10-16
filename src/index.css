@@ -42,7 +42,11 @@
 
   /* Typography */
   --color-default: #e0e0e0; /* Primary text */
-  --color-muted: #8888aa; /* Secondary text */
+  /* Secondary text. Must stay >= 4.5:1 (WCAG AA) on both `base` and
+     `surface` (helper text, descriptions and timestamps sit inside Cards and
+     Modals); `src/utils/tokens.test.ts` checks it. Was #8888aa before 2.8.0,
+     which was only 3.9:1 on `surface` (#113). */
+  --color-muted: #9797b5;
   --color-inverse: #1a1a2e; /* Text on a bright/colored fill (e.g. active Button, Badge) */
 
   /* Status colors */
