@@ -4,7 +4,16 @@ import { getResponsiveClasses } from "../utils/responsive";
 import { cn } from '../utils/cn';
 
 /**
- * Individual timeline event data.
+ * Every status a timeline item can take. `neutral` draws a plain, unlit
+ * diamond (border-default outline, no glow); the other four are neon-coloured
+ * and glow.
+ */
+export type TimelineStatus = 'success' | 'error' | 'warning' | 'info' | 'neutral';
+
+/**
+ * Individual timeline event data: a timestamped event in a log or activity
+ * feed. For process steps, rich descriptions or
+ * `status: 'neutral'`, use {@link TimelineItem} — `Timeline` accepts both.
  */
 export interface TimelineEvent {
   /**
@@ -27,9 +36,40 @@ export interface TimelineEvent {
 }
 
 /**
+ * The general timeline entry `Timeline` renders: a {@link TimelineEvent}
+ * whose `time` is optional, whose `description` can be any React content, and
+ * whose `status` can also be `'neutral'`. Every `TimelineEvent` is a valid
+ * `TimelineItem`.
+ */
+export interface TimelineItem {
+  /**
+   * Entry title.
+   */
+  title: string;
+  /**
+   * Optional description. A string (or number) renders in a `<p>`; any other
+   * React content (links, `<code>`, lists, notes) renders in a `<div>`, so
+   * block elements are valid inside it.
+   */
+  description?: React.ReactNode;
+  /**
+   * Optional time/timestamp shown at the right of the title. When omitted, no
+   * time element is rendered at all (not an empty one).
+   */
+  time?: string;
+  /**
+   * Status for visual styling. `'neutral'` renders an unlit, non-glowing
+   * diamond, for marking one step among plain ones.
+   * @default 'info'
+   */
+  status?: TimelineStatus;
+}
+
+/**
  * A vertical timeline component for displaying activity feeds or event logs.
  *
- * Features diamond-shaped status indicators with neon glow effects.
+ * Features diamond-shaped status indicators with neon glow effects, plus a
+ * plain `neutral` status. Items without `time` work as untimed process steps.
  *
  * @example
  * // Basic timeline
@@ -54,10 +94,20 @@ export interface TimelineEvent {
  *   { title: "High Memory", time: "1m ago", status: "warning" },
  *   { title: "Connection Lost", time: "5m ago", status: "error" }
  * ]} />
+ *
+ * @example
+ * // Untimed process steps: one highlighted among neutral ones, rich description
+ * <Timeline events={[
+ *   { title: "Scan", status: "neutral" },
+ *   { title: "Decrypt", status: "info", description: <>Run <code>decrypt --all</code></> },
+ *   { title: "Upload", status: "neutral" }
+ * ]} />
  */
 export interface TimelineProps {
   /**
-   * Array of timeline events to display.
+   * Array of timeline events to display. For untimed steps, React-node
+   * descriptions or `'neutral'` status, pass `TimelineItem[]` instead
+   * (see {@link TimelineItemsProps}).
    */
   events: TimelineEvent[];
   /**
@@ -71,7 +121,19 @@ export interface TimelineProps {
   className?: string;
 }
 
-const Timeline: React.FC<TimelineProps> = ({
+/**
+ * `TimelineProps` with `events` widened to {@link TimelineItem}: optional
+ * `time`, React-node `description`, and `'neutral'` status. `Timeline` accepts
+ * either props type.
+ */
+export interface TimelineItemsProps extends Omit<TimelineProps, 'events'> {
+  /**
+   * Array of timeline entries to display. `TimelineEvent[]` is also accepted.
+   */
+  events: TimelineItem[];
+}
+
+const TimelineBase: React.FC<TimelineItemsProps> = ({
   events,
   size = 'md',
   className = '',
@@ -126,7 +188,7 @@ const Timeline: React.FC<TimelineProps> = ({
   const gapClasses = getResponsiveClasses(size, gapMap);
   const spacingClasses = getResponsiveClasses(size, spacingMap);
 
-  const getStatusClasses = (status?: string): { border: string; background: string; inner: string } => {
+  const getStatusClasses = (status?: TimelineStatus): { border: string; background: string; inner: string } => {
     const statusStyles = {
       success: {
         border: 'border-success bg-success/30 shadow-[0_0_10px_var(--color-success)]',
@@ -148,6 +210,11 @@ const Timeline: React.FC<TimelineProps> = ({
         background: 'border-info bg-info/30 shadow-[0_0_10px_var(--color-info)]',
         inner: 'bg-info/60',
       },
+      neutral: {
+        border: 'border-border-default bg-border-default/30',
+        background: 'border-border-default bg-border-default/30',
+        inner: 'bg-muted/40',
+      },
     };
     return statusStyles[status as keyof typeof statusStyles] || statusStyles.info;
   };
@@ -158,6 +225,15 @@ const Timeline: React.FC<TimelineProps> = ({
     <div className={cn(spacingClasses, className)}>
       {events.map((event, index) => {
         const statusClasses = getStatusClasses(event.status);
+        // A string description keeps the original <p>; other React content gets
+        // a <div> so block elements (lists, <pre>, notes) stay valid HTML.
+        const isTextDescription = typeof event.description === 'string' || typeof event.description === 'number';
+        const DescriptionTag = isTextDescription ? 'p' : 'div';
+        const hasDescription =
+          event.description !== undefined &&
+          event.description !== null &&
+          typeof event.description !== 'boolean' &&
+          event.description !== '';
 
         return (
           <div key={index} className={cn('flex', gapClasses, 'group')}>
@@ -182,14 +258,16 @@ const Timeline: React.FC<TimelineProps> = ({
                 <h4 className={cn('font-semibold text-default group-hover:text-secondary transition-colors', titleClasses)}>
                   {event.title}
                 </h4>
-                <span className={cn('text-muted whitespace-nowrap ml-4', timeClasses)}>
-                  {event.time}
-                </span>
+                {event.time !== undefined && (
+                  <span className={cn('text-muted whitespace-nowrap ml-4', timeClasses)}>
+                    {event.time}
+                  </span>
+                )}
               </div>
-              {event.description && (
-                <p className={cn('text-muted mt-1', descClasses)}>
+              {hasDescription && (
+                <DescriptionTag className={cn('text-muted mt-1', descClasses)}>
                   {event.description}
-                </p>
+                </DescriptionTag>
               )}
             </div>
           </div>
@@ -199,7 +277,18 @@ const Timeline: React.FC<TimelineProps> = ({
   );
 };
 
-Timeline.displayName = "CyberUI.Timeline";
+TimelineBase.displayName = "CyberUI.Timeline";
+
+// Two call signatures: `TimelineItemsProps` (wider `TimelineItem[]` events) and
+// the original `TimelineProps` (`TimelineEvent[]`). The legacy one comes last on
+// purpose: type inference over an overloaded component (`React.ComponentProps<
+// typeof Timeline>`, `ComponentType<P>` parameters) reads the last signature, so
+// those keep seeing `TimelineProps` with `time: string`. One limitation, shared
+// with `Image`: a value annotated `typeof Timeline` must also accept
+// `TimelineItemsProps`, so a mock like `(p: TimelineProps) => …` typed as
+// `typeof Timeline` no longer type-checks; type it `React.FC<TimelineProps>`.
+const Timeline: ((props: TimelineItemsProps) => ReturnType<React.FC>) &
+  React.FC<TimelineProps> = TimelineBase;
 
 export default Timeline;
 

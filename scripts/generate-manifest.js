@@ -58,7 +58,7 @@ const DOC_SUMMARIES = {
   GradientText: 'Text with cyberpunk gradient effects.',
   SectionTitle: 'Title with decorative gradient line.',
   Steps: 'Multi-step progress indicator.',
-  Timeline: 'Vertical event history display.',
+  Timeline: 'Vertical event history or process-step display. Each `TimelineItem` takes an optional `time` (omitted: no time shown), a React-node `description` (code, links, notes), and a `status` of `success`/`error`/`warning`/`info` (default, glowing) or `neutral` (unlit, no glow).',
   Tooltip: 'Neon-bordered popover on hover/focus/tap (touch: tap toggles, outside tap closes). Placements: `top`, `bottom`, `left`, `right`. `glow={false}` for a quieter panel next to dense content.',
   FormField: 'Label/helper/error/success wrapper for any form control.',
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
@@ -190,6 +190,22 @@ const PROP_OVERRIDES = {
       type: '(CarouselImageData | CarouselStandInData)[]',
       description:
         'Array of slides to display. A slide may leave `src` out (`CarouselStandInData`) to show the built-in stand-in.',
+    },
+  },
+  // Timeline has the same two-signature shape: `TimelineItemsProps` first
+  // (`events: TimelineItem[]`), then the 2.7.1 `TimelineProps`
+  // (`events: TimelineEvent[]`). The type stays the `TimelineProps` one, which
+  // is what `ComponentProps<typeof Timeline>` sees and what check:compat
+  // compares; the description names the wider form. This override must stay
+  // even though it looks redundant: without it, react-docgen-typescript reads
+  // `TimelineBase` (the implementation, `React.FC<TimelineItemsProps>`) and
+  // records `events` as `TimelineItem[]`, which fails check:compat at release.
+  Timeline: {
+    events: {
+      type: 'TimelineEvent[]',
+      required: true,
+      description:
+        'Array of timeline events to display. `TimelineItem[]` (`TimelineItemsProps`) is also accepted: optional `time`, React-node `description`, and `\'neutral\'` status.',
     },
   },
 };
