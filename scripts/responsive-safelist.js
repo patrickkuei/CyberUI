@@ -19,13 +19,15 @@
 //     imported (RESPONSIVE_SIZE_MAPS), a property path into one
 //     (RESPONSIVE_SIZE_MAPS.linearProgress.width) or written inline;
 //   - the prefixes are the `Breakpoint` union in responsive.ts minus `base`.
-// A call whose map it cannot follow to string literals is an error that names
-// the file and line, so a new pattern fails the build instead of shipping
-// broken CSS. Teach `resolveExpression` the pattern, don't silence it.
+// A call whose map it cannot follow to string literals, or any use of the
+// helper other than a direct call (an alias, passing it as a callback), is an
+// error that names the file and line, so a new pattern fails the build instead
+// of shipping broken CSS. Teach `resolveExpression` the pattern, don't silence it.
 //
 // The output is committed because src/index.css imports it, so every build
 // (library, demo, Storybook, a fresh clone) needs it to exist.
-// `npm run build`/`dev`/`storybook` regenerate it first, and
+// `npm run build`, `build:demo`, `build-storybook`, `dev` and `storybook`
+// regenerate it first (their `pre*` scripts), and
 // src/test/responsive-safelist.test.ts fails CI if the committed copy is stale.
 // scripts/check-responsive-css.js then checks the built CSS really has every
 // class (CI runs it after `npm run build`).
@@ -97,28 +99,50 @@ function resolveModule(fromFile, specifier) {
   return null;
 }
 
-// Every `const <name> = <init>` in the file (any scope), plus where an
-// imported <name> comes from. Two same-named locals in different functions of
-// one file are both returned: emitting a few extra classes is harmless,
-// missing one is the bug this script exists to prevent.
-function findDeclarations(sf, name) {
-  const inits = [];
-  let imported = null;
-  const visit = (node) => {
-    if (ts.isVariableDeclaration(node) && ts.isIdentifier(node.name) && node.name.text === name && node.initializer) {
-      inits.push(node.initializer);
+// Finds what `name` refers to at `from`, the way TypeScript scopes it: walks
+// out from `from` through enclosing blocks/functions to the file, and returns
+// the first scope that declares it. A same-named const in some other function
+// of the file is never picked up. A parameter, or anything other than a
+// `const/let/var name = ...` or a named import, cannot be followed statically.
+//   -> { init } | { imported: { specifier, name } }
+function findDeclaration(from, name) {
+  for (let node = from; node; node = node.parent) {
+    if (ts.isFunctionLike(node) && node.parameters?.some((p) => declaresName(p.name, name))) {
+      throw new Error(`${where(from)}: \`${name}\` is a parameter; the class map must be a literal the script can read`);
     }
-    if (ts.isImportDeclaration(node) && node.importClause?.namedBindings && ts.isNamedImports(node.importClause.namedBindings)) {
-      for (const el of node.importClause.namedBindings.elements) {
-        if (el.name.text === name) {
-          imported = { specifier: node.moduleSpecifier.text, name: (el.propertyName ?? el.name).text };
+    if (!(ts.isSourceFile(node) || ts.isBlock(node) || ts.isModuleBlock(node) || ts.isCaseClause(node) || ts.isDefaultClause(node))) {
+      continue;
+    }
+    for (const stmt of node.statements) {
+      if (ts.isVariableStatement(stmt)) {
+        for (const decl of stmt.declarationList.declarations) {
+          if (ts.isIdentifier(decl.name) && decl.name.text === name) {
+            if (!decl.initializer) throw new Error(`${where(decl)}: \`${name}\` has no initializer`);
+            return { init: decl.initializer };
+          }
+          if (!ts.isIdentifier(decl.name) && declaresName(decl.name, name)) {
+            throw new Error(`${where(decl)}: \`${name}\` comes from destructuring; declare the map as \`const ${name} = {...}\``);
+          }
         }
       }
+      if (ts.isImportDeclaration(stmt) && stmt.importClause?.namedBindings && ts.isNamedImports(stmt.importClause.namedBindings)) {
+        for (const el of stmt.importClause.namedBindings.elements) {
+          if (el.name.text === name) {
+            return { imported: { specifier: stmt.moduleSpecifier.text, name: (el.propertyName ?? el.name).text } };
+          }
+        }
+      }
+      if ((ts.isFunctionDeclaration(stmt) || ts.isClassDeclaration(stmt) || ts.isEnumDeclaration(stmt)) && stmt.name?.text === name) {
+        throw new Error(`${where(stmt)}: \`${name}\` is not an object literal`);
+      }
     }
-    ts.forEachChild(node, visit);
-  };
-  visit(sf);
-  return { inits, imported };
+  }
+  return null;
+}
+
+function declaresName(binding, name) {
+  if (ts.isIdentifier(binding)) return binding.text === name;
+  return binding.elements.some((el) => !ts.isOmittedExpression(el) && declaresName(el.name, name));
 }
 
 // Follows an expression to the object literal(s) it denotes.
@@ -130,14 +154,12 @@ function resolveExpression(node, seen = new Set()) {
     const key = `${sf.fileName}#${node.text}`;
     if (seen.has(key)) throw new Error(`${where(node)}: circular reference to \`${node.text}\``);
     seen.add(key);
-    const { inits, imported } = findDeclarations(sf, node.text);
-    if (inits.length > 0) return inits.flatMap((init) => resolveExpression(init, seen));
-    if (imported) {
-      const target = resolveModule(sf.fileName, imported.specifier);
-      if (target) {
-        const { inits: remote } = findDeclarations(parse(target), imported.name);
-        if (remote.length > 0) return remote.flatMap((init) => resolveExpression(init, seen));
-      }
+    const found = findDeclaration(node, node.text);
+    if (found?.init) return resolveExpression(found.init, seen);
+    if (found?.imported) {
+      const target = resolveModule(sf.fileName, found.imported.specifier);
+      const remote = target && findDeclaration(parse(target), found.imported.name);
+      if (remote?.init) return resolveExpression(remote.init, seen);
     }
     throw new Error(`${where(node)}: cannot find an object literal for \`${node.text}\``);
   }
@@ -178,6 +200,22 @@ export function collectBreakpoints() {
     .filter((bp) => bp && bp !== 'base');
 }
 
+// `getResponsiveClasses(...)` or `ns.getResponsiveClasses(...)` -> the call.
+function helperCall(id) {
+  const callee = ts.isPropertyAccessExpression(id.parent) && id.parent.name === id ? id.parent : id;
+  return ts.isCallExpression(callee.parent) && callee.parent.expression === callee ? callee.parent : null;
+}
+
+// References that are not uses: its declaration in responsive.ts, a plain
+// (un-aliased) import, and a re-export such as src/components/index.ts's.
+function isAllowedNonCallReference(id, file) {
+  const parent = id.parent;
+  if (file === RESPONSIVE_TS && ts.isVariableDeclaration(parent) && parent.name === id) return true;
+  if (ts.isImportSpecifier(parent)) return parent.name.text === HELPER;
+  if (ts.isExportSpecifier(parent)) return (parent.propertyName ?? parent.name).text === HELPER && parent.parent.parent.moduleSpecifier !== undefined;
+  return false;
+}
+
 /**
  * Every map passed to getResponsiveClasses in library source.
  * @returns {{ site: string, classes: string[] }[]} one entry per call site
@@ -187,15 +225,20 @@ export function collectCallSites(srcDir = join(ROOT, 'src')) {
   for (const file of listSourceFiles(srcDir)) {
     const sf = parse(file);
     const visit = (node) => {
-      const callee = ts.isCallExpression(node) ? node.expression : null;
-      const name = callee && (ts.isIdentifier(callee) ? callee : ts.isPropertyAccessExpression(callee) ? callee.name : null);
-      if (name && name.text === HELPER) {
-        if (node.arguments.length < 2) throw new Error(`${where(node)}: ${HELPER}() called without a class map`);
-        const classes = resolveExpression(node.arguments[1])
-          .flatMap(mapClassStrings)
-          .flatMap((s) => s.split(/\s+/))
-          .filter(Boolean);
-        sites.push({ site: where(node), classes });
+      if (ts.isIdentifier(node) && node.text === HELPER) {
+        const call = helperCall(node);
+        if (call) {
+          if (call.arguments.length < 2) throw new Error(`${where(call)}: ${HELPER}() called without a class map`);
+          const classes = resolveExpression(call.arguments[1])
+            .flatMap(mapClassStrings)
+            .flatMap((str) => str.split(/\s+/))
+            .filter(Boolean);
+          sites.push({ site: where(call), classes });
+        } else if (!isAllowedNonCallReference(node, file)) {
+          // An alias or a callback hides the class map from this script, and
+          // its classes would silently be missing from the CSS again.
+          throw new Error(`${where(node)}: ${HELPER} is used other than as a direct call ${HELPER}(value, map); call it directly`);
+        }
       }
       ts.forEachChild(node, visit);
     };

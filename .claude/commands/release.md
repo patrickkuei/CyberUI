@@ -54,7 +54,7 @@ Run: `npm run build`
 
 Confirm the build succeeds and `dist/` is populated. Report the output file sizes for `dist/index.es.js` and `dist/cyberui-2045.css`.
 
-Then run: `npm run check:responsive-css`. It fails if the CSS lacks a breakpoint-prefixed class that `getResponsiveClasses` can build (responsive props would silently do nothing, issue #108). A failure blocks the release: run `npm run generate:responsive-safelist`, rebuild, and commit the regenerated `src/generated/responsive-safelist.css`.
+Then run: `npm run check:responsive-css`. It fails if the CSS lacks a breakpoint-prefixed class that `getResponsiveClasses` can build (responsive props would silently do nothing, issue #108). A failure blocks the release. `prebuild` has already regenerated `src/generated/responsive-safelist.css`, so the list is not stale: the safelist is not reaching Tailwind. Check that `src/index.css` still imports `./generated/responsive-safelist.css`, and that Tailwind accepts the `@source inline(...)` lines in it (a Tailwind upgrade can change this). Fix, rebuild and re-run; commit the safelist file too if it changed.
 
 ---
 

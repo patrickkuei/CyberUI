@@ -40,7 +40,8 @@ afterAll(() => rmSync(tmp, { recursive: true, force: true }));
 describe('responsive safelist generator', () => {
   it('the committed src/generated/responsive-safelist.css is up to date', () => {
     // Fix: npm run generate:responsive-safelist (build/dev/storybook also run it).
-    expect(readFileSync(safelist.SAFELIST_FILE, 'utf8')).toBe(safelist.renderSafelist());
+    // CRLF-normalised in case a Windows checkout ignores .gitattributes.
+    expect(readFileSync(safelist.SAFELIST_FILE, 'utf8').replace(/\r\n/g, '\n')).toBe(safelist.renderSafelist());
   });
 
   it('prefixes with every breakpoint getResponsiveClasses handles', () => {
@@ -85,6 +86,33 @@ export const f = (size: { base?: Size }) => getResponsiveClasses({ ...size, base
     const sites = safelist.collectCallSites(dir);
     expect(sites).toHaveLength(1);
     expect(sites[0].classes).toEqual(['py-1', 'px-4', 'py-3', 'px-8']);
+  });
+
+  it('resolves a map name to the declaration in scope, not a same-named one elsewhere', () => {
+    const dir = mkdtempSync(join(tmp, 'scope-'));
+    writeFileSync(
+      join(dir, 'Two.tsx'),
+      `import { getResponsiveClasses } from "./responsive";
+const sizeMap = { sm: "py-1" };
+export const a = (s: "sm") => {
+  const sizeMap = { sm: "px-4" };
+  return getResponsiveClasses(s, sizeMap);
+};
+export const b = (s: "sm") => getResponsiveClasses(s, sizeMap);
+`
+    );
+    expect(safelist.collectCallSites(dir).map((site) => site.classes)).toEqual([['px-4'], ['py-1']]);
+  });
+
+  it.each([
+    ['an aliased import', `import { getResponsiveClasses as g } from "./responsive";\nexport const f = (s: "sm") => g(s, { sm: "py-1" });\n`, /Bad\.tsx:1/],
+    ['a callback', `import { getResponsiveClasses } from "./responsive";\nexport const f = (xs: "sm"[]) => xs.map((x) => [x, { sm: "py-1" }]).map(getResponsiveClasses as never);\n`, /Bad\.tsx:2/],
+    ['a local alias', `import { getResponsiveClasses } from "./responsive";\nconst g = getResponsiveClasses;\nexport const f = (s: "sm") => g(s, { sm: "py-1" });\n`, /Bad\.tsx:2/],
+    ['a map passed in as a parameter', `import { getResponsiveClasses } from "./responsive";\nexport const f = (s: "sm", m: Record<"sm", string>) => getResponsiveClasses(s, m);\n`, /Bad\.tsx:2/],
+  ])('fails loudly on %s', (_label, source, site) => {
+    const dir = mkdtempSync(join(tmp, 'use-'));
+    writeFileSync(join(dir, 'Bad.tsx'), source);
+    expect(() => safelist.collectCallSites(dir)).toThrow(site);
   });
 
   it('fails loudly, naming the call site, when it cannot follow a map', () => {
