@@ -564,19 +564,50 @@ describe('init: package version lookup', { timeout: CLI_TIMEOUT }, () => {
 });
 
 describe('init: usage text', { timeout: CLI_TIMEOUT }, () => {
-  it('--help lists every target flag and --inline, and writes nothing', () => {
-    const { status, stdout } = sb.run('--help');
+  it('init --help lists every target flag and --inline, and writes nothing', () => {
+    const { status, stdout } = sb.run('init', '--help');
     expect(status).toBe(0);
     for (const flag of ['--claude', '--gemini', '--cursor', '--copilot', '--agents', '--all', '--inline', '--dry-run']) {
       expect(stdout).toContain(flag);
     }
+    expect(stdout).toContain('Usage: npx cyberui-2045 init [targets] [--inline] [--dry-run]');
     expect(sb.snapshot()).toEqual({});
   });
 
-  it('prints the same usage in a non-interactive shell with no target flags', () => {
-    const { status, stdout } = sb.run();
+  it('a target flag before --help still gets the init help', () => {
+    const { status, stdout } = sb.run('--claude', '--help');
     expect(status).toBe(0);
-    expect(stdout).toContain('--gemini');
+    expect(stdout).toBe(sb.run('init', '--help').stdout);
+    expect(sb.snapshot()).toEqual({});
+  });
+
+  // An AI assistant runs `npx cyberui-2045 init` with no flags in a shell
+  // without a TTY and checks only the exit code: it must not be 0 (issue #98).
+  it('exits 2 in a non-interactive shell with no target flags, prints the usage to stderr and writes nothing', () => {
+    for (const args of [[], ['init'], ['--inline'], ['init', '--inline'], ['--dry-run'], ['init', '--dry-run'], ['--inline', '--dry-run']]) {
+      const { status, stdout, stderr } = sb.run(...args);
+      expect(status).toBe(2);
+      expect(stderr).toContain('Non-interactive environment detected. Run it with a target flag:');
+      expect(stderr).toContain('Usage: npx cyberui-2045 init [targets]');
+      expect(stderr).toContain('--gemini');
+      expect(stdout).toBe('');
+      expect(sb.snapshot()).toEqual({});
+    }
+  });
+});
+
+describe('top-level help', { timeout: CLI_TIMEOUT }, () => {
+  it.each([['--help'], ['-h'], ['help']])('%s lists init, templates and create and points at <command> --help', (arg) => {
+    const { status, stdout, stderr } = sb.run(arg);
+    expect(status).toBe(0);
+    expect(stderr).toBe('');
+    expect(stdout).toContain('Usage: npx cyberui-2045 <command> [options]');
+    expect(stdout).toMatch(/npx cyberui-2045 init\s+#/);
+    expect(stdout).toMatch(/npx cyberui-2045 templates\s+#/);
+    expect(stdout).toMatch(/npx cyberui-2045 create <template> \[dir\]\s+#/);
+    expect(stdout).toContain('npx cyberui-2045 <command> --help');
+    // Not the init help.
+    expect(stdout).not.toContain('--claude');
     expect(sb.snapshot()).toEqual({});
   });
 });
