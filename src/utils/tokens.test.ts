@@ -110,6 +110,41 @@ describe('design tokens', () => {
   });
 });
 
+describe('text colour contrast (WCAG AA, #113)', () => {
+  // Read the shipped default hex values from the @theme block, so changing a
+  // token re-runs the check. 4.5:1 is the AA minimum for normal-size text.
+  const css = readFileSync(THEME_CSS_PATH, 'utf8');
+  const themeBody = css.match(/@theme\s*\{([\s\S]*?)\n\}/)?.[1] ?? '';
+  const hexOf = (name: string): string => {
+    const value = themeBody.match(new RegExp(`--color-${name}\\s*:\\s*(#[0-9a-fA-F]{6})\\s*;`))?.[1];
+    if (!value) throw new Error(`--color-${name} is not a 6-digit hex in the @theme block`);
+    return value;
+  };
+  // WCAG 2.x relative luminance and contrast ratio.
+  const luminance = (hex: string): number => {
+    const [r, g, b] = [1, 3, 5].map((i) => {
+      const c = parseInt(hex.slice(i, i + 2), 16) / 255;
+      return c <= 0.04045 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  };
+  const contrast = (a: string, b: string): number => {
+    const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+    return (hi + 0.05) / (lo + 0.05);
+  };
+
+  it('computes known ratios correctly (sanity check on the formula)', () => {
+    expect(contrast('#ffffff', '#000000')).toBeCloseTo(21, 5);
+    // #8888aa is the pre-2.8.0 --color-muted (#113): it failed AA on surface.
+    expect(contrast('#8888aa', '#2d2d44')).toBeCloseTo(3.92, 2);
+  });
+
+  it.each(['default', 'muted'])("'%s' text is at least 4.5:1 on both base and surface", (text) => {
+    expect(contrast(hexOf(text), hexOf('base'))).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(hexOf(text), hexOf('surface'))).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
 describe('deprecated --gradient-* variables (compatibility)', () => {
   // 2.6 emitted these and the old Design Tokens page showed
   // `bg-linear-(--gradient-accent)`, so user code may read them. They are

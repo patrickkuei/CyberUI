@@ -99,9 +99,9 @@ const Badge: React.FC<BadgeProps> = ({
     // `text-inverse`, not `text-default` — every filled variant is a solid
     // color fill, so the label needs the dedicated "readable on a bright
     // background" token rather than the page's default text color.
-    // `neutral` has no fill, so it uses `text-default`, which stays above
-    // 4.5:1 contrast on both `base` and `surface` (`text-muted` drops below
-    // it on `surface`, e.g. inside a Card).
+    // `neutral` has no fill, so it uses `text-default`, which stays well
+    // above 4.5:1 contrast on both `base` and `surface` (e.g. inside a Card)
+    // and reads as a label rather than secondary text.
     // Its outline is `ring-inset` (a box-shadow), not `border`, so it adds no
     // width/height and lines up with filled badges in the same row.
     const variants = {
