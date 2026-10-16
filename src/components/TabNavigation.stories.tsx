@@ -327,3 +327,25 @@ export const DropdownIconOnly: Story = {
     </div>
   ),
 };
+
+export const OverflowScroll: Story = {
+  args: {
+    tabs: ["Netrunner", "Firewall", "Black ICE", "Data Vault", "Signal Trace", "Cyberdeck", "Ghost Protocol"],
+    activeTab: "Netrunner",
+    onTabChange: (tab) => console.log("Tab changed to:", tab),
+    mode: "scroll",
+  },
+  parameters: {
+    layout: "padded",
+    docs: {
+      description: {
+        story: "Seven tabs in a 500px-wide panel. The strip scrolls horizontally on a thin scrollbar: a border-default thumb on a transparent track that turns secondary at 50% opacity on hover.",
+      },
+    },
+  },
+  render: (args) => (
+    <div style={{ width: 500, maxWidth: "100%" }}>
+      <TabNavigation {...args} />
+    </div>
+  ),
+};

@@ -251,7 +251,11 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
   const getContainerClasses = (): string => {
     switch (currentMode) {
       case "scroll":
-        return "w-full overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-border-default scrollbar-track-transparent hover:scrollbar-thumb-secondary/50 py-1";
+        // `cyberui-scrollbar-thin` (src/index.css) is what styles the
+        // scrollbar. The `scrollbar-*` classes after it need the
+        // tailwind-scrollbar plugin, which this build lacks, so they emit
+        // nothing; they stay only to keep the rendered class list stable.
+        return "w-full overflow-x-auto overflow-y-hidden cyberui-scrollbar-thin scrollbar-thin scrollbar-thumb-border-default scrollbar-track-transparent hover:scrollbar-thumb-secondary/50 py-1";
       case "wrap":
         return "flex flex-wrap gap-2";
       case "dropdown":

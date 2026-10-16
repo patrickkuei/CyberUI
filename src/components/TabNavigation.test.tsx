@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import TabNavigation from './TabNavigation';
@@ -121,5 +123,48 @@ describe('TabNavigation reduced motion', () => {
     render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} />);
     const tab = screen.getByRole('tab', { name: 'NEURAL' });
     expect(tab.className).toContain('motion-reduce:after:transition-none');
+  });
+});
+
+// Issue #96: the scroll container used to rely only on tailwind-scrollbar
+// classes (`scrollbar-thin`, ...) that this build never emits, so browsers
+// drew their default (white) scrollbar. These pin the class the container
+// carries and the rule in src/index.css that the class refers to.
+describe('TabNavigation scroll-mode scrollbar (#96)', () => {
+  const css = readFileSync(join(__dirname, '..', 'index.css'), 'utf8');
+  const layered = css.slice(css.indexOf('@layer cyberui {'));
+  /** Body of the first rule in `@layer cyberui` whose selector is exactly `selector`. */
+  const rule = (selector: string): string => {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return layered.match(new RegExp(`(?:^|[\\s}])${escaped}\\s*\\{([^}]*)\\}`))?.[1] ?? '';
+  };
+
+  it('gives the scroll container the cyberui-scrollbar-thin class', () => {
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="scroll" />);
+    expect(screen.getByRole('tablist')).toHaveClass('cyberui-scrollbar-thin', 'overflow-x-auto');
+  });
+
+  it('does not add it in wrap mode', () => {
+    render(<TabNavigation tabs={tabs} activeTab="NEURAL" onTabChange={vi.fn()} mode="wrap" />);
+    expect(screen.getByRole('tablist')).not.toHaveClass('cyberui-scrollbar-thin');
+  });
+
+  it('defines a thin border-default scrollbar on a transparent track for that class', () => {
+    const base = rule('.cyberui-scrollbar-thin');
+    expect(base).toMatch(/scrollbar-width:\s*thin;/);
+    expect(base).toMatch(/scrollbar-color:\s*var\(--color-border-default\)\s+transparent;/);
+    expect(rule('.cyberui-scrollbar-thin::-webkit-scrollbar')).toMatch(/height:\s*6px;/);
+    expect(rule('.cyberui-scrollbar-thin::-webkit-scrollbar-track')).toMatch(
+      /background-color:\s*transparent;/
+    );
+    expect(rule('.cyberui-scrollbar-thin::-webkit-scrollbar-thumb')).toMatch(
+      /background-color:\s*var\(--color-border-default\);/
+    );
+  });
+
+  it('turns the thumb secondary at 50% on hover, in both the standard and webkit rules', () => {
+    const half = /color-mix\(in oklab, var\(--color-secondary\) 50%, transparent\)/;
+    expect(rule('.cyberui-scrollbar-thin:hover')).toMatch(half);
+    expect(rule('.cyberui-scrollbar-thin:hover::-webkit-scrollbar-thumb')).toMatch(half);
   });
 });
