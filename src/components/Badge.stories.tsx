@@ -58,6 +58,14 @@ import 'cyberui-2045/styles.css';
 <Badge variant="success">ONLINE</Badge>
 <Badge variant="warning">DEGRADED</Badge>
 <Badge variant="error">OFFLINE</Badge>
+
+// Neutral outline for quiet labels
+<Badge variant="neutral">Your decision</Badge>
+
+// Flat (no resting shadow) and corner shapes
+<Badge variant="secondary" shadow={false}>Included</Badge>
+<Badge shape="rounded">Rounded</Badge>
+<Badge variant="neutral" shape="square" shadow={false}>Square</Badge>
 \`\`\`
 
 **Props:**
@@ -65,6 +73,8 @@ import 'cyberui-2045/styles.css';
 | Prop | Type | Required | Default | Description |
 |------|------|----------|---------|-------------|
 | \`variant\` | \`string\` | ❌ | \`'primary'\` | Badge color variant |
+| \`shadow\` | \`boolean\` | ❌ | \`true\` | Resting drop shadow (\`shadow-lg\`). Clickable badges still glow on hover when \`false\` |
+| \`shape\` | \`'pill' \\| 'rounded' \\| 'square'\` | ❌ | \`'pill'\` | Corner shape: fully rounded, slightly rounded, or sharp |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<'sm' \\| 'md' \\| 'lg'>\` | ❌ | \`'md'\` | Badge size (supports responsive values) |
 | \`leftIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the left side |
 | \`rightIcon\` | \`React.ReactNode\` | ❌ | - | Icon on the right side |
@@ -73,7 +83,9 @@ import 'cyberui-2045/styles.css';
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes |
 | \`onClick\` | \`() => void\` | ❌ | - | Click handler function |
 
-**Variant options:** \`'primary'\`, \`'secondary'\`, \`'accent'\`, \`'success'\`, \`'error'\`, \`'warning'\`
+**Variant options:** \`'primary'\`, \`'secondary'\`, \`'accent'\`, \`'success'\`, \`'error'\`, \`'warning'\`, \`'neutral'\`
+
+The six color variants are solid fills with dark text. \`neutral\` is transparent with a \`border-default\` outline and muted text, and is the same size as a filled badge. Use it for labels that carry no status.
 
 Additional HTML span attributes can be passed and will be applied to the badge element.
 `,
@@ -84,8 +96,17 @@ Additional HTML span attributes can be passed and will be applied to the badge e
   argTypes: {
     variant: {
       control: { type: 'select' },
-      options: ['primary', 'secondary', 'accent', 'success', 'error', 'warning'],
+      options: ['primary', 'secondary', 'accent', 'success', 'error', 'warning', 'neutral'],
       description: 'Badge color variant',
+    },
+    shadow: {
+      control: 'boolean',
+      description: 'Whether the badge has its resting drop shadow',
+    },
+    shape: {
+      control: { type: 'select' },
+      options: ['pill', 'rounded', 'square'],
+      description: 'Corner shape of the badge',
     },
     size: {
       control: { type: 'select' },
@@ -146,6 +167,97 @@ export const Warning: Story = {
     variant: 'warning',
     children: 'Warning',
   },
+};
+
+export const Neutral: Story = {
+  args: {
+    variant: 'neutral',
+    children: 'Unverified Signal',
+  },
+};
+
+export const Flat: Story = {
+  name: 'Without Shadow',
+  parameters: {
+    docs: {
+      description: {
+        story: '`shadow={false}` removes the resting drop shadow.',
+      },
+    },
+  },
+  args: {
+    variant: 'secondary',
+    shadow: false,
+    children: 'Uplink Included',
+  },
+};
+
+export const Shapes: Story = {
+  name: 'Shape Variants',
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Badge shape="pill" variant="accent">Pill Jack</Badge>
+      <Badge shape="rounded" variant="accent">Rounded Chip</Badge>
+      <Badge shape="square" variant="accent">Square Port</Badge>
+    </div>
+  ),
+};
+
+export const AllVariants: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story: 'Every variant in each shape, with and without the resting shadow.',
+      },
+    },
+  },
+  render: () => {
+    const variants = ['primary', 'secondary', 'accent', 'success', 'error', 'warning', 'neutral'] as const;
+    const shapes = ['pill', 'rounded', 'square'] as const;
+    return (
+      <div className="space-y-6">
+        {[true, false].map((shadow) => (
+          <div key={String(shadow)} className="space-y-3">
+            <h3 className="text-default font-semibold">{shadow ? 'Shadow on' : 'Shadow off'}</h3>
+            {shapes.map((shape) => (
+              <div key={shape} className="flex flex-wrap items-center gap-2">
+                {variants.map((variant) => (
+                  <Badge key={variant} variant={variant} shape={shape} shadow={shadow} size="sm">
+                    {variant.toUpperCase()}
+                  </Badge>
+                ))}
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    );
+  },
+};
+
+export const QuietLabels: Story = {
+  name: 'Quiet Labels Example',
+  parameters: {
+    docs: {
+      description: {
+        story: 'Flat, square badges beside outlined option tiles: a neutral label for an open choice and a filled cyan label for an included item.',
+      },
+    },
+  },
+  render: () => (
+    <div className="space-y-3">
+      <div className="flex items-center gap-3">
+        <span className="w-4 h-4 border border-border-default"></span>
+        <span className="text-default">Optic Implant Upgrade</span>
+        <Badge variant="neutral" shape="square" shadow={false} size="sm">Your decision</Badge>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="w-4 h-4 border border-secondary bg-secondary"></span>
+        <span className="text-default">Neural Firewall</span>
+        <Badge variant="secondary" shape="square" shadow={false} size="sm">Included</Badge>
+      </div>
+    </div>
+  ),
 };
 
 export const AllSizes: Story = {

@@ -78,4 +78,111 @@ describe('Badge', () => {
     render(<Badge size={{ base: 'sm', md: 'md', lg: 'lg' }}>Responsive</Badge>);
     expect(screen.getByText('Responsive')).toBeInTheDocument();
   });
+
+  // Pre-2.8 output, captured before `neutral`/`shadow`/`shape` were added.
+  // Defaults must keep rendering exactly this (minor-release compat policy).
+  it.each([
+    ['primary', 'hover:shadow-primary'],
+    ['secondary', 'hover:shadow-secondary'],
+    ['accent', 'hover:shadow-lg-accent'],
+    ['success', 'hover:shadow-success'],
+    ['error', 'hover:shadow-error'],
+    ['warning', 'hover:shadow-warning'],
+  ] as const)('renders the unchanged default class list for %s', (variant, hover) => {
+    const { unmount } = render(<Badge variant={variant}>Static</Badge>);
+    expect(getBadgeEl('Static').className).toBe(
+      `inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-${variant} text-inverse shadow-lg transition-shadow`
+    );
+    unmount();
+    render(<Badge variant={variant} clickable>Live</Badge>);
+    expect(getBadgeEl('Live').className).toBe(
+      `inline-flex items-center rounded-full font-semibold px-4 py-2 text-sm gap-2 bg-${variant} text-inverse shadow-lg ${hover} transition-shadow cursor-pointer`
+    );
+  });
+
+  it('renders the same classes as before when shadow and shape are passed their defaults explicitly', () => {
+    render(<Badge>Implicit</Badge>);
+    render(<Badge shadow shape="pill">Explicit</Badge>);
+    expect(getBadgeEl('Explicit').className).toBe(getBadgeEl('Implicit').className);
+  });
+
+  describe('neutral variant', () => {
+    it('renders transparent with a border-default outline and muted text', () => {
+      render(<Badge variant="neutral">Your decision</Badge>);
+      const el = getBadgeEl('Your decision');
+      expect(el).toHaveClass('bg-transparent', 'text-muted', 'ring-1', 'ring-inset', 'ring-border-default');
+      expect(el).not.toHaveClass('text-inverse');
+      expect(el.className).not.toMatch(/\bbg-(primary|secondary|accent|success|error|warning)\b/);
+    });
+
+    it('does not add a CSS border, so it matches filled badges in size', () => {
+      render(<Badge variant="neutral">Outline</Badge>);
+      const classes = getBadgeEl('Outline').className.split(/\s+/);
+      expect(classes.filter((c) => c === 'border' || /^border-\d/.test(c))).toEqual([]);
+    });
+
+    it('keeps the resting shadow by default and drops it with shadow={false}', () => {
+      render(<Badge variant="neutral">Shadowed</Badge>);
+      render(<Badge variant="neutral" shadow={false}>Flat</Badge>);
+      expect(getBadgeEl('Shadowed')).toHaveClass('shadow-lg');
+      expect(getBadgeEl('Flat')).not.toHaveClass('shadow-lg');
+    });
+
+    it('gets hover feedback and a pointer cursor when clickable', () => {
+      const handleClick = vi.fn();
+      render(<Badge variant="neutral" onClick={handleClick}>Recon</Badge>);
+      const el = getBadgeEl('Recon');
+      expect(el).toHaveClass('cursor-pointer', 'hover:ring-secondary', 'hover:text-secondary');
+      fireEvent.click(el);
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('shadow prop', () => {
+    it('applies shadow-lg by default', () => {
+      render(<Badge>Default</Badge>);
+      expect(getBadgeEl('Default')).toHaveClass('shadow-lg');
+    });
+
+    it('removes shadow-lg when shadow={false} and leaves the fill unchanged', () => {
+      render(<Badge variant="secondary" shadow={false}>Included</Badge>);
+      const el = getBadgeEl('Included');
+      expect(el).not.toHaveClass('shadow-lg');
+      expect(el).toHaveClass('bg-secondary', 'text-inverse');
+    });
+
+    it('keeps the hover glow on a clickable badge when shadow={false}', () => {
+      render(<Badge shadow={false} clickable>Hover</Badge>);
+      const el = getBadgeEl('Hover');
+      expect(el).not.toHaveClass('shadow-lg');
+      expect(el).toHaveClass('hover:shadow-primary', 'cursor-pointer');
+    });
+  });
+
+  describe('shape prop', () => {
+    it.each([
+      ['pill', 'rounded-full'],
+      ['rounded', 'rounded-md'],
+      ['square', 'rounded-none'],
+    ] as const)('shape="%s" applies %s', (shape, expected) => {
+      render(<Badge shape={shape}>Shape</Badge>);
+      const el = getBadgeEl('Shape');
+      expect(el).toHaveClass(expected);
+      for (const other of ['rounded-full', 'rounded-md', 'rounded-none'].filter((c) => c !== expected)) {
+        expect(el).not.toHaveClass(other);
+      }
+    });
+
+    it('defaults to pill', () => {
+      render(<Badge>Pill</Badge>);
+      expect(getBadgeEl('Pill')).toHaveClass('rounded-full');
+    });
+
+    it('lets className override the shape radius', () => {
+      render(<Badge shape="square" className="rounded-lg">Override</Badge>);
+      const el = getBadgeEl('Override');
+      expect(el).toHaveClass('rounded-lg');
+      expect(el).not.toHaveClass('rounded-none');
+    });
+  });
 });

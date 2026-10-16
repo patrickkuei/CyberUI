@@ -83,7 +83,7 @@ Every prop carries full JSDoc (types, \`@default\`, gotchas) — hover it in you
 
 Only cross-cutting facts that don't belong to any single component's own types are listed here:
 
-- \`Button\` variants: \`primary | secondary | danger | ghost\`. \`Badge\` variants: \`primary | secondary | accent | success | error | warning\`. Different sets — \`Button\` has no \`accent\`, \`Badge\` has no \`danger\`. Easy to mix up since both are status/action-ish components.
+- \`Button\` variants: \`primary | secondary | danger | ghost\`. \`Badge\` variants: \`primary | secondary | accent | success | error | warning | neutral\`. Different sets — \`Button\` has no \`accent\`, \`Badge\` has no \`danger\` or \`ghost\` (its transparent outlined style is \`neutral\`). Easy to mix up since both are status/action-ish components.
 - Full machine-readable prop reference for every component and hook: \`node_modules/cyberui-2045/dist/component-manifest.json\`. Grep it for a component name before writing code against it if you're not confident of its exact props.
 
 ### Hooks

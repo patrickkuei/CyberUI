@@ -1,4 +1,10 @@
 {
   "//": "Reviewed, intentional differences from compat/baseline.json that must not fail `npm run check:compat`. Friction on purpose: every entry needs an id (copy it from the failure output), a reason a reviewer can check, and the version that introduces it. Prefer deprecating and keeping the old API; only genuinely compatible-in-practice changes or deliberate (major) breaks belong here. Entries that stop matching anything are reported so they get removed (they become obsolete once the baseline is regenerated at release time).",
-  "allowed": []
+  "allowed": [
+    {
+      "id": "type-member-type:BadgeProps.variant",
+      "reason": "Issue #62: adds the 'neutral' member to Badge's variant union. Purely additive: every value accepted in 2.7 is still accepted and renders the same. Only code that treats BadgeProps['variant'] as an exhaustive set (e.g. a Record keyed by it) would need a new key.",
+      "since": "2.8.0"
+    }
+  ]
 }

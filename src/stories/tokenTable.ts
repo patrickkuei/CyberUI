@@ -89,14 +89,16 @@ export const TOKEN_ROWS: readonly TokenRow[] = [
     source: c('Badge'),
     reads: {
       primary: ['bg-primary', 'hover:shadow-primary'],
-      secondary: ['bg-secondary', 'hover:shadow-secondary'],
+      secondary: ['bg-secondary', 'hover:shadow-secondary', 'hover:ring-secondary', 'hover:text-secondary'],
       accent: ['bg-accent', 'hover:shadow-lg-accent'],
       success: ['bg-success', 'hover:shadow-success'],
       error: ['bg-error', 'hover:shadow-error'],
       warning: ['bg-warning', 'hover:shadow-warning'],
       inverse: ['text-inverse'],
+      muted: ['text-muted'],
+      'border-default': ['ring-border-default'],
     },
-    note: 'Each variant paints one token (fill, plus a glow on hover when clickable). Every variant takes its text colour from inverse.',
+    note: 'Each filled variant paints one token (fill, plus a glow on hover when clickable) and takes its text colour from inverse. The neutral variant has no fill: muted text inside a border-default ring, which turns secondary on hover when clickable.',
   },
   {
     component: 'Button',
