@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
 import TabNavigation from './TabNavigation';
 
@@ -74,6 +74,9 @@ describe('TabNavigation Component', () => {
     fireEvent.mouseDown(document.body);
     fireEvent.click(document.body);
     await waitFor(() => expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument());
+    // Focus restore runs in an effect after the collapse commits; flush it
+    // first, or this negative check passes before a wrong restore happens.
+    await act(async () => {});
     expect(anchor).not.toHaveFocus();
 
     fireEvent.mouseDown(anchor);
@@ -81,6 +84,7 @@ describe('TabNavigation Component', () => {
     fireEvent.mouseDown(screen.getByText('SIGNAL', { selector: 'button span' }));
     fireEvent.click(screen.getByText('SIGNAL', { selector: 'button span' }));
     await waitFor(() => expect(screen.getByRole('button', { expanded: false })).toBeInTheDocument());
+    await act(async () => {});
     expect(anchor).not.toHaveFocus();
   });
 
