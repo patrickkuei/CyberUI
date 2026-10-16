@@ -91,6 +91,12 @@ const MESSAGE_STATE_CLASSES: Record<FormFieldState, string> = {
  *   <textarea className="w-full rounded-lg bg-surface border-2 border-accent p-3" />
  * </FormField>
  *
+ * // No Tailwind in your app? Style the control with your own CSS class instead
+ * // (the utilities above only exist if your app compiles Tailwind):
+ * <FormField label="Transmission Log">
+ *   <textarea className="log-input" />
+ * </FormField>
+ *
  * @example
  * // Validation states
  * <FormField label="Access Code" error="Invalid — access denied">

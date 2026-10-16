@@ -551,6 +551,16 @@ describe('init: package version lookup', { timeout: CLI_TIMEOUT }, () => {
     expect(() => mod.getUsageContent()).toThrow(/version/);
     expect(mod.getUsageContent('1.2.3').startsWith('## CyberUI (cyberui-2045 v1.2.3)')).toBe(true);
   });
+
+  // Many apps use only the prebuilt styles.css, with no Tailwind (issue #97).
+  it('the guide tells apps without Tailwind to pass their own CSS class names', async () => {
+    const mod = (await import(
+      /* @vite-ignore */ pathToFileURL(join(REPO_BIN_DIR, 'usage-content.js')).href
+    )) as { getUsageContent: (version: string) => string };
+    const guide = mod.getUsageContent('1.2.3');
+    expect(guide).toContain('No Tailwind in your app? Pass your own CSS class names');
+    expect(guide).toContain('Tailwind utilities only work if your app compiles Tailwind');
+  });
 });
 
 describe('init: usage text', { timeout: CLI_TIMEOUT }, () => {

@@ -152,6 +152,13 @@ All components accept a \`className\` prop merged via \`tailwind-merge\` — you
 <Button className="w-full mt-4">Full width</Button>
 \`\`\`
 
+No Tailwind in your app? Pass your own CSS class names; \`className\` is added to the component's main element (usually its outer wrapper; the native control for Input/Select/Combobox, the panel for Modal/Drawer, the bubble for Tooltip). Tailwind utilities only work if your app compiles Tailwind — \`cyberui-2045/styles.css\` ships only the classes the library itself uses.
+
+\`\`\`tsx
+// plain CSS: .full-width { width: 100%; margin-top: 1rem; }
+<Button className="full-width">Full width</Button>
+\`\`\`
+
 ### cn() utility (re-exported)
 
 \`\`\`tsx

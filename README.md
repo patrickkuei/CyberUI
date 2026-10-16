@@ -183,6 +183,8 @@ All components accept a `className` prop, merged via [`tailwind-merge`](https://
 <Button className="mt-8 w-full">Full width with margin</Button>
 ```
 
+No Tailwind in your app? Pass your own CSS class names; `className` is added to the component's main element (usually its outer wrapper; the native control for `Input`/`Select`/`Combobox`). Tailwind utilities only work if your app compiles Tailwind.
+
 Use `className` for layout and spacing. Overriding color or variant classes is supported but visual coherence becomes your responsibility.
 
 ### cn() utility
