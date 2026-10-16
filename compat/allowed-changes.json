@@ -3,7 +3,7 @@
   "allowed": [
     {
       "id": "type-member-type:ModalProps.size",
-      "reason": "Issue #94: Modal `size` widened from \"sm\" | \"md\" | \"lg\" | \"xl\" | \"fullscreen\" to ResponsiveValue<ModalSize> (ModalSize adds \"2xl\"), the same ResponsiveValue pattern Button/Accordion/TabNavigation use. Every value that compiled before still compiles (compat/consumer.fixture.tsx passes `size=\"md\"`) and renders the identical class list (pinned in Modal.test.tsx). Only code that reads ModalProps['size'] back as a plain string union would need a narrowing check.",
+      "reason": "Issue #94: Modal `size` widened from \"sm\" | \"md\" | \"lg\" | \"xl\" | \"fullscreen\" to ResponsiveValue<ModalSize> (ModalSize adds \"2xl\"), the same ResponsiveValue pattern Button/Accordion/TabNavigation use. Every value that compiled before still compiles (compat/consumer.fixture.tsx passes `size=\"md\"`) and renders the identical class list (pinned in Modal.test.tsx). The real break: code that reads the type back, e.g. `Record<NonNullable<ModalProps['size']>, X>` or forwarding a `ModalProps['size']` value into the old string union, no longer compiles; the fix is the new `ModalSize` export (`Record<ModalSize, X>`).",
       "since": "2.8.0"
     }
   ]

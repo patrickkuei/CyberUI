@@ -138,7 +138,13 @@ export interface ModalProps extends ModalCallbacks {
   closeOnEscape?: boolean;
   /** CRT open/close animation timing and effects. */
   animation?: ModalAnimationConfig;
-  /** Additional CSS classes for the modal panel. */
+  /**
+   * Additional CSS classes for the modal panel.
+   * With a responsive `size`, a plain width override such as `max-w-3xl` only
+   * replaces the base max width; breakpoint classes such as `lg:max-w-6xl`
+   * still apply from that breakpoint up, so override them with the matching
+   * prefixed class (`lg:max-w-3xl`).
+   */
   className?: string;
   /** Additional CSS classes for the overlay backdrop. */
   overlayClassName?: string;

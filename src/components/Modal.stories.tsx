@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import React, { useState } from "react";
-import { expect } from "storybook/test";
+import { expect, userEvent, within } from "storybook/test";
 import Modal, { type ModalProps } from "./Modal";
 import Button from "./Button";
 
@@ -314,6 +314,11 @@ export const TwoXL: Story = {
       <TelemetryGrid />
     </ModalWrapper>
   ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole("button", { name: /open 2xl modal/i }));
+    const panel = await within(document.body).findByRole("dialog");
+    await expect(panel).toHaveClass("max-w-6xl");
+  },
 };
 
 export const ResponsiveSize: Story = {
@@ -334,6 +339,11 @@ export const ResponsiveSize: Story = {
       <TelemetryGrid />
     </ModalWrapper>
   ),
+  play: async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole("button", { name: /open responsive modal/i }));
+    const panel = await within(document.body).findByRole("dialog");
+    await expect(panel).toHaveClass("max-w-none", "w-full", "h-full", "lg:max-w-6xl", "lg:w-auto", "lg:h-auto");
+  },
 };
 
 export const ReducedMotionGlowFollowsScopedColor: Story = {
