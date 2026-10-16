@@ -177,11 +177,13 @@ Which components read which token (so you know what else changes when you re-the
 
 ### className prop
 
-All components accept a `className` prop, merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
+Most components accept a `className` prop (`TabNavigation` and `Notification` take more specific ones, such as `containerClassName`), merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
 
 ```tsx
 <Button className="mt-8 w-full">Full width with margin</Button>
 ```
+
+No Tailwind in your app? Pass your own CSS class names; `className` is added to the component's main element (usually its outer wrapper; the native control for `Input`/`Select`/`Combobox`, the panel for `Modal`/`Drawer`, the bubble for `Tooltip`; `LinearProgress` needs `fullWidth`, or `className` replaces its width). Tailwind utilities only work if your app compiles Tailwind — `cyberui-2045/styles.css` is a fixed, prebuilt stylesheet, so don't rely on any particular utility being in it.
 
 Use `className` for layout and spacing. Overriding color or variant classes is supported but visual coherence becomes your responsibility.
 
