@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Generates public/component-manifest.json from the library's TypeScript prop
 // types + JSDoc (via react-docgen-typescript), then regenerates the marked
-// component-table/list block inside each of the 5 doc files that would
-// otherwise be hand-synced: CLAUDE.md, AGENT.md, README.md, public/llms.txt,
-// bin/usage-content.js. Hand-written prose outside the markers is untouched.
+// component-table/list block inside each of the 6 files that would otherwise be
+// hand-synced: CLAUDE.md, AGENT.md, README.md, public/llms.txt,
+// bin/usage-content.js, and the package doc comment in src/index.ts (which
+// ships as the header of dist/index.d.ts). Hand-written prose outside the
+// markers is untouched.
 //
 // Run: npm run docs:generate
 
@@ -355,6 +357,22 @@ function renderLlmsTxtBlock(manifest) {
   ].join('\n');
 }
 
+// The component list in src/index.ts's package doc comment. It ships as the top
+// of dist/index.d.ts, so an AI assistant that reads only the types sees every
+// component from it (a stale hand-written list there once hid 12 of them).
+// Same categories as the CLAUDE.md inventory. Lines are joined with
+// JSDOC_LINE_BREAK because the block sits inside a `/** ... */` comment.
+function renderIndexHeader(manifest) {
+  const categoryLines = CATEGORY_ORDER.map((cat) => {
+    const names = manifest.components.filter((c) => c.category === cat).map((c) => c.name);
+    return `${cat}: ${names.join(', ')}`;
+  });
+  return [
+    `**All ${manifest.components.length} components** (import from \`'cyberui-2045'\`):`,
+    ...categoryLines,
+  ].join(JSDOC_LINE_BREAK);
+}
+
 function renderUsageContentTable(manifest) {
   const rows = manifest.components.map(
     (c) => `| ${c.name} | ${c.category} | \`dist/components/${c.name}.d.ts\` |`
@@ -364,6 +382,10 @@ function renderUsageContentTable(manifest) {
 
 // ─── Write ───────────────────────────────────────────────────────────────────
 
+// Line break inside a JSDoc block: keeps the ` * ` gutter on every line,
+// including the marker lines around a generated block.
+const JSDOC_LINE_BREAK = '\n * ';
+
 function updateDocFile(relPath, block) {
   const filePath = join(ROOT, relPath);
   const existing = readFileSync(filePath, 'utf8');
@@ -371,7 +393,8 @@ function updateDocFile(relPath, block) {
   // backtick would break out of the outer string, so escape any backticks
   // the block introduces (e.g. `dist/components/Button.d.ts`) before writing.
   const safeBlock = relPath.endsWith('.js') ? block.replace(/`/g, '\\`') : block;
-  const updated = replaceMarkedBlock(existing, MANIFEST_MARKER_START, MANIFEST_MARKER_END, safeBlock);
+  const eol = relPath.endsWith('.ts') ? JSDOC_LINE_BREAK : '\n';
+  const updated = replaceMarkedBlock(existing, MANIFEST_MARKER_START, MANIFEST_MARKER_END, safeBlock, eol);
   const changed = updated !== existing;
   if (changed) writeFileSync(filePath, updated, 'utf8');
   return changed;
@@ -392,6 +415,7 @@ function main() {
     ['README.md', renderReadmeBlock(manifest)],
     ['public/llms.txt', renderLlmsTxtBlock(manifest)],
     ['bin/usage-content.js', renderUsageContentTable(manifest)],
+    ['src/index.ts', renderIndexHeader(manifest)],
   ];
 
   const changed = targets.filter(([relPath, block]) => updateDocFile(relPath, block)).map(([relPath]) => relPath);
