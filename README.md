@@ -166,7 +166,7 @@ Override in your global CSS after importing `cyberui-2045/styles.css`:
   --color-surface: #2d2d44;        /* card / component surface */
   --color-border-default: #3c3c5e; /* borders    */
   --color-default: #e0e0e0;        /* primary text */
-  --color-muted: #8888aa;          /* secondary text */
+  --color-muted: #9797b5;          /* secondary text */
   --color-inverse: #1a1a2e;        /* inverted text */
 }
 ```
