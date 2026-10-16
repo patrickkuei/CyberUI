@@ -4,7 +4,7 @@
 // component-table/list block inside each of the 6 files that would otherwise be
 // hand-synced: CLAUDE.md, AGENT.md, README.md, public/llms.txt,
 // bin/usage-content.js, and the package doc comment in src/index.ts (which
-// ships as the header of dist/index.d.ts). Hand-written prose outside the
+// ships in dist/index.d.ts). Hand-written prose outside the
 // markers is untouched.
 //
 // Run: npm run docs:generate

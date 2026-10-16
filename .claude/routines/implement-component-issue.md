@@ -50,7 +50,7 @@ Do not start a second issue in the same run.
 11. **Commit.**
     Stage the new component files, stories, tests, index export, manifest-generated doc changes, and CHANGELOG — one commit (this is a single logical addition, not several concerns to split).
     ```
-    git add src/components/<ComponentName>.tsx src/components/<ComponentName>.stories.tsx src/components/<ComponentName>.test.tsx src/components/index.ts scripts/generate-manifest.js CLAUDE.md AGENT.md README.md public/llms.txt public/component-manifest.json bin/usage-content.js CHANGELOG.md
+    git add src/components/<ComponentName>.tsx src/components/<ComponentName>.stories.tsx src/components/<ComponentName>.test.tsx src/components/index.ts src/index.ts scripts/generate-manifest.js CLAUDE.md AGENT.md README.md public/llms.txt public/component-manifest.json bin/usage-content.js CHANGELOG.md
     git commit -m "feat: add <ComponentName> component"
     ```
 

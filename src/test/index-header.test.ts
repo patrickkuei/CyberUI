@@ -1,5 +1,5 @@
 // Guards the component list in src/index.ts's package doc comment, which ships
-// as the header of dist/index.d.ts. AI assistants that read only the types
+// in dist/index.d.ts. AI assistants that read only the types
 // treat that list as the full inventory, so a missing component there gets
 // rebuilt by hand instead of imported. The block is written by
 // `npm run docs:generate` (scripts/generate-manifest.js) from the manifest;
@@ -40,20 +40,18 @@ describe('src/index.ts package header', () => {
   });
 
   it('lists every manifest component under its category, in manifest order', () => {
-    const listed = Object.fromEntries(
-      headerBlockLines()
-        .slice(1)
-        .map((line) => {
-          const [category, names] = line.split(': ');
-          return [category, names.split(', ')];
-        }),
-    );
-    const expected = Object.fromEntries(
-      manifest.categoryOrder.map((category) => [
-        category,
-        manifest.components.filter((c) => c.category === category).map((c) => c.name),
-      ]),
-    );
+    // Ordered pairs, not an object, so a duplicated or malformed line fails
+    // the comparison instead of being merged away or throwing.
+    const listed = headerBlockLines()
+      .slice(1)
+      .map((line) => line.split(': '));
+    const expected = manifest.categoryOrder.map((category) => [
+      category,
+      manifest.components
+        .filter((c) => c.category === category)
+        .map((c) => c.name)
+        .join(', '),
+    ]);
     expect(listed).toEqual(expected);
   });
 
