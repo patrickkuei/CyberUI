@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from "@storybook/react-vite";
 import React, { useState } from "react";
 import { expect } from "storybook/test";
-import Modal from "./Modal";
+import Modal, { type ModalProps } from "./Modal";
 import Button from "./Button";
 
 const meta: Meta<typeof Modal> = {
@@ -17,7 +17,7 @@ const meta: Meta<typeof Modal> = {
 - **CRT Power-on Effect:** Authentic retro monitor boot sequence with flickering and horizontal line expansion
 - **Portal Rendering:** Uses React Portal for proper z-index layering
 - **Backdrop Controls:** Configurable overlay click and escape key handling
-- **Multiple Sizes:** From small dialogs to fullscreen modals
+- **Multiple Sizes:** From small dialogs (\`sm\`) through \`2xl\` (1152px) to \`fullscreen\`, as a static value or per breakpoint
 - **Accessibility:** Full ARIA support with focus management and screen reader compatibility. Escape restores focus to the trigger; overlay click does not.
 - **Cyberpunk Aesthetics:** Grid background, scanline effects, corner accents, and neon styling
 - **Reduced Motion:** Under \`prefers-reduced-motion: reduce\`, open and close are a 150ms opacity-only fade (no CRT scaling), \`animation.openDuration\`/\`closeDuration\` are capped at 150ms, and the idle glow holds still
@@ -83,6 +83,16 @@ function MyComponent() {
   </div>
 </Modal>
 
+// Full screen on phones, 1152px wide from the lg breakpoint (1024px) up
+<Modal
+  isOpen={isOpen}
+  onClose={() => setIsOpen(false)}
+  title="Grid Telemetry"
+  size={{ base: 'fullscreen', lg: '2xl' }}
+>
+  <TelemetryGrid />
+</Modal>
+
 // Minimal styling
 <Modal
   isOpen={isOpen}
@@ -102,7 +112,7 @@ function MyComponent() {
 | \`onClose\` | \`() => void\` | ✅ | - | Called when modal should close |
 | \`children\` | \`React.ReactNode\` | ✅ | - | Modal content |
 | \`title\` | \`string\` | ❌ | - | Optional modal title in header |
-| \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| 'xl' \\| 'fullscreen'\` | ❌ | \`'md'\` | Modal size |
+| \`size\` | \`ResponsiveValue<'sm' \\| 'md' \\| 'lg' \\| 'xl' \\| '2xl' \\| 'fullscreen'>\` | ❌ | \`'lg'\` | Max width: \`sm\` 448px, \`md\` 512px, \`lg\` 672px, \`xl\` 896px, \`2xl\` 1152px; \`fullscreen\` fills the overlay. Accepts a responsive object such as \`{ base: 'fullscreen', lg: '2xl' }\`; with no \`base\`, sizes below the first breakpoint use \`lg\` |
 | \`closeOnOverlayClick\` | \`boolean\` | ❌ | \`true\` | Allow closing by clicking overlay |
 | \`closeOnEscape\` | \`boolean\` | ❌ | \`true\` | Allow closing with Escape key |
 | \`showCloseButton\` | \`boolean\` | ❌ | \`true\` | Show close button in header |
@@ -138,7 +148,7 @@ interface ModalAnimationConfig {
     },
     size: {
       control: { type: "select" },
-      options: ["sm", "md", "lg", "xl", "fullscreen"],
+      options: ["sm", "md", "lg", "xl", "2xl", "fullscreen"],
       description: "Modal size",
     },
     closeOnOverlayClick: {
@@ -175,7 +185,12 @@ interface ModalAnimationConfig {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const ModalWrapper: React.FC<{ children: React.ReactNode; storyName: string }> = ({ children, storyName }) => {
+const ModalWrapper: React.FC<{
+  children: React.ReactNode;
+  storyName: string;
+  size?: ModalProps["size"];
+  title?: string;
+}> = ({ children, storyName, size, title = "System Alert" }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const handleClose = () => setIsOpen(false);
@@ -189,7 +204,8 @@ const ModalWrapper: React.FC<{ children: React.ReactNode; storyName: string }> =
       <Modal
         isOpen={isOpen}
         onClose={handleClose}
-        title="System Alert"
+        title={title}
+        size={size}
         onCancel={() => console.log("Cancelled")}
         onConfirm={() => console.log("Confirmed")}
         cancelText="Cancel"
@@ -250,6 +266,72 @@ export const Default: Story = {
           </p>
         </div>
       </div>
+    </ModalWrapper>
+  ),
+};
+
+const NODES = [
+  { id: "NX-01", sector: "Kowloon Stack", load: "97%", status: "OVERLOAD" },
+  { id: "NX-07", sector: "Neon Docks", load: "64%", status: "NOMINAL" },
+  { id: "NX-13", sector: "Chrome Spire", load: "88%", status: "THROTTLED" },
+  { id: "NX-21", sector: "Undercity Relay", load: "41%", status: "NOMINAL" },
+];
+
+const TelemetryGrid: React.FC = () => (
+  <div className="space-y-4">
+    <p className="text-accent text-sm font-mono">&gt; Streaming live load from the grid backbone...</p>
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {NODES.map((node) => (
+        <div key={node.id} className="bg-base/60 p-4 rounded border border-accent/30 space-y-1 font-mono text-sm">
+          <div className="text-primary font-semibold">{node.id}</div>
+          <div className="text-muted">{node.sector}</div>
+          <div className="flex justify-between">
+            <span className="text-muted">Load</span>
+            <span className="text-accent">{node.load}</span>
+          </div>
+          <div className={node.status === "NOMINAL" ? "text-success" : "text-error"}>{node.status}</div>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+export const TwoXL: Story = {
+  name: "2XL",
+  parameters: {
+    docs: {
+      description: {
+        story: "`size=\"2xl\"` caps the panel at 1152px, the step between `xl` (896px) and `fullscreen`.",
+      },
+      story: {
+        inline: false,
+        iframeHeight: 700,
+      },
+    },
+  },
+  render: () => (
+    <ModalWrapper storyName="2XL" size="2xl" title="Grid Telemetry">
+      <TelemetryGrid />
+    </ModalWrapper>
+  ),
+};
+
+export const ResponsiveSize: Story = {
+  parameters: {
+    docs: {
+      description: {
+        story:
+          "`size={{ base: 'fullscreen', lg: '2xl' }}` fills the screen on phones and tablets and becomes a 1152px panel from the `lg` breakpoint (1024px) up. Resize the viewport to switch between them.",
+      },
+      story: {
+        inline: false,
+        iframeHeight: 700,
+      },
+    },
+  },
+  render: () => (
+    <ModalWrapper storyName="Responsive" size={{ base: "fullscreen", lg: "2xl" }} title="Grid Telemetry">
+      <TelemetryGrid />
     </ModalWrapper>
   ),
 };

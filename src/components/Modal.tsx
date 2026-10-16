@@ -9,6 +9,15 @@ import { createPortal } from "react-dom";
 import Button from "./Button";
 import { cn } from "../utils/cn";
 import { useDialogBehavior } from "../hooks/useDialogBehavior";
+import type { ResponsiveValue } from "../utils/responsive";
+import { getResponsiveClasses, isResponsiveObject } from "../utils/responsive";
+
+/**
+ * Width step for `<Modal size>`.
+ * - `sm` 448px, `md` 512px, `lg` 672px, `xl` 896px, `2xl` 1152px (max widths)
+ * - `fullscreen`: fills the overlay (full width and height, still capped at 90vh)
+ */
+export type ModalSize = "sm" | "md" | "lg" | "xl" | "2xl" | "fullscreen";
 
 /**
  * Controls CRT animation timing and effects.
@@ -103,12 +112,19 @@ export interface ModalProps extends ModalCallbacks {
   /** Whether to render the Confirm button (requires `onConfirm`). @default true */
   showConfirm?: boolean;
   /**
-   * Width of the modal.
-   * - sm: 448px, md: 512px, lg: 672px, xl: 896px
+   * Width of the modal. A static value or a responsive object.
+   * - sm: 448px, md: 512px, lg: 672px, xl: 896px, 2xl: 1152px
+   * - fullscreen: fills the overlay
    * Use `lg` or `xl` for content-heavy modals (forms, tables, multi-step flows).
+   *
+   * A responsive object switches size per breakpoint, including to and from
+   * `fullscreen`: `{ base: 'fullscreen', lg: '2xl' }` is full screen on phones
+   * and 1152px wide from 1024px up. A breakpoint left out inherits the next
+   * smaller one; with no `base`, sizes below the first given breakpoint use
+   * `lg`.
    * @default 'lg'
    */
-  size?: "sm" | "md" | "lg" | "xl" | "fullscreen";
+  size?: ResponsiveValue<ModalSize>;
   /**
    * Visual variant of the modal.
    * - `default`: Standard RGB glow border.
@@ -136,13 +152,45 @@ const DEFAULT_ANIMATION: Required<ModalAnimationConfig> = {
   crtEffects: true,
 };
 
-const SIZE_CLASSES = {
+// Static `size`. These class lists are pinned by Modal.test.tsx: a plain
+// string must render exactly what it did before responsive sizes existed.
+const SIZE_CLASSES: Record<ModalSize, string> = {
   sm: "max-w-md",
   md: "max-w-lg",
   lg: "max-w-2xl",
   xl: "max-w-4xl",
+  "2xl": "max-w-6xl",
   fullscreen: "max-w-none w-full h-full",
 };
+
+// Responsive `size`. Every entry sets all three properties `fullscreen`
+// changes (max-width, width, height), so a larger breakpoint fully replaces a
+// smaller one's size: `{ base: 'fullscreen', lg: 'xl' }` must undo
+// fullscreen's `w-full h-full` at `lg`, not just change the max width.
+// `fullscreen` changes nothing else (corners and the 90vh cap are shared).
+const RESPONSIVE_SIZE_CLASSES: Record<ModalSize, string> = {
+  sm: "max-w-md w-auto h-auto",
+  md: "max-w-lg w-auto h-auto",
+  lg: "max-w-2xl w-auto h-auto",
+  xl: "max-w-4xl w-auto h-auto",
+  "2xl": "max-w-6xl w-auto h-auto",
+  fullscreen: "max-w-none w-full h-full",
+};
+
+// Tailwind only generates classes it finds as literal text in the source, and
+// getResponsiveClasses builds the prefixed ones (`lg:max-w-4xl`) at runtime.
+// This list puts every class it can produce from RESPONSIVE_SIZE_CLASSES into
+// the source; Modal.test.tsx fails if one is missing. Update both together.
+// sm:max-w-md sm:max-w-lg sm:max-w-2xl sm:max-w-4xl sm:max-w-6xl sm:max-w-none sm:w-auto sm:w-full sm:h-auto sm:h-full
+// md:max-w-md md:max-w-lg md:max-w-2xl md:max-w-4xl md:max-w-6xl md:max-w-none md:w-auto md:w-full md:h-auto md:h-full
+// lg:max-w-md lg:max-w-lg lg:max-w-2xl lg:max-w-4xl lg:max-w-6xl lg:max-w-none lg:w-auto lg:w-full lg:h-auto lg:h-full
+// xl:max-w-md xl:max-w-lg xl:max-w-2xl xl:max-w-4xl xl:max-w-6xl xl:max-w-none xl:w-auto xl:w-full xl:h-auto xl:h-full
+// 2xl:max-w-md 2xl:max-w-lg 2xl:max-w-2xl 2xl:max-w-4xl 2xl:max-w-6xl 2xl:max-w-none 2xl:w-auto 2xl:w-full 2xl:h-auto 2xl:h-full
+
+const getSizeClasses = (size: ResponsiveValue<ModalSize>): string =>
+  isResponsiveObject(size)
+    ? getResponsiveClasses({ ...size, base: size.base ?? "lg" }, RESPONSIVE_SIZE_CLASSES)
+    : SIZE_CLASSES[size];
 
 /**
  * A cinematic Cyberpunk modal with CRT boot-up effects, RGB glow, and immersive animations.
@@ -241,7 +289,7 @@ const Modal: React.FC<ModalProps> = memo(
 
       return cn(
         "relative bg-surface border-2 rounded-lg max-h-[90vh] overflow-hidden flex flex-col transform transition-all duration-300 motion-reduce:duration-150 motion-reduce:scale-100",
-        SIZE_CLASSES[size],
+        getSizeClasses(size),
         animationConfig.crtEffects && isOpening
           ? `animate-crt-power-on ${border} ${glow}`
           : animationConfig.crtEffects && isClosing
