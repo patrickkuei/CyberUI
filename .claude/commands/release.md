@@ -18,9 +18,9 @@ If anything fails, stop and report. Do not proceed until all checks pass.
 
 Run: `npm run docs:generate`
 
-This regenerates `public/component-manifest.json` and the component table/list block in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, and `bin/usage-content.js` from the current component types.
+This regenerates `public/component-manifest.json` and the component table/list block in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, `bin/usage-content.js`, and the component list in `src/index.ts`'s doc comment from the current component types.
 
-Run `git diff CLAUDE.md AGENT.md README.md public/llms.txt bin/usage-content.js public/component-manifest.json` and show the user. If anything changed beyond what's expected from work done since the last release (e.g. a new component that was never regenerated), stop and ask before proceeding.
+Run `git diff CLAUDE.md AGENT.md README.md public/llms.txt bin/usage-content.js src/index.ts public/component-manifest.json` and show the user. If anything changed beyond what's expected from work done since the last release (e.g. a new component that was never regenerated), stop and ask before proceeding.
 
 ---
 

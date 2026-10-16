@@ -33,14 +33,17 @@ import { warnOnce } from "./utils/devWarn";
  * ```
  * ⚠️ Do NOT import from subpaths like `cyberui-2045/components/Button` — root only.
  *
- * **All 21 components** (import from `'cyberui-2045'`):
- * Forms: Button, Input, Select, Toggle, Checkbox
- * Layout: Card, Modal, Divider
- * Feedback: Badge, Notification, Skeleton
- * Progress: CircularProgress, LinearProgress, SegmentedProgress
- * Navigation: TabNavigation, Carousel, Steps
+ * <!-- cyberui-2045:manifest:start -->
+ * **All 33 components** (import from `'cyberui-2045'`):
+ * Forms: Button, Input, Toggle, Select, Checkbox, FormField, RadioGroup, Slider, Combobox, DatePicker
+ * Layout: Card, Modal, Divider, Accordion, Drawer
+ * Feedback: Notification, Badge, Skeleton, Tooltip
+ * Progress: CircularProgress, SegmentedProgress, LinearProgress
+ * Navigation: TabNavigation, Carousel, Steps, DropdownMenu, Pagination
  * Typography: GradientText, SectionTitle
- * Display: Timeline | Media: Image
+ * Display: Timeline, Table
+ * Media: Image, Avatar
+ * <!-- cyberui-2045:manifest:end -->
  *
  * **Hooks & context** (import from `'cyberui-2045'`):
  * - `useCyberNotifications` → `showNotification(type, title, message, opts?)` — type: 'success'|'warning'|'error'
