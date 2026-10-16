@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import { describe, it, expect, vi } from 'vitest';
-import Badge from './Badge';
+import type React from 'react';
+import { describe, it, expect, vi, expectTypeOf } from 'vitest';
+import Badge, { type BadgeProps } from './Badge';
 
 // Badge renders: <span className="..."><span>{children}</span></span>
 // getByText finds the inner span — .parentElement reaches the outer badge span with all classes.
@@ -267,14 +268,11 @@ describe('Badge', () => {
       }).not.toThrow();
     });
 
-    // BadgeProps doesn't declare DOM attributes, but Badge forwards extra
-    // props at runtime; JSX spread is how such props reach it from TS.
     it("still calls a consumer's onKeyDown and onKeyUp, alongside activation", () => {
       const handleClick = vi.fn();
       const onKeyDown = vi.fn();
       const onKeyUp = vi.fn();
-      const extra = { onKeyDown, onKeyUp };
-      render(<Badge onClick={handleClick} {...extra}>Splice</Badge>);
+      render(<Badge onClick={handleClick} onKeyDown={onKeyDown} onKeyUp={onKeyUp}>Splice</Badge>);
       const el = screen.getByRole('button');
       fireEvent.keyDown(el, { key: 'Enter' });
       fireEvent.keyDown(el, { key: ' ' });
@@ -284,30 +282,124 @@ describe('Badge', () => {
       expect(handleClick).toHaveBeenCalledTimes(2);
     });
 
-    it("skips activation when the consumer's handler calls preventDefault", () => {
+    it("skips Enter activation when the consumer's onKeyDown calls preventDefault", () => {
       const handleClick = vi.fn();
-      const extra = { onKeyDown: (e: { preventDefault: () => void }) => e.preventDefault() };
-      render(<Badge onClick={handleClick} {...extra}>Firewall</Badge>);
+      render(<Badge onClick={handleClick} onKeyDown={(e) => e.preventDefault()}>Firewall</Badge>);
       fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
       expect(handleClick).not.toHaveBeenCalled();
     });
 
+    it("skips Space activation when the consumer's onKeyDown calls preventDefault", () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick} onKeyDown={(e) => e.preventDefault()}>Firewall</Badge>);
+      const el = screen.getByRole('button');
+      fireEvent.keyDown(el, { key: ' ' });
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('does not activate on a Space keyup without a Space keydown on the badge', () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick}>Ghost</Badge>);
+      fireEvent.keyUp(screen.getByRole('button'), { key: ' ' });
+      expect(handleClick).not.toHaveBeenCalled();
+    });
+
+    it('does not activate when focus leaves between Space keydown and keyup', () => {
+      const handleClick = vi.fn();
+      const onBlur = vi.fn();
+      render(<Badge onClick={handleClick} onBlur={onBlur}>Drift</Badge>);
+      const el = screen.getByRole('button');
+      el.focus();
+      fireEvent.keyDown(el, { key: ' ' });
+      el.blur();
+      el.focus();
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(handleClick).not.toHaveBeenCalled();
+      expect(onBlur).toHaveBeenCalledTimes(1);
+      // A fresh press still works after the reset.
+      fireEvent.keyDown(el, { key: ' ' });
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not activate on Enter with Ctrl, Alt or Meta held', () => {
+      const handleClick = vi.fn();
+      render(<Badge onClick={handleClick}>Chord</Badge>);
+      const el = screen.getByRole('button');
+      fireEvent.keyDown(el, { key: 'Enter', ctrlKey: true });
+      fireEvent.keyDown(el, { key: 'Enter', altKey: true });
+      fireEvent.keyDown(el, { key: 'Enter', metaKey: true });
+      expect(handleClick).not.toHaveBeenCalled();
+      fireEvent.keyDown(el, { key: 'Enter', shiftKey: true });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+    });
+
+    it('dispatches a real click that bubbles, firing onClick once per activation', () => {
+      const handleClick = vi.fn();
+      const parentClick = vi.fn();
+      render(
+        <div onClick={parentClick}>
+          <Badge onClick={handleClick}>Uplink</Badge>
+        </div>
+      );
+      const el = screen.getByRole('button');
+      fireEvent.keyDown(el, { key: 'Enter' });
+      expect(handleClick).toHaveBeenCalledTimes(1);
+      expect(parentClick).toHaveBeenCalledTimes(1);
+      fireEvent.keyDown(el, { key: ' ' });
+      fireEvent.keyUp(el, { key: ' ' });
+      expect(handleClick).toHaveBeenCalledTimes(2);
+      expect(parentClick).toHaveBeenCalledTimes(2);
+    });
+
+    it('bubbles keyboard activation from a clickable badge with no onClick', () => {
+      const parentClick = vi.fn();
+      render(
+        <div onClick={parentClick}>
+          <Badge clickable>Relay</Badge>
+        </div>
+      );
+      fireEvent.keyDown(screen.getByRole('button'), { key: 'Enter' });
+      expect(parentClick).toHaveBeenCalledTimes(1);
+    });
+
     it("passes a consumer's onKeyDown through unchanged on a non-clickable badge", () => {
       const onKeyDown = vi.fn();
-      const extra = { onKeyDown };
-      render(<Badge {...extra}>Static</Badge>);
+      render(<Badge onKeyDown={onKeyDown}>Static</Badge>);
       fireEvent.keyDown(getBadgeEl('Static'), { key: 'Enter' });
       expect(onKeyDown).toHaveBeenCalledTimes(1);
     });
 
     it('lets explicit role, tabIndex and aria-* props win', () => {
-      const extra = { role: 'link', tabIndex: -1, 'aria-label': 'Open dossier', 'aria-pressed': true };
-      render(<Badge onClick={() => {}} {...extra}>Dossier</Badge>);
+      render(
+        <Badge onClick={() => {}} role="link" tabIndex={-1} aria-label="Open dossier" aria-pressed>
+          Dossier
+        </Badge>
+      );
       const el = getBadgeEl('Dossier');
       expect(el).toHaveAttribute('role', 'link');
       expect(el).toHaveAttribute('tabindex', '-1');
       expect(el).toHaveAttribute('aria-label', 'Open dossier');
       expect(el).toHaveAttribute('aria-pressed', 'true');
+    });
+  });
+
+  // Type-level: these JSX forms must keep compiling (checked by
+  // `npm run type-check`); BadgeProps accepts <span> attributes.
+  describe('BadgeProps types', () => {
+    it('accepts span attributes and keeps onClick as () => void', () => {
+      const forms = (
+        <>
+          <Badge aria-label="Operator profile" clickable leftIcon={<span />}>{null}</Badge>
+          <Badge onKeyDown={(e) => e.key} onKeyUp={() => {}} onBlur={() => {}}>Keys</Badge>
+          <Badge role="link" tabIndex={-1} id="badge-id" data-testid="typed" title="Netrunner">Link</Badge>
+        </>
+      );
+      render(forms);
+      expect(screen.getByTestId('typed')).toHaveAttribute('id', 'badge-id');
+      expectTypeOf<BadgeProps['onClick']>().toEqualTypeOf<(() => void) | undefined>();
+      expectTypeOf<BadgeProps['children']>().toEqualTypeOf<React.ReactNode>();
     });
   });
 });

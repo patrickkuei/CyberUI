@@ -87,7 +87,7 @@ import 'cyberui-2045/styles.css';
 
 The six color variants are solid fills with dark text. \`neutral\` is transparent with a \`border-default\` outline and default-colored text, and is the same size as a filled badge. Use it for labels that carry no status.
 
-An interactive badge (\`clickable\` or \`onClick\`) stays a \`<span>\` and gets \`role="button"\`, \`tabIndex={0}\` and a focus-visible ring. Enter activates it on keydown and Space on keyup. A non-interactive badge has none of these.
+An interactive badge (\`clickable\` or \`onClick\`) stays a \`<span>\` and gets \`role="button"\`, \`tabIndex={0}\` and a focus-visible ring. Enter activates it on keydown and Space on keyup, after a Space keydown on the badge. Keyboard activation dispatches a click event, which bubbles to ancestor click handlers. A non-interactive badge has none of these.
 
 Additional HTML span attributes can be passed and will be applied to the badge element. An explicit \`role\`, \`tabIndex\` or \`aria-*\` attribute takes precedence, and an \`onKeyDown\` or \`onKeyUp\` handler runs before the built-in keyboard activation. Calling \`preventDefault()\` in it skips the activation.
 `,

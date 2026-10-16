@@ -47,7 +47,7 @@ const DOC_SUMMARIES = {
   LinearProgress: 'Smooth horizontal progress bar. By default a fixed width chosen by `size` (`className` replaces it); this default is deprecated, so set `fullWidth` to fill the container (from 3.0 it will). `animate={false}` drops the width transition for values driven every frame.',
   SegmentedProgress: 'Segmented progress: `variant="radial"` (circular arc gauge, default) or `variant="block"` (discrete filled blocks ▮▮▮▯▯).',
   TabNavigation: 'Animated tab bar.',
-  Badge: 'Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning` (filled), `neutral` (outline). `shape`: `pill`, `rounded` or `square`. `shadow={false}` for a flat badge.',
+  Badge: 'Status indicator. Variants: `primary`, `secondary`, `accent`, `success`, `error`, `warning` (filled), `neutral` (outline). `shape`: `pill`, `rounded` or `square`. `shadow={false}` for a flat badge. `clickable`/`onClick` makes it a focusable `role="button"` (Enter/Space activate). Accepts `<span>` attributes (`aria-label`, `role`, `tabIndex`, `onKeyDown`, ...).',
   Toggle: 'Cyberpunk switch.',
   Select: 'Styled dropdown.',
   Skeleton: 'Loading placeholder.',

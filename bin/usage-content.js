@@ -84,6 +84,7 @@ Every prop carries full JSDoc (types, \`@default\`, gotchas) — hover it in you
 Only cross-cutting facts that don't belong to any single component's own types are listed here:
 
 - \`Button\` variants: \`primary | secondary | danger | ghost\`. \`Badge\` variants: \`primary | secondary | accent | success | error | warning | neutral\`. Different sets — \`Button\` has no \`accent\`, \`Badge\` has no \`danger\` or \`ghost\` (its transparent outlined style is \`neutral\`). Easy to mix up since both are status/action-ish components.
+- \`Badge\` with \`clickable\` or \`onClick\` is an accessible button that stays a \`<span>\`: \`role="button"\`, \`tabIndex={0}\`, Enter/Space activate it by dispatching a real (bubbling) click. It accepts any \`<span>\` attribute, so give an icon-only clickable badge an \`aria-label\`; explicit \`role\`/\`tabIndex\`/\`aria-*\` win, and your \`onKeyDown\` runs first (\`preventDefault()\` skips activation).
 - Full machine-readable prop reference for every component and hook: \`node_modules/cyberui-2045/dist/component-manifest.json\`. Grep it for a component name before writing code against it if you're not confident of its exact props.
 
 ### Hooks
