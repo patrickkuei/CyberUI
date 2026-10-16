@@ -574,13 +574,13 @@ describe('init: usage text', { timeout: CLI_TIMEOUT }, () => {
   // An AI assistant runs `npx cyberui-2045 init` with no flags in a shell
   // without a TTY and checks only the exit code: it must not be 0 (issue #98).
   it('exits 2 in a non-interactive shell with no target flags, prints the usage to stderr and writes nothing', () => {
-    for (const args of [[], ['init'], ['init', '--inline'], ['--dry-run']]) {
+    for (const args of [[], ['init'], ['--inline'], ['init', '--inline'], ['--dry-run'], ['init', '--dry-run'], ['--inline', '--dry-run']]) {
       const { status, stdout, stderr } = sb.run(...args);
       expect(status).toBe(2);
       expect(stderr).toContain('Non-interactive environment detected. Run it with a target flag:');
       expect(stderr).toContain('Usage: npx cyberui-2045 init [targets]');
       expect(stderr).toContain('--gemini');
-      expect(stdout).not.toContain('Usage:');
+      expect(stdout).toBe('');
       expect(sb.snapshot()).toEqual({});
     }
   });

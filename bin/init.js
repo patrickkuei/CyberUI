@@ -128,7 +128,10 @@ async function main() {
   // has answered questions.
   const version = readPackageVersion();
 
-  console.log('\n  cyberui-2045 — AI assistant setup\n');
+  // Skipped on the non-interactive error path below, so stdout stays empty
+  // when the run fails.
+  const willFail = selectedKeys.length === 0 && !process.stdin.isTTY;
+  if (!willFail) console.log('\n  cyberui-2045 — AI assistant setup\n');
 
   let mode = inlineFlag ? 'inline' : 'own';
 
