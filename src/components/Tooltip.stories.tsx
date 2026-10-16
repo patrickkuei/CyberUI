@@ -69,8 +69,8 @@ const [open, setOpen] = React.useState(false);
 | \`glow\` | \`boolean\` | ❌ | \`true\` | Neon glow around the panel; \`false\` keeps the border and drops the glow |
 | \`size\` | \`'sm' \\| 'md' \\| 'lg' \\| ResponsiveValue<...>\` | ❌ | \`'md'\` | Panel text size / padding (supports responsive values) |
 | \`delay\` | \`number\` | ❌ | \`200\` | Delay in ms before showing on hover/focus (taps open immediately) |
-| \`disabled\` | \`boolean\` | ❌ | \`false\` | Disables hover/focus behavior entirely |
-| \`open\` | \`boolean\` | ❌ | - | Controlled visibility |
+| \`disabled\` | \`boolean\` | ❌ | \`false\` | Disables hover, focus, and tap behavior entirely |
+| \`open\` | \`boolean\` | ❌ | - | Controlled visibility (hover, focus, Escape, and taps report through \`onOpenChange\`) |
 | \`onOpenChange\` | \`(open: boolean) => void\` | ❌ | - | Fired on visibility change attempts (hover, focus, Escape, tap) |
 | \`className\` | \`string\` | ❌ | - | Additional CSS classes for the panel |
 
@@ -110,7 +110,7 @@ Most stories below force \`open\` for visual documentation. See **Interactive** 
     },
     disabled: {
       control: 'boolean',
-      description: 'Disables hover/focus behavior entirely',
+      description: 'Disables hover, focus, and tap behavior entirely',
     },
   },
   args: {

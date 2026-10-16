@@ -59,13 +59,13 @@ export interface TooltipProps {
    */
   delay?: number;
   /**
-   * Disables the tooltip — the trigger renders as-is with no hover/focus behavior.
+   * Disables the tooltip — the trigger renders as-is with no hover, focus, or tap behavior.
    * @default false
    */
   disabled?: boolean;
   /**
    * Controlled visibility. When set, the tooltip stops managing its own open
-   * state and `onOpenChange` becomes the only way to react to hover/focus/Escape.
+   * state and `onOpenChange` becomes the only way to react to hover/focus/Escape/tap.
    */
   open?: boolean;
   /** Fired whenever hover, focus, blur, Escape, or a touch tap would change visibility. */
@@ -147,8 +147,13 @@ const Tooltip: React.FC<TooltipProps> = ({
 
   const showTimeoutRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const wrapperRef = useRef<HTMLSpanElement>(null);
-  /** Timestamp of the last touch pointerdown/pointerup on the trigger. */
-  const lastTouchRef = useRef(0);
+  /**
+   * Timestamp of the last touch pointerdown/pointerup on the trigger, or null
+   * if there hasn't been one. Starting at null (not 0) matters: under a fake
+   * clock near 0 (`vi.useFakeTimers({ now: 0 })`), `Date.now() - 0` would sit
+   * inside the emulation window and swallow every hover/focus.
+   */
+  const lastTouchRef = useRef<number | null>(null);
   /** True while the tooltip is open because of a touch tap (enables outside-tap close). */
   const [openedByTouch, setOpenedByTouch] = useState(false);
 
@@ -170,7 +175,9 @@ const Tooltip: React.FC<TooltipProps> = ({
   );
 
   const isTouchEmulation = useCallback(
-    () => Date.now() - lastTouchRef.current < TOUCH_EMULATION_WINDOW_MS,
+    () =>
+      lastTouchRef.current !== null &&
+      Date.now() - lastTouchRef.current < TOUCH_EMULATION_WINDOW_MS,
     []
   );
 
@@ -208,6 +215,14 @@ const Tooltip: React.FC<TooltipProps> = ({
     [disabled, isOpen, handleHide, clearShowTimeout, setOpen]
   );
 
+  // Reset the touch flag whenever the tooltip isn't open, including when a
+  // controlled parent ignored the tap's onOpenChange(true) and opens it later
+  // for some other reason — otherwise that later open would get outside-tap
+  // dismissal it never asked for.
+  useEffect(() => {
+    if (!isOpen && openedByTouch) setOpenedByTouch(false);
+  }, [isOpen, openedByTouch]);
+
   // Outside-tap dismissal, only for a tooltip a tap opened. Hover/focus-opened
   // tooltips already close via mouseleave/blur.
   useEffect(() => {
@@ -215,8 +230,9 @@ const Tooltip: React.FC<TooltipProps> = ({
     const handleOutside = (e: PointerEvent) => {
       if (wrapperRef.current && !wrapperRef.current.contains(e.target as Node)) handleHide();
     };
-    document.addEventListener('pointerdown', handleOutside);
-    return () => document.removeEventListener('pointerdown', handleOutside);
+    // Capture phase, so another handler's stopPropagation can't keep it open.
+    document.addEventListener('pointerdown', handleOutside, { capture: true });
+    return () => document.removeEventListener('pointerdown', handleOutside, { capture: true });
   }, [isOpen, openedByTouch, handleHide]);
 
   const handleKeyDown = useCallback(

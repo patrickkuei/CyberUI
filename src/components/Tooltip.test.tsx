@@ -169,30 +169,61 @@ describe('Tooltip', () => {
     expect(screen.getByRole('tooltip')).toHaveClass('top-full');
   });
 
-  it('keeps the neon glow by default', () => {
-    render(
-      <Tooltip content="Info" open variant="secondary">
-        <button>Trigger</button>
-      </Tooltip>
-    );
-    const panel = screen.getByRole('tooltip');
-    expect(panel).toHaveClass('border-secondary');
-    expect(panel).toHaveClass('shadow-secondary');
-  });
+  // Pins the full default look (border + glow) for panel and arrow; the
+  // arrow is the panel's last decorative child.
+  const GLOW_BY_VARIANT = {
+    primary: 'shadow-primary',
+    secondary: 'shadow-secondary',
+    accent: 'shadow-lg-accent',
+  } as const;
 
-  it('drops the glow but keeps the variant border when glow={false}', () => {
+  it.each(['primary', 'secondary', 'accent'] as const)(
+    'draws the %s border and glow on panel and arrow by default',
+    (variant) => {
+      render(
+        <Tooltip content="Info" open variant={variant}>
+          <button>Trigger</button>
+        </Tooltip>
+      );
+      const panel = screen.getByRole('tooltip');
+      const arrow = panel.lastElementChild as HTMLElement;
+      for (const el of [panel, arrow]) {
+        expect(el).toHaveClass(`border-${variant}`);
+        expect(el).toHaveClass(GLOW_BY_VARIANT[variant]);
+      }
+    }
+  );
+
+  it.each(['primary', 'secondary', 'accent'] as const)(
+    'keeps only the %s border on panel and arrow when glow={false}',
+    (variant) => {
+      render(
+        <Tooltip content="Info" open variant={variant} glow={false}>
+          <button>Trigger</button>
+        </Tooltip>
+      );
+      const panel = screen.getByRole('tooltip');
+      const arrow = panel.lastElementChild as HTMLElement;
+      for (const el of [panel, arrow]) {
+        expect(el).toHaveClass(`border-${variant}`);
+        expect(el.className).not.toMatch(/\bshadow-/);
+      }
+    }
+  );
+
+  it('opens on hover under a fake clock starting at 0', () => {
+    vi.useRealTimers();
+    vi.useFakeTimers({ now: 0 });
     render(
-      <Tooltip content="Info" open variant="accent" glow={false}>
+      <Tooltip content="Info" delay={0}>
         <button>Trigger</button>
       </Tooltip>
     );
-    const panel = screen.getByRole('tooltip');
-    expect(panel).toHaveClass('border-accent');
-    expect(panel).not.toHaveClass('shadow-lg-accent');
-    // The arrow is the last decorative child of the panel.
-    const arrow = panel.lastElementChild as HTMLElement;
-    expect(arrow).toHaveClass('border-accent');
-    expect(arrow).not.toHaveClass('shadow-lg-accent');
+    fireEvent.mouseEnter(screen.getByText('Trigger').parentElement as HTMLElement);
+    act(() => {
+      vi.advanceTimersByTime(0);
+    });
+    expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
   it('keeps the 200ms default delay for hover', () => {
@@ -400,6 +431,92 @@ describe('Tooltip', () => {
       fireEvent.pointerDown(screen.getByText('Elsewhere'), { pointerType: 'mouse' });
       expect(screen.getByRole('tooltip')).toBeInTheDocument();
       expect(handleOpenChange).toHaveBeenCalledTimes(1);
+    });
+
+    it('removes its outside-tap listener when unmounted while tap-opened', () => {
+      const addSpy = vi.spyOn(document, 'addEventListener');
+      const removeSpy = vi.spyOn(document, 'removeEventListener');
+      const { unmount } = render(
+        <Tooltip content="Info">
+          <span>Label</span>
+        </Tooltip>
+      );
+      tap(screen.getByText('Label'));
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
+      const added = addSpy.mock.calls.filter(([type]) => type === 'pointerdown');
+      expect(added).toHaveLength(1);
+      unmount();
+      const removed = removeSpy.mock.calls.filter(([type]) => type === 'pointerdown');
+      expect(removed).toHaveLength(1);
+      expect(removed[0][1]).toBe(added[0][1]);
+      expect(removed[0][2]).toEqual(added[0][2]);
+      addSpy.mockRestore();
+      removeSpy.mockRestore();
+    });
+
+    it('closes on an outside tap even if another handler stops propagation', () => {
+      render(
+        <div>
+          <Tooltip content="Info">
+            <span>Label</span>
+          </Tooltip>
+          <p onPointerDown={(e) => e.stopPropagation()}>Elsewhere</p>
+        </div>
+      );
+      tap(screen.getByText('Label'));
+      fireEvent.pointerDown(screen.getByText('Elsewhere'), { pointerType: 'touch' });
+      expect(screen.queryByRole('tooltip')).toBeNull();
+    });
+
+    it('leaves only the second tooltip open after tapping A then B', () => {
+      render(
+        <div>
+          <Tooltip content="Alpha readout">
+            <span>A</span>
+          </Tooltip>
+          <Tooltip content="Beta readout">
+            <span>B</span>
+          </Tooltip>
+        </div>
+      );
+      tap(screen.getByText('A'));
+      expect(screen.getByRole('tooltip')).toHaveTextContent('Alpha readout');
+      tap(screen.getByText('B'));
+      const tooltips = screen.getAllByRole('tooltip');
+      expect(tooltips).toHaveLength(1);
+      expect(tooltips[0]).toHaveTextContent('Beta readout');
+    });
+
+    it('does not dismiss on outside pointerdown when a controlled parent ignored the tap and opened it later', () => {
+      const handleOpenChange = vi.fn();
+      const { rerender } = render(
+        <div>
+          <Tooltip content="Info" open={false} onOpenChange={handleOpenChange}>
+            <span>Label</span>
+          </Tooltip>
+          <p>Elsewhere</p>
+        </div>
+      );
+      const trigger = screen.getByText('Label');
+      fireEvent.pointerDown(trigger, { pointerType: 'touch' });
+      fireEvent.pointerUp(trigger, { pointerType: 'touch' });
+      expect(handleOpenChange).toHaveBeenLastCalledWith(true);
+      // The parent ignores the tap, then opens the tooltip itself later.
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      rerender(
+        <div>
+          <Tooltip content="Info" open={true} onOpenChange={handleOpenChange}>
+            <span>Label</span>
+          </Tooltip>
+          <p>Elsewhere</p>
+        </div>
+      );
+      handleOpenChange.mockClear();
+      fireEvent.pointerDown(screen.getByText('Elsewhere'), { pointerType: 'mouse' });
+      expect(handleOpenChange).not.toHaveBeenCalled();
+      expect(screen.getByRole('tooltip')).toBeInTheDocument();
     });
   });
 });
