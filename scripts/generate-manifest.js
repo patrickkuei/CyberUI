@@ -196,7 +196,10 @@ const PROP_OVERRIDES = {
   // (`events: TimelineItem[]`), then the 2.7.1 `TimelineProps`
   // (`events: TimelineEvent[]`). The type stays the `TimelineProps` one, which
   // is what `ComponentProps<typeof Timeline>` sees and what check:compat
-  // compares; the description names the wider form.
+  // compares; the description names the wider form. This override must stay
+  // even though it looks redundant: without it, react-docgen-typescript reads
+  // `TimelineBase` (the implementation, `React.FC<TimelineItemsProps>`) and
+  // records `events` as `TimelineItem[]`, which fails check:compat at release.
   Timeline: {
     events: {
       type: 'TimelineEvent[]',

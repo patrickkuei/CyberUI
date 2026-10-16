@@ -283,7 +283,10 @@ TimelineBase.displayName = "CyberUI.Timeline";
 // the original `TimelineProps` (`TimelineEvent[]`). The legacy one comes last on
 // purpose: type inference over an overloaded component (`React.ComponentProps<
 // typeof Timeline>`, `ComponentType<P>` parameters) reads the last signature, so
-// those keep seeing `TimelineProps` with `time: string`.
+// those keep seeing `TimelineProps` with `time: string`. One limitation, shared
+// with `Image`: a value annotated `typeof Timeline` must also accept
+// `TimelineItemsProps`, so a mock like `(p: TimelineProps) => …` typed as
+// `typeof Timeline` no longer type-checks; type it `React.FC<TimelineProps>`.
 const Timeline: ((props: TimelineItemsProps) => ReturnType<React.FC>) &
   React.FC<TimelineProps> = TimelineBase;
 
