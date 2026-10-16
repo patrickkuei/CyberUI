@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import type { ResponsiveValue } from '../utils/responsive';
 import { getResponsiveClasses, RESPONSIVE_SIZE_MAPS } from '../utils/responsive';
 import { cn } from '../utils/cn';
@@ -21,7 +21,12 @@ import { cn } from '../utils/cn';
  *   Profile
  * </Badge>
  */
-export interface BadgeProps {
+/**
+ * Extra `<span>` attributes (`aria-label`, `role`, `tabIndex`, `onKeyDown`,
+ * `data-*`, ...) are forwarded to the badge element. An icon-only interactive
+ * badge needs an `aria-label` to have an accessible name.
+ */
+export interface BadgeProps extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick' | 'children' | 'className'> {
   /**
    * Semantic style of the badge.
    * - `primary` / `secondary` / `accent` / `success` / `error` / `warning`:
@@ -46,9 +51,18 @@ export interface BadgeProps {
   leftIcon?: React.ReactNode;
   /** Icon to render on the right side of the label */
   rightIcon?: React.ReactNode;
-  /** Whether the badge should show hover effects and a pointer cursor */
+  /**
+   * Whether the badge is interactive: hover effects, a pointer cursor, and
+   * button semantics (`role="button"`, `tabIndex={0}`, Enter/Space
+   * activation, a `focus-visible` ring). Passing `onClick` alone does the same.
+   */
   clickable?: boolean;
-  /** Optional click handler */
+  /**
+   * Click handler. Also fired from the keyboard when the badge is
+   * interactive: Enter on keydown, Space on keyup (WAI-ARIA button pattern).
+   * Keyboard activation dispatches a real click event, so it also bubbles to
+   * ancestor click handlers, as a native button's would.
+   */
   onClick?: () => void;
   /**
    * Whether the badge carries its resting drop shadow (`shadow-lg`).
@@ -133,6 +147,61 @@ const Badge: React.FC<BadgeProps> = ({
     return hoverVariants[variant as keyof typeof hoverVariants];
   };
 
+  // Interactive badges only. Same focus classes Button uses, so they add no
+  // CSS. The ring sits outside the fill, so what makes it visible is its
+  // contrast against the page (>= 3:1, WCAG 1.4.11); cyan is swapped for
+  // yellow on the cyan `secondary` badge so the ring doesn't read as part of
+  // the fill. `neutral` is `ring-inset`, so its ring draws inside the outline.
+  const getFocusClasses = (variant: string): string =>
+    `focus:outline-none focus-visible:ring-2 ${variant === 'secondary' ? 'focus-visible:ring-accent/50' : 'focus-visible:ring-secondary/50'}`;
+
+  const interactive = clickable || !!onClick;
+
+  // Consumer key/blur handlers are composed with the keyboard activation
+  // below rather than replaced by it (or replacing it); `role`, `tabIndex`
+  // and `aria-*` in `rest` are spread last, so explicit props win.
+  const {
+    onKeyDown: consumerOnKeyDown,
+    onKeyUp: consumerOnKeyUp,
+    onBlur: consumerOnBlur,
+    ...rest
+  } = props;
+
+  // Set by a Space keydown on this badge, so a Space keyup only activates
+  // when the press started here (as on a native <button>), not after a Space
+  // pressed elsewhere or before focus moved away and back.
+  const spaceArmed = useRef(false);
+
+  // WAI-ARIA button pattern: Enter activates on keydown; Space activates on
+  // keyup, and its keydown is prevented so the page doesn't scroll. A consumer
+  // handler that calls preventDefault() opts out of the activation.
+  // Activation dispatches a real click (`currentTarget.click()`), so `onClick`
+  // fires once and the click bubbles to ancestors like a native button's.
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>) => {
+    consumerOnKeyDown?.(event);
+    if (event.defaultPrevented) return;
+    if (event.key === 'Enter' && !event.ctrlKey && !event.altKey && !event.metaKey) {
+      event.preventDefault();
+      event.currentTarget.click();
+    } else if (event.key === ' ') {
+      event.preventDefault();
+      spaceArmed.current = true;
+    }
+  };
+
+  const handleKeyUp = (event: React.KeyboardEvent<HTMLSpanElement>) => {
+    consumerOnKeyUp?.(event);
+    if (event.key !== ' ' || !spaceArmed.current) return;
+    spaceArmed.current = false;
+    if (event.defaultPrevented) return;
+    event.currentTarget.click();
+  };
+
+  const handleBlur = (event: React.FocusEvent<HTMLSpanElement>) => {
+    spaceArmed.current = false;
+    consumerOnBlur?.(event);
+  };
+
   const shapeClasses = {
     pill: 'rounded-full',
     rounded: 'rounded-md',
@@ -141,11 +210,18 @@ const Badge: React.FC<BadgeProps> = ({
 
   // Class order is kept identical to pre-2.8 output for the defaults
   // (pill + shadow); Badge.test.tsx pins the exact default class string.
+  // A non-interactive badge gets no role/tabIndex/key handlers at all, so its
+  // DOM is unchanged from before keyboard support was added (also pinned).
   return (
     <span
-      className={cn('inline-flex items-center', shapeClasses[shape], 'font-semibold', getSizeClasses(size), getVariantClasses(variant), shadow && 'shadow-lg', getHoverClasses(variant, clickable || !!onClick), className)}
+      className={cn('inline-flex items-center', shapeClasses[shape], 'font-semibold', getSizeClasses(size), getVariantClasses(variant), shadow && 'shadow-lg', getHoverClasses(variant, interactive), interactive && getFocusClasses(variant), className)}
       onClick={onClick}
-      {...props}
+      role={interactive ? 'button' : undefined}
+      tabIndex={interactive ? 0 : undefined}
+      onKeyDown={interactive ? handleKeyDown : consumerOnKeyDown}
+      onKeyUp={interactive ? handleKeyUp : consumerOnKeyUp}
+      onBlur={interactive ? handleBlur : consumerOnBlur}
+      {...rest}
     >
       {leftIcon}
       <span>{children}</span>
