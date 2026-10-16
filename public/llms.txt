@@ -22,7 +22,7 @@ Templates are for STARTING a new app. For an existing app, read the template sou
 
 Fork one into a new folder:
 ```bash
-npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
+npx --yes tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
 ```
 - **Repository**: [cyberui-templates](https://github.com/patrickkuei/cyberui-templates) - Source and the current list of templates.
 - **Site**: [Live demos](https://patrickkuei.github.io/cyberui-templates/)

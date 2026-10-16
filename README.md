@@ -55,10 +55,10 @@ npx cyberui-2045 create monitoring my-app   # copy one into ./my-app (dir defaul
 cd my-app && npm install && npm run dev
 ```
 
-`create` runs `npx tiged` for you, so it needs network access. It refuses a directory that already has files in it, and `--dry-run` prints the command without running it. The same thing by hand:
+`create` runs `npx --yes tiged` for you, so it needs network access. It refuses a directory that already has files in it, and `--dry-run` prints the command without running it. The same thing by hand:
 
 ```bash
-npx tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
+npx --yes tiged patrickkuei/cyberui-templates/packages/<template-name> my-app
 ```
 
 In an existing app, read a template's source for patterns instead of copying it in.

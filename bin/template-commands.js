@@ -1,8 +1,10 @@
 // `npx cyberui-2045 templates` and `npx cyberui-2045 create <template> [dir]`.
 //
-// `create` forks a template by running `npx tiged <repo>/packages/<template>
+// `create` forks a template by running `npx --yes tiged <repo>/packages/<template>
 // <dir>` as a child process (tiged is not a dependency of this package, and
-// must stay that way).
+// must stay that way). `--yes` because otherwise npx asks "Ok to proceed?"
+// before its first download of tiged, and an AI assistant running `create`
+// in a non-interactive shell can't answer, so it stalls there.
 //
 // Shell safety: on Windows, Node >= 20.12 refuses to spawn `npx.cmd` without
 // `shell: true`, which makes the shell parse the command line. So both values
@@ -92,7 +94,7 @@ export function runTemplates(argv, io = {}) {
 export function createUsage() {
   return `  Usage: npx cyberui-2045 create <template> [dir] [--dry-run]
 
-  Copies a template into a new directory (using \`npx tiged\`) so you can start
+  Copies a template into a new directory (using \`npx --yes tiged\`) so you can start
   an app from it. Needs network access and \`npx\`.
 
   Templates:
@@ -181,7 +183,7 @@ export function runCreate(argv, io = {}) {
   }
 
   const command = 'npx';
-  const commandArgs = ['tiged', `${TEMPLATES_REPO_SLUG}/packages/${template}`, dir];
+  const commandArgs = ['--yes', 'tiged', `${TEMPLATES_REPO_SLUG}/packages/${template}`, dir];
   const printable = [command, ...commandArgs].join(' ');
 
   if (dryRun) {
