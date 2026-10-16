@@ -132,7 +132,7 @@ npx cyberui-2045 init --all --inline      # paste the guide in everywhere instea
 npx cyberui-2045 init --all --dry-run     # show every file it would write; write nothing
 ```
 
-With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
+With no flags, `init` asks which tools to set up, then "own file (recommended) or inline?". In a non-interactive shell (CI, or an AI assistant running it for you) there is no one to ask, so pass a target flag: without one, `init` writes nothing, prints the usage and exits with code 2. Where the guide is pasted in, it sits between `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->` markers. Updating the guide changes only what is between them. Adding a new block trims trailing blank lines and spaces at the end of your file and puts one blank line before the block. For Claude Code, `CLAUDE.md` gets only this:
 
 ```md
 <!-- cyberui-2045:start -->
@@ -177,11 +177,13 @@ Which components read which token (so you know what else changes when you re-the
 
 ### className prop
 
-All components accept a `className` prop, merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
+Most components accept a `className` prop (`TabNavigation` and `Notification` take more specific ones, such as `containerClassName`), merged via [`tailwind-merge`](https://github.com/dcastil/tailwind-merge) — your classes win on conflict:
 
 ```tsx
 <Button className="mt-8 w-full">Full width with margin</Button>
 ```
+
+No Tailwind in your app? Pass your own CSS class names; `className` is added to the component's main element (usually its outer wrapper; the native control for `Input`/`Select`/`Combobox`, the panel for `Modal`/`Drawer`, the bubble for `Tooltip`; `LinearProgress` needs `fullWidth`, or `className` replaces its width). Tailwind utilities only work if your app compiles Tailwind — `cyberui-2045/styles.css` is a fixed, prebuilt stylesheet, so don't rely on any particular utility being in it.
 
 Use `className` for layout and spacing. Overriding color or variant classes is supported but visual coherence becomes your responsibility.
 

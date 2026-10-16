@@ -84,7 +84,7 @@ Every prop carries full JSDoc (types, \`@default\`, gotchas) — hover it in you
 Only cross-cutting facts that don't belong to any single component's own types are listed here:
 
 - \`Button\` variants: \`primary | secondary | danger | ghost\`. \`Badge\` variants: \`primary | secondary | accent | success | error | warning\`. Different sets — \`Button\` has no \`accent\`, \`Badge\` has no \`danger\`. Easy to mix up since both are status/action-ish components.
-- Full machine-readable prop reference for all 21 components + hooks: \`node_modules/cyberui-2045/dist/component-manifest.json\`. Grep it for a component name before writing code against it if you're not confident of its exact props.
+- Full machine-readable prop reference for every component and hook: \`node_modules/cyberui-2045/dist/component-manifest.json\`. Grep it for a component name before writing code against it if you're not confident of its exact props.
 
 ### Hooks
 
@@ -146,10 +146,17 @@ Override in your global CSS (after importing cyberui-2045/styles.css):
 
 ### className overrides
 
-All components accept a \`className\` prop merged via \`tailwind-merge\` — your classes win on conflict.
+Most components accept a \`className\` prop (TabNavigation and Notification take more specific ones, such as \`containerClassName\`) merged via \`tailwind-merge\` — your classes win on conflict.
 
 \`\`\`tsx
 <Button className="w-full mt-4">Full width</Button>
+\`\`\`
+
+No Tailwind in your app? Pass your own CSS class names; \`className\` is added to the component's main element (usually its outer wrapper; the native control for Input/Select/Combobox, the panel for Modal/Drawer, the bubble for Tooltip; LinearProgress needs \`fullWidth\`, or \`className\` replaces its width). Tailwind utilities only work if your app compiles Tailwind — \`cyberui-2045/styles.css\` is a fixed, prebuilt stylesheet, so don't rely on any particular utility being in it.
+
+\`\`\`tsx
+// plain CSS: .full-width { width: 100%; margin-top: 1rem; }
+<Button className="full-width">Full width</Button>
 \`\`\`
 
 ### cn() utility (re-exported)

@@ -62,7 +62,7 @@ The guide is about 150 lines. Each tool gets it in the way that tool actually su
 | `--copilot` | guide in `.github/instructions/cyberui.instructions.md`, with `applyTo: "**/*.ts,**/*.tsx,**/*.js,**/*.jsx,**/*.css"` frontmatter | guide pasted into `.github/copilot-instructions.md` inside the markers |
 | `--agents` | guide pasted into `AGENTS.md` inside the markers (no alternative exists) | same |
 
-`--all` does all five. `--dry-run` prints every file a run would write, with its content, and writes nothing. `--help` lists the flags. With no flags, `init` asks which tools to set up, then asks once "own file (recommended) or inline?" if any of them has an own-file mode.
+`--all` does all five. `--dry-run` prints every file a run would write, with its content, and writes nothing. `init --help` lists the flags (`npx cyberui-2045 --help` lists the commands). With no flags, `init` asks which tools to set up, then asks once "own file (recommended) or inline?" if any of them has an own-file mode; in a non-interactive shell it writes nothing and exits 2.
 
 The markers are `<!-- cyberui-2045:start -->` and `<!-- cyberui-2045:end -->`. The own files hold nothing but the guide (and, for Cursor and Copilot, the frontmatter above it), so `init` rewrites them whole. Every generated guide starts with a `## CyberUI (cyberui-2045 vX.Y.Z)` heading, right under the frontmatter where there is one.
 

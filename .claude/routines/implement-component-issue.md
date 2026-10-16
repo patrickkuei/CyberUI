@@ -39,7 +39,7 @@ Do not start a second issue in the same run.
 7. **Tests** (`*.test.tsx`): render, interaction (click/keyboard), a11y attributes present, controlled/uncontrolled state if applicable.
 
 8. **Wire up the manifest generator.**
-   In `scripts/generate-manifest.js`, add the component to `CATEGORY_MAP` and write a one-line entry in `DOC_SUMMARIES`. Run `npm run docs:generate` — this regenerates the component tables in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, `bin/usage-content.js`, and `public/component-manifest.json`. Review the diff.
+   In `scripts/generate-manifest.js`, add the component to `CATEGORY_MAP` and write a one-line entry in `DOC_SUMMARIES`. Run `npm run docs:generate` — this regenerates the component tables in `CLAUDE.md`, `AGENT.md`, `README.md`, `public/llms.txt`, `bin/usage-content.js`, the component list in `src/index.ts`'s package doc comment, and `public/component-manifest.json`. Review the diff.
 
 9. **Validate.**
    `npm run lint && npm run type-check && npm test -- --project=unit`. Fix anything red before continuing.
@@ -50,7 +50,7 @@ Do not start a second issue in the same run.
 11. **Commit.**
     Stage the new component files, stories, tests, index export, manifest-generated doc changes, and CHANGELOG — one commit (this is a single logical addition, not several concerns to split).
     ```
-    git add src/components/<ComponentName>.tsx src/components/<ComponentName>.stories.tsx src/components/<ComponentName>.test.tsx src/components/index.ts scripts/generate-manifest.js CLAUDE.md AGENT.md README.md public/llms.txt public/component-manifest.json bin/usage-content.js CHANGELOG.md
+    git add src/components/<ComponentName>.tsx src/components/<ComponentName>.stories.tsx src/components/<ComponentName>.test.tsx src/components/index.ts src/index.ts scripts/generate-manifest.js CLAUDE.md AGENT.md README.md public/llms.txt public/component-manifest.json bin/usage-content.js CHANGELOG.md
     git commit -m "feat: add <ComponentName> component"
     ```
 
