@@ -59,7 +59,7 @@ const DOC_SUMMARIES = {
   SectionTitle: 'Title with decorative gradient line.',
   Steps: 'Multi-step progress indicator.',
   Timeline: 'Vertical event history display.',
-  Tooltip: 'Neon-bordered popover on hover/focus. Placements: `top`, `bottom`, `left`, `right`.',
+  Tooltip: 'Neon-bordered popover on hover/focus/tap (touch: tap toggles, outside tap closes). Placements: `top`, `bottom`, `left`, `right`. `glow={false}` for a quieter panel next to dense content.',
   FormField: 'Label/helper/error/success wrapper for any form control.',
   Accordion: 'Collapsible section list. `mode`: `single` (default) or `multiple` open panels.',
   Avatar: 'Circular profile image with glitch-style initials fallback and an `online`/`offline`/`away` status dot.',
