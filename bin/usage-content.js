@@ -146,13 +146,13 @@ Override in your global CSS (after importing cyberui-2045/styles.css):
 
 ### className overrides
 
-All components accept a \`className\` prop merged via \`tailwind-merge\` — your classes win on conflict.
+Most components accept a \`className\` prop (TabNavigation and Notification take more specific ones, such as \`containerClassName\`) merged via \`tailwind-merge\` — your classes win on conflict.
 
 \`\`\`tsx
 <Button className="w-full mt-4">Full width</Button>
 \`\`\`
 
-No Tailwind in your app? Pass your own CSS class names; \`className\` is added to the component's main element (usually its outer wrapper; the native control for Input/Select/Combobox, the panel for Modal/Drawer, the bubble for Tooltip). Tailwind utilities only work if your app compiles Tailwind — \`cyberui-2045/styles.css\` ships only the classes the library itself uses.
+No Tailwind in your app? Pass your own CSS class names; \`className\` is added to the component's main element (usually its outer wrapper; the native control for Input/Select/Combobox, the panel for Modal/Drawer, the bubble for Tooltip; LinearProgress needs \`fullWidth\`, or \`className\` replaces its width). Tailwind utilities only work if your app compiles Tailwind — \`cyberui-2045/styles.css\` is a fixed, prebuilt stylesheet, so don't rely on any particular utility being in it.
 
 \`\`\`tsx
 // plain CSS: .full-width { width: 100%; margin-top: 1rem; }
